@@ -8,7 +8,7 @@ from kernel_study.search import search
 
 # Serialize against the engineering pilot on the same physical GPU.
 import time
-pilot_file=ROOT/'results/local_pilot_v2/pilot_results.json'
+pilot_file=ROOT/'results/local_pilot_v3/pilot_results.json'
 while not pilot_file.exists() or len(read_json(pilot_file)) < 24 or not (ROOT/'tmp/gpu_ready_for_llm').exists():
     print('Waiting for engineering pilot to release the GPU...',flush=True)
     time.sleep(10)
