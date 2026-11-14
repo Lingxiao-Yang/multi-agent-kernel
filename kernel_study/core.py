@@ -109,6 +109,26 @@ def validate_config(config):
     return config
 
 
+def launch_contract(family):
+    """Common API semantics, not optimization recommendations or knowledge cards."""
+    common = ['num_warps', 'num_stages']
+    if family == 'matmul':
+        active = common + ['block_m', 'block_n', 'block_k', 'tensor_core']
+        entry = {'tensor_core=false':'matmul_simt', 'tensor_core=true':'matmul_tensor'}
+        semantics = 'shape is [M,N,K], inputs A[M,K], B[K,N], output Y[M,N]. BM/BN/BK are tile parameters; BK is used only by matmul_tensor.'
+    elif family in ['softmax','layernorm']:
+        active = common + ['block','fused']
+        entry = {'fused=false':[family+'_stats',family+'_apply'], 'fused=true':family+'_fused'}
+        semantics = 'shape is [rows,columns]. Row reductions use next_power_of_2(columns). block controls the apply launch only when fused=false.'
+    else:
+        active = common + ['block','fused']
+        entry = {'fused=false':['bias_add','relu'], 'fused=true':'bias_relu'}
+        semantics = 'shape is [rows,columns]; bias has [columns]. block is the number of flat output elements per program.'
+    return {'active_config_fields':active,'ignored_config_fields':sorted(set(baseline_config(family))-set(active)),
+            'entry_points':entry,'semantics':semantics,
+            'note':'Ignore unrelated family functions in the shared device module. Changing an ignored field does not change this operation.'}
+
+
 def environment():
     import sys
     result = {"python": sys.version, "platform": platform.platform()}

@@ -7,7 +7,7 @@ import sys
 import time
 from pathlib import Path
 
-from .core import (ROOT, Budget, baseline_config, digest, environment, event, read_json,
+from .core import (ROOT, Budget, baseline_config, digest, environment, event, launch_contract, read_json,
                    utcnow, validate_config, write_json)
 from .knowledge import select_cards
 from .source_policy import check_source
@@ -112,6 +112,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],'config':incumbent['config'],
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history, 'knowledge_cards':cards, 'hardware':manifest['environment'],
+                   'launch_contract':launch_contract(case['family']),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
         try:

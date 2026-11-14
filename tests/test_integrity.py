@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 import numpy as np
 import pytest
-from kernel_study.core import ROOT, Budget, baseline_config, cases, validate_config
+from kernel_study.core import ROOT, Budget, baseline_config, cases, launch_contract, validate_config
 from kernel_study.source_policy import check_source
 from kernel_study.knowledge import select_cards
 from kernel_study.analysis import geometric_mean, paired_effects
@@ -100,3 +100,11 @@ def test_scripted_control_has_zero_real_model_tokens():
     assert reply.input_tokens==reply.output_tokens==0
     assert reply.metadata['synthetic']
     assert json.loads(reply.text)['config']['fused']
+
+
+def test_softmax_contract_exposes_ignored_tensor_knobs():
+    contract=launch_contract('softmax')
+    assert 'tensor_core' in contract['ignored_config_fields']
+    assert 'block_m' in contract['ignored_config_fields']
+    assert 'fused' in contract['active_config_fields']
+    assert 'tensor_core' in launch_contract('matmul')['active_config_fields']

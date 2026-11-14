@@ -39,8 +39,9 @@ def paired_effects(rows, resamples=5000, seed=42):
     names = ['roles_without_knowledge','knowledge_single','roles_with_knowledge','interaction_ratio']
     return {'complete_pairs':len(complete),'case_clusters':len(matrix),'bootstrap_seed':seed,
             'resamples':resamples,'effects':{name:{'ratio':float(np.exp(matrix[:,i].mean())),
-            'ci95':[float(x) for x in np.exp(np.quantile(boots[:,i],[.025,.975]))]} for i,name in enumerate(names)},
-            'note':'Case-cluster bootstrap over paired log ratios; small-suite inference only.'}
+            'ci95':([float(x) for x in np.exp(np.quantile(boots[:,i],[.025,.975]))] if len(matrix)>1 else None)} for i,name in enumerate(names)},
+            'note':('Case-cluster bootstrap over paired log ratios; small-suite inference only.' if len(matrix)>1
+                    else 'Only one case cluster: confidence intervals are not estimable.')}
 
 
 def checkpoint_curve(summary, axis, checkpoints):
