@@ -60,6 +60,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     log = output / 'events.jsonl'
     start = time.perf_counter()
     starting_cost = getattr(provider, 'spent', 0.)
+    starting_completed_cost = getattr(provider, 'completed_cost', 0.)
     source_text = (ROOT / 'kernel_study/kernels.py').read_text(encoding='utf-8')
     # Candidate source stores only the device module; trusted wrapper is never editable.
     base_source = output / 'baseline.py'
@@ -169,10 +170,14 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         if checked['status'] == 'ok':
             final = {'candidate_id':item['id'], 'result':checked, 'config':item['config']}
             break
-    summary = {'status':'complete' if final else 'final_failed', 'manifest':manifest,
+    final_stop = stop or budget.stop_reason()
+    completed_search = final_stop in ['candidate_cap','call_cap','token_safety_cap']
+    summary = {'status':('complete' if completed_search else 'interrupted') if final else 'final_failed', 'manifest':manifest,
                'stop_reason':stop or budget.stop_reason(), 'budget':budget.snapshot(), 'profile_invocations':profile_count,
                'final':final,'history':history,'wall_seconds':time.perf_counter()-start,'resolved_model':resolved_model,
-               'scientific_evidence':provider.name == 'llm', 'estimated_inference_usd':getattr(provider,'spent',0)-starting_cost}
+               'scientific_evidence':provider.name == 'llm' and completed_search and resolved_model is not None,
+               'estimated_inference_usd':getattr(provider,'completed_cost',0)-starting_completed_cost,
+               'budget_committed_usd':getattr(provider,'spent',0)-starting_cost}
     if final:
         summary['speedup'] = final['result']['paired_speedup']
         # Initial incumbent retained => measured fluctuations don't imply a selected regression.

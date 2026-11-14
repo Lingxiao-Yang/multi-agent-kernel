@@ -5,6 +5,8 @@ import json
 import os
 import time
 import urllib.request
+import urllib.error
+import re
 from dataclasses import dataclass
 
 
@@ -31,6 +33,7 @@ class ChatProvider:
         self.key = os.environ.get(api_key_env, '')
         self.input_price, self.output_price, self.dollar_cap = input_price, output_price, dollar_cap
         self.spent = 0.
+        self.completed_cost = 0.
         if dollar_cap is not None and (input_price is None or output_price is None):
             raise ValueError('A dollar cap requires explicit input/output token prices')
 
@@ -57,14 +60,27 @@ class ChatProvider:
         # Reserve on send; an ambiguous network failure may still incur charges.
         if reserved_cost is not None:
             self.spent += reserved_cost
-        with urllib.request.urlopen(request, timeout=180) as response:
-            data = json.load(response)
+        try:
+            with urllib.request.urlopen(request, timeout=180) as response:
+                data = json.load(response)
+        except urllib.error.HTTPError as exc:
+            body=exc.read().decode('utf-8',errors='replace')
+            try:
+                detail=json.loads(body).get('error',{})
+            except json.JSONDecodeError:
+                detail={}
+            # Definite request rejection is not an ambiguous successful inference.
+            if exc.code in [400,401,403,404,429] and reserved_cost is not None:
+                self.spent -= reserved_cost
+            message=re.sub(r'sk-[A-Za-z0-9_-]+','[REDACTED]',str(detail.get('message','')))
+            raise RuntimeError(f'HTTP {exc.code}: {detail.get("code", "unknown")} {message[:500]}') from None
         usage = data.get('usage')
         if not usage or 'prompt_tokens' not in usage or 'completion_tokens' not in usage:
             raise RuntimeError('missing_usage: stop rather than invent token totals')
         actual_cost = None
         if self.input_price is not None and self.output_price is not None:
             actual_cost = (usage['prompt_tokens']*self.input_price + usage['completion_tokens']*self.output_price)/1e6
+            self.completed_cost += actual_cost
             if reserved_cost is not None:
                 self.spent += actual_cost - reserved_cost
             else:
