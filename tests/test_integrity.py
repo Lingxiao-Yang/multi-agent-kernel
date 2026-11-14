@@ -83,6 +83,7 @@ def test_known_factorial_interaction_and_no_improvement_runs():
             for v,speedup in [('single',1),('multi',2),('single_knowledge',3),('multi_knowledge',12)]]
     r = paired_effects(rows,resamples=100)
     assert r['complete_pairs']==9
+    assert r['bootstrap_seed']==42
     assert r['effects']['interaction_ratio']['ratio']==pytest.approx(2)
     assert geometric_mean([1,4])==pytest.approx(2)
     with pytest.raises(ValueError):

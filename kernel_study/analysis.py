@@ -25,7 +25,7 @@ def paired_effects(rows, resamples=5000, seed=42):
     if not complete:
         return {'complete_pairs':0,'effects':{},'note':'Four-arm matched observations required.'}
     per_case = {}
-    for (case, seed), v in complete.items():
+    for (case, run_seed), v in complete.items():
         logs = {k:np.log(x) for k,x in v.items()}
         effects = [logs['multi']-logs['single'],
                    logs['single_knowledge']-logs['single'],
@@ -60,10 +60,17 @@ def checkpoint_curve(summary, axis, checkpoints):
 def analyze(input_dir, output_dir, allow_controls=False):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True,exist_ok=True)
-    rows, summaries = [], []
+    rows, summaries, excluded = [], [], []
     for path in sorted(Path(input_dir).rglob('summary.json')):
         s = read_json(path)
         if s.get('status') != 'complete':
+            excluded.append({'path':str(path),'reason':s.get('status')})
+            continue
+        if s.get('stop_reason') == 'token_safety_cap':
+            excluded.append({'path':str(path),'reason':'token_limited_report_separately','speedup':s.get('speedup')})
+            continue
+        if s.get('stop_reason') not in ['candidate_cap','call_cap']:
+            excluded.append({'path':str(path),'reason':'interrupted_search','detail':s.get('stop_reason')})
             continue
         if not s.get('scientific_evidence') and not allow_controls:
             continue
@@ -93,7 +100,8 @@ def analyze(input_dir, output_dir, allow_controls=False):
         w = csv.DictWriter(f,fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     report = {'n_runs':len(rows), 'evidence_type':'engineering-control' if allow_controls else 'LLM-study',
               'variant_geomeans':{v:geometric_mean([r['speedup'] for r in rows if r['variant']==v]) for v in VARIANTS if any(r['variant']==v for r in rows)},
-              'paired':paired_effects(rows), 'excluded_incomplete_runs':len(list(Path(input_dir).rglob('summary.json')))-len(rows)}
+              'paired':paired_effects(rows), 'excluded_runs':excluded,
+              'excluded_incomplete_runs':len(list(Path(input_dir).rglob('summary.json')))-len(rows)}
     write_json(output_dir/'aggregate.json',report)
     import matplotlib
     matplotlib.use('Agg')

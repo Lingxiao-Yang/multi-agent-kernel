@@ -93,7 +93,8 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         system = ROLES[stage] if variant.startswith('multi') else GENERAL
         if stage == drop_role:
             # Same call slot reassigned to implementer/general reasoning.
-            system = ROLES['implement'] if variant.startswith('multi') else GENERAL
+            replacement = 'advise' if stage == 'implement' else 'implement'
+            system = ROLES[replacement] if variant.startswith('multi') else GENERAL
         prompt = system + '\n' + CONTRACT
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)

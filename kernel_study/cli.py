@@ -28,7 +28,7 @@ def main():
     run.add_argument('--dollar-cap',type=float)
     run.add_argument('--input-price',type=float)
     run.add_argument('--output-price',type=float)
-    run.add_argument('--drop-role',choices=['analyze','advise','review'])
+    run.add_argument('--drop-role',choices=['analyze','advise','implement','review'])
     run.add_argument('--drop-category')
     report = sub.add_parser('analyze')
     report.add_argument('--input',required=True)
