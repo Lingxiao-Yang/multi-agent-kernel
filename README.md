@@ -4,10 +4,10 @@ Implementation of **proposal_final.pdf**. The older `.tex` file is not the
 protocol. This is an experiment repository: engineering controls and local
 GPU measurements are kept separate from the planned A100 LLM study.
 
-Branch policy: **`code`** contains implementation/configurations/tests;
-**`results`** contains raw experiment logs, measurements, plots and reports.
-Results carry source hashes and manifests. The initial bootstrap remains in
-`main`; subsequent work uses the two dedicated branches.
+Branch policy: **`main`** contains implementation/configurations/tests only;
+**`results`** contains raw experiment logs, measurements, plots, reports and
+standalone plotting scripts. Results carry source hashes and manifests so they
+can be traced back to the code on `main`.
 
 ## What is implemented
 

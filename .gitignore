@@ -8,3 +8,9 @@ __pycache__/
 tmp/
 *.ncu-rep
 
+
+# Experiment outputs live on the `results` branch
+results/
+reports/
+logs/
+proposal.tex
