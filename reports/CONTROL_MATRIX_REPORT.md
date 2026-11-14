@@ -1,19 +1,42 @@
-# Four-arm GPU infrastructure control
+# Four-Variant GPU Infrastructure Control
 
-All four controller variants completed two candidate attempts and eight
-scripted role calls on `softmax_irregular`, seed 11. Candidate proposals were
-identical deterministic configurations, with **zero LLM tokens**. Actual
-GPU kernels were validated, timed, considered for retention, profiled and
-checked again on fresh inputs by the full controller pipeline.
+**Purpose.** This control checks that all four controller paths run correctly
+end to end on a real GPU. It is not evidence about roles or knowledge.
 
-Measured final speedups were 1.806x (single), 1.967x (single + knowledge),
-1.805x (multi), and 1.819x (multi + knowledge). These differences arise from
-measurement/search noise despite identical proposal policy. They are not
-role or knowledge effects. The control supports operational correctness of
-the four paths and illustrates the need for paired repeated A100 runs.
+**Setup.**
 
-There is one case and one seed in this infrastructure control; no meaningful
-case-cluster confidence interval can be estimated. Raw sources, prompts,
-results, latency samples, final checks and budget ledgers are retained in
-`results/gpu_control_matrix`. The analysis is clearly labeled engineering
-control and is excluded from real-model study summaries by default.
+- Case: `softmax_irregular`, seed 11.
+- Every variant made two candidate attempts and eight role calls, served by a
+  scripted provider.
+- All variants proposed identical deterministic configurations, so **no LLM
+  tokens** were used.
+- Real GPU kernels went through the full pipeline: validation, timing,
+  retention, profiling and a final check on fresh inputs.
+
+## Results
+
+| Variant | Final speedup |
+| --- | ---: |
+| `single` | 1.806× |
+| `single_knowledge` | 1.967× |
+| `multi` | 1.805× |
+| `multi_knowledge` | 1.819× |
+
+Every variant proposed exactly the same thing. The spread in final speedup
+therefore comes from measurement and search noise, **not** from roles or
+knowledge. This shows that the four paths work, and it shows why the A100
+study needs paired, repeated runs.
+
+## Scope
+
+With one case and one seed, no meaningful case-cluster confidence interval
+can be computed. `results/gpu_control_matrix` holds the complete record:
+
+- source, prompts and results;
+- latency samples and final checks;
+- budget ledgers.
+
+The analysis output is labeled as an engineering control. By default it is
+left out of real-model summaries.
+
+Plot: [`gpu_control_matrix/search_curves.png`](gpu_control_matrix/search_curves.png).

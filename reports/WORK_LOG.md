@@ -1,60 +1,77 @@
-# Execution log checkpoint — November 14, 2026
+# Experiment Log (checkpoint: 2026-11-14)
 
-The initial implementation/access log is in `docs/WORK_LOG.md`. Subsequent
-experimental records live on the **results** branch; implementation commits
-live on **code**, as requested by the user.
+The implementation log is in `docs/WORK_LOG.md` on `main`. This file records
+the experiments. Code lives on `main`; results live on this branch.
 
-## Verified local work
+## Completed locally
 
-- Implemented all four controller variants, 12 benchmark cases, hardware cards,
-  Triton baselines and transformations, correctness/timing/profile harness,
-  cost/budget accounting, source policy, fallback and analysis pipeline.
-- 26 integrity tests pass, including quota/cost handling, unknown output
-  rejection, final fallback, interaction arithmetic and API field semantics.
-- First engineering pilot: 24 GPU evaluations, 23 correct. Retained the failed
-  layer-normalization edge case and fixed the mean arithmetic without changing
-  tolerances.
-- Fixed-snapshot engineering rerun: all 24 evaluations correct.
-- Four-arm deterministic GPU control: 4 searches, 8 candidate attempts,
-  32 scripted calls and zero LLM tokens. All searches completed.
-- Real-model smoke: 4 searches, 4 candidate attempts, 16 paid model calls,
-  71,841 total tokens, estimated $0.0341196. All candidates correct; two
-  retained improvements. This is development evidence on one laptop case.
-- A 39-token diagnostic completion cost approximately $0.0000216.
-- Discovered and fixed missing common launch-API semantics before the A100
-  campaign. This keeps hardware guidance as the independently ablated part.
+**Implementation.**
+
+- All four controller variants and 12 benchmark cases.
+- Hardware knowledge cards, Triton baselines and transformations.
+- The correctness, timing and profiling harness.
+- Cost and budget accounting, the source policy, fallback and the analysis
+  pipeline.
+
+**Tests.** 26 integrity tests pass. They cover:
+
+- quota and cost handling;
+- rejection of unknown outputs;
+- final fallback and interaction arithmetic;
+- the meaning of API fields.
+
+**Experiments.**
+
+| Run | Scale | Outcome |
+| --- | --- | --- |
+| Engineering pilot (v2) | 24 GPU evaluations | 23 correct. The failed layer-norm edge case was kept, and the mean arithmetic was fixed without changing tolerances. |
+| Engineering rerun (v3) | 24 GPU evaluations, fixed snapshot | All correct ([report](GPU_PILOT_REPORT.md)). |
+| Four-variant scripted control | 4 searches, 8 candidate attempts, 32 scripted calls, zero LLM tokens | All searches completed ([report](CONTROL_MATRIX_REPORT.md)). |
+| Real-model smoke test | 4 searches, 4 candidate attempts, 16 model calls, 71,841 tokens, about $0.0341 | All candidates correct; two improvements retained. Development evidence on one laptop case ([report](LLM_SMOKE_REPORT.md)). |
+| Diagnostic completion | 39 tokens | Cost about $0.0000216. |
+
+**Prompt fix.** A gap in the shared launch-API description was found and
+fixed before the A100 campaign. This keeps hardware guidance as the only
+independently ablated knowledge.
 
 ## Lonestar6
 
-- Logged in using the user's account and MFA; verified allocation ASC26098.
-- Source checkout: `$SCRATCH/kernel-study`, tracking code.
-- Engineering job 3582290 submitted 16:16:25, started 16:34:38 America/Chicago.
-  Its initial 18:27 scheduler estimate was conservative. Environment setup
-  is taking longer than expected while extracting/installing CUDA packages
-  into the shared scratch environment. The job has not yet produced a
-  completed A100 benchmark cohort at this checkpoint.
-- A request to extend the running job's time limit was denied by Slurm;
-  the original 30-minute limit remains. No bypass was attempted.
-- Separate checkout `$SCRATCH/kernel-study-llm` avoids changing the running
-  engineering job's code. Model job 3582326 is dependency-gated on job
-  3582290 and additionally requires 24/24 successful engineering evaluations.
-- Model campaign: 2 cases x 4 variants x 3 seeds, 2 candidate attempts and
-  8 model calls per run; shared $4.49 cap. It is a pilot, not the full primary
-  study. Together with the local $0.50 cap and diagnostic, this stays below
-  the approved $5 inference allowance.
+- **Allocation.** Access to `ASC26098` was verified. The code is checked out
+  at `$SCRATCH/kernel-study`, tracking `main`.
+- **Engineering job 3582290.**
+  - Submitted at 16:16:25 and started at 16:34:38 America/Chicago.
+  - Setting up the environment was slow, because CUDA packages had to be
+    extracted into the shared scratch environment.
+  - At this checkpoint the job had not yet produced a complete A100 cohort.
+  - Slurm denied a request to extend its 30-minute limit, so the original
+    limit stands.
+- **Model job 3582326.**
+  - It runs from a separate checkout (`$SCRATCH/kernel-study-llm`), so the
+    running engineering job's code is not changed.
+  - It waits for job 3582290 to finish, and it runs only if all 24
+    engineering evaluations pass.
+- **Model pilot campaign.**
+  - 2 cases × 4 variants × 3 seeds.
+  - 2 candidate attempts and 8 model calls per run.
+  - A shared $4.49 cap. Together with the local $0.50 cap and the diagnostic
+    call, total spend stays under the $5 inference budget.
+  - This is a pilot, not the primary study.
 
-## Runpod
+## Backup compute
 
-- Followed https://agents.runpod.io/ and installed official plugin 2.1.0.
-- Verified 17 skill directories, MCP URL, enabled status and successful OAuth.
-- New plugin tools require restarting Codex to appear in this session.
-- Queried the public GPU catalog: low Secure A100 PCIe 80 GB/SXM 80 GB stock;
-  Community stock unconfirmed. See RUNPOD_OPTIONS.md and its JSON snapshot.
-- No Runpod GPU or storage resource was created.
+We assessed Runpod as a fallback A100 provider: public pricing and a snapshot
+of the catalog's capacity. No resources were created. See
+[`COMPUTE_OPTIONS.md`](COMPUTE_OPTIONS.md).
 
-## Remaining research work
+## Remaining work
 
-A100 pilot validation, repeated real-model A100 runs, protocol freeze,
-larger primary searches, role/category ablations, final cost/uncertainty and
-mechanism analysis, final report and presentation. Completion is reported
-by evidence; the full 144-search proposal has not been completed.
+1. Validate the A100 pilot.
+2. Run repeated real-model A100 runs.
+3. Freeze the protocol.
+4. Run the primary 144-search study.
+5. Run role and knowledge-category ablations.
+6. Complete the final cost, uncertainty and mechanism analysis.
+7. Write the final report and presentation.
+
+Progress is reported only from evidence. The full study has not been
+completed.
