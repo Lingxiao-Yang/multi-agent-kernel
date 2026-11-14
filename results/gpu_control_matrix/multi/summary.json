@@ -1,0 +1,604 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-14T22:43:18.366062+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "scripted-control",
+    "model": "none",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": null,
+      "endpoint": null,
+      "input_usd_per_million": null,
+      "output_usd_per_million": null
+    },
+    "protocol_hash": "59b5ae4cb914605986388b110163d01a7c4dbfd50daa37eec03ca1876794fcf5",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "b0b2e110e14b2c8b8ce486b38c7ca9852de24c40d2dd912d67540d4ecc1eff29",
+      "kernel_study/bench.py": "69d4d2d7e783cd701d1c0cfa621308e53e189911011fba74ba2c136a56220cc8",
+      "kernel_study/cli.py": "d914b762d3d5cd308141fb07f409ffbcd2115e7cbccc3db77006f27b75214419",
+      "kernel_study/core.py": "d7a927f96798a43a6d5a9b4fb149caebd2c9b3033075febe37c32ce3a84a2f59",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "0278b438af0178841442554bfdeb65ac50b31d1ee26ee93ac985616fa6317cdb",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "tokens": 0
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.7598718760000054,
+      "validation_seconds": 3.3099364589999993,
+      "candidate": {
+        "median_ms": 0.01525759994983673,
+        "p25_ms": 0.013363199681043623,
+        "p75_ms": 0.01669120043516159,
+        "min_ms": 0.00727040022611618,
+        "samples_ms": [
+          0.016383999586105348,
+          0.01669120043516159,
+          0.015564799308776855,
+          0.01372160017490387,
+          0.01525759994983673,
+          0.017715199291706084,
+          0.06214720010757446,
+          0.013414399325847625,
+          0.013209599256515502,
+          0.013312000036239623,
+          0.013312000036239623,
+          0.0130048006772995,
+          0.01454080045223236,
+          0.016684800386428833,
+          0.013414399325847625,
+          0.09175040125846863,
+          0.017715199291706084,
+          0.01669120043516159,
+          0.012697599828243256,
+          0.00727040022611618,
+          0.016575999557971954,
+          0.01812479943037033,
+          0.015052799880504609,
+          0.013107199966907502,
+          0.012889599800109864,
+          0.014745600521564484,
+          0.01372160017490387,
+          0.015353600680828094,
+          0.015452800691127777,
+          0.02222079932689667,
+          0.07536640167236328
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.02754560112953186,
+        "p25_ms": 0.026465600728988646,
+        "p75_ms": 0.03394560068845749,
+        "min_ms": 0.02222079932689667,
+        "samples_ms": [
+          0.03593280017375946,
+          0.032358399033546446,
+          0.048127999901771544,
+          0.03163839876651764,
+          0.048844799399375916,
+          0.03655360043048859,
+          0.02222079932689667,
+          0.027033600211143493,
+          0.026111999154090883,
+          0.03287039995193482,
+          0.025887998938560485,
+          0.026009601354599,
+          0.02447360008955002,
+          0.03184640109539032,
+          0.026726400852203368,
+          0.0989184021949768,
+          0.027340799570083618,
+          0.02754560112953186,
+          0.025088000297546386,
+          0.035020801424980166,
+          0.02754560112953186,
+          0.026931199431419372,
+          0.03275839984416962,
+          0.02682879865169525,
+          0.026204800605773924,
+          0.02908160090446472,
+          0.045465600490570066,
+          0.02754560112953186,
+          0.02590720057487488,
+          0.026726400852203368,
+          0.07710719704627991
+        ]
+      },
+      "paired_speedup": 1.8053692074831613,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.015360000729560851,
+          "p25_ms": 0.01372160017490387,
+          "p75_ms": 0.019507200270891187,
+          "min_ms": 0.006963200122117996,
+          "samples_ms": [
+            0.01494400054216385,
+            0.013516800105571746,
+            0.014950400590896607,
+            0.01372160017490387,
+            0.040345600247383116,
+            0.02539519965648651,
+            0.019251200556755065,
+            0.013312000036239623,
+            0.01372160017490387,
+            0.015769599378108977,
+            0.013619199395179749,
+            0.028364801406860353,
+            0.015360000729560851,
+            0.013209599256515502,
+            0.012902399897575379,
+            0.02046079933643341,
+            0.014028799533843995,
+            0.006963200122117996,
+            0.009216000139713288,
+            0.028467199206352232,
+            0.019763199985027312,
+            0.01812479943037033,
+            0.014640000462532044,
+            0.015564799308776855,
+            0.015769599378108977,
+            0.013808000087738036,
+            0.024089600145816802,
+            0.015360000729560851,
+            0.016281600296497344,
+            0.014336000382900237,
+            0.031641599535942075
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.028569599986076354,
+          "p25_ms": 0.026624000072479247,
+          "p75_ms": 0.03199999928474426,
+          "min_ms": 0.02467840015888214,
+          "samples_ms": [
+            0.026624000072479247,
+            0.026624000072479247,
+            0.031539198756217954,
+            0.027136000990867614,
+            0.03112959861755371,
+            0.028454399108886717,
+            0.03031040132045746,
+            0.02620159983634949,
+            0.05263360142707825,
+            0.030003198981285097,
+            0.02528960108757019,
+            0.025600001215934753,
+            0.026521599292755126,
+            0.026009601354599,
+            0.02467840015888214,
+            0.026111999154090883,
+            0.09615359902381897,
+            0.07782400250434876,
+            0.03665919899940491,
+            0.027955201268196107,
+            0.02815999984741211,
+            0.050892800092697144,
+            0.02815360128879547,
+            0.03614720106124878,
+            0.02815999984741211,
+            0.028569599986076354,
+            0.0347135990858078,
+            0.02908160090446472,
+            0.030502399802207945,
+            0.02868799865245819,
+            0.03246079981327057
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.011868800222873687,
+        "p25_ms": 0.009974399954080582,
+        "p75_ms": 0.013875199854373932,
+        "min_ms": 0.008703999966382981,
+        "samples_ms": [
+          0.013823999464511872,
+          0.008703999966382981,
+          0.012383999675512314,
+          0.01085439994931221,
+          0.008908800035715102,
+          0.013926400244235993,
+          0.01228799968957901,
+          0.015052799880504609,
+          0.00971520021557808,
+          0.010956799983978272,
+          0.00942080020904541,
+          0.008806400001049042,
+          0.01616320013999939,
+          0.009523200243711472,
+          0.012390399724245072,
+          0.010342399775981902,
+          0.008908800035715102,
+          0.008806400001049042,
+          0.015161600708961488,
+          0.01157120019197464,
+          0.013702400028705597,
+          0.010233599692583084,
+          0.011868800222873687,
+          0.011366400122642516,
+          0.014745600521564484,
+          0.015462400019168853,
+          0.011878400295972823,
+          0.011161600053310395,
+          0.013209599256515502,
+          0.01648319959640503,
+          0.02959359884262085
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 210.07393105979938,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.4906265200000064,
+      "process_seconds": 14.860542177000013
+    },
+    "config": {
+      "num_warps": 4,
+      "num_stages": 1,
+      "block": 256,
+      "block_m": 16,
+      "block_n": 16,
+      "block_k": 32,
+      "fused": true,
+      "tensor_core": false
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "num_warps": 4,
+        "num_stages": 1,
+        "block": 256,
+        "block_m": 16,
+        "block_n": 16,
+        "block_k": 32,
+        "fused": true,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Predefined engineering control; no LLM inference.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.7118250000000046,
+        "validation_seconds": 3.15858814500001,
+        "candidate": {
+          "median_ms": 0.01496639996767044,
+          "p25_ms": 0.014028799533843995,
+          "p75_ms": 0.017715200036764148,
+          "min_ms": 0.006758400052785873
+        },
+        "incumbent": {
+          "median_ms": 0.025702399015426636,
+          "p25_ms": 0.024780799448490144,
+          "p75_ms": 0.028095999360084535,
+          "min_ms": 0.014643199741840363
+        },
+        "paired_speedup": 1.7173401132501795,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.014131200313568116,
+            "p25_ms": 0.013209599256515502,
+            "p75_ms": 0.01607680022716522,
+            "min_ms": 0.012595200538635254
+          },
+          "incumbent": {
+            "median_ms": 0.025702399015426636,
+            "p25_ms": 0.024883200228214265,
+            "p75_ms": 0.027804799377918243,
+            "min_ms": 0.023654399812221526
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 214.16132182246506,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.2971960669999874,
+        "process_seconds": 14.43313637,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 22,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "tokens": 0
+      },
+      "review": {
+        "note": "Scripted plumbing check; no scientific role/knowledge comparison."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "tokens": 0
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "num_warps": 8,
+        "num_stages": 1,
+        "block": 512,
+        "block_m": 16,
+        "block_n": 16,
+        "block_k": 32,
+        "fused": true,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Predefined engineering control; no LLM inference.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.7991478889999826,
+        "validation_seconds": 3.302723622000002,
+        "candidate": {
+          "median_ms": 0.015564799308776855,
+          "p25_ms": 0.013670399785041809,
+          "p75_ms": 0.018380799889564516,
+          "min_ms": 0.009318400174379349
+        },
+        "incumbent": {
+          "median_ms": 0.0143327996134758,
+          "p25_ms": 0.012947200238704682,
+          "p75_ms": 0.015513599663972855,
+          "min_ms": 0.007577600330114365
+        },
+        "paired_speedup": 0.9208470555347064,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 205.92774352012376,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.4274624459999927,
+        "process_seconds": 15.933368349999995
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "tokens": 0
+      },
+      "review": {
+        "note": "Scripted plumbing check; no scientific role/knowledge comparison."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "tokens": 0
+      }
+    }
+  ],
+  "wall_seconds": 73.425018859,
+  "resolved_model": "none",
+  "scientific_evidence": false,
+  "estimated_inference_usd": 0.0,
+  "budget_committed_usd": 0.0,
+  "speedup": 1.8053692074831613
+}

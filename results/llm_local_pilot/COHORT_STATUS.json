@@ -1,0 +1,10 @@
+{
+  "eligible_for_scientific_analysis": false,
+  "reason": "The first inference request received HTTP 429; a follow-up diagnostic confirmed credit_balance_exhausted.",
+  "successful_model_responses": 0,
+  "reported_model_tokens": 0,
+  "completed_llm_searches": 0,
+  "legacy_summary_note": "The old controller labeled a successful final baseline validation as status=complete despite interrupted inference. That label is not a completed search. Code now uses status=interrupted.",
+  "cost_note": "The old estimated_inference_usd=0.0117716 was an unused conservative request reservation, not a charge or reported token cost. The corrected provider releases a reservation when a request is definitively rejected.",
+  "raw_logs_preserved": true
+}

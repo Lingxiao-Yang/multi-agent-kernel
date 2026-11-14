@@ -1,0 +1,410 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "num_warps": 4,
+      "num_stages": 1,
+      "block": 256,
+      "block_m": 16,
+      "block_n": 16,
+      "block_k": 32,
+      "fused": false,
+      "tensor_core": false
+    },
+    "source": "/mnt/e/2026-2027 Master/CS 395T ML Found/Project/results/llm_local_smoke/softmax_irregular_single_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 2.9802322387695312e-08
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 2.980232238769531e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.4655582130000084,
+      "validation_seconds": 2.9300238569999237,
+      "candidate": {
+        "median_ms": 0.025481599569320678,
+        "p25_ms": 0.024272000044584276,
+        "p75_ms": 0.02964319884777069,
+        "min_ms": 0.023347200453281404,
+        "samples_ms": [
+          0.025481599569320678,
+          0.031206399202346802,
+          0.024985599517822265,
+          0.024166400730609893,
+          0.04270080029964447,
+          0.029286399483680725,
+          0.043110400438308716,
+          0.024275200068950654,
+          0.02385919988155365,
+          0.02486719936132431,
+          0.024457600712776185,
+          0.023958399891853333,
+          0.031215998530387878,
+          0.026316800713539125,
+          0.029692798852920532,
+          0.023347200453281404,
+          0.024371199309825897,
+          0.028966400027275085,
+          0.024063999950885772,
+          0.024371199309825897,
+          0.024268800020217897,
+          0.030720001459121703,
+          0.0283488005399704,
+          0.02959359884262085,
+          0.030608001351356506,
+          0.02457599937915802,
+          0.02385919988155365,
+          0.025702399015426636,
+          0.024268800020217897,
+          0.027238398790359497,
+          0.08528640270233154
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.027340799570083618,
+        "p25_ms": 0.024168000370264054,
+        "p75_ms": 0.030774399638175964,
+        "min_ms": 0.023449599742889404,
+        "samples_ms": [
+          0.02457599937915802,
+          0.023948800563812257,
+          0.023449599742889404,
+          0.023849600553512575,
+          0.03553279936313629,
+          0.03112959861755371,
+          0.030822399258613586,
+          0.030924800038337707,
+          0.023654399812221526,
+          0.024780799448490144,
+          0.030092799663543703,
+          0.028672000765800475,
+          0.027340799570083618,
+          0.030726400017738343,
+          0.024268800020217897,
+          0.02385919988155365,
+          0.026111999154090883,
+          0.027340799570083618,
+          0.025804799795150758,
+          0.02385919988155365,
+          0.02805759906768799,
+          0.026009601354599,
+          0.02447360008955002,
+          0.02406720072031021,
+          0.04176320135593414,
+          0.02898240089416504,
+          0.023654399812221526,
+          0.03041279911994934,
+          0.03840000033378601,
+          0.05418239831924439,
+          0.07772160172462464
+        ]
+      },
+      "paired_speedup": 1.0729624526005572,
+      "confirmed": false,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.026521599292755126,
+          "p25_ms": 0.024929599463939668,
+          "p75_ms": 0.031441600620746614,
+          "min_ms": 0.02436479926109314,
+          "samples_ms": [
+            0.02949439883232117,
+            0.0336896002292633,
+            0.025804799795150758,
+            0.025804799795150758,
+            0.03860799968242645,
+            0.024780799448490144,
+            0.024780799448490144,
+            0.02467840015888214,
+            0.03051519989967346,
+            0.02447360008955002,
+            0.02447360008955002,
+            0.029798400402069092,
+            0.031350401043891904,
+            0.024873599410057068,
+            0.03993600010871887,
+            0.025497600436210632,
+            0.02447360008955002,
+            0.031446400284767154,
+            0.026521599292755126,
+            0.025088000297546386,
+            0.02436479926109314,
+            0.024985599517822265,
+            0.027750399708747864,
+            0.0732159972190857,
+            0.050995200872421265,
+            0.026124799251556398,
+            0.025702399015426636,
+            0.03840000033378601,
+            0.02948479950428009,
+            0.031436800956726074,
+            0.032153600454330446
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.026316800713539125,
+          "p25_ms": 0.025088000297546386,
+          "p75_ms": 0.030934399366378783,
+          "min_ms": 0.02385919988155365,
+          "samples_ms": [
+            0.025497600436210632,
+            0.024371199309825897,
+            0.024985599517822265,
+            0.031641599535942075,
+            0.03563840091228485,
+            0.028460800647735596,
+            0.024985599517822265,
+            0.024166400730609893,
+            0.026316800713539125,
+            0.025702399015426636,
+            0.02529279887676239,
+            0.03635199964046478,
+            0.026624000072479247,
+            0.02385919988155365,
+            0.030822399258613586,
+            0.02529279887676239,
+            0.026710399985313417,
+            0.03317759931087494,
+            0.026624000072479247,
+            0.025190401077270507,
+            0.024268800020217897,
+            0.031046399474143983,
+            0.025804799795150758,
+            0.14213119745254515,
+            0.14602240324020385,
+            0.03297280073165894,
+            0.02467840015888214,
+            0.02959359884262085,
+            0.026111999154090883,
+            0.029798400402069092,
+            0.024371199309825897
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.011161600053310395,
+        "p25_ms": 0.009932800009846688,
+        "p75_ms": 0.011876800283789634,
+        "min_ms": 0.008806400001049042,
+        "samples_ms": [
+          0.010751999914646149,
+          0.010547199845314026,
+          0.010956799983978272,
+          0.010342399775981902,
+          0.013414399325847625,
+          0.010649599879980088,
+          0.014950400590896607,
+          0.011366400122642516,
+          0.011776000261306763,
+          0.008899199962615966,
+          0.010956799983978272,
+          0.00942080020904541,
+          0.018297599256038667,
+          0.011468800157308579,
+          0.01658879965543747,
+          0.015238399803638458,
+          0.011776000261306763,
+          0.00888959988951683,
+          0.008806400001049042,
+          0.011673600226640702,
+          0.011875200271606445,
+          0.011878400295972823,
+          0.011161600053310395,
+          0.008908800035715102,
+          0.01157120019197464,
+          0.008908800035715102,
+          0.009523200243711472,
+          0.01228799968957901,
+          0.012492799758911132,
+          0.010444799810647965,
+          0.009523200243711472
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 20,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 18,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 6.623999979638029e-06,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 125.78582405238892,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.066641982999954,
+      "process_seconds": 13.900884397000027
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": false,
+        "num_stages": 1,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "The incumbent configuration is well balanced and tuned for the RTX 4060 GPU and the problem shape. The block size of 256 with block_m and block_n at 16 fits the irregular shape well, and using 4 warps with a single stage aligns with hardware capabilities. Tensor cores are correctly disabled as the kernel does not use them. No profiling bottlenecks or better candidates have been found, so preserving this configuration maintains correctness and performance.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.4840454659999978,
+        "validation_seconds": 2.9421594850000474,
+        "candidate": {
+          "median_ms": 0.026521599292755126,
+          "p25_ms": 0.02492479905486107,
+          "p75_ms": 0.029902400076389314,
+          "min_ms": 0.023552000522613525
+        },
+        "incumbent": {
+          "median_ms": 0.025088000297546386,
+          "p25_ms": 0.024320000410079957,
+          "p75_ms": 0.02860639989376068,
+          "min_ms": 0.023039999604225158
+        },
+        "paired_speedup": 0.9459459823902718,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 120.85334540423311,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.069607560999998,
+        "process_seconds": 14.126655754000012
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10175,
+        "output_tokens": 487,
+        "tokens": 10662
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": false,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The incumbent configuration is well balanced and tuned for the RTX 4060 GPU and the problem shape. The block size and tile dimensions fit the irregular shape well, and the use of 4 warps with a single stage aligns with hardware capabilities. Tensor cores are correctly disabled as the kernel does not currently leverage them. No profiling bottlenecks or better candidates have been found, so preserving this configuration maintains correctness and performance."
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15156,
+        "output_tokens": 641,
+        "tokens": 15797
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 15156,
+    "output_tokens": 641,
+    "tokens": 15797
+  }
+}

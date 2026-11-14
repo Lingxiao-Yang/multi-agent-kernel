@@ -1,0 +1,37 @@
+{
+  "n_runs": 4,
+  "evidence_type": "LLM-study",
+  "variant_geomeans": {
+    "single": 1.0,
+    "single_knowledge": 1.797091941321425,
+    "multi": 1.0,
+    "multi_knowledge": 1.6986300468731124
+  },
+  "paired": {
+    "complete_pairs": 1,
+    "case_clusters": 1,
+    "bootstrap_seed": 42,
+    "resamples": 5000,
+    "effects": {
+      "roles_without_knowledge": {
+        "ratio": 1.0,
+        "ci95": null
+      },
+      "knowledge_single": {
+        "ratio": 1.797091941321425,
+        "ci95": null
+      },
+      "roles_with_knowledge": {
+        "ratio": 0.9452104301486588,
+        "ci95": null
+      },
+      "interaction_ratio": {
+        "ratio": 0.9452104301486588,
+        "ci95": null
+      }
+    },
+    "note": "Only one case cluster: confidence intervals are not estimable."
+  },
+  "excluded_runs": [],
+  "excluded_incomplete_runs": 0
+}

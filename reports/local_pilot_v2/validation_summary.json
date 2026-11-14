@@ -1,0 +1,20 @@
+{
+  "evaluations": 24,
+  "passed": 23,
+  "failed": 1,
+  "hardware": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_bytes": 8585216000,
+    "capability": [
+      8,
+      9
+    ],
+    "sm_count": 24
+  },
+  "warning": "Predefined transforms, laptop GPU, small sample pilot. Do not infer LLM or A100 effects."
+}

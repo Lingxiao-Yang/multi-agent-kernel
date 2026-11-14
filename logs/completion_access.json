@@ -1,0 +1,8 @@
+{
+  "status": "ok",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "input_tokens": 34,
+  "output_tokens": 5,
+  "reply": "{\"ok\":true}",
+  "estimated_usd": 2.16e-05
+}

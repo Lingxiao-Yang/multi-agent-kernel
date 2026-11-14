@@ -1,0 +1,55 @@
+{
+  "type": "engineering-pilot",
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_bytes": 8585216000,
+    "capability": [
+      8,
+      9
+    ],
+    "sm_count": 24
+  },
+  "protocol": {
+    "schema_version": 1,
+    "status": "development-not-frozen",
+    "proposal": "proposal_final.pdf",
+    "candidate_cap": 20,
+    "call_cap": 100,
+    "token_safety_cap": 500000,
+    "max_output_tokens": 4096,
+    "profile_cap": 21,
+    "temperature": 0.7,
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "warmup": 3,
+    "timing_repeats": 9,
+    "inner_repeats": 3,
+    "validation_seeds": [
+      101
+    ],
+    "final_validation_seeds": [
+      10001,
+      10002,
+      10003,
+      10004,
+      10005
+    ],
+    "improvement_threshold": 1.01,
+    "target_speedup": 1.1,
+    "worker_timeout_s": 180,
+    "feedback_mode": "timing-and-compiler-resources",
+    "model": null,
+    "endpoint": null,
+    "input_usd_per_million": null,
+    "output_usd_per_million": null
+  },
+  "started_utc": "2026-11-14T22:19:13.959505+00:00"
+}

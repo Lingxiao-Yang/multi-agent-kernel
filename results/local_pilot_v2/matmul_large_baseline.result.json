@@ -1,0 +1,141 @@
+{
+  "status": "ok",
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_bytes": 8585216000,
+    "capability": [
+      8,
+      9
+    ],
+    "sm_count": 24
+  },
+  "validation": [
+    {
+      "seed": 10001,
+      "edge": "random",
+      "max_abs_error": 0.0625
+    },
+    {
+      "seed": 10002,
+      "edge": "random",
+      "max_abs_error": 0.0625
+    },
+    {
+      "seed": 10003,
+      "edge": "random",
+      "max_abs_error": 0.0625
+    },
+    {
+      "seed": 10004,
+      "edge": "random",
+      "max_abs_error": 0.0625
+    },
+    {
+      "seed": 10005,
+      "edge": "random",
+      "max_abs_error": 0.0625
+    },
+    {
+      "seed": 10001,
+      "edge": "zeros",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "constant",
+      "max_abs_error": 1.52587890625e-05
+    },
+    {
+      "seed": 10001,
+      "edge": "large",
+      "max_abs_error": 2.0
+    },
+    {
+      "seed": 10001,
+      "edge": "negative",
+      "max_abs_error": 0.125
+    }
+  ],
+  "first_launch_seconds": 2.534592177000036,
+  "validation_seconds": 2.8877673840000853,
+  "candidate": {
+    "median_ms": 4.09395186106364,
+    "p25_ms": 3.69867738087972,
+    "p75_ms": 4.322986602783203,
+    "min_ms": 1.7281707127888997,
+    "samples_ms": [
+      4.547583897908528,
+      4.294656117757161,
+      3.832490603129069,
+      4.322986602783203,
+      4.09395186106364,
+      4.692991892496745,
+      3.294549306233724,
+      1.7281707127888997,
+      3.69867738087972
+    ]
+  },
+  "incumbent": {
+    "median_ms": 2.4108373324076333,
+    "p25_ms": 2.39684263865153,
+    "p75_ms": 2.860714594523112,
+    "min_ms": 1.7797120412190754,
+    "samples_ms": [
+      2.966869354248047,
+      2.4016213417053223,
+      3.0993067423502603,
+      2.4108373324076333,
+      2.7661654154459634,
+      2.39684263865153,
+      2.04697593053182,
+      1.7797120412190754,
+      2.860714594523112
+    ]
+  },
+  "paired_speedup": 0.5888777919780619,
+  "confirmed": false,
+  "library": {
+    "median_ms": 0.10308266679445903,
+    "p25_ms": 0.09077333410580952,
+    "p75_ms": 0.1225386659304301,
+    "min_ms": 0.08533333738644917,
+    "samples_ms": [
+      0.10308266679445903,
+      0.08874666690826416,
+      0.12998400131861368,
+      0.09077333410580952,
+      0.1225386659304301,
+      0.09113599856694539,
+      0.10956799983978271,
+      0.08533333738644917,
+      0.14199466506640115
+    ]
+  },
+  "profile": {
+    "mode": "compiler-resources",
+    "kernels": [
+      {
+        "registers_per_thread": 22,
+        "spills": 0,
+        "shared_bytes": 512,
+        "num_warps": 4
+      },
+      {
+        "registers_per_thread": 22,
+        "spills": 0,
+        "shared_bytes": 512,
+        "num_warps": 4
+      }
+    ],
+    "hardware_counters": null,
+    "note": "No hardware-counter bottleneck claims."
+  },
+  "profile_seconds": 9.899000019686355e-06,
+  "worker_seconds": 3.4505436489999965,
+  "process_seconds": 14.324851176000038
+}

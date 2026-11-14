@@ -1,0 +1,423 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-14T22:50:01.437819+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "single",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 1,
+      "call_cap": 4,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6
+    },
+    "protocol_hash": "ff8cacf12ff7ab82822bf2415761fd6161df9921356090159937f8cfb77278a0",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+      "kernel_study/bench.py": "69d4d2d7e783cd701d1c0cfa621308e53e189911011fba74ba2c136a56220cc8",
+      "kernel_study/cli.py": "d914b762d3d5cd308141fb07f409ffbcd2115e7cbccc3db77006f27b75214419",
+      "kernel_study/core.py": "d7a927f96798a43a6d5a9b4fb149caebd2c9b3033075febe37c32ce3a84a2f59",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "0278b438af0178841442554bfdeb65ac50b31d1ee26ee93ac985616fa6317cdb",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 15156,
+    "output_tokens": 641,
+    "tokens": 15797
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.5244265210000094,
+      "validation_seconds": 3.053848377999998,
+      "candidate": {
+        "median_ms": 0.027033600211143493,
+        "p25_ms": 0.0248319998383522,
+        "p75_ms": 0.029952000081539157,
+        "min_ms": 0.023347200453281404,
+        "samples_ms": [
+          0.031027200818061828,
+          0.027340799570083618,
+          0.023347200453281404,
+          0.023756800591945647,
+          0.029798400402069092,
+          0.02396160066127777,
+          0.02600319981575012,
+          0.03307519853115082,
+          0.025600001215934753,
+          0.0234592005610466,
+          0.023654399812221526,
+          0.025193598866462708,
+          0.024166400730609893,
+          0.02887679934501648,
+          0.03186239898204803,
+          0.02467840015888214,
+          0.023756800591945647,
+          0.03256320059299469,
+          0.025379198789596557,
+          0.027529600262641906,
+          0.024985599517822265,
+          0.0729088008403778,
+          0.06297600269317627,
+          0.03184640109539032,
+          0.030105599761009218,
+          0.027238398790359497,
+          0.027340799570083618,
+          0.027033600211143493,
+          0.027136000990867614,
+          0.02590720057487488,
+          0.025699201226234435
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.026009601354599,
+        "p25_ms": 0.024166400730609893,
+        "p75_ms": 0.03133439868688583,
+        "min_ms": 0.023244799673557283,
+        "samples_ms": [
+          0.03492160141468048,
+          0.028672000765800475,
+          0.023756800591945647,
+          0.02385919988155365,
+          0.03112959861755371,
+          0.025497600436210632,
+          0.02396160066127777,
+          0.025190401077270507,
+          0.025088000297546386,
+          0.024166400730609893,
+          0.023244799673557283,
+          0.029798400402069092,
+          0.02385919988155365,
+          0.026316800713539125,
+          0.024156799912452696,
+          0.024166400730609893,
+          0.025088000297546386,
+          0.024883200228214265,
+          0.02396160066127777,
+          0.03317759931087494,
+          0.029798400402069092,
+          0.1662976026535034,
+          0.03256320059299469,
+          0.02754560112953186,
+          0.03297599852085113,
+          0.028364801406860353,
+          0.04167680144309997,
+          0.054476797580718994,
+          0.026009601354599,
+          0.025088000297546386,
+          0.031539198756217954
+        ]
+      },
+      "paired_speedup": 0.9621212547146276,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.011468800157308579,
+        "p25_ms": 0.010438399761915206,
+        "p75_ms": 0.012748800218105316,
+        "min_ms": 0.008806400001049042,
+        "samples_ms": [
+          0.011468800157308579,
+          0.012377600371837615,
+          0.012800000607967377,
+          0.008806400001049042,
+          0.01197120025753975,
+          0.012697599828243256,
+          0.008908800035715102,
+          0.01053439974784851,
+          0.012185599654912949,
+          0.008908800035715102,
+          0.009728000313043595,
+          0.009625600278377533,
+          0.01679359972476959,
+          0.025702399015426636,
+          0.013823999464511872,
+          0.011468800157308579,
+          0.010956799983978272,
+          0.012697599828243256,
+          0.009625600278377533,
+          0.011353600025177001,
+          0.011059200018644333,
+          0.009206400066614152,
+          0.010751999914646149,
+          0.01157120019197464,
+          0.011878400295972823,
+          0.010342399775981902,
+          0.01515520066022873,
+          0.022835199534893037,
+          0.031436800956726074,
+          0.016179199516773223,
+          0.010956799983978272
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 118.56445219896304,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.205877723999947,
+      "process_seconds": 14.39382928300006
+    },
+    "config": {
+      "num_warps": 4,
+      "num_stages": 1,
+      "block": 256,
+      "block_m": 16,
+      "block_n": 16,
+      "block_k": 32,
+      "fused": false,
+      "tensor_core": false
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": false,
+        "num_stages": 1,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "The incumbent configuration is well balanced and tuned for the RTX 4060 GPU and the problem shape. The block size of 256 with block_m and block_n at 16 fits the irregular shape well, and using 4 warps with a single stage aligns with hardware capabilities. Tensor cores are correctly disabled as the kernel does not use them. No profiling bottlenecks or better candidates have been found, so preserving this configuration maintains correctness and performance.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.4840454659999978,
+        "validation_seconds": 2.9421594850000474,
+        "candidate": {
+          "median_ms": 0.026521599292755126,
+          "p25_ms": 0.02492479905486107,
+          "p75_ms": 0.029902400076389314,
+          "min_ms": 0.023552000522613525
+        },
+        "incumbent": {
+          "median_ms": 0.025088000297546386,
+          "p25_ms": 0.024320000410079957,
+          "p75_ms": 0.02860639989376068,
+          "min_ms": 0.023039999604225158
+        },
+        "paired_speedup": 0.9459459823902718,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 120.85334540423311,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.069607560999998,
+        "process_seconds": 14.126655754000012
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10175,
+        "output_tokens": 487,
+        "tokens": 10662
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": false,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The incumbent configuration is well balanced and tuned for the RTX 4060 GPU and the problem shape. The block size and tile dimensions fit the irregular shape well, and the use of 4 warps with a single stage aligns with hardware capabilities. Tensor cores are correctly disabled as the kernel does not currently leverage them. No profiling bottlenecks or better candidates have been found, so preserving this configuration maintains correctness and performance."
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15156,
+        "output_tokens": 641,
+        "tokens": 15797
+      }
+    }
+  ],
+  "wall_seconds": 49.227204495000024,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.0070880000000000006,
+  "budget_committed_usd": 0.007088000000000014,
+  "speedup": 1.0
+}

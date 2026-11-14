@@ -1,0 +1,467 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-14T22:46:43.198765+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 1,
+      "call_cap": 4,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6
+    },
+    "protocol_hash": "ff8cacf12ff7ab82822bf2415761fd6161df9921356090159937f8cfb77278a0",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "b0b2e110e14b2c8b8ce486b38c7ca9852de24c40d2dd912d67540d4ecc1eff29",
+      "kernel_study/bench.py": "69d4d2d7e783cd701d1c0cfa621308e53e189911011fba74ba2c136a56220cc8",
+      "kernel_study/cli.py": "d914b762d3d5cd308141fb07f409ffbcd2115e7cbccc3db77006f27b75214419",
+      "kernel_study/core.py": "d7a927f96798a43a6d5a9b4fb149caebd2c9b3033075febe37c32ce3a84a2f59",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "0278b438af0178841442554bfdeb65ac50b31d1ee26ee93ac985616fa6317cdb",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 14868,
+    "output_tokens": 1235,
+    "tokens": 16103
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.390159691000008,
+      "validation_seconds": 2.8791616949999934,
+      "candidate": {
+        "median_ms": 0.027033600211143493,
+        "p25_ms": 0.02513919919729233,
+        "p75_ms": 0.034764799475669864,
+        "min_ms": 0.023875199258327484,
+        "samples_ms": [
+          0.03175039887428284,
+          0.024985599517822265,
+          0.025913599133491515,
+          0.02805759906768799,
+          0.02529279887676239,
+          0.031027200818061828,
+          0.045363199710845944,
+          0.023958399891853333,
+          0.024371199309825897,
+          0.0383103996515274,
+          0.025600001215934753,
+          0.052937597036361694,
+          0.0336896002292633,
+          0.024063999950885772,
+          0.024259200692176817,
+          0.025497600436210632,
+          0.026009601354599,
+          0.04433920085430145,
+          0.027033600211143493,
+          0.14940160512924194,
+          0.07495679855346679,
+          0.031948798894882204,
+          0.027033600211143493,
+          0.043315199017524716,
+          0.03297280073165894,
+          0.03583999872207642,
+          0.024883200228214265,
+          0.02539519965648651,
+          0.023875199258327484,
+          0.024063999950885772,
+          0.030928000807762146
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.025884801149368288,
+        "p25_ms": 0.024883200228214265,
+        "p75_ms": 0.03271680027246475,
+        "min_ms": 0.01884160041809082,
+        "samples_ms": [
+          0.02744640111923218,
+          0.02467840015888214,
+          0.023756800591945647,
+          0.03061760067939758,
+          0.023552000522613525,
+          0.023958399891853333,
+          0.02744320034980774,
+          0.026009601354599,
+          0.03441919982433319,
+          0.025702399015426636,
+          0.02529279887676239,
+          0.024883200228214265,
+          0.025497600436210632,
+          0.025088000297546386,
+          0.046691200137138365,
+          0.03583999872207642,
+          0.034918400645256045,
+          0.025702399015426636,
+          0.02539519965648651,
+          0.024780799448490144,
+          0.07301120162010193,
+          0.01884160041809082,
+          0.04106239974498749,
+          0.03409920036792755,
+          0.026009601354599,
+          0.03133440017700195,
+          0.07393280267715455,
+          0.02951039969921112,
+          0.02396160066127777,
+          0.024883200228214265,
+          0.025884801149368288
+        ]
+      },
+      "paired_speedup": 0.957504769886267,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.012083200365304947,
+        "p25_ms": 0.010649599879980088,
+        "p75_ms": 0.013465599715709686,
+        "min_ms": 0.008703999966382981,
+        "samples_ms": [
+          0.009625600278377533,
+          0.010547199845314026,
+          0.011878400295972823,
+          0.009113600105047226,
+          0.01515520066022873,
+          0.011660800129175187,
+          0.009830400347709656,
+          0.009523200243711472,
+          0.015052799880504609,
+          0.016383999586105348,
+          0.012083200365304947,
+          0.012902399897575379,
+          0.012595200538635254,
+          0.010751999914646149,
+          0.012800000607967377,
+          0.010547199845314026,
+          0.012595200538635254,
+          0.015360000729560851,
+          0.012387199699878693,
+          0.011161600053310395,
+          0.010137599706649781,
+          0.008703999966382981,
+          0.013312000036239623,
+          0.011059200018644333,
+          0.012492799758911132,
+          0.016896000504493712,
+          0.022937600314617158,
+          0.013619199395179749,
+          0.03911679983139038,
+          0.010751999914646149,
+          0.011241599917411804
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 118.56445219896304,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.0210318869999924,
+      "process_seconds": 14.082638636000013
+    },
+    "config": {
+      "num_warps": 4,
+      "num_stages": 1,
+      "block": 256,
+      "block_m": 16,
+      "block_n": 16,
+      "block_k": 32,
+      "fused": false,
+      "tensor_core": false
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 512,
+        "block_k": 64,
+        "block_m": 32,
+        "block_n": 32,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 8,
+        "tensor_core": true
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "The updated configuration addresses the identified bottlenecks by increasing warp count to 8 and pipeline stages to 2, improving latency hiding and resource utilization. The block size is increased to 512, with block_m and block_n set to 32 to enhance GPU resource utilization and parallelism. The block_k is set to 64 to leverage tensor core capabilities effectively, and tensor_core is enabled to activate tensor core optimizations compatible with the hardware's compute capability 8.9. The fused flag remains false as per the advice to avoid additional complexity without evidence of benefit.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 3.0254017819999603,
+        "validation_seconds": 3.4663152950000153,
+        "candidate": {
+          "median_ms": 0.031231999397277832,
+          "p25_ms": 0.028667199611663818,
+          "p75_ms": 0.03481920063495636,
+          "min_ms": 0.021299199759960176
+        },
+        "incumbent": {
+          "median_ms": 0.031436800956726074,
+          "p25_ms": 0.027902400493621825,
+          "p75_ms": 0.035076799988746646,
+          "min_ms": 0.024985599517822265
+        },
+        "paired_speedup": 1.0065574271068312,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 102.62628271821004,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.6089077610000118,
+        "process_seconds": 14.630402833000005
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9879,
+        "output_tokens": 656,
+        "tokens": 10535
+      },
+      "review": {
+        "review": {
+          "measured_outcome": {
+            "median_ms": 0.03123,
+            "min_ms": 0.0213,
+            "p25_ms": 0.02867,
+            "p75_ms": 0.03482,
+            "paired_speedup_vs_incumbent": 1.0066,
+            "status": "ok",
+            "validation": "passed",
+            "notes": "The new configuration yields a very slight performance improvement (~0.7%) over the incumbent, but the gain is marginal and within noise."
+          },
+          "failures": [
+            "No significant speedup despite increased warp count, pipeline stages, block size, and enabling tensor cores.",
+            "Logical bandwidth decreased relative to incumbent (from ~120 GB/s to ~102 GB/s), possibly indicating suboptimal memory access patterns or increased overhead.",
+            "No hardware counter data available to confirm bottleneck changes or tensor core utilization."
+          ],
+          "analysis": {
+            "likely_reasons": [
+              "The problem shape (513x781) is irregular and may not align well with the chosen block sizes (32x32 tiles), causing thread divergence or underutilized threads.",
+              "Tensor core usage might be inefficient due to data layout or kernel design, possibly not fully exploiting the hardware capabilities.",
+              "Increasing warps and stages increased resource usage but did not translate into proportional throughput improvements, possibly due to memory bottlenecks or synchronization overhead.",
+              "Fused=false may limit potential optimizations by separating reductions and applications rather than fusing them."
+            ]
+          },
+          "next_directions": [
+            {
+              "config_changes": {
+                "fused": true
+              },
+              "rationale": "Try enabling fused mode to reduce kernel launch overhead and improve data locality by combining reduction and application phases, potentially boosting performance."
+            },
+            {
+              "config_changes": {
+                "block_m": 64,
+                "block_n": 64,
+                "block_k": 32,
+                "num_warps": 4,
+                "num_stages": 3
+              },
+              "rationale": "Test larger block shapes to better match matrix dimensions and improve warp occupancy, while adjusting pipeline stages to hide latency."
+            },
+            {
+              "config_changes": {
+                "tensor_core": false
+              },
+              "rationale": "Evaluate performance without tensor cores to isolate their impact and verify if they are currently underutilized or causing overhead."
+            },
+            {
+              "diagnostics": {
+                "collect_hardware_counters": true,
+                "profile_kernel": true
+              },
+              "rationale": "Gather detailed hardware counter metrics and kernel profiles to identify precise bottlenecks, resource utilization, and tensor core efficiency."
+            }
+          ]
+        }
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 14868,
+        "output_tokens": 1235,
+        "tokens": 16103
+      }
+    }
+  ],
+  "wall_seconds": 70.771785196,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.007923200000000002,
+  "budget_committed_usd": 0.007923199999999998,
+  "speedup": 1.0
+}

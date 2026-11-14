@@ -1,0 +1,37 @@
+{
+  "n_runs": 4,
+  "evidence_type": "engineering-control",
+  "variant_geomeans": {
+    "single": 1.8057553768543093,
+    "single_knowledge": 1.9671053941654475,
+    "multi": 1.8053692074831613,
+    "multi_knowledge": 1.819444288651376
+  },
+  "paired": {
+    "complete_pairs": 1,
+    "case_clusters": 1,
+    "bootstrap_seed": 42,
+    "resamples": 5000,
+    "effects": {
+      "roles_without_knowledge": {
+        "ratio": 0.9997861452464173,
+        "ci95": null
+      },
+      "knowledge_single": {
+        "ratio": 1.0893531977693545,
+        "ci95": null
+      },
+      "roles_with_knowledge": {
+        "ratio": 0.9249348276141974,
+        "ci95": null
+      },
+      "interaction_ratio": {
+        "ratio": 0.925132671633721,
+        "ci95": null
+      }
+    },
+    "note": "Only one case cluster: confidence intervals are not estimable."
+  },
+  "excluded_runs": [],
+  "excluded_incomplete_runs": 0
+}

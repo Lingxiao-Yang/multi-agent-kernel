@@ -1,0 +1,150 @@
+{
+  "status": "ok",
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_bytes": 8585216000,
+    "capability": [
+      8,
+      9
+    ],
+    "sm_count": 24
+  },
+  "validation": [
+    {
+      "seed": 10001,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10002,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10003,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10004,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10005,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "zeros",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "constant",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "large",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "negative",
+      "max_abs_error": 0.0
+    }
+  ],
+  "first_launch_seconds": 2.768285584999944,
+  "validation_seconds": 3.0281767079999327,
+  "candidate": {
+    "median_ms": 0.24951465924580893,
+    "p25_ms": 0.24268800020217896,
+    "p75_ms": 0.2511253356933594,
+    "min_ms": 0.233130673567454,
+    "samples_ms": [
+      0.24951465924580893,
+      0.24951465924580893,
+      0.24780799945195517,
+      0.24268800020217896,
+      0.237226665019989,
+      0.2511253356933594,
+      0.33587201436360675,
+      0.2658986647923787,
+      0.233130673567454
+    ]
+  },
+  "incumbent": {
+    "median_ms": 0.24644267559051514,
+    "p25_ms": 0.24337067206700644,
+    "p75_ms": 0.25149865945180255,
+    "min_ms": 0.23859200874964395,
+    "samples_ms": [
+      0.24541866779327393,
+      0.2491733431816101,
+      1.1260586579640706,
+      0.2590399980545044,
+      0.24337067206700644,
+      0.23859200874964395,
+      0.25149865945180255,
+      0.24644267559051514,
+      0.24234666426976523
+    ]
+  },
+  "paired_speedup": 0.9876881636350374,
+  "confirmed": false,
+  "library": {
+    "median_ms": 0.23688532908757529,
+    "p25_ms": 0.23517866929372153,
+    "p75_ms": 0.23748266696929932,
+    "min_ms": 0.23244800170262656,
+    "samples_ms": [
+      0.23748266696929932,
+      0.23679999510447183,
+      0.23825067281723022,
+      0.23688532908757529,
+      0.23517866929372153,
+      0.23995733261108398,
+      0.237226665019989,
+      0.23244800170262656,
+      0.23480532566706339
+    ]
+  },
+  "profile": {
+    "mode": "compiler-resources",
+    "kernels": [
+      {
+        "registers_per_thread": 14,
+        "spills": 0,
+        "shared_bytes": 0,
+        "num_warps": 4
+      },
+      {
+        "registers_per_thread": 10,
+        "spills": 0,
+        "shared_bytes": 0,
+        "num_warps": 4
+      }
+    ],
+    "hardware_counters": null,
+    "note": "No hardware-counter bottleneck claims."
+  },
+  "profile_seconds": 7.321999987652816e-06,
+  "throughput": {
+    "flops": null,
+    "minimum_bytes": 33558528,
+    "logical_gbps": 134.49521603834856,
+    "achieved_tflops": null,
+    "fraction_peak_bandwidth": null,
+    "fraction_peak_compute": null,
+    "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+  },
+  "worker_seconds": 3.099117777999936,
+  "process_seconds": 14.22099739500004
+}

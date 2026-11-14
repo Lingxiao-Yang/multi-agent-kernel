@@ -1,0 +1,180 @@
+{
+  "status": "ok",
+  "environment": {
+    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+    "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "memory_bytes": 8585216000,
+    "capability": [
+      8,
+      9
+    ],
+    "sm_count": 24
+  },
+  "validation": [
+    {
+      "seed": 10001,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10002,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10003,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10004,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10005,
+      "edge": "random",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "zeros",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "constant",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "large",
+      "max_abs_error": 0.0
+    },
+    {
+      "seed": 10001,
+      "edge": "negative",
+      "max_abs_error": 0.0
+    }
+  ],
+  "first_launch_seconds": 2.6631008210000573,
+  "validation_seconds": 2.8889324720000786,
+  "candidate": {
+    "median_ms": 0.11400533715883891,
+    "p25_ms": 0.0631466656923294,
+    "p75_ms": 0.11910399794578552,
+    "min_ms": 0.06007466713587443,
+    "samples_ms": [
+      0.11400533715883891,
+      0.13004799683888754,
+      0.06486399968465169,
+      0.11910399794578552,
+      0.06109866499900818,
+      0.11844266454378764,
+      0.06007466713587443,
+      0.12185600399971008,
+      0.0631466656923294
+    ]
+  },
+  "incumbent": {
+    "median_ms": 0.2344533403714498,
+    "p25_ms": 0.22835199038187662,
+    "p75_ms": 0.23995733261108398,
+    "min_ms": 0.22425599892934164,
+    "samples_ms": [
+      0.2344533403714498,
+      0.2491733431816101,
+      0.22835199038187662,
+      0.23995733261108398,
+      0.22425599892934164,
+      0.2402986685434977,
+      0.22528000672658285,
+      0.23819732666015625,
+      0.22965333859125772
+    ]
+  },
+  "paired_speedup": 2.0565119687755993,
+  "confirmed": true,
+  "confirmation": {
+    "candidate": {
+      "median_ms": 0.0993280013402303,
+      "p25_ms": 0.06071466704209646,
+      "p75_ms": 0.11878400047620137,
+      "min_ms": 0.05597866574923197,
+      "samples_ms": [
+        0.12117333213488261,
+        0.09864532947540283,
+        0.0993280013402303,
+        0.12356266379356384,
+        0.06071466704209646,
+        0.11878400047620137,
+        0.05597866574923197,
+        0.11878400047620137,
+        0.05836800237496694
+      ]
+    },
+    "incumbent": {
+      "median_ms": 0.23278933763504028,
+      "p25_ms": 0.22323199113210043,
+      "p75_ms": 0.24268800020217896,
+      "min_ms": 0.22152533133824667,
+      "samples_ms": [
+        0.22152533133824667,
+        0.24268800020217896,
+        0.22323199113210043,
+        0.24846933285395303,
+        0.23278933763504028,
+        0.2678613265355428,
+        0.2239146629969279,
+        0.23925334215164185,
+        0.22217599550882974
+      ]
+    }
+  },
+  "library": {
+    "median_ms": 0.23140267531077066,
+    "p25_ms": 0.2228906750679016,
+    "p75_ms": 0.2395626703898112,
+    "min_ms": 0.21401600042978922,
+    "samples_ms": [
+      0.2228906750679016,
+      0.3280213276545207,
+      0.22525866826375326,
+      0.2573653260866801,
+      0.21401600042978922,
+      0.23825067281723022,
+      0.21811199188232422,
+      0.23140267531077066,
+      0.2395626703898112
+    ]
+  },
+  "profile": {
+    "mode": "compiler-resources",
+    "kernels": [
+      {
+        "registers_per_thread": 14,
+        "spills": 0,
+        "shared_bytes": 0,
+        "num_warps": 4
+      }
+    ],
+    "hardware_counters": null,
+    "note": "No hardware-counter bottleneck claims."
+  },
+  "profile_seconds": 5.391000058807549e-06,
+  "throughput": {
+    "flops": null,
+    "minimum_bytes": 33558528,
+    "logical_gbps": 294.3592715597542,
+    "achieved_tflops": null,
+    "fraction_peak_bandwidth": null,
+    "fraction_peak_compute": null,
+    "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+  },
+  "worker_seconds": 2.959657904000096,
+  "process_seconds": 13.939523629000064
+}

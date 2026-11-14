@@ -1,0 +1,42 @@
+[
+  {
+    "cohort": "llm_local_pilot",
+    "type": "LLM pilot",
+    "terminated_searches": 1,
+    "completed_searches": 0,
+    "attempts": 1,
+    "model_calls": 1,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "status_counts": {
+      "complete": 1
+    }
+  },
+  {
+    "cohort": "llm_local_smoke",
+    "type": "LLM pilot",
+    "terminated_searches": 4,
+    "completed_searches": 4,
+    "attempts": 4,
+    "model_calls": 16,
+    "input_tokens": 67355,
+    "output_tokens": 4486,
+    "status_counts": {
+      "complete": 4
+    }
+  },
+  {
+    "cohort": "local_pilot_v2",
+    "type": "predefined-transform pilot",
+    "evaluations": 24,
+    "correct": 23,
+    "incorrect_or_error": 1
+  },
+  {
+    "cohort": "local_pilot_v3",
+    "type": "predefined-transform pilot",
+    "evaluations": 24,
+    "correct": 24,
+    "incorrect_or_error": 0
+  }
+]
