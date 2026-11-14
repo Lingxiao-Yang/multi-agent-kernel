@@ -18,12 +18,17 @@ p.add_argument('--model',default='gpt-4.1-mini-2025-04-14')
 p.add_argument('--endpoint',default='https://api.openai.com/v1')
 p.add_argument('--input-price',type=float,default=.4)
 p.add_argument('--output-price',type=float,default=1.6)
+p.add_argument('--validated-pilot',help='Require 24 successful GPU engineering evaluations from this directory')
 args=p.parse_args()
 if not 1<=args.attempts<=20 or args.dollar_cap<=0:
     p.error('attempts must be 1..20 and dollar cap positive')
 chosen=args.cases.split(','); seeds=[int(s) for s in args.seeds.split(',')]
 if set(chosen)-{c['id'] for c in cases()}:
     p.error('unknown case')
+if args.validated_pilot:
+    measured=read_json(Path(args.validated_pilot)/'pilot_results.json')
+    if len(measured)!=24 or any(row['result']['status']!='ok' for row in measured):
+        p.error('The prerequisite GPU pilot is incomplete or contains validation failures')
 output=Path(args.output).resolve(); output.mkdir(parents=True,exist_ok=False)
 protocol=read_json(ROOT/'configs/protocol.json')
 protocol.update(candidate_cap=args.attempts,call_cap=4*args.attempts,model=args.model,endpoint=args.endpoint,

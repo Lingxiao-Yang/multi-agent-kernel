@@ -16,6 +16,8 @@ export CUDA_VISIBLE_DEVICES=0
 export OMP_NUM_THREADS=1
 export TRITON_CACHE_DIR="$SCRATCH/kernel-study-cache/triton"
 : "${OPENAI_API_KEY:?Supply credential in environment, never a script or command argument}"
+: "${VALIDATED_PILOT_DIR:?Set the completed engineering pilot directory}"
 python -m kernel_study.cli doctor
 python scripts/probe_counters.py "logs/counters-${SLURM_JOB_ID}.json"
-python scripts/run_campaign.py --output "results/a100-llm-pilot-${SLURM_JOB_ID}" --dollar-cap 5
+python scripts/run_campaign.py --output "results/a100-llm-pilot-${SLURM_JOB_ID}" --dollar-cap 5 \
+  --validated-pilot "$VALIDATED_PILOT_DIR"
