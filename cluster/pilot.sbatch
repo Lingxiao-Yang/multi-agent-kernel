@@ -20,7 +20,9 @@ python3 -m venv "$SCRATCH/kernel-study-venv"
 source "$SCRATCH/kernel-study-venv/bin/activate"
 python -m pip install --upgrade pip
 python -m pip install torch --index-url https://download.pytorch.org/whl/cu128
-python -m pip install numpy matplotlib pytest
+# NumPy 2.5.x falsely rejects the EPYC 7763 compute nodes (X86_V2 check, job 3582290).
+python -m pip install "numpy>=1.26,<2.3" matplotlib pytest
+python -c "import numpy, torch; print('numpy', numpy.__version__, 'torch', torch.__version__, torch.cuda.get_device_name(0))"
 python -m pip freeze > "logs/environment-${SLURM_JOB_ID}.txt"
 nvidia-smi > "logs/gpu-${SLURM_JOB_ID}.txt"
 python -m pytest -q
