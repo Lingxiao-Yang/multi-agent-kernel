@@ -1,70 +1,136 @@
-# Development protocol and completion criteria
+# Experimental Protocol and Completion Criteria
 
-The supplied **final PDF** defines the research question. This document
-records implementation choices, deviations and gates; it does not silently
-replace the full experiment with a smaller engineering exercise.
+The [project proposal](proposal_final.pdf) defines the research question.
+This document records the implementation choices, deviations from the
+proposal, and the gates for calling the study complete. It does not swap the
+full experiment for a smaller engineering exercise.
 
 ## Primary study
 
-Twelve cases x four arms x three seeds = 144 searches. Each starts from an
-identical source hash for its family. Match 20 attempts and 100 model-call
-caps, report actual token use, and flag any token-limited runs separately.
-The default token safety cap of 500,000 is provisional until pilot review.
-All four arms use the same underlying model, four sequential calls per
-candidate, context construction, sampling, greedy retention and evidence.
+**Scale.** Twelve cases × four variants × three seeds give 144 searches.
+Every search in a family starts from the same baseline source hash.
 
-The single-agent prompt remains general across all four calls; stage labels
-offer the same analysis, planning, implementation and review opportunities.
-The multi-agent arm assigns four explicit specialist prompts. Review is
-advisory. Retention is exclusively the automated harness's decision.
+**Budgets.**
 
-The prototype permits config changes and edits to existing Triton device
-functions through a stable ABI. New host-level scheduling algorithms are
-outside the current search space. That bounds generalization and should be
-stated in any final report.
+- Each search has matched caps of 20 candidate attempts and 100 model calls.
+- Actual token use is reported, and token-limited runs are flagged separately.
+- The default 500,000-token safety cap is provisional until after the pilot
+  review.
+
+**Shared conditions.** All four variants use:
+
+- the same underlying model;
+- four sequential calls per candidate;
+- the same context construction and sampling settings;
+- greedy retention and the same evidence.
+
+**Prompts.** The single agent keeps a general prompt for all four calls. Stage
+labels give it the same analysis, planning, implementation and review steps.
+The multi-agent variants assign four specialist role prompts instead. Review
+is advisory only; the automated harness alone decides which candidates to
+keep.
+
+**Search space.** The prototype allows two kinds of change:
+
+- configuration changes;
+- edits to existing Triton device functions behind a stable interface.
+
+New host-side scheduling algorithms are out of scope. This limits how far the
+results generalize, and any final report should state that limit.
 
 ## Validation and timing
 
-- Fixed per-case dtype/atol/rtol in configs/cases.json; contiguous tensors.
-- Search seeds 101/202/303; final-only seeds 10001–10005. Each validation
-  also tests zeros, constants, large values and negative inputs.
-- Trusted reference on cloned inputs; outputs must overwrite poisoned
-  buffers and inputs must be bitwise unchanged after execution.
-- Warm-up and first launch outside timing; alternating AB/BA CUDA events,
-  31 samples, 10 inner repetitions. Report median and IQR plus raw samples.
-- Accept only a correct candidate that exceeds 1.01x in an initial paired
-  comparison and a second paired confirmation. This threshold is a pilot
-  choice, not a confidence test. Search curves use baseline-relative timings;
-  final endpoints remeasure the selected candidate and baseline together.
-- Fresh final-validation failure triggers fallback through prior retained
-  candidates. Initial kernels remain eligible; unchanged runs score 1.0.
-- Final evaluation allowance is at most 21 retained candidates, identical
-  for every arm. Actual final attempts depend on failures and are logged.
-- Compiler resources are collected initially and for every new incumbent
-  with a 21-invocation cap. Nsight counters are currently unavailable/unverified;
-  they must not be inferred from resource reports or speedup alone.
+**Correctness criteria.** Tolerances (dtype, `atol`, `rtol`) are fixed per
+case in `configs/cases.json`. All tensors are contiguous.
+
+**Inputs.**
+
+- Search uses seeds 101, 202 and 303.
+- Final validation uses seeds 10001–10005, which are never seen during search.
+- Every validation also tests zero, constant, large-magnitude and negative
+  inputs.
+
+**Reference checks.**
+
+- The trusted reference runs on cloned inputs.
+- Each candidate must overwrite deliberately poisoned output buffers.
+- Inputs must be bitwise unchanged after the candidate runs.
+
+**Timing.**
+
+- Warm-up and the first launch are excluded from timing.
+- Candidate and baseline alternate in AB/BA order using CUDA events: 31
+  samples of 10 inner repetitions each.
+- The median and IQR are reported, and the raw samples are kept.
+
+**Acceptance.** A candidate is kept only if it is correct and beats the
+incumbent by more than 1.01× in two separate paired comparisons. This
+threshold is a pilot choice, not a statistical test.
+
+**Reported speedups.**
+
+- Search curves use timings relative to the baseline.
+- Final speedups come from remeasuring the selected candidate and the
+  baseline together.
+
+**Fallback.** If a candidate fails final validation on fresh inputs, the
+harness falls back to the previously retained candidate, then the one before
+it. The initial kernel is always eligible, so a run with no improvement scores
+1.0.
+
+**Final-evaluation budget.** Final evaluation covers at most 21 retained
+candidates, the same for every variant. The actual number of attempts depends
+on failures and is logged.
+
+**Profiling.** Compiler resource usage is collected for the baseline and for
+each new incumbent, up to 21 invocations. Nsight hardware counters are
+currently unverified. They must not be inferred from resource reports or from
+speedups.
 
 ## Analysis
 
-Pair case and seed across all four variants. Work in log speedups. Average
-paired effects within each case and bootstrap complete case clusters 5,000
-times with seed 42. Report role effect without knowledge, knowledge effect
-for the single agent, role effect with knowledge and the multiplicative
-interaction `(multi_knowledge * single)/(multi * single_knowledge)`.
-Report missing/incomplete runs and avoid post-hoc selection. Token-limited
-or endpoint-failed runs require separate accounting. Do not pool local RTX
-and A100 results, different providers, source hashes or model versions.
+**Effects.** Runs are paired by case and seed across all four variants, and
+effects are computed on log speedups. Within each case, the paired effects
+are averaged.
+
+**Uncertainty.** Whole cases are then resampled in a case-cluster bootstrap:
+5,000 resamples with seed 42.
+
+**Reported quantities.**
+
+- The role effect without knowledge.
+- The knowledge effect for the single agent.
+- The role effect with knowledge.
+- The multiplicative interaction,
+  `(multi_knowledge × single) / (multi × single_knowledge)`.
+
+**Exclusions and pooling.**
+
+- Missing and incomplete runs are reported, and no runs are selected after
+  the fact.
+- Token-limited runs and runs that failed at the endpoint are reported
+  separately.
+- Results are never pooled across:
+  - different GPUs, such as a local RTX GPU and an A100;
+  - different providers;
+  - different source hashes or model versions.
 
 ## Gates before declaring the experiment complete
 
-1. A100 GPU correctness and software compatibility verified on all cases.
-2. Profiling capability checked; common reduced mode explicitly frozen if needed.
-3. Model, prices, token safety cap, cases, knowledge bank and protocol hashes frozen.
-4. Four-way pilot passes and affordability is reviewed.
-5. Primary repeated searches complete, including unsuccessful runs.
-6. Role/category ablations on two cases and mechanism examples inspected.
-7. Confidence intervals, cost curves, library comparisons, measured throughput
-   and justified roofline bounds generated; final report/presentation completed.
+1. A100 correctness and software compatibility are verified on every case.
+2. Profiling capability is checked; if needed, a common reduced mode is frozen
+   explicitly.
+3. The model, prices, token safety cap, cases, knowledge bank and protocol
+   hashes are frozen.
+4. The four-variant pilot passes and its cost is reviewed.
+5. The primary repeated searches are complete, including unsuccessful runs.
+6. Role and knowledge-category ablations on two cases are complete, and
+   example mechanisms are inspected.
+7. The following are produced:
+   - confidence intervals and cost curves;
+   - library comparisons and measured throughput;
+   - justified roofline bounds;
+   - the final report and presentation.
 
-Completion percentages must be based on evidence against these milestones.
-Unit tests and source files alone cannot establish completion of steps 4–7.
+Completion is measured against these milestones. Unit tests and source code
+alone cannot show that steps 4–7 are complete.

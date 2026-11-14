@@ -1,77 +1,96 @@
-# Work log
+# Development Log
 
-Dates use America/Chicago for project reporting. Machine events use explicit UTC.
-No account passwords, MFA tokens or API keys belong in this repository.
+Dates are in America/Chicago time. Logs of machine events use UTC.
+Credentials are never stored in this repository. Later experimental records
+are on the `results` branch (`reports/WORK_LOG.md`).
 
-## 2026-11-14 — implementation and first validation
+## 2026-11-14 — Implementation and first validation
 
-- Inspected workspace: only proposal_final.pdf and an older proposal.tex existed.
-- Extracted all three PDF pages with pdftotext and visually inspected page 1.
-- Found substantive PDF/TEX differences. User confirmed PDF is authoritative:
-  20 candidate attempts, 100 calls; token cap is a safety limit, not a matching
-  variable; profile baseline and each new incumbent. Bootstrap paired effects
-  and roofline/headroom reporting are in the PDF.
-- Consulted current TACC Lonestar6, NVIDIA Ampere/best-practices, Triton and
-  OpenAI API documentation. URLs are retained in knowledge/cards.json and README.
-- Established that local Windows has an RTX 4060 Laptop GPU and WSL Ubuntu.
-  Local GPU results must not be presented as A100 results.
-- Lonestar6: outbound SSH required execution outside the network sandbox;
-  default SSH MAC failed. hmac-sha2-512 reached authentication. Initial supplied
-  password did not authenticate. User provided a correction and confirmed MFA
-  must be handled manually. No GPU allocations or jobs have yet been verified.
-- Created project-local Windows Python environment with NumPy, pytest,
-  matplotlib and Paramiko. Linux GPU setup initially failed because uv could
-  not rename an extracted wheel on the Windows mount; retry uses /tmp Linux
-  storage. Setup logs are in logs/.
-- Implemented four kernel families, 12 explicit cases, trusted references,
-  edge/random/fresh validation, paired AB/BA CUDA event timing, confirmation,
-  compiler-resource feedback, candidate process timeouts and AST integrity gate.
-- Implemented general/specialized four-call loops, JSONL/state/source logs,
-  greedy retention, all-attempt accounting, model token reporting, scripted
-  engineering control, final validation fallback and 12 hardware cards.
-- Implemented factorial paired analysis, case-cluster bootstrap, CSV output,
-  performance/cost curves, and a balanced 144-search manifest.
-- Ran the first test suite: **19 passed** (logs/tests_initial.log). These are
-  software integrity tests, not GPU correctness or scientific experiment results.
+**Scope.** We took the final proposal PDF as authoritative over an earlier
+LaTeX draft. Its key terms:
 
-Pending and subsequent results are recorded below as they occur. A written
-implementation is not counted as a completed A100/LLM experiment.
+- 20 candidate attempts and 100 model calls per search;
+- a token cap that is a safety limit, not a matched variable;
+- profiling of the baseline and of every new incumbent;
+- bootstrapped paired effects, with roofline/headroom reporting.
 
-## 2026-11-14 — access, deployment and GPU pilot
+**Sources.** We consulted current documentation for TACC Lonestar6, NVIDIA
+Ampere tuning and CUDA best practices, Triton, and the OpenAI API. The
+references are in `knowledge/cards.json` and the README.
 
-- Corrected password plus user-provided MFA successfully authenticated to
-  Lonestar6. Allocation ASC26098 and scratch access were verified. Submitted
-  A100 pilot job **3582290** to gpu-a100-small, then reduced its limit to 30
-  minutes. It remains pending for resources; the scheduler initially estimated
-  18:27 America/Chicago. This is an estimate, not a completed allocation.
-- Verified replacement OpenAI credential with a read-only models request.
-  Chose available pinned gpt-4.1-mini-2025-04-14 for the inexpensive pilot,
-  with published input/output rates of $0.40/$1.60 per million tokens.
-  The user explicitly approved exporting source/prompts/measurements to
-  api.openai.com and a **$5 total pilot cap** after automatic approval review
-  requested clarification. No key was persisted in project files.
-- Installed local WSL PyTorch 2.11.0+cu128 and Triton 3.6.0. Linux /tmp was not
-  persistent across WSL sessions; the final environment is .venv-linux using
-  copy-mode installation. Logs retain all setup attempts and failures.
-- Completed **24 actual RTX 4060 evaluations** in results/local_pilot_v2:
-  23 passed, one fused layernorm_irregular evaluation failed the unchanged
-  2e-5 absolute tolerance (maximum observed difference ~3.99e-5).
-- Diagnosed cancellation from approximate division in the mean on a constant
-  irregular-width row. Replaced mean division with tl.div_rn in both baseline
-  and fused normalization kernels. Did not loosen tolerances. Launched
-  results/local_pilot_v3 with standard 31-sample timing and source snapshots.
-- Pilot v2 was exploratory: resource reporting instrumentation changed during
-  execution; v3 records immutable candidate source and code hashes. v2 is kept
-  as the failure trace, not the frozen evaluation dataset.
-- Observed noisy local baseline-versus-itself timings (one paired ratio ~0.59).
-  Laptop timings are development evidence and not A100 performance claims.
-- Integrity tests now **21 passed**. An intermediate test invocation failed
-  because Windows user/sandbox temp-directory ownership differed; rerunning
-  with a fresh project-local pytest temp path passed (logs/tests_v5.log).
-- User supplied empty GitHub repository. Initialized local main and pushed
-  commit d7fd1e6. Lonestar6 HTTPS read access to the repository was verified;
-  its SSH key is not registered with GitHub, so deployment uses HTTPS.
-- The real LLM launcher was stopped while waiting for GPU validation, before
-  making any inference requests, to reload the corrected source-policy code.
-- Added logical traffic/FLOP throughput accounting and an Nsight counter probe.
-  Peak fractions stay null until hardware-specific peak values are verified.
+**Hardware.**
+
+- Local development uses an RTX 4060 Laptop GPU under WSL Ubuntu. Local GPU
+  results are never presented as A100 results.
+- The first attempt to install the Linux GPU environment on the Windows-mounted
+  drive failed. The environment was then rebuilt on Linux-native storage.
+  Setup logs are on the `results` branch.
+
+**Implemented.**
+
+- *Benchmark and harness.*
+  - Four kernel families, 12 cases and trusted references.
+  - Edge-case, random and fresh-input validation.
+  - Paired AB/BA CUDA-event timing with confirmation of gains.
+  - Compiler-resource feedback, candidate process timeouts and an AST
+    integrity gate.
+- *Agent loops.*
+  - General and specialized four-call loops with greedy retention.
+  - JSONL, state and source logging, and accounting for every attempt.
+  - Model token reporting and a scripted engineering control.
+  - Fallback during final validation, and 12 hardware knowledge cards.
+- *Analysis.*
+  - Factorial paired analysis and a case-cluster bootstrap.
+  - CSV output and performance/cost curves.
+  - A balanced 144-search manifest.
+
+**Tests.** The first suite: **19 passed**. These are software integrity
+tests. They are not GPU correctness checks or scientific results.
+
+## 2026-11-14 — Cluster access and local GPU pilot
+
+**Lonestar6.**
+
+- Access to allocation `ASC26098` and its scratch space was verified.
+- A100 pilot job 3582290 was submitted to `gpu-a100-small` with a 30-minute
+  limit. When this entry was written, it was still waiting in the queue.
+- The cluster checks out the repository over HTTPS.
+
+**Model API.**
+
+- We selected the pinned `gpt-4.1-mini-2025-04-14` snapshot for a low-cost
+  pilot. Its rates are $0.40 per million input tokens and $1.60 per million
+  output tokens.
+- Inference spending for the pilot is capped at **$5 total**.
+- Sending kernel source, prompts and measurements to the API was approved
+  before any requests were made.
+
+**Local software.** PyTorch 2.11.0+cu128 and Triton 3.6.0 on WSL, installed in
+a persistent `.venv-linux` environment.
+
+**Pilot v2 (exploratory).**
+
+- 24 RTX 4060 evaluations ran; 23 passed.
+- `layernorm_irregular` failed the unchanged `2e-5` absolute tolerance, with a
+  maximum difference of about `3.99e-5`. The cause was cancellation from
+  approximate division in the mean on a constant row of irregular width.
+- Fix: both layer-normalization kernels now use `tl.div_rn` for the mean.
+  The tolerances were not loosened.
+- Reporting instrumentation changed while v2 was running. It is kept as the
+  record of the failure, not as the evaluation dataset.
+
+**Pilot v3 (reproducible).** Records immutable candidate source and code
+hashes, and uses the standard 31-sample timing.
+
+**Timing noise.** Laptop timing is noisy: one baseline-versus-itself ratio
+was about 0.59. Laptop timings are development evidence, not A100
+performance claims.
+
+**Tests.** The integrity suite now has **21 passed**.
+
+**Additions.**
+
+- Throughput accounting for logical traffic and FLOPs.
+- An Nsight counter probe.
+
+Peak-fraction fields stay null until the hardware's peak values are verified.

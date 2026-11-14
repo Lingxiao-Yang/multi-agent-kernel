@@ -1,36 +1,67 @@
-# Budget-matched multi-agent kernel optimization
+# Budget-Matched Multi-Agent Kernel Optimization
 
-Implementation of **proposal_final.pdf**. The older `.tex` file is not the
-protocol. This is an experiment repository: engineering controls and local
-GPU measurements are kept separate from the planned A100 LLM study.
+This repository implements the study described in the
+[project proposal](docs/proposal_final.pdf). The study asks whether LLM role
+specialization and curated hardware knowledge improve Triton kernel
+optimization when every variant gets the same attempt and call budget.
 
-Branch policy: **`main`** contains implementation/configurations/tests only;
-**`results`** contains raw experiment logs, measurements, plots, reports and
-standalone plotting scripts. Results carry source hashes and manifests so they
-can be traced back to the code on `main`.
+Engineering controls and local-GPU measurements are kept separate from the
+planned A100 LLM study, and they are not pooled with it.
+
+## Repository layout
+
+| Branch | Contents |
+| --- | --- |
+| `main` | Implementation, configurations, tests, cluster launchers and documentation |
+| [`results`](../../tree/results) | Raw experiment outputs, reports, preliminary plots and standalone plotting scripts |
+
+Every result directory records source hashes and a manifest, so each run can
+be traced to the code on `main`.
+
+| Path | Purpose |
+| --- | --- |
+| `kernel_study/` | Search controller, LLM providers, benchmark harness, metrics and analysis |
+| `configs/` | Case definitions, protocol parameters and the 144-search primary manifest |
+| `knowledge/cards.json` | Twelve sourced hardware knowledge cards |
+| `scripts/` | Pilot, campaign, probing and reporting entry points |
+| `cluster/` | Slurm launchers for TACC Lonestar6 |
+| `tests/` | CPU-only integrity tests |
+| `docs/` | Proposal, protocol and development log |
 
 ## What is implemented
 
-- Twelve cases: matmul, row softmax, layer normalization and bias + ReLU,
-  three shapes each, including irregular boundaries.
-- Readable Triton baselines; parameter and device-source transformations.
-- Four variants: `single`, `single_knowledge`, `multi`, `multi_knowledge`.
-  Identical four-call cadence and greedy search; specialized role prompts
-  change only in multi variants. General agents get analysis/revision calls.
-- Twelve sourced knowledge cards, deterministic selection and category ablation.
-- A trusted PyTorch reference and timing harness, fresh final inputs, edge
-  cases, immutable input checks, paired AB/BA timing and gain confirmation.
-- JSONL prompts/responses, candidate source, compiler errors, correctness,
-  latency samples, budgets, hardware/software metadata and SHA256 hashes.
-- Final-validation fallback, accounting for failures/repairs, a token safety
-  cap, explicit prices and bounded inference spending.
-- Paired factorial effects, case-cluster bootstrap confidence intervals,
-  performance-versus-budget curves, CSV summaries and Slurm launchers.
+- **Benchmark suite.** Twelve cases cover matrix multiplication, row softmax,
+  layer normalization and bias + ReLU. Each family has three shapes, including
+  irregular boundaries.
+- **Search space.** Readable Triton baselines, with parameter and device-source
+  transformations.
+- **Four variants.** `single`, `single_knowledge`, `multi` and
+  `multi_knowledge` share a four-call cadence and greedy retention. Only the
+  multi-agent variants use specialized role prompts. The single agent receives
+  equivalent analysis and revision calls with a general prompt.
+- **Knowledge bank.** Twelve sourced cards with deterministic selection and
+  category ablation.
+- **Measurement harness.**
+  - A trusted PyTorch reference and fresh inputs for final validation.
+  - Edge-case inputs and checks that inputs are not modified.
+  - Paired AB/BA timing, with a second measurement to confirm each gain.
+- **Provenance.** Every run records:
+  - prompts and responses as JSONL;
+  - candidate source and compiler errors;
+  - correctness results and latency samples;
+  - budgets, hardware/software metadata and SHA-256 hashes.
+- **Budget control.**
+  - Fallback to earlier candidates when final validation fails.
+  - Accounting for failed and repaired attempts.
+  - A token safety cap, explicit model prices and a bounded inference spend.
+- **Analysis.**
+  - Paired factorial effects and case-cluster bootstrap confidence intervals.
+  - Performance-versus-budget curves and CSV summaries.
 
 ## Quick start
 
-Linux with a CUDA GPU is required for measurements. CPU-only integrity tests
-can run on Windows. Do not benchmark on a cluster login node.
+GPU measurements require Linux with a CUDA GPU. The CPU-only integrity tests
+also run on Windows. Do not benchmark on a cluster login node.
 
 ```bash
 python -m venv .venv
@@ -41,9 +72,11 @@ python -m kernel_study.cli doctor
 python -m kernel_study.cli pilot --output results/my-pilot
 ```
 
-Use `--quick` only for development. Every output directory must be new;
-existing runs are never silently overwritten. The baseline/transform pilot
-uses no LLM and therefore cannot establish a role or knowledge effect.
+Use `--quick` only during development. Each run must write to a new output
+directory, so existing runs are never overwritten. The baseline/transform
+pilot uses no LLM and cannot measure a role or knowledge effect.
+
+A scripted-provider control run:
 
 ```bash
 python -m kernel_study.cli run --case softmax_irregular \
@@ -51,9 +84,16 @@ python -m kernel_study.cli run --case softmax_irregular \
   --provider scripted --output results/control-example
 ```
 
-For real model runs, configure `OPENAI_API_KEY` in the shell environment.
-The endpoint implements the Chat Completions schema with reported usage,
-JSON output, a seed and sampling temperature. Use one fixed model snapshot.
+### Real-model runs
+
+Set `OPENAI_API_KEY` in the shell environment. The endpoint must implement the
+Chat Completions schema and support:
+
+- reported token usage;
+- JSON output;
+- a seed and a sampling temperature.
+
+Use one fixed model snapshot for a whole campaign.
 
 ```bash
 python -m kernel_study.cli run --case softmax_irregular \
@@ -64,17 +104,22 @@ python -m kernel_study.cli run --case softmax_irregular \
 python -m kernel_study.cli analyze --input results/llm-example --output reports/example
 ```
 
-Prices are USD per million tokens and must be checked before a new campaign.
-The selected model is available in the supplied account as of 2026-11-14;
-it is a deprecated snapshot, retained here for a reproducible low-cost pilot.
-No scientific superiority is assumed. The `$5` bound in `scripts/llm_pilot.py`
-is shared across all pilot jobs; individual CLI `--dollar-cap` limits apply
-to one process, not to unrelated Slurm jobs.
+**Prices.** Prices are in USD per million tokens. Check them before starting a
+new campaign.
 
-## Lonestar6
+**Model.** The pilot uses the pinned `gpt-4.1-mini-2025-04-14` snapshot.
+It was available as of 2026-11-14. It is a deprecated snapshot, chosen for a
+reproducible, low-cost pilot. The study assumes no model is scientifically
+superior.
 
-The verified allocation is `ASC26098`. The project is deployed under
-`$SCRATCH/kernel-study`. Python environments and caches use `$SCRATCH`.
+**Spending caps.** The `$5` limit in `scripts/llm_pilot.py` is shared across
+all pilot jobs. A `--dollar-cap` passed to the CLI limits only that one
+process. It does not limit other Slurm jobs.
+
+## Running on Lonestar6
+
+The project runs under allocation `ASC26098` from `$SCRATCH/kernel-study`.
+Python environments and caches also live on `$SCRATCH`.
 
 ```bash
 mkdir -p logs
@@ -82,47 +127,71 @@ sbatch cluster/pilot.sbatch
 squeue -u "$USER"
 ```
 
-`cluster/search.sbatch` runs one explicit manifest index, so accidental
-submission of all 144 searches cannot occur. It requires a pinned model,
-endpoint, prices, credentials and a financial limit in environment variables.
-Inspect `configs/primary_manifest.json` before submitting repeated jobs.
-TACC queue wait is separate from optimization wall time; query Slurm
-`sacct` for submit/start/end/elapsed and preserve that output with the run.
+`cluster/search.sbatch` runs a single manifest index, so the 144 searches
+cannot be submitted all at once by accident. The script reads the following
+from environment variables:
+
+- the pinned model and endpoint;
+- the token prices;
+- the API credentials;
+- the spending limit.
+
+Review `configs/primary_manifest.json` before submitting repeated jobs.
+
+Queue wait time is not part of optimization wall time. Record the Slurm
+`sacct` submit, start, end and elapsed times with each run.
 
 ## Protocol status and interpretation
 
-The protocol is **development, not frozen** until the A100 pilot passes and
-costs/caps are inspected. The PDF's final plan is 20 attempts, 100 calls,
-three seeds and 12 cases (144 searches). Tokens are a reported resource,
-with an initial 500,000-token safety cap requiring pilot review.
+**Protocol status.** The protocol stays in development and is not frozen
+until:
 
-The first measurement mode is common timing + compiler resource feedback.
-No Nsight hardware-counter evidence is fabricated. The resource summary
-does not establish bandwidth, occupancy, stall reasons or a roofline bound.
-Each new incumbent receives profiling within the common 21-invocation cap.
-Compilation/first-launch time, process time and validation time are reported
-separately. Hardware-counter profiling and certified A100 peak-based
-roofline fractions remain additional work until access/specifications are verified.
+- the A100 pilot passes;
+- its costs and caps have been reviewed.
 
-Candidate modules may contain only approved Triton JIT functions. Launching,
-allocation, references and timers remain trusted code outside those modules.
-The AST gate and subprocess timeout are integrity controls, **not a security
-sandbox** against adversarial GPU code. Model-generated modules are limited
-to the existing function ABI; arbitrary new host dispatch strategies are
-outside this prototype. The baseline matmul deliberately avoids tensor-core
-instructions per the PDF; report library speed separately so its headroom
-does not inflate claims about agent quality.
+**Final plan.** The proposal's final plan is 144 searches: 12 cases, three
+seeds and four variants. Each search gets 20 attempts and 100 calls. Token use
+is reported but is not a matched budget. An initial 500,000-token safety cap
+will be reviewed after the pilot.
 
-Current evidence and unfinished work are in [docs/WORK_LOG.md](docs/WORK_LOG.md).
-Raw result directories and their manifests are the authority for executed
-experiments. Unit-test fixtures and scripted controls are not LLM findings.
+**Measurement mode.** The current mode uses common timing plus compiler
+resource feedback.
 
-## Sources
+- No Nsight hardware-counter data is used or inferred. The resource summary
+  says nothing about bandwidth, occupancy, stall reasons or roofline bounds.
+- Each new incumbent kernel is profiled, within a shared cap of 21
+  invocations.
+- Compile and first-launch time, process time and validation time are
+  reported separately.
+- Two things wait until hardware access and specifications are verified:
+  hardware-counter profiling and A100 peak-based roofline fractions.
 
-- [Final proposal](proposal_final.pdf), supplied by the user.
-- [TACC Lonestar6 guide](https://docs.tacc.utexas.edu/hpc/lonestar6/).
-- [NVIDIA Ampere tuning guide](https://docs.nvidia.com/cuda/ampere-tuning-guide/).
-- [CUDA best practices](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/).
-- [Triton tutorials](https://triton-lang.org/main/getting-started/tutorials/).
-- [Chat Completions reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create).
-- [Pinned model and pricing](https://developers.openai.com/api/docs/models/gpt-4.1-mini).
+**Integrity limits.**
+
+- Candidate modules may contain only approved Triton JIT functions. Launch,
+  memory allocation, reference computation and timing stay in trusted code
+  outside those modules.
+- The AST gate and subprocess timeout guard integrity. They are **not a
+  security sandbox** against adversarial GPU code.
+- Model-generated code must keep the existing function interface. New
+  host-side dispatch strategies are out of scope for this prototype.
+
+**Matmul baseline.** As the proposal specifies, the matmul baseline does not
+use tensor-core instructions. Library performance is reported separately so
+that this headroom does not inflate claims about the agents.
+
+See [docs/PROTOCOL.md](docs/PROTOCOL.md) for the full protocol and
+[docs/WORK_LOG.md](docs/WORK_LOG.md) for the development record. For executed
+experiments, the authority is the raw result directories and manifests on the
+`results` branch. Unit-test fixtures and scripted controls are not LLM
+findings.
+
+## References
+
+- [Project proposal](docs/proposal_final.pdf)
+- [TACC Lonestar6 user guide](https://docs.tacc.utexas.edu/hpc/lonestar6/)
+- [NVIDIA Ampere tuning guide](https://docs.nvidia.com/cuda/ampere-tuning-guide/)
+- [CUDA C++ best practices guide](https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/)
+- [Triton tutorials](https://triton-lang.org/main/getting-started/tutorials/)
+- [OpenAI Chat Completions API reference](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)
+- [`gpt-4.1-mini` model and pricing](https://developers.openai.com/api/docs/models/gpt-4.1-mini)
