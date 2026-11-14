@@ -1,0 +1,722 @@
+[
+  {
+    "case": "softmax_small",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "softmax_small",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "softmax_small",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "softmax_small",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "matmul_square",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "softmax_small",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_wide",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "softmax_small",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_small",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "matmul_large",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "softmax_wide",
+    "variant": "multi",
+    "seed": 33
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "softmax_small",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "multi",
+    "seed": 11
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_small",
+    "variant": "single",
+    "seed": 22
+  },
+  {
+    "case": "matmul_square",
+    "variant": "multi",
+    "seed": 22
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi_knowledge",
+    "seed": 22
+  },
+  {
+    "case": "matmul_rectangular",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "elementwise_large",
+    "variant": "multi_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "elementwise_irregular",
+    "variant": "single_knowledge",
+    "seed": 33
+  },
+  {
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11
+  },
+  {
+    "case": "matmul_large",
+    "variant": "single",
+    "seed": 22
+  }
+]

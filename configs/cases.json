@@ -1,0 +1,14 @@
+[
+  {"id":"matmul_square", "family":"matmul", "shape":[512,512,512], "dtype":"float16", "atol":0.03, "rtol":0.01},
+  {"id":"matmul_large", "family":"matmul", "shape":[1024,1024,1024], "dtype":"float16", "atol":0.05, "rtol":0.01},
+  {"id":"matmul_rectangular", "family":"matmul", "shape":[257,769,513], "dtype":"float16", "atol":0.05, "rtol":0.01},
+  {"id":"softmax_small", "family":"softmax", "shape":[256,128], "dtype":"float32", "atol":0.000002, "rtol":0.00002},
+  {"id":"softmax_wide", "family":"softmax", "shape":[1024,4096], "dtype":"float32", "atol":0.000002, "rtol":0.00002},
+  {"id":"softmax_irregular", "family":"softmax", "shape":[513,781], "dtype":"float32", "atol":0.000002, "rtol":0.00002},
+  {"id":"layernorm_small", "family":"layernorm", "shape":[256,128], "dtype":"float32", "atol":0.00002, "rtol":0.0002},
+  {"id":"layernorm_wide", "family":"layernorm", "shape":[1024,4096], "dtype":"float32", "atol":0.00002, "rtol":0.0002},
+  {"id":"layernorm_irregular", "family":"layernorm", "shape":[513,781], "dtype":"float32", "atol":0.00002, "rtol":0.0002},
+  {"id":"elementwise_small", "family":"elementwise", "shape":[64,128], "dtype":"float32", "atol":0.000001, "rtol":0.000001},
+  {"id":"elementwise_large", "family":"elementwise", "shape":[4096,1024], "dtype":"float32", "atol":0.000001, "rtol":0.000001},
+  {"id":"elementwise_irregular", "family":"elementwise", "shape":[513,781], "dtype":"float32", "atol":0.000001, "rtol":0.000001}
+]

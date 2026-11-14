@@ -1,0 +1,10 @@
+.venv/
+.venv-linux/
+.cache/
+__pycache__/
+.pytest_cache/
+*.pyc
+.env
+tmp/
+*.ncu-rep
+
