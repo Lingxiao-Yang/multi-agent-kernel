@@ -45,7 +45,11 @@ event(log,'campaign_launch',command=command,phase_ceiling_usd=settings['cap_usd'
 result=subprocess.run(command,cwd=ROOT)
 event(log,'campaign_exit',returncode=result.returncode)
 report=summarize(out/'campaign',out/'repair_report.json',plan)
+audit=subprocess.run([sys.executable,str(ROOT/'scripts/audit_source_runs.py'),
+    '--input',str(out/'campaign'),'--output',str(out/'source_audit')],cwd=ROOT)
+event(log,'source_audit_exit',returncode=audit.returncode)
 event(log,'phase_evaluated',complete=report['complete'],improved_searches_by_case=report['improved_searches_by_case'],
       stronger_required=report['stronger_required'],first_correct_after_attempt_2=report['first_correct_after_attempt_2'])
-write_json(out/'status.json',dict(status='complete' if report['complete'] and result.returncode==0 else 'incomplete'))
-raise SystemExit(0 if report['complete'] and result.returncode==0 else 2)
+success=report['complete'] and result.returncode==0 and audit.returncode==0
+write_json(out/'status.json',dict(status='complete' if success else 'incomplete'))
+raise SystemExit(0 if success else 2)
