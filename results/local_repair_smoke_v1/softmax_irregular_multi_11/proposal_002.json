@@ -1,0 +1,54 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats_stage1",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_stats_stage2",
+        "grid": [
+          513
+        ],
+        "args": [
+          "S",
+          "S",
+          4,
+          4
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats_stage1(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col_block = tl.program_id(1)\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < N\n\n    # Load slice with padding -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n    local_max = tl.max(x, 0)\n\n    # Subtract local max for numerical stability and compute exp and sum\n    exp_x = tl.exp(x - local_max)\n    local_denom = tl.sum(exp_x, 0)\n\n    # Store partial max and denom per block\n    # layout: S[row, col_block*2] = max, S[row, col_block*2+1] = denom\n    ptr_max = S + row * 8 + col_block * 2\n    ptr_denom = ptr_max + 1\n    tl.store(ptr_max, local_max)\n    tl.store(ptr_denom, local_denom)\n\n@triton.jit\ndef softmax_stats_stage2(S_in, S_out, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n\n    # Load all partial max and denom from stage1 (BLOCK=4 blocks, each block 2 elements)\n    offs = tl.arange(0, BLOCK * 2)  # 8 elements: max, denom pairs\n    mask = offs < BLOCK * 2\n    vals = tl.load(S_in + row * 8 + offs, mask, other=-float('inf'))\n\n    # Separate max and denom values\n    max_vals = tl.where(offs % 2 == 0, vals, -float('inf'))\n    denom_vals = tl.where(offs % 2 == 1, vals, 0.0)\n\n    # Reduce max over blocks\n    max_val = tl.max(max_vals, 0)\n\n    # Adjust denom sums by exp(max_vals - max_val) to combine partial sums correctly\n    adj = tl.exp(tl.where(max_vals != -float('inf'), max_vals - max_val, -float('inf')))\n    denom_val = tl.sum(denom_vals * adj, 0)\n\n    # Store global max and denom\n    tl.store(S_out + row * 2, max_val)\n    tl.store(S_out + row * 2 + 1, denom_val)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    idx = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = idx // N\n    mask = idx < TOTAL\n\n    x = tl.load(X + idx, mask, other=0.0)\n    max_val = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n\n    y = tl.exp(x - max_val) / denom\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Refactor fused kernel to a three-kernel reduction scheme avoiding unsupported warp shuffle: first kernel computes local max and denom per block slice and stores partial results; second kernel reduces these partial results per row to obtain global max and denom; third kernel applies softmax normalization using global stats. This decomposition uses only supported Triton primitives and ensures correct masking and indexing, covering the entire input with concrete grid sizes and powers-of-two block sizes. This approach respects Triton's current capabilities and addresses the previous failure due to unsupported shuffle reductions, enabling efficient and correct softmax computation on irregular shapes."
+}

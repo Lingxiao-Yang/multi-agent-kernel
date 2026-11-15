@@ -1,0 +1,61 @@
+{
+  "checked_utc": "2026-11-15T19:33:20.179668+00:00",
+  "source": "tmp\\results-worktree\\results\\a100_source_pilot_3582814",
+  "searches": 16,
+  "counts": {
+    "error": 7,
+    "incorrect": 10,
+    "ok": 5,
+    "proposal_error": 10
+  },
+  "by_family": {
+    "elementwise": {
+      "error": 3,
+      "incorrect": 3,
+      "ok": 1,
+      "proposal_error": 1
+    },
+    "layernorm": {
+      "incorrect": 3,
+      "proposal_error": 3,
+      "error": 2
+    },
+    "matmul": {
+      "ok": 4,
+      "proposal_error": 4
+    },
+    "softmax": {
+      "incorrect": 4,
+      "error": 2,
+      "proposal_error": 2
+    }
+  },
+  "retained": [
+    {
+      "case": "elementwise_irregular",
+      "variant": "single",
+      "attempt": 1
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi",
+      "attempt": 1
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi_knowledge",
+      "attempt": 1
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single",
+      "attempt": 1
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single_knowledge",
+      "attempt": 1
+    }
+  ],
+  "cost": 0.32243240000000006
+}

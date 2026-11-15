@@ -1,0 +1,27 @@
+{
+  "jobs": [
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11
+    }
+  ],
+  "shared_dollar_cap": 0.5,
+  "phase": "pilot",
+  "note": "Reduced pilot caps, not the full proposed primary study."
+}

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513,
+          4
+        ],
+        "num_warps": 4,
+        "num_stages": 1,
+        "args": [
+          "X",
+          "Y",
+          781
+        ]
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 256\n    col_block = tl.program_id(1)\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < N\n\n    # Load input slice with masking, padding with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: local max and denom per block slice\n    local_max = tl.max(x, 0)\n    exp_x = tl.exp(x - local_max)\n    local_denom = tl.sum(exp_x, 0)\n\n    # Warp-wide reduction across blocks (program_id(1)) for max and denom\n    pid1 = tl.program_id(1)\n    # Reduce max with warp shuffle down\n    for offset in [2, 1]:\n        tmp = tl.shfl_down(local_max, offset, 4)\n        if pid1 + offset < 4:\n            local_max = tl.maximum(local_max, tmp)\n    # Reduce denom with warp shuffle down\n    for offset in [2, 1]:\n        tmp = tl.shfl_down(local_denom, offset, 4)\n        if pid1 + offset < 4:\n            local_denom += tmp\n\n    # Broadcast final max and denom to all lanes in warp\n    max_val = tl.shfl(local_max, 0, 4)\n    denom_val = tl.shfl(local_denom, 0, 4)\n\n    # Compute final softmax slice\n    y = tl.exp(x - max_val) / denom_val\n\n    # Store result masked\n    tl.store(Y + row * N + offs, y, mask)\n",
+  "rationale": "Implemented a fused softmax kernel that replaces the two-step approach with a single kernel. Uses BLOCK=256 and a 2D grid (rows x 4 column blocks) to reduce masked work and improve utilization. Each block loads a slice of the row, computes local max and denom, then performs a warp-wide reduction across the 4 blocks per row with warp shuffle instructions to get the global max and denom. Finally, computes normalized softmax values for the slice and stores results with masking. This reduces memory traffic and kernel launch overhead, addressing the main bottlenecks observed in the incumbent."
+}

@@ -1,5 +1,20 @@
 # Experiment Log
 
+## Checkpoint 5 - 2026-11-15: longer guided repair rounds submitted
+
+Raw pilot failures verified; shared API guidance and diagnostics added; 41
+integrity tests passed. User approved a $25 total cap. Submitted mini job
+3584053 (16 searches, 8 attempts, 2 seeds, $4 ceiling) and conditional matched
+GPT-4.1 job 3584057 ($16). The larger-model job waits for successful complete
+mini evidence and runs only if either reduction case misses the 6/8 readiness
+threshold. Maximum total reserved exposure including prior spend and local
+smoke: $21.3739192. Local smoke remains active, with 3/4 completed
+searches copied at this checkpoint. Full outcomes are pending.
+
+See [REPAIR_ROUND_STATUS.md](REPAIR_ROUND_STATUS.md). User will return after
+jobs finish; no polling loop remains necessary. Every phase writes its own
+event, decision, source-audit and cost records automatically.
+
 ## Checkpoint 4 - 2026-11-15: A100 source pilot completed
 
 Lonestar6 job 3582814 completed at 22:25 CST on 2026-11-14 (exit 0:0,

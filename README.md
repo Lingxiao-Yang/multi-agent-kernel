@@ -10,6 +10,7 @@ that link it to the exact code that produced it.
 
 | Report | Summary |
 | --- | --- |
+| [Guided repair round](reports/REPAIR_ROUND_STATUS.md) | Longer A100 repair round submitted; conditional stronger-model comparison; $25 approved total cap |
 | **[Source-generation pilot](reports/SOURCE_PILOT_REPORT.md)** | **Agents author Triton source. A100 job 3582814: 16 searches, 5 correct authored kernels (tiled `tl.dot` matmul in all 4 variants, 1.48–3.03×; fused bias + ReLU, 1.86×); no correct softmax or layernorm. Plus an 8-search laptop smoke** |
 | [A100 configuration-selection pilot](reports/A100_PILOT_REPORT.md) | Lonestar6 A100-PCIE-40GB: 24/24 engineering evaluations correct; 24-search LLM pilot (2 cases × 4 variants × 3 seeds). Multi-agent variants reached 6.3× on matmul by enabling tensor cores; single agents never did. Configuration-only: no authored source |
 | [GPU engineering pilot](reports/GPU_PILOT_REPORT.md) | 24/24 correct baseline/transformation evaluations on an RTX 4060 Laptop GPU, including a numerical failure that was found and fixed |

@@ -89,6 +89,36 @@
       "fetched": "2026-11-15 (CST); results/a100_source_pilot_3582814, logs/a100/source-pilot-3582814.*",
       "outcome": "16/16 searches complete (4 families x 4 variants x seed 11, 2 attempts); 32 attempts, 5 correct and retained (4 matmul, 1 elementwise); estimated inference $0.3224. Final speedups: matmul single 1.476, single_knowledge 2.714, multi 2.717, multi_knowledge 3.027; elementwise single 1.856; other 11 searches 1.000. Offline gate-v2 replay keeps all 5 retained kernels.",
       "report": "reports/SOURCE_PILOT_REPORT.md"
+    },
+    {
+      "job_id": 3584053,
+      "name": "kernel-repair-mini",
+      "script": "cluster/repair_round.sbatch",
+      "partition": "gpu-a100-small",
+      "time_limit": "03:00:00",
+      "commit": "0d0fd71",
+      "submitted": "2026-11-15T13:36:02",
+      "state": "PENDING",
+      "dependency": null,
+      "dollar_cap_usd": 4.0,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "expected_output": "$SCRATCH/kernel-study-repair-20261115/results/repair-mini-3584053",
+      "note": "2 cases x 4 variants x 2 seeds; 8 attempts, 32 calls per search."
+    },
+    {
+      "job_id": 3584057,
+      "name": "kernel-repair-strong",
+      "script": "cluster/repair_round.sbatch",
+      "partition": "gpu-a100-small",
+      "time_limit": "04:00:00",
+      "commit": "0d0fd71",
+      "submitted": "2026-11-15T13:37:12",
+      "state": "PENDING",
+      "dependency": "afterany:3584053",
+      "dollar_cap_usd": 16.0,
+      "model": "gpt-4.1-2025-04-14",
+      "expected_output": "$SCRATCH/kernel-study-repair-20261115/results/repair-strong-3584057",
+      "note": "Strong phase checks successful mini completion and the recorded readiness threshold before any inference."
     }
   ]
 }
