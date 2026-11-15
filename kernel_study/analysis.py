@@ -63,7 +63,9 @@ def validate_cohort(summaries):
     # have different source hashes. Each family's baseline must remain frozen.
     fingerprints = {(s['manifest']['protocol_hash'],s['manifest']['knowledge_hash'],
                      s['manifest']['provider'],s['manifest']['model'],s['resolved_model'],
-                     s['manifest']['environment'].get('gpu')) for s in summaries}
+                     s['manifest']['environment'].get('gpu'),
+                     tuple(sorted((k,v) for k,v in s['manifest'].get('code_hashes',{}).items()
+                                  if k != 'kernel_study/analysis.py'))) for s in summaries}
     baselines, case_definitions = {}, {}
     for s in summaries:
         m=s['manifest']

@@ -60,6 +60,8 @@ def test_cohort_allows_family_baselines_but_rejects_within_family_drift():
     with pytest.raises(ValueError,match='Incompatible'): validate_cohort([a,b,drift])
     drift=copy.deepcopy(a);drift['manifest']['case_hash']='changed'
     with pytest.raises(ValueError,match='Incompatible'): validate_cohort([a,b,drift])
+    drift=copy.deepcopy(a);drift['manifest']['code_hashes']={'kernel_study/search.py':'changed'}
+    with pytest.raises(ValueError,match='Incompatible'): validate_cohort([a,b,drift])
 
 
 def test_source_search_rejects_null_source_and_counts_failed_attempts(tmp_path,monkeypatch):
