@@ -36,6 +36,12 @@ sources still pass. There are 37 passing CPU tests. The running A100 job
 checkout after it started. All 12 source-interface baseline checks passed on
 A100 before inference. Full logs and the completed laptop report are on results.
 
+A100 job 3582814 completed (exit 0:0, 27 min 51 s, about $0.322): 16/16
+searches, 5 correct authored kernels (tiled `tl.dot` matmul in all four
+variants, 1.48–3.03×; fused bias + ReLU, 1.86×), no correct softmax or
+layernorm. Offline gate-v2 replay changes no outcome. Results and audit are on
+the `results` branch (`reports/SOURCE_PILOT_REPORT.md`).
+
 Dates are in America/Chicago time. Logs of machine events use UTC.
 Credentials are never stored in this repository. Later experimental records
 are on the `results` branch (`reports/WORK_LOG.md`).
