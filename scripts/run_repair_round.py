@@ -23,6 +23,10 @@ write_json(out/'plan.json',plan)
 if args.phase=='strong':
     if not args.mini_output: raise SystemExit('Strong phase requires completed mini output')
     mini=Path(args.mini_output)
+    if not (mini/'status.json').exists() or read_json(mini/'status.json').get('status')!='complete':
+        event(log,'phase_blocked',reason='Mini phase did not finish successfully; no inference requested')
+        write_json(out/'status.json',dict(status='blocked',reason='mini_incomplete'))
+        raise SystemExit(2)
     if read_json(mini/'plan.json')!=plan: raise SystemExit('Plan drift between phases')
     decision=summarize(mini/'campaign',out/'mini_decision_recomputed.json',plan)
     if not decision['complete']: raise SystemExit('Mini phase is incomplete; refusing selective comparison')
