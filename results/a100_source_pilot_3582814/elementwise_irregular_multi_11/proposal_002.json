@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu_tiled",
+        "grid": [
+          513,
+          25
+        ],
+        "args": [
+          "X",
+          "B",
+          "Y",
+          781
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu_tiled(X, B, Y, N: tl.constexpr):\n    BLOCK_SIZE = 32\n    row = tl.program_id(0)  # row index\n    block_id = tl.program_id(1)  # column block index\n    col_start = block_id * BLOCK_SIZE\n    offsets = col_start + tl.arange(0, BLOCK_SIZE)  # constexpr\n    mask = offsets < N\n    x_ptr = X + row * N + offsets\n    b_ptr = B + offsets\n    x = tl.load(x_ptr, mask, other=0.0)\n    b = tl.load(b_ptr, mask, other=0.0)\n    z = x + b\n    y = tl.maximum(z, 0.0)\n    tl.store(Y + row * N + offsets, y, mask)\n",
+  "rationale": "Merged bias addition and relu into a single 2D tiled kernel to improve occupancy and memory bandwidth utilization. Used a constexpr BLOCK_SIZE=32 with a 2D grid (rows, blocks per row) and masking for partial tiles to handle irregular shape (N=781). Increased warps to 8 and pipeline stages to 2 for better latency hiding and throughput. Eliminated separate tail kernel by masking partial tiles, reducing kernel launch overhead and improving parallelism. This addresses prior bottlenecks of low occupancy and memory-bound behavior, and fixes prior compilation errors by using constexpr arange arguments."
+}

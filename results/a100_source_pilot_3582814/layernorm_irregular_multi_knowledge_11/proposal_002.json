@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    sum_val = 0.0\n    sq_sum_val = 0.0\n    # Tile loop for mean and variance computation\n    for tile_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = tile_start + offs\n        mask = col < N\n        ptr = X + row * N + col\n        x = tl.load(ptr, mask, other=0.0)\n        sum_val += tl.sum(x, mask)\n    mean = sum_val / N\n\n    # Barrier for synchronization across stages\n    tl.barrier()\n\n    for tile_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = tile_start + offs\n        mask = col < N\n        ptr = X + row * N + col\n        x = tl.load(ptr, mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        sq_sum_val += tl.sum(centered * centered, mask)\n    var = sq_sum_val / N\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Barrier to ensure mean and inv_std ready\n    tl.barrier()\n\n    # Compute output in tiles\n    for tile_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = tile_start + offs\n        mask = col < N\n        x_ptr = X + row * N + col\n        x = tl.load(x_ptr, mask, other=0.0)\n        w = tl.load(W + col, mask, other=0.0)\n        b = tl.load(B + col, mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        y = (centered * inv_std) * w + b\n        y_ptr = Y + row * N + col\n        tl.store(y_ptr, y, mask)\n",
+  "rationale": "Fused layernorm_stats and layernorm_apply into a single kernel with tiled per-row reduction. The kernel iterates over tiles of size BLOCK=256 to handle irregular N=781 with masking, summing input and squared differences in separate loops separated by barriers for correctness. Then applies normalization and affine transform in a final tile loop, minimizing global memory traffic and kernel launches, addressing bottlenecks K05, K07 and K09. Using 2 stages allows synchronization needed for multi-pass reductions, preserving correctness and efficiency for irregular widths."
+}

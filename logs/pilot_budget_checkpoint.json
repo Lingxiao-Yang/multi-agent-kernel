@@ -3,8 +3,9 @@
   "prior_completed_campaigns_usd": 0.48188200000000003,
   "new_local_completed_usd": 0.0695772,
   "diagnostics_approx_usd": 2.76e-05,
-  "running_a100_maximum_usd": 1.25,
-  "upper_bound_with_running_ceiling_usd": 1.8014868000000002,
-  "note": "Ceiling is reserved exposure, not actual A100 spend. Failed rejected API requests are not billed as inference.",
-  "updated_utc": "2026-11-15T04:07:38.743968+00:00"
+  "note": "Estimated from token usage at pinned prices. Failed rejected API requests are not billed as inference.",
+  "updated_utc": "2026-11-15T07:30:00+00:00",
+  "a100_source_pilot_3582814_usd": 0.3224324,
+  "total_completed_usd": 0.8739192,
+  "remaining_of_approved_usd": 4.1260808
 }

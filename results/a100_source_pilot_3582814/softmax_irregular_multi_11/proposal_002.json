@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          "N",
+          64
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          13000
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400053,
+          "N",
+          32
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n    x = tl.load(X + offs, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    denom = tl.sum(tl.exp(x - mx), 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    idx = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = idx < TOTAL\n    row = idx // N\n    col = idx % N\n    x = tl.load(X + idx, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=-float('inf'))\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    safe_denom = tl.where(denom > 0, denom, 1.0)\n    y = tl.exp(x - mx) / safe_denom\n    y = tl.where(mask, y, 0.0)\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Refined kernel launches with smaller BLOCK sizes (64 for softmax_stats, 32 for softmax_apply) to allow finer-grained masking and boundary checks, preventing out-of-bounds accesses that caused NaNs. Added explicit mask-based loading with safe defaults (-inf for max, 1.0 for denom) and safe denominator replacement to avoid division by zero or invalid values. Computed row and column indices explicitly in softmax_apply for clarity and robust indexing. Enabled 2 pipeline stages and 4 warps to balance resource usage and latency hiding. These changes directly address invalid load/store accesses and denominator safety, resolving NaNs at boundaries and improving correctness at some throughput trade-offs."
+}

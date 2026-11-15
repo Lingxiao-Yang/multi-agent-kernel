@@ -1,0 +1,42 @@
+{
+  "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+  "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+  "torch": "2.11.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "gpu": "NVIDIA A100-PCIE-40GB",
+  "memory_bytes": 42406903808,
+  "capability": [
+    8,
+    0
+  ],
+  "sm_count": 108
+}
+matmul_square ok 
+matmul_large ok 
+matmul_rectangular ok 
+softmax_small ok 
+softmax_wide ok 
+softmax_irregular ok 
+layernorm_small ok 
+layernorm_wide ok 
+layernorm_irregular ok 
+elementwise_small ok 
+elementwise_large ok 
+elementwise_irregular ok 
+elementwise_irregular single 11 complete 1.8564102081908924 0.0145296
+softmax_irregular single 11 complete 1.0 0.0320188
+layernorm_irregular multi 11 complete 1.0 0.05030639999999999
+softmax_irregular single_knowledge 11 complete 1.0 0.07166520000000003
+softmax_irregular multi 11 complete 1.0 0.08917840000000002
+matmul_rectangular single_knowledge 11 complete 2.714082478351387 0.11148600000000002
+elementwise_irregular multi 11 complete 1.0 0.12981320000000002
+matmul_rectangular single 11 complete 1.4760062334460693 0.1541656
+layernorm_irregular multi_knowledge 11 complete 1.0 0.17499080000000006
+elementwise_irregular multi_knowledge 11 complete 1.0 0.19493760000000004
+elementwise_irregular single_knowledge 11 complete 1.0 0.21082880000000004
+softmax_irregular multi_knowledge 11 complete 1.0 0.23121800000000003
+layernorm_irregular single_knowledge 11 complete 1.0 0.2541684
+layernorm_irregular single 11 complete 1.0 0.27728639999999993
+matmul_rectangular multi_knowledge 11 complete 3.0269839618497763 0.3011471999999999
+matmul_rectangular multi 11 complete 2.7169274502361755 0.32243239999999984

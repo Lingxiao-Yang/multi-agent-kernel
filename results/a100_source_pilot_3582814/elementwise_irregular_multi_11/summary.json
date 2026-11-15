@@ -1,0 +1,523 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:10:19.411196+00:00",
+    "case": {
+      "id": "elementwise_irregular",
+      "family": "elementwise",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 1e-06,
+      "rtol": 1e-06
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "146472a571ffbebb10f8eaa7b73fd5cbccdef2359c07df70a4591efcb973a04a",
+    "baseline_hash": "28f90ba2ae68a784f67ab0d7230dd112a974e54af9f2ca3e8b9545dcdc03e7f0",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 30386,
+    "output_tokens": 3858,
+    "tokens": 34244
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0
+        }
+      ],
+      "first_launch_seconds": 1.1951046837493777,
+      "validation_seconds": 1.936769057996571,
+      "candidate": {
+        "median_ms": 0.03604480028152466,
+        "p25_ms": 0.03420159965753555,
+        "p75_ms": 0.04428800046443939,
+        "min_ms": 0.03297280073165894,
+        "samples_ms": [
+          0.03860479891300202,
+          0.0347135990858078,
+          0.045363199710845944,
+          0.03573760092258453,
+          0.045158401131629944,
+          0.03635199964046478,
+          0.03328000009059906,
+          0.04485119879245758,
+          0.03594239950180054,
+          0.04116480052471161,
+          0.03583999872207642,
+          0.03338240087032318,
+          0.046079999208450316,
+          0.03532800078392029,
+          0.0449535995721817,
+          0.03604480028152466,
+          0.0336896002292633,
+          0.04423680007457733,
+          0.03338240087032318,
+          0.0447488009929657,
+          0.03543039858341217,
+          0.03328000009059906,
+          0.04382719993591309,
+          0.03573760092258453,
+          0.04485119879245758,
+          0.03614720106124878,
+          0.03338240087032318,
+          0.04433920085430145,
+          0.0336896002292633,
+          0.04382719993591309,
+          0.03297280073165894
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03583999872207642,
+        "p25_ms": 0.034355200827121735,
+        "p75_ms": 0.04479999989271164,
+        "min_ms": 0.031641599535942075,
+        "samples_ms": [
+          0.03461120128631592,
+          0.046387198567390445,
+          0.03389439880847931,
+          0.0449535995721817,
+          0.03583999872207642,
+          0.03389439880847931,
+          0.04464640021324158,
+          0.03409920036792755,
+          0.0449535995721817,
+          0.035123199224472046,
+          0.03348479866981506,
+          0.04444159865379334,
+          0.03563520014286041,
+          0.04669440090656281,
+          0.03553279936313629,
+          0.0449535995721817,
+          0.03768320083618164,
+          0.03389439880847931,
+          0.0447488009929657,
+          0.03532800078392029,
+          0.0421887993812561,
+          0.03583999872207642,
+          0.03348479866981506,
+          0.04526079893112182,
+          0.03553279936313629,
+          0.043315199017524716,
+          0.0477183997631073,
+          0.03358719944953918,
+          0.04485119879245758,
+          0.03573760092258453,
+          0.031641599535942075
+        ]
+      },
+      "paired_speedup": 0.9943181385983926,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.018943999707698823,
+        "p25_ms": 0.01879040002822876,
+        "p75_ms": 0.019353600591421126,
+        "min_ms": 0.018534399569034576,
+        "samples_ms": [
+          0.027340799570083618,
+          0.020787200331687926,
+          0.01945600062608719,
+          0.01884160041809082,
+          0.029286399483680725,
+          0.020172800123691558,
+          0.019251200556755065,
+          0.01884160041809082,
+          0.026009601354599,
+          0.019046400487422944,
+          0.020684799551963805,
+          0.018943999707698823,
+          0.019148799777030944,
+          0.03031040132045746,
+          0.01884160041809082,
+          0.018739199638366698,
+          0.01884160041809082,
+          0.018534399569034576,
+          0.019046400487422944,
+          0.018636800348758698,
+          0.01884160041809082,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.018534399569034576,
+          0.01884160041809082,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.018534399569034576,
+          0.01884160041809082,
+          0.018534399569034576,
+          0.018943999707698823
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3208348,
+        "logical_gbps": 89.01000907042035,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.1325769051909447,
+      "process_seconds": 15.168623380362988
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "bias_add",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "B",
+            "T",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "relu",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "T",
+            "Y",
+            "TOTAL",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_tiled",
+            "grid": [
+              513,
+              25
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              781
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          },
+          {
+            "kernel": "relu_tail",
+            "grid": [
+              513,
+              1
+            ],
+            "args": [
+              "Y",
+              781
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "44d2629aa77a98288d7dc5c7837c8b437b77fa241a58904f7f8ca6dece5f055f",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Split the computation into a tiled 2D grid to increase occupancy and better utilize GPU resources. Use 25 blocks of size 32 to cover 781 columns (25*32=800 covering 781 with some excess). Launch 8 warps per block with 2 pipeline stages to hide latency and improve throughput. Add a small tail kernel to handle remainder columns beyond tiled coverage for correctness, ensuring full coverage of irregular shape. This trades a tiny extra kernel launch overhead for better parallelism and memory bandwidth utilization, addressing both under-utilization and memory-bound bottlenecks.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:26:\ndef bias_add_relu_tiled(X, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    block_size = 32\n    col_start = block_id * block_size\n    offsets = col_start + tl.arange(0, block_size)\n                          ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 10.696353303268552,
+        "process_seconds": 12.892721277661622
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7254,
+        "output_tokens": 1467,
+        "tokens": 8721
+      },
+      "review": {
+        "measured_outcome": "The initial attempt to split the bias_add + relu operation into a tiled 2D grid and a tail kernel failed to compile due to a type error: tl.arange() requires a constexpr argument but was given a runtime variable. The incumbent single-launch fused kernel achieves moderate bandwidth utilization (~93 GB/s) but under-utilizes GPU compute resources (4 warps only) and has higher latency (~0.034 ms) than the library reference (~0.0195 ms). No hardware counters indicated compute bottlenecks, suggesting memory-bound behavior and low occupancy.",
+        "failures": "Compilation error in proposed tiled kernel due to non-constexpr argument to tl.arange(). This prevents launching the tiled kernel with the intended 2D grid and tiling. The incumbent kernel uses a 1D launch with low warps, limiting occupancy and parallelism. The tail kernel approach adds complexity and overhead for small remainder handling but is currently uncompilable.",
+        "next_directions": "Correct the tiled kernel by using a constexpr tile size and only constexpr arguments to tl.arange(), e.g., define BLOCK_SIZE as a constexpr parameter and use tl.arange(0, BLOCK_SIZE). Use a 2D grid with (rows, num_blocks_per_row) matching shape. Remove the separate tail kernel by ensuring the mask handles partial tiles. Increase num_warps to 8 and num_stages to 2 to improve latency hiding and throughput. Consider launching with grid dimensions [ROWS, CEIL_DIV(N, BLOCK_SIZE)] for full coverage. This should improve occupancy, reduce kernel launch overhead, and better saturate memory bandwidth, potentially lowering latency closer to library reference.",
+        "implement": {
+          "config": {
+            "mode": "source-v1",
+            "launches": [
+              {
+                "kernel": "bias_add_relu_tiled",
+                "grid": [
+                  513,
+                  25
+                ],
+                "args": [
+                  "X",
+                  "B",
+                  "Y",
+                  781
+                ],
+                "num_warps": 8,
+                "num_stages": 2
+              }
+            ]
+          },
+          "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu_tiled(X, B, Y, N: tl.constexpr):\n    BLOCK_SIZE = 32\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    col_start = block_id * BLOCK_SIZE\n    offsets = col_start + tl.arange(0, BLOCK_SIZE)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=0.0)\n    b = tl.load(B + offsets, mask, other=0.0)\n    z = x + b\n    y = tl.maximum(z, 0.0)\n    tl.store(Y + row * N + offsets, y, mask)\n"
+        },
+        "rationale": "Fixed compilation error by declaring BLOCK_SIZE as constexpr and used it in tl.arange(). This enables a tiled 2D launch with proper masking for partial tiles, eliminating the need for a separate tail kernel. Increased warps and stages to improve occupancy and latency hiding, addressing previous under-utilization and memory bandwidth bottleneck hypotheses."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 11795,
+        "output_tokens": 2099,
+        "tokens": 13894
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_tiled",
+            "grid": [
+              513,
+              25
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              781
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "edac6943074257c2ae43780364c66bacb6e7b62a26725b0fb9a02b8df1a14b19",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Merged bias addition and relu into a single 2D tiled kernel to improve occupancy and memory bandwidth utilization. Used a constexpr BLOCK_SIZE=32 with a 2D grid (rows, blocks per row) and masking for partial tiles to handle irregular shape (N=781). Increased warps to 8 and pipeline stages to 2 for better latency hiding and throughput. Eliminated separate tail kernel by masking partial tiles, reducing kernel launch overhead and improving parallelism. This addresses prior bottlenecks of low occupancy and memory-bound behavior, and fixes prior compilation errors by using constexpr arange arguments.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:26:\ndef bias_add_relu_tiled(X, B, Y, N: tl.constexpr):\n    BLOCK_SIZE = 32\n    row = tl.program_id(0)  # row index\n    block_id = tl.program_id(1)  # column block index\n    col_start = block_id * BLOCK_SIZE\n    offsets = col_start + tl.arange(0, BLOCK_SIZE)  # constexpr\n                          ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 10.84965211711824,
+        "process_seconds": 12.898686560802162
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 24321,
+        "output_tokens": 3461,
+        "tokens": 27782
+      },
+      "review": {
+        "measured_outcome": "The attempts to implement a tiled 2D kernel using a constexpr BLOCK_SIZE parameter and 2D grid launch failed to compile due to the use of a non-constexpr argument in tl.arange(). The compilation error is consistent and blocks execution. The incumbent kernel uses a single 1D launch with 4 warps and a separate relu kernel, achieving moderate bandwidth (~93 GB/s) but higher latency (~0.034 ms) than the library reference (~0.0195 ms). Hardware profiling shows no compute bottlenecks, indicating memory-bound performance and low occupancy due to limited parallelism in the kernel launch configuration.",
+        "failures": "Repeated compilation failure caused by non-constexpr argument passed to tl.arange(), specifically the offset calculation using runtime variables prevents kernel compilation. Attempts to tile the kernel into 2D launches with masking to handle irregular tensor shapes have failed to compile. The incumbent kernel, though correct and compiling, underutilizes GPU resources with low warp count and single dimension launch, resulting in suboptimal latency and throughput.",
+        "next_directions": "Revise the kernel so that all arguments to tl.arange() are strictly constexpr values. For example, define BLOCK_SIZE as a global constexpr or function parameter and use tl.arange(0, BLOCK_SIZE) alone. Calculate offsets by adding a constexpr multiple of BLOCK_SIZE to the tl.arange result, ensuring the addition is done on the host or via constexpr arithmetic, not runtime variables. Launch a 2D grid with dimensions [ROWS, CEIL_DIV(N, BLOCK_SIZE)] to cover the entire shape. Use masking to handle partial tiles without any tail kernel. Increase num_warps to 8 and num_stages to 2 to improve occupancy and latency hiding. This approach should resolve compilation errors, increase parallelism, saturate memory bandwidth more effectively, and reduce latency closer to the library baseline. Careful inlining of offset computations and use of constexpr parameters is critical to avoid further compilation errors."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 30386,
+        "output_tokens": 3858,
+        "tokens": 34244
+      }
+    }
+  ],
+  "wall_seconds": 87.01597630046308,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.01832720000000003,
+  "budget_committed_usd": 0.018327200000000002,
+  "speedup": 1.0
+}

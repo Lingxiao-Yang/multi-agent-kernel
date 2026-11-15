@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt",
+        "grid": [
+          17,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          32,
+          32,
+          32
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline with 2 stages to overlap loads and compute\n    for k in range(0, K, BK):\n        offs_k = k + tl.arange(0, BK)\n        # Load tiles with boundary mask\n        a = tl.load(A + offs_m[:, None] * K + offs_k[None, :], (offs_m[:, None] < M) & (offs_k[None, :] < K), other=0).to(tl.float32)\n        b = tl.load(B + offs_k[:, None] * N + offs_n[None, :], (offs_k[:, None] < K) & (offs_n[None, :] < N), other=0).to(tl.float32)\n        acc += tl.dot(a, b)\n\n    mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask)\n",
+  "rationale": "Increased tile sizes to 32x32 and BK=32 to improve data reuse and reduce kernel launch overhead. Increased warps to 8 and pipeline stages to 2 to better overlap memory and computation, improving GPU utilization. Used tl.dot with FP32 accumulation for efficient warp-level matrix multiply-accumulate instructions on Ampere architecture."
+}

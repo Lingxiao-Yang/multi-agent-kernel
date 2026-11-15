@@ -1,0 +1,613 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:23:20.211261+00:00",
+    "case": {
+      "id": "matmul_rectangular",
+      "family": "matmul",
+      "shape": [
+        257,
+        769,
+        513
+      ],
+      "dtype": "float16",
+      "atol": 0.05,
+      "rtol": 0.01
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "157cdba1b21ccceb7f11e6b21647854f445e1a3d10b11b750db83178e2769a30",
+    "baseline_hash": "e09ecab37ba32285b4d544ec49101ebac0b5e350a6407a9145ae7ddf7eebd32c",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 33649,
+    "output_tokens": 4891,
+    "tokens": 38540
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 1.182192150503397,
+      "validation_seconds": 1.9424745319411159,
+      "candidate": {
+        "median_ms": 0.0719871997833252,
+        "p25_ms": 0.07188479900360108,
+        "p75_ms": 0.07219200134277344,
+        "min_ms": 0.07178239822387696,
+        "samples_ms": [
+          0.07270399928092956,
+          0.07219200134277344,
+          0.07208960056304932,
+          0.07208960056304932,
+          0.07208960056304932,
+          0.0719871997833252,
+          0.07188479900360108,
+          0.07188479900360108,
+          0.07188479900360108,
+          0.07219200134277344,
+          0.08007680177688599,
+          0.0719871997833252,
+          0.07178239822387696,
+          0.07239680290222168,
+          0.07188479900360108,
+          0.07208960056304932,
+          0.07178239822387696,
+          0.0719871997833252,
+          0.0719871997833252,
+          0.07219200134277344,
+          0.07485439777374267,
+          0.07219200134277344,
+          0.07516160011291503,
+          0.07178239822387696,
+          0.07188479900360108,
+          0.07208960056304932,
+          0.07208960056304932,
+          0.07188479900360108,
+          0.0719871997833252,
+          0.07178239822387696,
+          0.0719871997833252
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.1955839991569519,
+        "p25_ms": 0.19537919759750366,
+        "p75_ms": 0.19563519954681396,
+        "min_ms": 0.19517439603805542,
+        "samples_ms": [
+          0.19589120149612427,
+          0.19578880071640015,
+          0.19568639993667603,
+          0.1955839991569519,
+          0.19548159837722778,
+          0.1955839991569519,
+          0.1955839991569519,
+          0.19548159837722778,
+          0.19527679681777954,
+          0.1955839991569519,
+          0.19537919759750366,
+          0.19537919759750366,
+          0.1968127965927124,
+          0.19589120149612427,
+          0.20152320861816406,
+          0.1955839991569519,
+          0.19537919759750366,
+          0.19537919759750366,
+          0.1955839991569519,
+          0.19517439603805542,
+          0.19548159837722778,
+          0.19537919759750366,
+          0.1955839991569519,
+          0.19548159837722778,
+          0.19537919759750366,
+          0.19537919759750366,
+          0.19548159837722778,
+          0.19568639993667603,
+          0.20193281173706054,
+          0.1955839991569519,
+          0.19537919759750366
+        ]
+      },
+      "paired_speedup": 2.7169274502361755,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.07208960056304932,
+          "p25_ms": 0.07188479900360108,
+          "p75_ms": 0.07229440212249756,
+          "min_ms": 0.07167999744415283,
+          "samples_ms": [
+            0.07280640006065368,
+            0.07239680290222168,
+            0.07208960056304932,
+            0.07219200134277344,
+            0.07239680290222168,
+            0.07178239822387696,
+            0.07188479900360108,
+            0.07178239822387696,
+            0.07239680290222168,
+            0.07188479900360108,
+            0.07833600044250488,
+            0.07188479900360108,
+            0.07188479900360108,
+            0.07178239822387696,
+            0.07167999744415283,
+            0.07526400089263915,
+            0.07219200134277344,
+            0.07188479900360108,
+            0.07219200134277344,
+            0.0719871997833252,
+            0.07208960056304932,
+            0.07208960056304932,
+            0.07188479900360108,
+            0.07208960056304932,
+            0.07813119888305664,
+            0.07178239822387696,
+            0.07188479900360108,
+            0.0737280011177063,
+            0.07208960056304932,
+            0.07208960056304932,
+            0.0719871997833252
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.1955839991569519,
+          "p25_ms": 0.19548159837722778,
+          "p75_ms": 0.19568639993667603,
+          "min_ms": 0.19527679681777954,
+          "samples_ms": [
+            0.1959936022758484,
+            0.19568639993667603,
+            0.19589120149612427,
+            0.1960960030555725,
+            0.1955839991569519,
+            0.19568639993667603,
+            0.19568639993667603,
+            0.19537919759750366,
+            0.19548159837722778,
+            0.19548159837722778,
+            0.19548159837722778,
+            0.19548159837722778,
+            0.19701759815216063,
+            0.19722239971160888,
+            0.19548159837722778,
+            0.19578880071640015,
+            0.1955839991569519,
+            0.1955839991569519,
+            0.19548159837722778,
+            0.19568639993667603,
+            0.19537919759750366,
+            0.19548159837722778,
+            0.1955839991569519,
+            0.19527679681777954,
+            0.19537919759750366,
+            0.1955839991569519,
+            0.19548159837722778,
+            0.19527679681777954,
+            0.19568639993667603,
+            0.1955839991569519,
+            0.19548159837722778
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.03266560137271881,
+        "p25_ms": 0.03246079981327057,
+        "p75_ms": 0.032767999172210696,
+        "min_ms": 0.032358399033546446,
+        "samples_ms": [
+          0.032767999172210696,
+          0.03246079981327057,
+          0.03297280073165894,
+          0.03246079981327057,
+          0.03297280073165894,
+          0.03256320059299469,
+          0.032767999172210696,
+          0.03246079981327057,
+          0.03266560137271881,
+          0.03246079981327057,
+          0.03389439880847931,
+          0.03256320059299469,
+          0.034406399726867674,
+          0.03246079981327057,
+          0.03256320059299469,
+          0.032358399033546446,
+          0.046079999208450316,
+          0.03983359932899475,
+          0.03266560137271881,
+          0.03256320059299469,
+          0.032767999172210696,
+          0.03246079981327057,
+          0.03266560137271881,
+          0.03256320059299469,
+          0.032767999172210696,
+          0.03246079981327057,
+          0.032767999172210696,
+          0.03256320059299469,
+          0.032767999172210696,
+          0.03246079981327057,
+          0.032767999172210696
+        ]
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 20.113881417226555,
+        "achieved_tflops": 2.8167710177687604,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.445460246875882,
+      "process_seconds": 14.04992394335568
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt_tiled",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            32,
+            32,
+            32
+          ],
+          "num_warps": 8,
+          "num_stages": 2
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "matmul_simt_tiled",
+            "grid": [
+              17,
+              49
+            ],
+            "args": [
+              "A",
+              "B",
+              "Y",
+              "M",
+              "N",
+              "K",
+              32,
+              32,
+              32
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "0708de644812c569c0045b48612c32113bfa2bd81e4eda201688c9de81f48451",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Transformed the original naive matmul kernel into a 2D tiled matrix multiply that processes blocks of size BM x BN and iterates over K in tiles of BK. The kernel uses tl.dot for efficient SIMD dot product on each tile, increasing instruction-level parallelism and throughput. The kernel uses 8 warps and 2 pipeline stages to improve latency hiding and compute utilization on the A100 GPU. This structure addresses the compute underutilization and latency-bound hypotheses by leveraging larger blocks, pipelining, and dot-product intrinsics, aiming for higher TFLOPS utilization.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.4551315885037184,
+        "validation_seconds": 3.1707429299131036,
+        "candidate": {
+          "median_ms": 0.07208960056304932,
+          "p25_ms": 0.0719871997833252,
+          "p75_ms": 0.07219200134277344,
+          "min_ms": 0.07188479900360108
+        },
+        "incumbent": {
+          "median_ms": 0.1955839991569519,
+          "p25_ms": 0.19548159837722778,
+          "p75_ms": 0.19563519954681396,
+          "min_ms": 0.19537919759750366
+        },
+        "paired_speedup": 2.7130681489335595,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.056729602813720706,
+            "p25_ms": 0.056627202033996585,
+            "p75_ms": 0.07188479900360108,
+            "min_ms": 0.05642240047454834
+          },
+          "incumbent": {
+            "median_ms": 0.1533951997756958,
+            "p25_ms": 0.15329279899597167,
+            "p75_ms": 0.17459200024604798,
+            "min_ms": 0.15319039821624755
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 20.08531034561129,
+          "achieved_tflops": 2.8127698921380038,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.4355832934379578,
+        "process_seconds": 15.834115510806441,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 61,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 6980,
+        "output_tokens": 1546,
+        "tokens": 8526
+      },
+      "review": {
+        "measured_outcome": "The transformed matmul kernel using 2D tiling with block sizes (32,32,32), 8 warps, and 2 pipeline stages demonstrates a confirmed performance improvement, achieving roughly 2.8 TFLOPS vs. the original 1.0 TFLOPS, and a speedup of about 2.7x over the naive baseline. The kernel uses shared memory (2048 bytes) and increased registers (61 per thread) without spills, indicating resource usage within limits. The latency hiding via pipelining and increased warps likely contributed to improved utilization. However, the achieved TFLOPS are still far below the A100 peak (~37 TFLOPS), suggesting room for further optimization.",
+        "failures": "No hardware counter bottlenecks were detected, but the kernel is still underutilizing the device compute capacity. Memory bandwidth usage fraction is unknown, but logical traffic is low, so memory bandwidth is unlikely the bottleneck. Latency hiding improved but may still be imperfect. The kernel does not use advanced memory hierarchy optimizations such as shared memory tiling beyond a small buffer, nor does it use vectorized loads/stores or warp-level primitives beyond tl.dot. Load/store masking may cause some divergence and overhead.",
+        "next_directions": [
+          "Increase tile sizes (BM, BN, BK) to better amortize memory latency and increase compute per thread block, constrained by register and shared memory limits.",
+          "Implement more aggressive shared memory usage to stage tiles of A and B, enabling data reuse and higher arithmetic intensity.",
+          "Explore vectorized memory operations (e.g., tl.load with vector types) to improve memory throughput and reduce instruction count.",
+          "Increase pipeline stages to further hide latency if register pressure allows.",
+          "Consider warp-level primitives or cooperative loading patterns to improve memory access coalescing and reduce divergence.",
+          "Profile memory bandwidth usage explicitly to rule out bandwidth bottleneck and tune tile sizes accordingly.",
+          "Experiment with data layout transformations (e.g., transposed B) to improve load patterns and cache utilization."
+        ],
+        "retain": false
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 12461,
+        "output_tokens": 1957,
+        "tokens": 14418
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive shared_memory"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 26713,
+        "output_tokens": 4460,
+        "tokens": 31173
+      },
+      "review": {
+        "summary": "The attempted transformation to use explicit shared memory allocation with tiling and vectorized loads/stores failed due to the unsupported Triton primitive 'shared_memory'. The prior version with simpler 2D tiling and tl.dot intrinsics improved performance significantly but still underutilizes the device compute capacity. Measured bottlenecks indicate compute underutilization and imperfect latency hiding; memory bandwidth is unlikely a bottleneck given low logical traffic. The failure to use shared memory explicitly suggests a limitation in the Triton environment or version used.",
+        "measured_outcomes": "The baseline simt tiled kernel with (32,32,32) tiles, 8 warps, and 2 pipeline stages achieved ~2.8 TFLOPS on A100, a 2.7x speedup over naive. The attempted shared memory vectorized kernel with (64,64,64) tiles and 3 pipeline stages failed to compile due to unsupported primitive. No hardware counter bottlenecks detected; register usage is high but no spills. Latency hiding improved with pipelining but could be further optimized.",
+        "failures": "The main failure is the usage of tl.shared_memory, which is not a supported primitive in the current Triton environment, causing a proposal error and no kernel launch.",
+        "next_directions": [
+          "Avoid using unsupported primitives like tl.shared_memory; use the officially supported shared memory patterns in Triton (e.g., via tl.shared.array).",
+          "Implement shared memory tiling using supported Triton constructs such as tl.shared.array to stage tiles of A and B explicitly for data reuse.",
+          "Increase tile sizes carefully within register and shared memory limits to improve arithmetic intensity and amortize memory latency.",
+          "Increase pipeline stages to better hide latency if register pressure allows.",
+          "Use vectorized load/store intrinsics supported by Triton to improve memory throughput and reduce instruction overhead.",
+          "Explore warp-level cooperative loading and memory access coalescing to reduce divergence and improve memory efficiency.",
+          "Profile and tune memory bandwidth usage explicitly to confirm bottlenecks and guide tile size adjustments.",
+          "Consider data layout transformations (e.g., transposing B) to improve memory access patterns and cache utilization."
+        ],
+        "retain": false
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 33649,
+        "output_tokens": 4891,
+        "tokens": 38540
+      }
+    }
+  ],
+  "wall_seconds": 95.24920430965722,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.02128520000000006,
+  "budget_committed_usd": 0.02128519999999995,
+  "speedup": 2.7169274502361755
+}

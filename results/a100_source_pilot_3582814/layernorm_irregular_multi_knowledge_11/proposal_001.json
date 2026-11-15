@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "num_warps": 4,
+        "num_stages": 1,
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781
+        ]
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, N)\n    mask = offs < N\n\n    # Load input row with masking\n    x_ptr = X + row * N + offs\n    x = tl.load(x_ptr, mask, other=0.0)\n\n    # Compute mean of the row\n    mean = tl.sum(x, mask) / N\n\n    # Center the input\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Compute variance and inv stddev\n    var = tl.sum(centered * centered, mask) / N\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load weight and bias\n    w = tl.load(W + offs, mask, other=0.0)\n    b = tl.load(B + offs, mask, other=0.0)\n\n    # Apply layernorm fused operation\n    y = (centered * inv_std) * w + b\n\n    # Store output with masking\n    y_ptr = Y + row * N + offs\n    tl.store(y_ptr, y, mask)\n",
+  "rationale": "Fused layernorm_stats and layernorm_apply kernels into a single kernel layernorm_fused, reducing intermediate memory traffic and launch overhead. Each program processes one row (M=513) with N=781 columns, using masking for boundary columns. The kernel computes mean, variance, normalization, and applies affine weights and bias in one pass using per-row parallelism, which should improve throughput compared to separate kernels."
+}

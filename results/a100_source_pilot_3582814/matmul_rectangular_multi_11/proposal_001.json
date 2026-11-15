@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt_tiled",
+        "grid": [
+          17,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          32,
+          32,
+          32
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt_tiled(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    for k_block_start in range(0, K, BK):\n        k_offs = k_block_start + tl.arange(0, BK)\n\n        a_mask = (offs_m[:, None] < M) & (k_offs[None, :] < K)\n        b_mask = (k_offs[:, None] < K) & (offs_n[None, :] < N)\n\n        a = tl.load(A + offs_m[:, None] * K + k_offs[None, :], a_mask, 0).to(tl.float32)\n        b = tl.load(B + k_offs[:, None] * N + offs_n[None, :], b_mask, 0).to(tl.float32)\n\n        acc += tl.dot(a, b)\n\n    mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask)\n",
+  "rationale": "Transformed the original naive matmul kernel into a 2D tiled matrix multiply that processes blocks of size BM x BN and iterates over K in tiles of BK. The kernel uses tl.dot for efficient SIMD dot product on each tile, increasing instruction-level parallelism and throughput. The kernel uses 8 warps and 2 pipeline stages to improve latency hiding and compute utilization on the A100 GPU. This structure addresses the compute underutilization and latency-bound hypotheses by leveraging larger blocks, pipelining, and dot-product intrinsics, aiming for higher TFLOPS utilization."
+}

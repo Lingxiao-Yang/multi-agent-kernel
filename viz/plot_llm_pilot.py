@@ -1,6 +1,6 @@
 """Per-case dot plot of final speedup by variant (one dot per seed, tick = geometric mean).
 
-Usage: python viz/plot_llm_pilot.py results/a100_llm_pilot_3582416/analysis/runs.csv out.png
+Usage: python viz/plot_llm_pilot.py <runs.csv> <out.png> [title]
 Standalone: needs only numpy and matplotlib.
 """
 import csv
@@ -21,7 +21,7 @@ COLORS = dict(zip(VARIANTS, ['#2a78d6', '#eb6834', '#1baf7a', '#eda100']))
 SURFACE, INK, MUTED, GRID = '#fcfcfb', '#1f1f1e', '#6b6a63', '#e4e3df'
 
 
-def main(runs_csv, output):
+def main(runs_csv, output, title='A100 LLM pilot'):
     data = defaultdict(lambda: defaultdict(list))
     gpu = ''
     with open(runs_csv, newline='', encoding='utf-8') as f:
@@ -31,8 +31,13 @@ def main(runs_csv, output):
     cases = sorted(data)
     xmax = max(v for c in cases for vs in data[c].values() for v in vs) * 1.4
 
-    fig, axes = plt.subplots(1, len(cases), figsize=(5.2 * len(cases), 3.4), sharey=True, facecolor=SURFACE)
-    axes = np.atleast_1d(axes)
+    ncols = min(2, len(cases))
+    nrows = -(-len(cases) // ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.2 * ncols, 3.0 * nrows + 0.4), sharey=True,
+                             facecolor=SURFACE, squeeze=False)
+    axes = axes.ravel()
+    for ax in axes[len(cases):]:
+        ax.set_visible(False)
     for ax, case in zip(axes, cases):
         ax.set_facecolor(SURFACE)
         for y, variant in enumerate(VARIANTS):
@@ -41,7 +46,8 @@ def main(runs_csv, output):
             ax.scatter(vals, y + np.asarray(jitter), s=64, color=COLORS[variant],
                        edgecolor=SURFACE, linewidth=2, zorder=3)
             g = float(np.exp(np.mean(np.log(vals))))
-            ax.plot([g, g], [y - 0.28, y + 0.28], color=INK, linewidth=2, zorder=4)
+            if len(vals) > 1:
+                ax.plot([g, g], [y - 0.28, y + 0.28], color=INK, linewidth=2, zorder=4)
             ax.text(xmax / 1.02, y, f'{g:.2f}×', va='center', ha='right', fontsize=9, color=INK)
         ax.axvline(1, color=MUTED, linewidth=1, linestyle=(0, (3, 3)), zorder=1)
         ax.set_xscale('log')
@@ -60,7 +66,10 @@ def main(runs_csv, output):
             lab.set_color(INK)
         ax.set_title(case, loc='left', fontsize=11, color=INK)
         ax.set_xlabel('Final speedup vs. baseline (log scale)', color=MUTED, fontsize=9)
-    fig.suptitle(f'A100 LLM pilot — final speedup per seed (dots) and geometric mean (tick, value at right)\n'
+    seeds = max(len(vs) for c in cases for vs in data[c].values())
+    what = ('per seed (dots) and geometric mean (tick, value at right)' if seeds > 1
+            else 'one seed per variant (value at right)')
+    fig.suptitle(f'{title} — final speedup, {what}\n'
                  f'{gpu}; 2 candidate attempts per search; pilot evidence only',
                  x=0.01, ha='left', fontsize=10, color=INK)
     fig.tight_layout()
@@ -71,6 +80,6 @@ def main(runs_csv, output):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) not in (3, 4):
         raise SystemExit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(*sys.argv[1:])

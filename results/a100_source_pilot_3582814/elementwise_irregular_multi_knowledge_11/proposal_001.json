@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu_fused",
+        "grid": [
+          56,
+          31
+        ],
+        "num_warps": 4,
+        "num_stages": 1,
+        "args": [
+          "X",
+          "B",
+          "Y",
+          513,
+          781,
+          16
+        ]
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu_fused(X, B, Y, M: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    row_start = pid_m * BLOCK\n    col_start = pid_n * BLOCK\n\n    offs_m = row_start + tl.arange(0, BLOCK)\n    offs_n = col_start + tl.arange(0, BLOCK)\n\n    mask_m = offs_m < M\n    mask_n = offs_n < N\n\n    offs_m_broadcast = tl.reshape(offs_m, (BLOCK, 1))\n    offs_n_broadcast = tl.reshape(offs_n, (1, BLOCK))\n\n    ptrs = offs_m_broadcast * N + offs_n_broadcast\n\n    # Load X block with mask\n    x = tl.load(X + ptrs, mask=(mask_m[:, None] & mask_n[None, :]), other=0.0)\n\n    # Load bias for columns with mask\n    b = tl.load(B + offs_n, mask=mask_n, other=0.0)\n\n    # Add bias and apply ReLU\n    y = x + b\n    y = tl.maximum(y, 0.0)\n\n    # Store result with mask\n    tl.store(Y + ptrs, y, mask=(mask_m[:, None] & mask_n[None, :]))\n",
+  "rationale": "Changed grid to 2D decomposition (56x31) with smaller block size 16 to increase parallelism and better fit irregular shape 513x781 with masking, improving GPU utilization and reducing masking overhead per launch. Fused bias add and ReLU to reduce intermediate memory traffic and synchronization overhead, lowering latency and improving throughput."
+}

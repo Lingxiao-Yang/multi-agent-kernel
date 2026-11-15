@@ -1,0 +1,125 @@
+accepted,attempt,calls,case,error,has_dot,has_reduction,kernels,launches,run,seed,source_differs,source_supplied,status,structural_screen,variant
+False,1,"{'tl.program_id': 3, 'tl.load': 3, 'tl.maximum': 2, 'tl.store': 2, 'tl.arange': 1}",elementwise_irregular,"at 6:26:
+def bias_add_relu_tiled(X, B, Y, N: tl.constexpr):
+    row = tl.program_id(0)
+    block_id = tl.program_id(1)
+    block_size = 32
+    col_start = block_id * block_size
+    offsets = col_start + tl.arange(0, block_size)
+                          ^
+arange's arguments must be of type tl.constexpr",False,False,"['bias_add_relu_tiled', 'relu_tail']",2,elementwise_irregular_multi_11,11,True,True,error,True,multi
+False,2,"{'tl.program_id': 2, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 1}",elementwise_irregular,"at 6:26:
+def bias_add_relu_tiled(X, B, Y, N: tl.constexpr):
+    BLOCK_SIZE = 32
+    row = tl.program_id(0)  # row index
+    block_id = tl.program_id(1)  # column block index
+    col_start = block_id * BLOCK_SIZE
+    offsets = col_start + tl.arange(0, BLOCK_SIZE)  # constexpr
+                          ^
+arange's arguments must be of type tl.constexpr",False,False,['bias_add_relu_tiled'],1,elementwise_irregular_multi_11,11,True,True,error,True,multi
+False,1,"{'tl.program_id': 2, 'tl.reshape': 2, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 2}",elementwise_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 146205 / 400653 (36.5%)
+Greatest absolute difference: nan at index (0, 496) (up to 1e-06 allowed)
+Greatest relative difference: nan at index (0, 496) (up to 1e-06 allowed)",False,False,['bias_add_relu_fused'],1,elementwise_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,2,"{'tl.program_id': 1, 'tl.reshape': 2, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 2}",elementwise_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 392205 / 400653 (97.9%)
+Greatest absolute difference: nan at index (0, 528) (up to 1e-06 allowed)
+Greatest relative difference: nan at index (0, 528) (up to 1e-06 allowed)",False,False,['bias_add_relu_fused'],1,elementwise_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+True,1,"{'tl.program_id': 1, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 1}",elementwise_irregular,,False,False,['bias_add_relu'],1,elementwise_irregular_single_11,11,True,True,ok,True,single
+False,2,"{'tl.program_id': 1, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 1}",elementwise_irregular,source_edit_required: launched device bodies have no structural change beyond identifiers/literals,False,False,['bias_add_relu'],1,elementwise_irregular_single_11,11,True,True,proposal_error,False,single
+False,1,"{'tl.program_id': 1, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 1}",elementwise_irregular,"at 4:25:
+def bias_add_relu(X, B, Y, TOTAL: tl.constexpr):
+    BLOCK = 256
+    pid = tl.program_id(0)
+    offs = pid * BLOCK + tl.arange(0, BLOCK)
+                         ^
+arange's arguments must be of type tl.constexpr",False,False,['bias_add_relu'],1,elementwise_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,2,"{'tl.program_id': 1, 'tl.load': 2, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 1}",elementwise_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 900 / 400653 (0.2%)
+Greatest absolute difference: nan at index (511, 662) (up to 1e-06 allowed)
+Greatest relative difference: nan at index (511, 662) (up to 1e-06 allowed)",False,False,['bias_add_relu'],1,elementwise_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400030 / 400653 (99.8%)
+Greatest absolute difference: 11.640910148620605 at index (154, 343) (up to 2e-05 allowed)
+Greatest relative difference: 210030.734375 at index (11, 395) (up to 0.0002 allowed)",False,True,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,incorrect,True,multi
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 3, 'tl.where': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.cast': 1}",layernorm_irregular,invalid argument symbol or integer,False,True,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,proposal_error,False,multi
+False,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1, 'tl.sum': 2}",layernorm_irregular,"at 3:11:
+def layernorm_fused(X, W, B, Y, N: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, N)
+           ^
+arange's range must be a power of 2",False,True,['layernorm_fused'],1,layernorm_irregular_multi_knowledge_11,11,True,True,error,True,multi_knowledge
+False,2,"{'tl.program_id': 1, 'range': 3, 'tl.barrier': 2, 'tl.rsqrt': 1, 'tl.arange': 3, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1}",layernorm_irregular,unsupported Triton primitive barrier,False,True,['layernorm_fused'],1,layernorm_irregular_multi_knowledge_11,11,True,True,proposal_error,False,multi_knowledge
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.zeros': 2, 'range': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6}",layernorm_irregular,Python object mutation forbidden; use tl.store for output,False,False,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_single_11,11,True,True,proposal_error,False,single
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'range': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6}",layernorm_irregular,"at 12:15:
+def layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    offset = tl.arange(0, BLOCK)
+    mean = 0.0
+    m2 = 0.0
+    count = 0
+    for i in range(0, N, BLOCK):
+        idx = i + offset
+        mask = idx < N
+        x = tl.load(X + row * N + idx, mask, other=0.0)
+        for j in range(BLOCK):
+            if mask[j]:
+               ^
+Did you forget to add @triton.jit ? (`_semantic` argument must be provided outside of JIT functions.)",False,False,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_single_11,11,True,True,error,True,single
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 6, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.sum': 2}",layernorm_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400030 / 400653 (99.8%)
+Greatest absolute difference: nan at index (512, 181) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (512, 181) (up to 0.0002 allowed)",False,True,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 6, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.sum': 2}",layernorm_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400030 / 400653 (99.8%)
+Greatest absolute difference: nan at index (512, 181) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (512, 181) (up to 0.0002 allowed)",False,True,"['layernorm_stats', 'layernorm_apply']",2,layernorm_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+True,1,"{'tl.program_id': 2, 'tl.zeros': 1, 'range': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.load(A + offs_m[:, None] * K + k_offs[None, :], a_mask, 0).to': 1, 'tl.load(B + k_offs[:, None] * N + offs_n[None, :], b_mask, 0).to': 1, 'tl.dot': 1, 'tl.load': 2}",matmul_rectangular,,True,False,['matmul_simt_tiled'],1,matmul_rectangular_multi_11,11,True,True,ok,True,multi
+False,2,"{'tl.program_id': 2, 'tl.zeros': 1, 'tl.shared_memory': 2, 'range': 1, 'tl.store': 3, 'tl.arange': 5, 'tl.load(a_ptrs, mask_a, other=0).to': 1, 'tl.load(b_ptrs, mask_b, other=0).to': 1, 'tl.barrier': 2, 'tl.load(smem_a + a_row[:, None] * BK + a_col[None, :], mask_smem_a[:, None], other=0).to': 1, 'tl.load(smem_b + b_row[:, None] * BN + b_col[None, :], mask_smem_b[:, None], other=0).to': 1, 'tl.dot': 1, 'a_tile.to(tl.float16).reshape': 1, 'b_tile.to(tl.float16).reshape': 1, 'tl.load': 4, 'a_tile.to': 1, 'b_tile.to': 1}",matmul_rectangular,unsupported Triton primitive shared_memory,True,False,['matmul_shared_tiled_vec_v2'],1,matmul_rectangular_multi_11,11,True,True,proposal_error,False,multi
+True,1,"{'tl.program_id': 2, 'tl.zeros': 1, 'range': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.load(A + row_offsets[:, None] * K + k_offsets[None, :], (row_offsets[:, None] < M) & (k_offsets[None, :] < K), other=0).to': 1, 'tl.load(B + k_offsets[:, None] * N + col_offsets[None, :], (k_offsets[:, None] < K) & (col_offsets[None, :] < N), other=0).to': 1, 'tl.dot': 1, 'tl.load': 2}",matmul_rectangular,,True,False,['matmul_simt_tiled_shared'],1,matmul_rectangular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+False,2,"{'tl.program_id': 2, 'tl.zeros': 1, 'tl.shared_memory': 2, 'tl.load': 4, 'tl.barrier': 2, 'range': 1, 'tl.store': 1, 'tl.arange': 4, 'sA[buf_idx, :, :].to': 1, 'sB[buf_idx, :, :].to': 1, 'tl.dot': 1}",matmul_rectangular,Python object mutation forbidden; use tl.store for output,True,False,['matmul_shared_pipeline_double_buffered'],1,matmul_rectangular_multi_knowledge_11,11,True,True,proposal_error,False,multi_knowledge
+True,1,"{'tl.program_id': 2, 'tl.zeros': 3, 'range': 1, 'tl.store': 1, 'tl.arange': 4, 'tl.load(A + rows[:, None] * K + k0[None, :], mask=mask_a0, other=0).to': 1, 'tl.load(B + k0[:, None] * N + cols[None, :], mask=mask_b0, other=0).to': 1, 'tl.dot': 2, 'tl.load(A + rows[:, None] * K + k1[None, :], mask=mask_a1, other=0).to': 1, 'tl.load(B + k1[:, None] * N + cols[None, :], mask=mask_b1, other=0).to': 1, 'tl.load': 4}",matmul_rectangular,,True,False,['matmul_simt'],1,matmul_rectangular_single_11,11,True,True,ok,True,single
+False,2,"{'tl.program_id': 2, 'tl.zeros': 3, 'range': 1, 'tl.store': 1, 'tl.arange': 4, 'tl.load(A + rows[:, None] * K + k0[None, :], mask=mask_a0, other=0).to': 1, 'tl.load(B + k0[:, None] * N + cols[None, :], mask=mask_b0, other=0).to': 1, 'tl.dot': 2, 'tl.load(A + rows[:, None] * K + k1[None, :], mask=mask_a1, other=0).to': 1, 'tl.load(B + k1[:, None] * N + cols[None, :], mask=mask_b1, other=0).to': 1, 'tl.load': 4}",matmul_rectangular,source_edit_required: launched device bodies have no structural change beyond identifiers/literals,True,False,['matmul_simt'],1,matmul_rectangular_single_11,11,True,True,proposal_error,False,single
+True,1,"{'tl.program_id': 2, 'tl.zeros': 1, 'range': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.load(A + offs_m[:, None] * K + offs_k[None, :], (offs_m[:, None] < M) & (offs_k[None, :] < K), other=0).to': 1, 'tl.load(B + offs_k[:, None] * N + offs_n[None, :], (offs_k[:, None] < K) & (offs_n[None, :] < N), other=0).to': 1, 'tl.dot': 1, 'tl.load': 2}",matmul_rectangular,,True,False,['matmul_simt'],1,matmul_rectangular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.zeros': 1, 'range': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.load(A + offs_m[:, None] * K + offs_k[None, :], (offs_m[:, None] < M) & (offs_k[None, :] < K), other=0).to': 1, 'tl.load(B + offs_k[:, None] * N + offs_n[None, :], (offs_k[:, None] < K) & (offs_n[None, :] < N), other=0).to': 1, 'tl.dot': 1, 'tl.load': 2}",matmul_rectangular,source_edit_required: launched device bodies have no structural change beyond identifiers/literals,True,False,['matmul_simt'],1,matmul_rectangular_single_knowledge_11,11,True,True,proposal_error,False,single_knowledge
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.sum': 1, 'tl.store': 3, 'tl.exp': 2, 'float': 1}",softmax_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: nan at index (512, 128) (up to 2e-06 allowed)
+Greatest relative difference: nan at index (512, 128) (up to 2e-05 allowed)",False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_multi_11,11,True,True,incorrect,True,multi
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.sum': 1, 'tl.store': 3, 'tl.exp': 2, 'float': 2, 'tl.where': 2}",softmax_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)
+Greatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_multi_11,11,True,True,incorrect,True,multi
+False,1,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'tl.arange': 1, 'float': 1}",softmax_irregular,"at 4:29:
+def softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    block_id = tl.program_id(1)
+    col = block_id * BLOCK + tl.arange(0, BLOCK)
+                             ^
+arange's range must be a power of 2",False,True,['softmax_fused'],1,softmax_irregular_multi_knowledge_11,11,True,True,error,True,multi_knowledge
+False,2,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 2, 'tl.max': 2, 'tl.exp': 2, 'tl.store': 2, 'float': 1, 'tl.sum': 1}",softmax_irregular,"at 3:18:
+def softmax_fused_final_reduce(Y, N: tl.constexpr):
+    row = tl.program_id(0)
+    offs_in_row = tl.arange(0, N)
+                  ^
+arange's range must be a power of 2",False,True,"['softmax_fused', 'softmax_fused_final_reduce']",2,softmax_irregular_multi_knowledge_11,11,True,True,error,True,multi_knowledge
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 3, 'float': 1}",softmax_irregular,invalid argument symbol or integer,False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_single_11,11,True,True,proposal_error,False,single
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 3, 'float': 1}",softmax_irregular,invalid argument symbol or integer,False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_single_11,11,True,True,proposal_error,False,single
+False,1,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 3, 'float': 1}",softmax_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)
+Greatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 3, 'float': 1}",softmax_irregular,"Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: 0.15892410278320312 at index (178, 146) (up to 2e-06 allowed)
+Greatest relative difference: 2.6467092037200928 at index (416, 58) (up to 2e-05 allowed)",False,True,"['softmax_stats', 'softmax_apply']",2,softmax_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge

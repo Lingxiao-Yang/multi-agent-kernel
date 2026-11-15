@@ -1,0 +1,37 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu_tiled",
+        "grid": [
+          513,
+          25
+        ],
+        "args": [
+          "X",
+          "B",
+          "Y",
+          781
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      },
+      {
+        "kernel": "relu_tail",
+        "grid": [
+          513,
+          1
+        ],
+        "args": [
+          "Y",
+          781
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu_tiled(X, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    block_size = 32\n    col_start = block_id * block_size\n    offsets = col_start + tl.arange(0, block_size)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=0.0)\n    b = tl.load(B + offsets, mask, other=0.0)\n    z = x + b\n    y = tl.maximum(z, 0.0)\n    tl.store(Y + row * N + offsets, y, mask)\n\n@triton.jit\ndef relu_tail(Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    col = 800  # Offset beyond tiled blocks\n    mask = col < N\n    x = tl.load(Y + row * N + col, mask, other=0.0)\n    y = tl.maximum(x, 0.0)\n    tl.store(Y + row * N + col, y, mask)\n",
+  "rationale": "Split the computation into a tiled 2D grid to increase occupancy and better utilize GPU resources. Use 25 blocks of size 32 to cover 781 columns (25*32=800 covering 781 with some excess). Launch 8 warps per block with 2 pipeline stages to hide latency and improve throughput. Add a small tail kernel to handle remainder columns beyond tiled coverage for correctness, ensuring full coverage of irregular shape. This trades a tiny extra kernel launch overhead for better parallelism and memory bandwidth utilization, addressing both under-utilization and memory-bound bottlenecks."
+}

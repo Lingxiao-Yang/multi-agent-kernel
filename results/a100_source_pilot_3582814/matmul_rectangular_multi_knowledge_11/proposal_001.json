@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt_tiled_shared",
+        "grid": [
+          17,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          32,
+          32,
+          64
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt_tiled_shared(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    # Compute offsets for rows and columns\n    row_offsets = pid_m * BM + tl.arange(0, BM)\n    col_offsets = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline stages\n    for k0 in range(0, K, BK):\n        k_offsets = k0 + tl.arange(0, BK)\n\n        # Load tiles of A and B with masking for boundaries\n        a_tile = tl.load(A + row_offsets[:, None] * K + k_offsets[None, :], (row_offsets[:, None] < M) & (k_offsets[None, :] < K), other=0).to(tl.float32)\n        b_tile = tl.load(B + k_offsets[:, None] * N + col_offsets[None, :], (k_offsets[:, None] < K) & (col_offsets[None, :] < N), other=0).to(tl.float32)\n\n        # Accumulate partial dot products\n        acc += tl.dot(a_tile, b_tile)\n\n    # Store the result with boundary masking\n    mask = (row_offsets[:, None] < M) & (col_offsets[None, :] < N)\n    tl.store(Y + row_offsets[:, None] * N + col_offsets[None, :], acc, mask)\n",
+  "rationale": "Refined the kernel to implement the tiled SIMT matrix multiplication with tile sizes BM=32, BN=32, BK=64 as advised. The kernel uses a software pipeline with two stages to overlap loads and computation, improving memory reuse and reducing DRAM traffic. The blocking strategy accumulates partial results in registers, enhancing data locality. Boundary masking is maintained to handle non-multiple dimensions efficiently. The grid size and launch configuration remain unchanged to saturate GPU resources. This implementation aims to improve throughput by increasing tile sizes for better operand reuse (K02), reduce excess memory transactions by coalescing loads (K01), and use a software pipeline for overlapping memory and compute (K08), while maintaining warp count for balanced parallelism (K04) and proper masking for boundary conditions (K07)."
+}

@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          1570
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400953,
+          781,
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(x, 0)\n    mean = sum_x / N\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_sq = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_sq / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    i = pid * BLOCK + offs\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    normalized = (x - mean) * inv\n    y = normalized * w + b\n    tl.store(Y + i, y, mask)\n",
+  "rationale": "Increased num_warps from 4 to 8 and num_stages from 1 to 2 for layernorm_apply to better hide latency and improve occupancy. Similarly, increased num_stages to 2 for layernorm_stats. Adjusted grid size for layernorm_apply to 1570 to fully cover all elements with BLOCK=256, reducing partial load overhead and improving data movement efficiency. The kernels maintain the same computation but now better utilize GPU resources and reduce boundary checks, addressing identified medium uncertainty bottlenecks."
+}

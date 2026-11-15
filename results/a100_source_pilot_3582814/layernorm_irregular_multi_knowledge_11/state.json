@@ -1,0 +1,409 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/layernorm_irregular_multi_knowledge_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.322980153374374,
+      "validation_seconds": 2.085759782232344,
+      "candidate": {
+        "median_ms": 0.03543039858341217,
+        "p25_ms": 0.034406399726867674,
+        "p75_ms": 0.04336639940738678,
+        "min_ms": 0.032767999172210696,
+        "samples_ms": [
+          0.045875200629234315,
+          0.03604480028152466,
+          0.033792001008987424,
+          0.04454399943351746,
+          0.03573760092258453,
+          0.062463998794555664,
+          0.03553279936313629,
+          0.043110400438308716,
+          0.03543039858341217,
+          0.03297280073165894,
+          0.04392960071563721,
+          0.035020801424980166,
+          0.03328000009059906,
+          0.04341759979724884,
+          0.034406399726867674,
+          0.03307519853115082,
+          0.034918400645256045,
+          0.034406399726867674,
+          0.043724799156188966,
+          0.034815999865531924,
+          0.03287039995193482,
+          0.043315199017524716,
+          0.034815999865531924,
+          0.03328000009059906,
+          0.04352000057697296,
+          0.03532800078392029,
+          0.04362240135669708,
+          0.04208639860153198,
+          0.032767999172210696,
+          0.042905598878860474,
+          0.034918400645256045
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03532800078392029,
+        "p25_ms": 0.03389439880847931,
+        "p75_ms": 0.04341759979724884,
+        "min_ms": 0.03287039995193482,
+        "samples_ms": [
+          0.03686400055885315,
+          0.03389439880847931,
+          0.04423680007457733,
+          0.03348479866981506,
+          0.04352000057697296,
+          0.03543039858341217,
+          0.04352000057697296,
+          0.035123199224472046,
+          0.03317759931087494,
+          0.03532800078392029,
+          0.03563520014286041,
+          0.04341759979724884,
+          0.034918400645256045,
+          0.03348479866981506,
+          0.04352000057697296,
+          0.03461120128631592,
+          0.03297280073165894,
+          0.04485119879245758,
+          0.035020801424980166,
+          0.040550398826599124,
+          0.04341759979724884,
+          0.03358719944953918,
+          0.040140798687934874,
+          0.03461120128631592,
+          0.03389439880847931,
+          0.04362240135669708,
+          0.03532800078392029,
+          0.03287039995193482,
+          0.04382719993591309,
+          0.034918400645256045,
+          0.03297280073165894
+        ]
+      },
+      "paired_speedup": 0.9971098885819529,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.029798400402069092,
+        "p25_ms": 0.02959359884262085,
+        "p75_ms": 0.030003198981285097,
+        "min_ms": 0.029388800263404846,
+        "samples_ms": [
+          0.03020800054073334,
+          0.032358399033546446,
+          0.030105599761009218,
+          0.02969599962234497,
+          0.03819519877433777,
+          0.031436800956726074,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.029900801181793214,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.029900801181793214,
+          0.02959359884262085,
+          0.02969599962234497,
+          0.029491201043128967,
+          0.02969599962234497,
+          0.029388800263404846,
+          0.029900801181793214,
+          0.029388800263404846,
+          0.03532800078392029,
+          0.029491201043128967,
+          0.029798400402069092,
+          0.030822399258613586,
+          0.02959359884262085,
+          0.029388800263404846,
+          0.029798400402069092,
+          0.029388800263404846,
+          0.029900801181793214,
+          0.029388800263404846,
+          0.029798400402069092
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.81589275598526e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 90.64171243909036,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.277178244665265,
+      "process_seconds": 13.977336220443249
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused",
+            "grid": [
+              513
+            ],
+            "num_warps": 4,
+            "num_stages": 1,
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              781
+            ]
+          }
+        ]
+      },
+      "source_hash": "b69888531e27fa203ab368fbd8aa2b32b4a6170aaa631aae20a44499ea1c2764",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fused layernorm_stats and layernorm_apply kernels into a single kernel layernorm_fused, reducing intermediate memory traffic and launch overhead. Each program processes one row (M=513) with N=781 columns, using masking for boundary columns. The kernel computes mean, variance, normalization, and applies affine weights and bias in one pass using per-row parallelism, which should improve throughput compared to separate kernels.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 3:11:\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, N)\n           ^\narange's range must be a power of 2",
+        "worker_seconds": 10.927922120317817,
+        "process_seconds": 13.107798052951694
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9597,
+        "output_tokens": 1203,
+        "tokens": 10800
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + offs, mask, other=0.0)\n\n    # Compute mean\n    mean = tl.sum(x, mask) / N\n\n    # Center input\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Compute variance\n    var = tl.sum(centered * centered, mask) / N\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load weights and bias\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n\n    # Apply layernorm fused\n    y = (centered * inv_std) * w + b\n\n    # Store output\n    tl.store(Y + offs, y, mask)\n",
+        "rationale": "Replaced tl.arange(0, N) with tl.arange(0, BLOCK) where BLOCK is a power of two (256), satisfying Triton's requirement that arange length be a power of two. Introduced an explicit BLOCK parameter to represent tile size and used masking to handle irregular shape N=781. This retains the fusion benefits while resolving the compilation error caused by non-power-of-two arange size. The kernel grid remains 513 (rows), each program processes one row with BLOCK=256 columns, masking boundary elements. This approach preserves parallelism and reduces intermediate memory traffic, addressing bottlenecks K05, K07, and K09 with correct indexing and masking for irregular input width."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 14621,
+        "output_tokens": 1674,
+        "tokens": 16295
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive barrier"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 29076,
+        "output_tokens": 3558,
+        "tokens": 32634
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    acc_sum = 0.0\n    acc_sq_sum = 0.0\n    # Loop over tiles to accumulate sum and squared sum for mean/variance\n    for tile_start in range(0, N, BLOCK):\n        col = tile_start + offs\n        mask = col < N\n        ptr = X + row * N + col\n        x = tl.load(ptr, mask, other=0.0)\n        acc_sum += tl.sum(x, mask)\n        acc_sq_sum += tl.sum(x * x, mask)\n    mean = acc_sum / N\n    var = acc_sq_sum / N - mean * mean\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Compute normalized output in tiles\n    for tile_start in range(0, N, BLOCK):\n        col = tile_start + offs\n        mask = col < N\n        x_ptr = X + row * N + col\n        x = tl.load(x_ptr, mask, other=0.0)\n        w = tl.load(W + col, mask, other=0.0)\n        b = tl.load(B + col, mask, other=0.0)\n        y = ((x - mean) * inv_std) * w + b\n        y_ptr = Y + row * N + col\n        tl.store(y_ptr, y, mask)\n",
+        "rationale": "Replaced multi-stage tiled reductions with a single-stage loop performing sum and sum of squares accumulations in one pass to avoid unsupported barrier primitives and simplify kernel structure. This maintains tiled processing with masking for irregular width N=781 using BLOCK=256, processing each row by looping over tiles. The mean and variance are computed numerically stable via E[x^2] - (E[x])^2 formula. Then the kernel loops again over tiles to apply normalization and affine transform, storing outputs. This avoids synchronization primitives unsupported by Triton while preserving fusion benefits, reducing global memory traffic and kernel launches (K05, K09), and using masking for irregular shape (K07). Num_stages=1 simplifies implementation and avoids barrier errors while still achieving fused computation with tiled decomposition."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 35515,
+        "output_tokens": 4137,
+        "tokens": 39652
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 35515,
+    "output_tokens": 4137,
+    "tokens": 39652
+  }
+}

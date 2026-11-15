@@ -1,0 +1,493 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:04:32.787851+00:00",
+    "case": {
+      "id": "layernorm_irregular",
+      "family": "layernorm",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-05,
+      "rtol": 0.0002
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "d56bbe0d9cb78bb9ecc73c04286ae77beed62029ec85e1fdd71d90872378f76b",
+    "baseline_hash": "f1ddf0c51eeac383cd1e63cae99169f71122e2f826500a5f89f22073cdd5301d",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 30075,
+    "output_tokens": 3911,
+    "tokens": 33986
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.2002941705286503,
+      "validation_seconds": 1.9217341858893633,
+      "candidate": {
+        "median_ms": 0.03809280097484589,
+        "p25_ms": 0.03527680039405823,
+        "p75_ms": 0.04464640021324158,
+        "min_ms": 0.03266560137271881,
+        "samples_ms": [
+          0.040038400888442995,
+          0.04669440090656281,
+          0.03809280097484589,
+          0.03563520014286041,
+          0.046079999208450316,
+          0.03624959886074066,
+          0.04669440090656281,
+          0.037376001477241516,
+          0.0477183997631073,
+          0.03850240111351013,
+          0.04782080054283142,
+          0.037478399276733396,
+          0.04249599874019623,
+          0.04249599874019623,
+          0.03307519853115082,
+          0.043007999658584595,
+          0.034508800506591795,
+          0.035020801424980166,
+          0.04628480076789856,
+          0.037273600697517395,
+          0.04669440090656281,
+          0.03553279936313629,
+          0.03266560137271881,
+          0.046489599347114566,
+          0.03573760092258453,
+          0.043110400438308716,
+          0.0347135990858078,
+          0.03287039995193482,
+          0.04321280121803284,
+          0.034918400645256045,
+          0.03266560137271881
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03819519877433777,
+        "p25_ms": 0.03537919968366623,
+        "p75_ms": 0.04403200000524521,
+        "min_ms": 0.032767999172210696,
+        "samples_ms": [
+          0.0477183997631073,
+          0.03819519877433777,
+          0.04362240135669708,
+          0.037887999415397645,
+          0.03594239950180054,
+          0.048127999901771544,
+          0.03594239950180054,
+          0.04710400104522705,
+          0.037785598635673524,
+          0.04710400104522705,
+          0.037785598635673524,
+          0.046387198567390445,
+          0.03850240111351013,
+          0.03522560000419617,
+          0.04321280121803284,
+          0.034815999865531924,
+          0.032767999172210696,
+          0.04556800127029419,
+          0.03553279936313629,
+          0.04505600035190582,
+          0.037887999415397645,
+          0.04392960071563721,
+          0.03522560000419617,
+          0.034918400645256045,
+          0.04362240135669708,
+          0.034406399726867674,
+          0.03317759931087494,
+          0.04126720130443573,
+          0.034508800506591795,
+          0.042905598878860474,
+          0.04413439929485321
+        ]
+      },
+      "paired_speedup": 1.002688114207183,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.030003198981285097,
+        "p25_ms": 0.029798400402069092,
+        "p75_ms": 0.030156800150871278,
+        "min_ms": 0.02959359884262085,
+        "samples_ms": [
+          0.031744000315666196,
+          0.030003198981285097,
+          0.039628800749778745,
+          0.029900801181793214,
+          0.030105599761009218,
+          0.029900801181793214,
+          0.03031040132045746,
+          0.029900801181793214,
+          0.03829759955406189,
+          0.029900801181793214,
+          0.03020800054073334,
+          0.030003198981285097,
+          0.03133440017700195,
+          0.02959359884262085,
+          0.029900801181793214,
+          0.029798400402069092,
+          0.030003198981285097,
+          0.02959359884262085,
+          0.03389439880847931,
+          0.02959359884262085,
+          0.029900801181793214,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.030105599761009218,
+          0.030003198981285097,
+          0.03133440017700195,
+          0.02959359884262085,
+          0.029798400402069092,
+          0.02969599962234497,
+          0.030105599761009218
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 84.30653346076221,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.111481485888362,
+      "process_seconds": 13.850042109377682
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 2
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1570
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400953,
+              781,
+              256
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "5df422cb35e72586ad55c6d703d25a1f8d5cd6df031c27adb38abd92db36a725",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Increased num_warps from 4 to 8 and num_stages from 1 to 2 for layernorm_apply to better hide latency and improve occupancy. Similarly, increased num_stages to 2 for layernorm_stats. Adjusted grid size for layernorm_apply to 1570 to fully cover all elements with BLOCK=256, reducing partial load overhead and improving data movement efficiency. The kernels maintain the same computation but now better utilize GPU resources and reduce boundary checks, addressing identified medium uncertainty bottlenecks.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400030 / 400653 (99.8%)\nGreatest absolute difference: 11.640910148620605 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 210030.734375 at index (11, 395) (up to 0.0002 allowed)",
+        "worker_seconds": 16.34416747931391,
+        "process_seconds": 18.395443548448384
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7436,
+        "output_tokens": 1487,
+        "tokens": 8923
+      },
+      "review": {
+        "measured_outcome": "The updated kernels increased num_warps and num_stages to better utilize GPU resources and adjusted grid size to reduce partial loads and boundary checks. However, the result was incorrect with 99.8% mismatched elements and extremely large errors, indicating a fundamental correctness issue rather than a performance bottleneck.",
+        "failure_analysis": "The large absolute and relative differences suggest an indexing or masking bug causing most outputs to be invalid. The change to compute 'row' and 'col' after computing 'i' with mask applied, and the way mask is used in loads and stores, may have introduced off-by-one errors or out-of-bound accesses especially since N=781 is irregular with BLOCK=256. Masking and indexing must be carefully aligned to avoid reading/storing wrong elements or using incorrect normalization statistics.",
+        "next_directions": [
+          "Review and fix the calculation of row and col indices relative to i and mask to ensure correct element-wise semantics.",
+          "Validate that masking fully prevents out-of-bounds memory accesses and no partial loads affect computed means and variances.",
+          "Consider computing mean and inverse sqrt using numerically stable operations and check for correct epsilon usage.",
+          "Test with smaller shapes or add debug outputs to isolate discrepancy source.",
+          "If partial blocks are necessary due to irregular N, handle them explicitly with conditional logic rather than relying on broad masking, to guarantee correctness.",
+          "Revert to simpler kernel with known correctness and incrementally add improvements, verifying correctness at each step."
+        ],
+        "retention_decision": null
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 12171,
+        "output_tokens": 1786,
+        "tokens": 13957
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "invalid argument symbol or integer"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 24492,
+        "output_tokens": 3492,
+        "tokens": 27984
+      },
+      "review": {
+        "measured_outcome": "The proposed kernels aim to fix correctness issues by explicitly computing valid element counts for partial rows in layernorm_stats and applying masking carefully in layernorm_apply. However, the last attempt failed to compile due to invalid argument types in launch configurations (e.g., string literals '781' instead of integers). The previously accepted kernels show very high error rates (99.8% mismatched elements) indicating fundamental indexing and masking bugs remain in the attempted fixes. The increased warps and stages improve resource usage but don't address correctness. The irregular dimension N=781 with BLOCK=256 causes partial blocks that are not fully handled by current masking and index calculations, leading to out-of-bounds memory accesses and invalid normalization statistics.",
+        "failures": [
+          "Invalid argument types in launch args causing proposal error.",
+          "Incorrect masking and indexing leading to out-of-bound accesses and invalid normalization.",
+          "High error rates demonstrate the results are not numerically correct."
+        ],
+        "next_directions": [
+          "Correct launch arguments to use integer constants for N, BLOCK, and TOTAL instead of strings to ensure valid kernel launch configurations.",
+          "Revisit index computations in both kernels, ensuring 'row' and 'col' are correctly derived and consistent with masking to prevent out-of-bound accesses.",
+          "Validate that masking fully covers partial blocks and that mean and variance are computed only over valid elements with correct denominators.",
+          "Consider a two-phase approach in layernorm_stats: first compute per-block partial sums and counts, then combine them to handle irregular rows precisely.",
+          "Add explicit boundary checks and conditional logic for partial blocks instead of relying purely on masking to improve correctness.",
+          "Test kernels on smaller, simpler shapes with partial blocks to debug and verify correctness before scaling to full problem size.",
+          "Incrementally build from a simple, verified-correct baseline, adding complexity only after correctness is confirmed at each step.",
+          "Use debugging outputs or assertions within device code (if possible) or via small test kernels to localize error sources."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 30075,
+        "output_tokens": 3911,
+        "tokens": 33986
+      }
+    }
+  ],
+  "wall_seconds": 74.51246789842844,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.0182876,
+  "budget_committed_usd": 0.018287599999999987,
+  "speedup": 1.0
+}

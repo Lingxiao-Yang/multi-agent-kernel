@@ -1,5 +1,39 @@
 # Experiment Log
 
+## Checkpoint 4 - 2026-11-15: A100 source pilot completed
+
+Lonestar6 job 3582814 completed at 22:25 CST on 2026-11-14 (exit 0:0,
+27 min 51 s) at frozen commit `ea03292`. Outputs were fetched on 2026-11-15
+and archived in `results/a100_source_pilot_3582814` with Slurm output in
+`logs/a100/source-pilot-3582814.*`.
+
+- 16/16 searches completed (4 irregular cases × 4 variants × seed 11,
+  2 attempts); 128 model calls; estimated $0.3224 of the $1.25 ceiling.
+- 5 of 32 attempts were correct and retained, all first attempts:
+  - matmul in all four variants (K-tiled `tl.dot`): single 1.48×,
+    single + knowledge 2.71×, multi 2.72×, multi + knowledge 3.03×;
+  - elementwise, single only (fused bias + ReLU): 1.86×.
+- No variant produced a correct softmax or layernorm kernel. Failures: 10
+  incorrect, 7 compilation errors (mostly `tl.arange` extents), 10 policy-gate
+  rejections.
+- Offline gate-v2 replay (main `8e8f4bc`) rejects three softmax cosmetic
+  rewrites the original gate passed; all three were incorrect anyway, so no
+  search outcome changes. All five retained kernels pass gate v2.
+- Manual inspection: every retained kernel is an authored algorithmic change.
+  Matmul speedup differences across variants come from tile shape and warps,
+  not from different algorithms.
+
+Total inference spend to date is about $0.874 of the $5 approved: $0.448
+A100 configuration pilot, $0.034 + $0.012 laptop model runs, $0.070 laptop
+source smoke, $0.322 this job, and under $0.0001 of diagnostics
+(`logs/pilot_budget_checkpoint.json`).
+
+Details: [SOURCE_PILOT_REPORT.md](SOURCE_PILOT_REPORT.md).
+
+**Next decisions (before freezing gate 3):** whether to add shared guidance on
+masking irregular widths with power-of-two blocks, or to pin a stronger model;
+whether 2 attempts is enough to see repair; and the primary-study budget.
+
 ## Checkpoint 3 - 2026-11-14: source-generation revision
 
 Reviewed the completed A100 pilot: all 48 proposals were configuration-only.

@@ -1,0 +1,398 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/layernorm_irregular_multi_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.2348558269441128,
+      "validation_seconds": 1.8959594024345279,
+      "candidate": {
+        "median_ms": 0.034815999865531924,
+        "p25_ms": 0.03430399894714355,
+        "p75_ms": 0.04326400011777878,
+        "min_ms": 0.03246079981327057,
+        "samples_ms": [
+          0.03676159977912903,
+          0.04341759979724884,
+          0.03522560000419617,
+          0.03328000009059906,
+          0.04444159865379334,
+          0.034918400645256045,
+          0.03338240087032318,
+          0.043724799156188966,
+          0.034815999865531924,
+          0.0392192006111145,
+          0.03532800078392029,
+          0.03430399894714355,
+          0.04352000057697296,
+          0.034815999865531924,
+          0.032767999172210696,
+          0.04352000057697296,
+          0.034406399726867674,
+          0.03266560137271881,
+          0.043110400438308716,
+          0.03461120128631592,
+          0.03246079981327057,
+          0.04413439929485321,
+          0.03430399894714355,
+          0.03266560137271881,
+          0.034508800506591795,
+          0.034508800506591795,
+          0.043724799156188966,
+          0.034815999865531924,
+          0.032767999172210696,
+          0.04352000057697296,
+          0.03461120128631592
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.034815999865531924,
+        "p25_ms": 0.03358719944953918,
+        "p75_ms": 0.0434688001871109,
+        "min_ms": 0.03266560137271881,
+        "samples_ms": [
+          0.04505600035190582,
+          0.03594239950180054,
+          0.03399679958820343,
+          0.0347135990858078,
+          0.034918400645256045,
+          0.04423680007457733,
+          0.034918400645256045,
+          0.03287039995193482,
+          0.04382719993591309,
+          0.035020801424980166,
+          0.03266560137271881,
+          0.043724799156188966,
+          0.03461120128631592,
+          0.03287039995193482,
+          0.04352000057697296,
+          0.034406399726867674,
+          0.03317759931087494,
+          0.03594239950180054,
+          0.03409920036792755,
+          0.04454399943351746,
+          0.0347135990858078,
+          0.032767999172210696,
+          0.04485119879245758,
+          0.034815999865531924,
+          0.03266560137271881,
+          0.04352000057697296,
+          0.03573760092258453,
+          0.03317759931087494,
+          0.04341759979724884,
+          0.034815999865531924,
+          0.032767999172210696
+        ]
+      },
+      "paired_speedup": 1.0,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.02959359884262085,
+        "p25_ms": 0.029491201043128967,
+        "p75_ms": 0.029900801181793214,
+        "min_ms": 0.029286399483680725,
+        "samples_ms": [
+          0.030105599761009218,
+          0.029491201043128967,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.03020800054073334,
+          0.029491201043128967,
+          0.029900801181793214,
+          0.02959359884262085,
+          0.029900801181793214,
+          0.029491201043128967,
+          0.0579584002494812,
+          0.029491201043128967,
+          0.02969599962234497,
+          0.029286399483680725,
+          0.02959359884262085,
+          0.032358399033546446,
+          0.029388800263404846,
+          0.029286399483680725,
+          0.02959359884262085,
+          0.029491201043128967,
+          0.02959359884262085,
+          0.029491201043128967,
+          0.02969599962234497,
+          0.029388800263404846,
+          0.02959359884262085,
+          0.029286399483680725,
+          0.03225600123405457,
+          0.029388800263404846,
+          0.029900801181793214,
+          0.029388800263404846,
+          0.03665919899940491
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.7041340470314026e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 92.24126873861174,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.171850890852511,
+      "process_seconds": 13.749161133542657
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 2
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1570
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400953,
+              781,
+              256
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "5df422cb35e72586ad55c6d703d25a1f8d5cd6df031c27adb38abd92db36a725",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Increased num_warps from 4 to 8 and num_stages from 1 to 2 for layernorm_apply to better hide latency and improve occupancy. Similarly, increased num_stages to 2 for layernorm_stats. Adjusted grid size for layernorm_apply to 1570 to fully cover all elements with BLOCK=256, reducing partial load overhead and improving data movement efficiency. The kernels maintain the same computation but now better utilize GPU resources and reduce boundary checks, addressing identified medium uncertainty bottlenecks.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400030 / 400653 (99.8%)\nGreatest absolute difference: 11.640910148620605 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 210030.734375 at index (11, 395) (up to 0.0002 allowed)",
+        "worker_seconds": 16.34416747931391,
+        "process_seconds": 18.395443548448384
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7436,
+        "output_tokens": 1487,
+        "tokens": 8923
+      },
+      "review": {
+        "measured_outcome": "The updated kernels increased num_warps and num_stages to better utilize GPU resources and adjusted grid size to reduce partial loads and boundary checks. However, the result was incorrect with 99.8% mismatched elements and extremely large errors, indicating a fundamental correctness issue rather than a performance bottleneck.",
+        "failure_analysis": "The large absolute and relative differences suggest an indexing or masking bug causing most outputs to be invalid. The change to compute 'row' and 'col' after computing 'i' with mask applied, and the way mask is used in loads and stores, may have introduced off-by-one errors or out-of-bound accesses especially since N=781 is irregular with BLOCK=256. Masking and indexing must be carefully aligned to avoid reading/storing wrong elements or using incorrect normalization statistics.",
+        "next_directions": [
+          "Review and fix the calculation of row and col indices relative to i and mask to ensure correct element-wise semantics.",
+          "Validate that masking fully prevents out-of-bounds memory accesses and no partial loads affect computed means and variances.",
+          "Consider computing mean and inverse sqrt using numerically stable operations and check for correct epsilon usage.",
+          "Test with smaller shapes or add debug outputs to isolate discrepancy source.",
+          "If partial blocks are necessary due to irregular N, handle them explicitly with conditional logic rather than relying on broad masking, to guarantee correctness.",
+          "Revert to simpler kernel with known correctness and incrementally add improvements, verifying correctness at each step."
+        ],
+        "retention_decision": null
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 12171,
+        "output_tokens": 1786,
+        "tokens": 13957
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "invalid argument symbol or integer"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 24492,
+        "output_tokens": 3492,
+        "tokens": 27984
+      },
+      "review": {
+        "measured_outcome": "The proposed kernels aim to fix correctness issues by explicitly computing valid element counts for partial rows in layernorm_stats and applying masking carefully in layernorm_apply. However, the last attempt failed to compile due to invalid argument types in launch configurations (e.g., string literals '781' instead of integers). The previously accepted kernels show very high error rates (99.8% mismatched elements) indicating fundamental indexing and masking bugs remain in the attempted fixes. The increased warps and stages improve resource usage but don't address correctness. The irregular dimension N=781 with BLOCK=256 causes partial blocks that are not fully handled by current masking and index calculations, leading to out-of-bounds memory accesses and invalid normalization statistics.",
+        "failures": [
+          "Invalid argument types in launch args causing proposal error.",
+          "Incorrect masking and indexing leading to out-of-bound accesses and invalid normalization.",
+          "High error rates demonstrate the results are not numerically correct."
+        ],
+        "next_directions": [
+          "Correct launch arguments to use integer constants for N, BLOCK, and TOTAL instead of strings to ensure valid kernel launch configurations.",
+          "Revisit index computations in both kernels, ensuring 'row' and 'col' are correctly derived and consistent with masking to prevent out-of-bound accesses.",
+          "Validate that masking fully covers partial blocks and that mean and variance are computed only over valid elements with correct denominators.",
+          "Consider a two-phase approach in layernorm_stats: first compute per-block partial sums and counts, then combine them to handle irregular rows precisely.",
+          "Add explicit boundary checks and conditional logic for partial blocks instead of relying purely on masking to improve correctness.",
+          "Test kernels on smaller, simpler shapes with partial blocks to debug and verify correctness before scaling to full problem size.",
+          "Incrementally build from a simple, verified-correct baseline, adding complexity only after correctness is confirmed at each step.",
+          "Use debugging outputs or assertions within device code (if possible) or via small test kernels to localize error sources."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 30075,
+        "output_tokens": 3911,
+        "tokens": 33986
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 30075,
+    "output_tokens": 3911,
+    "tokens": 33986
+  }
+}

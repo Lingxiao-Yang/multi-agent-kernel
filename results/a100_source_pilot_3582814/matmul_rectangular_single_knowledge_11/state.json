@@ -1,0 +1,511 @@
+{
+  "incumbent": {
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            32,
+            32,
+            32
+          ],
+          "num_warps": 8,
+          "num_stages": 2
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/matmul_rectangular_single_knowledge_11/candidate_001.py",
+    "rationale": "Increased tile sizes to 32x32 and BK=32 to improve data reuse and reduce kernel launch overhead. Increased warps to 8 and pipeline stages to 2 to better overlap memory and computation, improving GPU utilization. Used tl.dot with FP32 accumulation for efficient warp-level matrix multiply-accumulate instructions on Ampere architecture.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.941169057972729,
+      "validation_seconds": 3.6670261155813932,
+      "candidate": {
+        "median_ms": 0.0719871997833252,
+        "p25_ms": 0.07188479900360108,
+        "p75_ms": 0.07208960056304932,
+        "min_ms": 0.07178239822387696,
+        "samples_ms": [
+          0.07249919772148132,
+          0.07208960056304932,
+          0.0719871997833252,
+          0.07208960056304932,
+          0.07188479900360108,
+          0.0719871997833252,
+          0.0719871997833252,
+          0.07188479900360108,
+          0.0779263973236084,
+          0.07208960056304932,
+          0.0719871997833252,
+          0.07208960056304932,
+          0.07188479900360108,
+          0.07208960056304932,
+          0.07188479900360108,
+          0.07188479900360108,
+          0.07178239822387696,
+          0.07188479900360108,
+          0.07208960056304932,
+          0.07208960056304932,
+          0.07249919772148132,
+          0.0719871997833252,
+          0.07485439777374267,
+          0.0719871997833252,
+          0.07188479900360108,
+          0.07208960056304932,
+          0.0719871997833252,
+          0.07178239822387696,
+          0.07208960056304932,
+          0.07208960056304932,
+          0.07208960056304932
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19537919759750366,
+        "p25_ms": 0.19522559642791748,
+        "p75_ms": 0.19548159837722778,
+        "min_ms": 0.1950719952583313,
+        "samples_ms": [
+          0.19548159837722778,
+          0.19548159837722778,
+          0.20305919647216797,
+          0.19537919759750366,
+          0.19517439603805542,
+          0.19548159837722778,
+          0.19537919759750366,
+          0.19527679681777954,
+          0.19548159837722778,
+          0.19537919759750366,
+          0.19548159837722778,
+          0.19537919759750366,
+          0.19548159837722778,
+          0.19548159837722778,
+          0.19517439603805542,
+          0.1950719952583313,
+          0.20183041095733642,
+          0.1950719952583313,
+          0.19537919759750366,
+          0.19527679681777954,
+          0.1950719952583313,
+          0.1950719952583313,
+          0.19517439603805542,
+          0.1955839991569519,
+          0.19517439603805542,
+          0.19527679681777954,
+          0.19527679681777954,
+          0.19537919759750366,
+          0.19527679681777954,
+          0.19548159837722778,
+          0.1960960030555725
+        ]
+      },
+      "paired_speedup": 2.714082478351387,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.0719871997833252,
+          "p25_ms": 0.07188479900360108,
+          "p75_ms": 0.07208960056304932,
+          "min_ms": 0.07178239822387696,
+          "samples_ms": [
+            0.07280640006065368,
+            0.07219200134277344,
+            0.07188479900360108,
+            0.07208960056304932,
+            0.0719871997833252,
+            0.07188479900360108,
+            0.0719871997833252,
+            0.0719871997833252,
+            0.07188479900360108,
+            0.07208960056304932,
+            0.07178239822387696,
+            0.07219200134277344,
+            0.07802879810333252,
+            0.07208960056304932,
+            0.07178239822387696,
+            0.0719871997833252,
+            0.07188479900360108,
+            0.0719871997833252,
+            0.0719871997833252,
+            0.07208960056304932,
+            0.0719871997833252,
+            0.0719871997833252,
+            0.07188479900360108,
+            0.0719871997833252,
+            0.07208960056304932,
+            0.0719871997833252,
+            0.07505919933319091,
+            0.07219200134277344,
+            0.07188479900360108,
+            0.0719871997833252,
+            0.07178239822387696
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.19527679681777954,
+          "p25_ms": 0.19522559642791748,
+          "p75_ms": 0.19548159837722778,
+          "min_ms": 0.1950719952583313,
+          "samples_ms": [
+            0.19548159837722778,
+            0.1955839991569519,
+            0.19527679681777954,
+            0.19537919759750366,
+            0.19527679681777954,
+            0.19537919759750366,
+            0.2017280101776123,
+            0.19548159837722778,
+            0.19548159837722778,
+            0.19527679681777954,
+            0.19548159837722778,
+            0.19517439603805542,
+            0.19537919759750366,
+            0.19548159837722778,
+            0.19527679681777954,
+            0.19527679681777954,
+            0.19517439603805542,
+            0.19527679681777954,
+            0.19517439603805542,
+            0.1950719952583313,
+            0.20193281173706054,
+            0.19527679681777954,
+            0.19517439603805542,
+            0.19517439603805542,
+            0.19537919759750366,
+            0.19527679681777954,
+            0.19517439603805542,
+            0.19701759815216063,
+            0.20193281173706054,
+            0.19548159837722778,
+            0.19517439603805542
+          ]
+        }
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 20.113881417226555,
+        "achieved_tflops": 2.8167710177687604,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 4.061655321158469,
+      "process_seconds": 15.353427035734057,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 61,
+            "spills": 0,
+            "shared_bytes": 2048,
+            "num_warps": 8
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "matmul_simt",
+            "grid": [
+              17,
+              49
+            ],
+            "args": [
+              "A",
+              "B",
+              "Y",
+              "M",
+              "N",
+              "K",
+              32,
+              32,
+              32
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "54668db6f3aeabb751b332890bc4475e5efd76163c2a49a79cf4070c08d419c1",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Increased tile sizes to 32x32 and BK=32 to improve data reuse and reduce kernel launch overhead. Increased warps to 8 and pipeline stages to 2 to better overlap memory and computation, improving GPU utilization. Used tl.dot with FP32 accumulation for efficient warp-level matrix multiply-accumulate instructions on Ampere architecture.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.941169057972729,
+        "validation_seconds": 3.6670261155813932,
+        "candidate": {
+          "median_ms": 0.0719871997833252,
+          "p25_ms": 0.07188479900360108,
+          "p75_ms": 0.07208960056304932,
+          "min_ms": 0.07178239822387696
+        },
+        "incumbent": {
+          "median_ms": 0.19537919759750366,
+          "p25_ms": 0.19522559642791748,
+          "p75_ms": 0.19548159837722778,
+          "min_ms": 0.1950719952583313
+        },
+        "paired_speedup": 2.714082478351387,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.0719871997833252,
+            "p25_ms": 0.07188479900360108,
+            "p75_ms": 0.07208960056304932,
+            "min_ms": 0.07178239822387696
+          },
+          "incumbent": {
+            "median_ms": 0.19527679681777954,
+            "p25_ms": 0.19522559642791748,
+            "p75_ms": 0.19548159837722778,
+            "min_ms": 0.1950719952583313
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 20.113881417226555,
+          "achieved_tflops": 2.8167710177687604,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.061655321158469,
+        "process_seconds": 15.353427035734057,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 61,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9675,
+        "output_tokens": 1517,
+        "tokens": 11192
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                17,
+                49
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                32,
+                32,
+                32
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline with 2 stages to overlap loads and compute\n    for k in range(0, K, BK):\n        offs_k = k + tl.arange(0, BK)\n        # Load tiles with boundary mask\n        a = tl.load(A + offs_m[:, None] * K + offs_k[None, :], (offs_m[:, None] < M) & (offs_k[None, :] < K), other=0).to(tl.float32)\n        b = tl.load(B + offs_k[:, None] * N + offs_n[None, :], (offs_k[:, None] < K) & (offs_n[None, :] < N), other=0).to(tl.float32)\n        acc += tl.dot(a, b)\n\n    mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask)\n",
+        "rationale": "Maintain previously validated tiling of 32x32 with BK=32 and 2-stage software pipelining to overlap memory and compute operations, leveraging tl.dot for efficient FP32 accumulation and optimal GPU utilization on A100 architecture. This structure balances operand reuse, register usage, and latency hiding, yielding a confirmed 2.7x speedup over the prior baseline."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15991,
+        "output_tokens": 2018,
+        "tokens": 18009
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 32580,
+        "output_tokens": 3553,
+        "tokens": 36133
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                9,
+                49
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                64,
+                32,
+                32
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(\n    A, B, Y,\n    M: tl.constexpr, N: tl.constexpr, K: tl.constexpr,\n    BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr\n):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline with 2 stages to overlap loads and compute\n    for k in range(0, K, BK):\n        offs_k = k + tl.arange(0, BK)\n\n        # Load tiles with boundary mask\n        a_mask = (offs_m[:, None] < M) & (offs_k[None, :] < K)\n        b_mask = (offs_k[:, None] < K) & (offs_n[None, :] < N)\n\n        a = tl.load(A + offs_m[:, None] * K + offs_k[None, :], a_mask, other=0).to(tl.float32)\n        b = tl.load(B + offs_k[:, None] * N + offs_n[None, :], b_mask, other=0).to(tl.float32)\n\n        acc += tl.dot(a, b)\n\n    mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask)\n",
+        "rationale": "Reduced grid dimension in M to 9 matching tile size BM=64 over M=257 to reduce redundant kernel launches and improve GPU occupancy. Maintained BN=32, BK=32, num_warps=8, and num_stages=2 to preserve effective memory-compute overlap and register balance. This adjustment hypothesized to better fit workload shape, reduce launch overhead, and improve throughput without increasing register pressure or complexity."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 39397,
+        "output_tokens": 4093,
+        "tokens": 43490
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 39397,
+    "output_tokens": 4093,
+    "tokens": 43490
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513,
+          13
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          40053,
+          64
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      },
+      {
+        "kernel": "softmax_fused_final_reduce",
+        "grid": [
+          513
+        ],
+        "args": [
+          "Y",
+          781
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    offs_in_block = tl.arange(0, BLOCK)\n    col = block_id * BLOCK + offs_in_block\n    mask = col < N\n    offs = row * N + col\n\n    # Load input with masking for boundary elements\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Compute partial max per block\n    block_max = tl.max(x, axis=0)\n\n    # Compute exponentials shifted by block max\n    exps = tl.exp(x - block_max)\n\n    # Store partial exponentials for final reduction\n    tl.store(Y + offs, exps, mask)\n\n@triton.jit\ndef softmax_fused_final_reduce(Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    offs_in_row = tl.arange(0, N)\n    offs = row * N + offs_in_row\n    mask = offs_in_row < N\n\n    # Load partial exponentials\n    vals = tl.load(Y + offs, mask, other=0.0)\n\n    # Compute max of partial exponentials for numerical stability\n    mx = tl.max(vals, axis=0)\n\n    # Recompute exp shifted by global max for stable sum\n    exps = tl.exp(vals - mx)\n\n    # Compute sum of exponentials\n    denom = tl.sum(exps, axis=0)\n\n    # Normalize\n    y = exps / denom\n\n    # Store normalized output\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "Split softmax into two kernels: first computes partial exponentials per block with block-wise max subtraction and stores partial exponentials; second kernel performs row-wise max and sum reduction and normalizes outputs. This improves parallel reduction efficiency and numerical stability over large irregular dimension 781 with power-of-two block size 64, balances resource use and memory coalescing, and reduces kernel overhead compared to separate stats and apply kernels."
+}

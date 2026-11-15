@@ -1,0 +1,542 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:16:04.875084+00:00",
+    "case": {
+      "id": "elementwise_irregular",
+      "family": "elementwise",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 1e-06,
+      "rtol": 1e-06
+    },
+    "variant": "single_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "146472a571ffbebb10f8eaa7b73fd5cbccdef2359c07df70a4591efcb973a04a",
+    "baseline_hash": "28f90ba2ae68a784f67ab0d7230dd112a974e54af9f2ca3e8b9545dcdc03e7f0",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 30976,
+    "output_tokens": 2188,
+    "tokens": 33164
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0
+        }
+      ],
+      "first_launch_seconds": 1.1802055835723877,
+      "validation_seconds": 1.9347185185179114,
+      "candidate": {
+        "median_ms": 0.03399679958820343,
+        "p25_ms": 0.03225600123405457,
+        "p75_ms": 0.040396800637245184,
+        "min_ms": 0.03041279911994934,
+        "samples_ms": [
+          0.043724799156188966,
+          0.03696640133857727,
+          0.03348479866981506,
+          0.04505600035190582,
+          0.03604480028152466,
+          0.03328000009059906,
+          0.03635199964046478,
+          0.03399679958820343,
+          0.04485119879245758,
+          0.035123199224472046,
+          0.03287039995193482,
+          0.04464640021324158,
+          0.034815999865531924,
+          0.030720001459121703,
+          0.03901439905166626,
+          0.032767999172210696,
+          0.03041279911994934,
+          0.04095999896526337,
+          0.032767999172210696,
+          0.03061760067939758,
+          0.04106239974498749,
+          0.03993600010871887,
+          0.031027200818061828,
+          0.030822399258613586,
+          0.03225600123405457,
+          0.03297280073165894,
+          0.031027200818061828,
+          0.04126720130443573,
+          0.03225600123405457,
+          0.030822399258613586,
+          0.04085760116577149
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03399679958820343,
+        "p25_ms": 0.03230720013380051,
+        "p75_ms": 0.039680001139640805,
+        "min_ms": 0.03041279911994934,
+        "samples_ms": [
+          0.03706879913806915,
+          0.03399679958820343,
+          0.045875200629234315,
+          0.03399679958820343,
+          0.0449535995721817,
+          0.03583999872207642,
+          0.03317759931087494,
+          0.04423680007457733,
+          0.03563520014286041,
+          0.04403199851512909,
+          0.03594239950180054,
+          0.03317759931087494,
+          0.04116480052471161,
+          0.032767999172210696,
+          0.030822399258613586,
+          0.04085760116577149,
+          0.03850240111351013,
+          0.030924800038337707,
+          0.03051519989967346,
+          0.03809280097484589,
+          0.03246079981327057,
+          0.03041279911994934,
+          0.04136959910392761,
+          0.034201601147651674,
+          0.030720001459121703,
+          0.04136959910392761,
+          0.0336896002292633,
+          0.03051519989967346,
+          0.030822399258613586,
+          0.032153600454330446,
+          0.03287039995193482
+        ]
+      },
+      "paired_speedup": 1.0,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.018943999707698823,
+        "p25_ms": 0.018739199638366698,
+        "p75_ms": 0.019251199811697005,
+        "min_ms": 0.018534399569034576,
+        "samples_ms": [
+          0.029388800263404846,
+          0.020479999482631683,
+          0.01935359984636307,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.01884160041809082,
+          0.019046400487422944,
+          0.018636800348758698,
+          0.019046400487422944,
+          0.018636800348758698,
+          0.020479999482631683,
+          0.018534399569034576,
+          0.018943999707698823,
+          0.02815999984741211,
+          0.019046400487422944,
+          0.019968000054359437,
+          0.018943999707698823,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.02539519965648651,
+          0.018943999707698823,
+          0.020275199413299562,
+          0.019046400487422944,
+          0.018739199638366698,
+          0.018943999707698823,
+          0.018739199638366698,
+          0.019148799777030944,
+          0.018636800348758698,
+          0.018943999707698823
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3208348,
+        "logical_gbps": 94.372059689797,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.1165793407708406,
+      "process_seconds": 14.038894045166671
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "bias_add",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "B",
+            "T",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "relu",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "T",
+            "Y",
+            "TOTAL",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              399753
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "e5dec1d56f6d89f2b6f741965e36453af7b8455ec0ef53aad30ca01ce14cba7b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fused bias_add and relu into a single kernel to eliminate intermediate memory traffic and kernel launch overhead. The grid and block sizes remain unchanged to maintain parallelism. Masking ensures correct handling of boundary conditions. This fusion reduces global memory load/store operations and improves data locality, leading to better performance.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 4:25:\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr):\n    BLOCK = 256\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n                         ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 10.949390212073922,
+        "process_seconds": 13.137157650664449
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 8835,
+        "output_tokens": 788,
+        "tokens": 9623
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "bias_add_relu",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "B",
+                "Y",
+                399753,
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < TOTAL\n    x = tl.load(X + offs, mask, other=0.0)\n    b = tl.load(B + (offs % N), mask, other=0.0)\n    y = x + b\n    y_relu = tl.maximum(y, 0.0)\n    tl.store(Y + offs, y_relu, mask)\n",
+        "rationale": "Fixed compilation error by making BLOCK a constexpr parameter and passing it as an argument. Added N as constexpr parameter to correctly compute bias indexing with modulo. Preserved fusion of bias add and relu in single kernel to reduce memory traffic and kernel launch overhead. Maintained original grid and launch dimensions for parallelism and boundary masking for correctness."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13237,
+        "output_tokens": 1068,
+        "tokens": 14305
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              399753,
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "6e990c08be862a5fc48fe99d5e12fe86be483b5ae725da96dfc383bef88848a9",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fused bias_add and ReLU into a single kernel to reduce memory load/store and kernel launch overhead, improving data locality and performance. Used constexpr parameters TOTAL, N, and BLOCK for compile-time optimization. Maintained masking for boundary correctness and preserved original grid and block size for parallelism.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 900 / 400653 (0.2%)\nGreatest absolute difference: nan at index (511, 662) (up to 1e-06 allowed)\nGreatest relative difference: nan at index (511, 662) (up to 1e-06 allowed)",
+        "worker_seconds": 12.80724449083209,
+        "process_seconds": 14.901013111695647
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 25418,
+        "output_tokens": 1895,
+        "tokens": 27313
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "bias_add_relu",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "B",
+                "Y",
+                399753,
+                781,
+                128
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < TOTAL\n    x = tl.load(X + offs, mask, other=0.0)\n    b = tl.load(B + (offs % N), mask, other=0.0)\n    y = x + b\n    y_relu = tl.maximum(y, 0.0)\n    tl.store(Y + offs, y_relu, mask)\n",
+        "rationale": "Reduced BLOCK size from 256 to 128 to decrease register pressure and improve correctness, addressing numerical mismatch issues. This change balances parallelism and resource usage, expected to improve correctness and potentially performance due to better occupancy and fewer resource conflicts. Preserved fusion of bias addition and ReLU for reduced memory traffic and kernel overhead, maintained masking for boundary correctness, and retained original grid size for parallelism."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 30976,
+        "output_tokens": 2188,
+        "tokens": 33164
+      }
+    }
+  ],
+  "wall_seconds": 75.94759163539857,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.015891199999999994,
+  "budget_committed_usd": 0.015891199999999994,
+  "speedup": 1.0
+}

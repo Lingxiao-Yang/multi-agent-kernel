@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "B",
+          "Y",
+          "TOTAL",
+          "N",
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < TOTAL\n    x = tl.load(X + offs, mask, other=0.0)\n    b = tl.load(B + (offs % N), mask, other=0.0)\n    r = x + b\n    r = tl.maximum(r, 0.0)\n    tl.store(Y + offs, r, mask)\n",
+  "rationale": "Fused bias_add and relu into single kernel to reduce memory traffic and kernel launch overhead. Increased num_warps to 8 and num_stages to 2 to better hide latency and improve pipelining on NVIDIA A100, enhancing throughput and lowering latency."
+}

@@ -1,0 +1,550 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:14:38.011483+00:00",
+    "case": {
+      "id": "elementwise_irregular",
+      "family": "elementwise",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 1e-06,
+      "rtol": 1e-06
+    },
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "146472a571ffbebb10f8eaa7b73fd5cbccdef2359c07df70a4591efcb973a04a",
+    "baseline_hash": "28f90ba2ae68a784f67ab0d7230dd112a974e54af9f2ca3e8b9545dcdc03e7f0",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 34115,
+    "output_tokens": 3938,
+    "tokens": 38053
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0
+        }
+      ],
+      "first_launch_seconds": 1.2056613331660628,
+      "validation_seconds": 1.9663490746170282,
+      "candidate": {
+        "median_ms": 0.03563520014286041,
+        "p25_ms": 0.03292159885168076,
+        "p75_ms": 0.042496000230312345,
+        "min_ms": 0.03031040132045746,
+        "samples_ms": [
+          0.03676159977912903,
+          0.0449535995721817,
+          0.03573760092258453,
+          0.032767999172210696,
+          0.04485119879245758,
+          0.03563520014286041,
+          0.04628480076789856,
+          0.035123199224472046,
+          0.04444159865379334,
+          0.03543039858341217,
+          0.03307519853115082,
+          0.04454399943351746,
+          0.03543039858341217,
+          0.03317759931087494,
+          0.04362240135669708,
+          0.03266560137271881,
+          0.04413439929485321,
+          0.03573760092258453,
+          0.03317759931087494,
+          0.04464640021324158,
+          0.034918400645256045,
+          0.030720001459121703,
+          0.04136959910392761,
+          0.032358399033546446,
+          0.03031040132045746,
+          0.04126720130443573,
+          0.03266560137271881,
+          0.03051519989967346,
+          0.04106239974498749,
+          0.037887999415397645,
+          0.03051519989967346
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03573760092258453,
+        "p25_ms": 0.033228799700737,
+        "p75_ms": 0.0420864000916481,
+        "min_ms": 0.03061760067939758,
+        "samples_ms": [
+          0.04659200012683869,
+          0.03604480028152466,
+          0.04116480052471161,
+          0.03543039858341217,
+          0.03317759931087494,
+          0.04505600035190582,
+          0.03614720106124878,
+          0.04485119879245758,
+          0.03573760092258453,
+          0.03328000009059906,
+          0.04433920085430145,
+          0.035020801424980166,
+          0.04362240135669708,
+          0.03573760092258453,
+          0.03317759931087494,
+          0.04485119879245758,
+          0.03532800078392029,
+          0.0336896002292633,
+          0.04444159865379334,
+          0.03358719944953918,
+          0.043007999658584595,
+          0.03317759931087494,
+          0.030822399258613586,
+          0.04106239974498749,
+          0.03932160139083862,
+          0.03061760067939758,
+          0.03061760067939758,
+          0.03819519877433777,
+          0.03307519853115082,
+          0.03061760067939758,
+          0.04106239974498749
+        ]
+      },
+      "paired_speedup": 1.0028735850875987,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.01935359984636307,
+        "p25_ms": 0.019148799777030944,
+        "p75_ms": 0.02027520015835762,
+        "min_ms": 0.01884160041809082,
+        "samples_ms": [
+          0.027340799570083618,
+          0.018943999707698823,
+          0.019865599274635316,
+          0.019251200556755065,
+          0.019251200556755065,
+          0.019046400487422944,
+          0.019251200556755065,
+          0.01884160041809082,
+          0.01966080069541931,
+          0.019251200556755065,
+          0.0289792001247406,
+          0.019968000054359437,
+          0.019763199985027312,
+          0.031027200818061828,
+          0.026726400852203368,
+          0.01935359984636307,
+          0.020787200331687926,
+          0.01884160041809082,
+          0.019251200556755065,
+          0.02682879865169525,
+          0.019148799777030944,
+          0.020582400262355804,
+          0.01945600062608719,
+          0.018943999707698823,
+          0.019148799777030944,
+          0.019046400487422944,
+          0.019251200556755065,
+          0.020582400262355804,
+          0.01935359984636307,
+          0.01884160041809082,
+          0.01935359984636307
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3208348,
+        "logical_gbps": 90.03311296520947,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.158659828826785,
+      "process_seconds": 13.93331526312977
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "bias_add",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "B",
+            "T",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "relu",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "T",
+            "Y",
+            "TOTAL",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_fused",
+            "grid": [
+              56,
+              31
+            ],
+            "num_warps": 4,
+            "num_stages": 1,
+            "args": [
+              "X",
+              "B",
+              "Y",
+              513,
+              781,
+              16
+            ]
+          }
+        ]
+      },
+      "source_hash": "fd7d0e52da7d2489916c6afa1919d732b4cb47d6b6ee1603a5e13d8e1270ffd3",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Changed grid to 2D decomposition (56x31) with smaller block size 16 to increase parallelism and better fit irregular shape 513x781 with masking, improving GPU utilization and reducing masking overhead per launch. Fused bias add and ReLU to reduce intermediate memory traffic and synchronization overhead, lowering latency and improving throughput.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 146205 / 400653 (36.5%)\nGreatest absolute difference: nan at index (0, 496) (up to 1e-06 allowed)\nGreatest relative difference: nan at index (0, 496) (up to 1e-06 allowed)",
+        "worker_seconds": 12.690812934190035,
+        "process_seconds": 14.786939395591617
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 8595,
+        "output_tokens": 1220,
+        "tokens": 9815
+      },
+      "review": {
+        "measured_outcome": "The fused kernel with a 2D grid and block size 16 was incorrect, failing validation with NaNs and mismatched elements (36.5% mismatch). The error indicates a serious correctness issue possibly related to indexing or masking logic. The approach aimed to improve parallelism and reduce memory traffic by fusing bias addition and ReLU and using a finer-grained 2D grid. However, the implementation likely mishandled program_id usage or indexing, causing invalid memory accesses or masking errors.",
+        "failures": [
+          "Incorrect indexing or program_id usage: The original code decomposed pid into 2D indices manually, but the proposed code uses tl.program_id(0) and tl.program_id(1) assuming a 2D grid, which may mismatch the launched grid shape leading to invalid memory accesses.",
+          "Masking errors: The mask logic may be inconsistent or incorrectly applied leading to NaNs and large validation errors.",
+          "Shape and grid mismatch: The grid dimensions (56,31) must match the launch grid size; a mismatch can cause out-of-bounds accesses or insufficient coverage of input data, resulting in NaNs or missing writes."
+        ],
+        "next_directions": [
+          "Verify that the launch grid is indeed 2D with dimensions matching the code assumptions (56,31). If the launch grid is 1D, switch back to manual pid decomposition or launch a 2D grid.",
+          "Add explicit bounds checks on memory loads and stores, ensure masks are applied correctly to avoid invalid memory accesses.",
+          "Test smaller block sizes or different grid configurations and validate correctness before performance tuning.",
+          "Add debug instrumentation or compare intermediate results to isolate the cause of NaNs.",
+          "Consider retaining the fusion but revert to the original program_id(0) based indexing if 2D grid launch is not supported or mismatched.",
+          "Ensure all masks are properly broadcasted and combined to prevent loading/storing invalid data."
+        ],
+        "retention": false
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13357,
+        "output_tokens": 1605,
+        "tokens": 14962
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_fused",
+            "grid": [
+              33,
+              49
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              513,
+              781,
+              16
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "1a306c9e707cfc227454145531c5362e794344d64bf45155de72e85131e43608",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Reimplemented kernel to use a 1D launch grid of size 33*49 with manual 2D decomposition of program_id to pid_m and pid_n, matching the launch grid dimensions and fully covering the 513x781 shape with 16x16 blocks. This prevents out-of-bounds memory accesses and masking errors caused by mismatched program_id usage in a 2D launch grid. Explicit combined masks are used to guard all loads and stores. The kernel fuses bias addition and ReLU to reduce memory traffic and kernel overhead, applying the operations in a single pass.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 392205 / 400653 (97.9%)\nGreatest absolute difference: nan at index (0, 528) (up to 1e-06 allowed)\nGreatest relative difference: nan at index (0, 528) (up to 1e-06 allowed)",
+        "worker_seconds": 12.275455116294324,
+        "process_seconds": 14.360499722883105
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 27334,
+        "output_tokens": 3429,
+        "tokens": 30763
+      },
+      "review": {
+        "measured_outcomes": {
+          "attempt_1": {
+            "status": "incorrect",
+            "error": "Tensor-likes are not close; 36.5% mismatched elements; NaNs present due to invalid memory accesses.",
+            "root_cause": [
+              "Incorrect indexing or program_id usage causing out-of-bounds accesses.",
+              "Masking logic inconsistent or incomplete, leading to boundary errors."
+            ],
+            "performance": "Kernel attempted to increase parallelism with 2D grid and block size 16; fusion of bias add and ReLU to reduce memory traffic."
+          },
+          "attempt_2": {
+            "status": "incorrect",
+            "error": "Tensor-likes are not close; 97.9% mismatched elements; NaNs present.",
+            "root_cause": [
+              "Manual 2D decomposition of 1D program_id inconsistent with launch grid or masking logic.",
+              "Likely incorrect masking or indexing leading to large-scale data corruption."
+            ],
+            "performance": "Fused kernel with manual 2D decomposition and combined mask still fails correctness validation."
+          }
+        },
+        "failures": [
+          "Mismatched launch grid dimensions and program_id usage causing invalid indexing.",
+          "Incomplete or incorrect masks leading to invalid memory loads/stores and NaNs.",
+          "Excessive mismatches indicate severe logic errors in index calculations or masking."
+        ],
+        "next_directions": [
+          "Verify that the launch grid dimensions match the indexing strategy exactly: if using 2D indexing (program_id(0), program_id(1)), launch grid must be 2D with correct dimensions.",
+          "If launching 1D grid, manually decompose program_id correctly and ensure grid size matches coverage of the input shape with the chosen block size.",
+          "Augment masking to explicitly combine row and column bounds and apply masks consistently to all loads and stores.",
+          "Add debug checks or logging in kernel (e.g., output mask sums or partial results) to isolate where NaNs or invalid accesses occur.",
+          "Test with reduced input size or smaller block sizes to simplify debugging and verify correctness incrementally.",
+          "Consider splitting fusion into separate bias add and ReLU kernels temporarily to isolate correctness issues.",
+          "Ensure all offsets and pointer calculations use safe integer arithmetic and respect tensor shape boundaries.",
+          "Review and potentially simplify kernel indexing and masking logic, avoiding complex manual program_id decompositions if possible."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 34115,
+        "output_tokens": 3938,
+        "tokens": 38053
+      }
+    }
+  ],
+  "wall_seconds": 86.63189257029444,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.019946800000000015,
+  "budget_committed_usd": 0.019946799999999987,
+  "speedup": 1.0
+}

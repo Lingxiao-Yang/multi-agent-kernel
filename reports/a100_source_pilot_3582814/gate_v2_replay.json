@@ -1,0 +1,180 @@
+{
+  "gate_version": 2,
+  "scope": "Offline AST replay only. Original measurements and search outcomes are unchanged.",
+  "gate_source_hash": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+  "candidates": [
+    {
+      "run": "elementwise_irregular_multi_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_multi_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_multi_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_multi_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_single_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_single_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    },
+    {
+      "run": "elementwise_irregular_single_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "elementwise_irregular_single_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "invalid argument symbol or integer"
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "unsupported Triton primitive barrier"
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "attempt": 1,
+      "replayed_gate": "rejected",
+      "reason": "Python object mutation forbidden; use tl.store for output"
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "matmul_rectangular_multi_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "matmul_rectangular_multi_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "unsupported Triton primitive shared_memory"
+    },
+    {
+      "run": "matmul_rectangular_multi_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "matmul_rectangular_multi_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "Python object mutation forbidden; use tl.store for output"
+    },
+    {
+      "run": "matmul_rectangular_single_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "matmul_rectangular_single_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    },
+    {
+      "run": "matmul_rectangular_single_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "matmul_rectangular_single_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "attempt": 1,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "pass"
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "attempt": 1,
+      "replayed_gate": "rejected",
+      "reason": "invalid argument symbol or integer"
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "invalid argument symbol or integer"
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "attempt": 1,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "attempt": 2,
+      "replayed_gate": "rejected",
+      "reason": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+    }
+  ]
+}

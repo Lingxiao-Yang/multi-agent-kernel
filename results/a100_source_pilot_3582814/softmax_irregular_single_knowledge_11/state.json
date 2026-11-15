@@ -1,0 +1,587 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "softmax_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/softmax_irregular_single_knowledge_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 2.980232238769531e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 1.1895145885646343,
+      "validation_seconds": 1.8708626367151737,
+      "candidate": {
+        "median_ms": 0.03758080005645752,
+        "p25_ms": 0.036659200489521024,
+        "p75_ms": 0.04561920017004013,
+        "min_ms": 0.03399679958820343,
+        "samples_ms": [
+          0.03880960047245026,
+          0.03563520014286041,
+          0.048640000820159915,
+          0.03532800078392029,
+          0.045363199710845944,
+          0.03676159977912903,
+          0.045465600490570066,
+          0.03676159977912903,
+          0.03409920036792755,
+          0.046387198567390445,
+          0.03706879913806915,
+          0.046387198567390445,
+          0.037376001477241516,
+          0.04270080029964447,
+          0.037171199917793274,
+          0.03532800078392029,
+          0.04628480076789856,
+          0.036556801199913024,
+          0.046489599347114566,
+          0.03758080005645752,
+          0.046387198567390445,
+          0.034815999865531924,
+          0.0447488009929657,
+          0.03696640133857727,
+          0.04669440090656281,
+          0.03758080005645752,
+          0.045772799849510194,
+          0.037376001477241516,
+          0.03409920036792755,
+          0.03840000033378601,
+          0.03399679958820343
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03850240111351013,
+        "p25_ms": 0.03619839996099472,
+        "p75_ms": 0.04628480076789856,
+        "min_ms": 0.034201601147651674,
+        "samples_ms": [
+          0.03553279936313629,
+          0.03891200125217438,
+          0.034918400645256045,
+          0.04628480076789856,
+          0.037273600697517395,
+          0.045158401131629944,
+          0.03850240111351013,
+          0.034201601147651674,
+          0.045363199710845944,
+          0.03635199964046478,
+          0.14755840301513673,
+          0.03696640133857727,
+          0.04669440090656281,
+          0.037478399276733396,
+          0.034918400645256045,
+          0.0449535995721817,
+          0.034918400645256045,
+          0.04679679870605469,
+          0.03768320083618164,
+          0.04659200012683869,
+          0.035020801424980166,
+          0.06215680241584778,
+          0.035020801424980166,
+          0.04628480076789856,
+          0.037171199917793274,
+          0.04659200012683869,
+          0.037478399276733396,
+          0.042803201079368594,
+          0.046387198567390445,
+          0.03604480028152466,
+          0.045363199710845944
+        ]
+      },
+      "paired_speedup": 1.024523188853566,
+      "confirmed": false,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.036556801199913024,
+          "p25_ms": 0.03522560000419617,
+          "p75_ms": 0.045465600490570066,
+          "min_ms": 0.033792001008987424,
+          "samples_ms": [
+            0.03583999872207642,
+            0.04567039906978607,
+            0.034406399726867674,
+            0.046079999208450316,
+            0.036556801199913024,
+            0.03461120128631592,
+            0.03594239950180054,
+            0.034406399726867674,
+            0.048230400681495665,
+            0.03624959886074066,
+            0.04556800127029419,
+            0.03635199964046478,
+            0.033792001008987424,
+            0.04556800127029419,
+            0.036556801199913024,
+            0.04157440066337585,
+            0.03635199964046478,
+            0.034201601147651674,
+            0.045363199710845944,
+            0.03665919899940491,
+            0.04669440090656281,
+            0.03676159977912903,
+            0.03461120128631592,
+            0.045363199710845944,
+            0.03461120128631592,
+            0.050380802154541014,
+            0.036556801199913024,
+            0.04352000057697296,
+            0.03614720106124878,
+            0.03399679958820343,
+            0.046387198567390445
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03686400055885315,
+          "p25_ms": 0.03624959886074066,
+          "p75_ms": 0.045209600031375884,
+          "min_ms": 0.031948798894882204,
+          "samples_ms": [
+            0.04423680007457733,
+            0.03532800078392029,
+            0.04628480076789856,
+            0.03686400055885315,
+            0.04444159865379334,
+            0.03686400055885315,
+            0.033792001008987424,
+            0.04526079893112182,
+            0.03676159977912903,
+            0.045772799849510194,
+            0.03676159977912903,
+            0.04136959910392761,
+            0.045158401131629944,
+            0.031948798894882204,
+            0.045363199710845944,
+            0.03676159977912903,
+            0.03399679958820343,
+            0.04618239998817444,
+            0.03696640133857727,
+            0.046079999208450316,
+            0.03676159977912903,
+            0.0449535995721817,
+            0.03624959886074066,
+            0.03430399894714355,
+            0.045875200629234315,
+            0.03624959886074066,
+            0.045772799849510194,
+            0.03665919899940491,
+            0.03461120128631592,
+            0.043110400438308716,
+            0.034815999865531924
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.014643199741840363,
+        "p25_ms": 0.01443839967250824,
+        "p75_ms": 0.014745600521564484,
+        "min_ms": 0.014233599603176116,
+        "samples_ms": [
+          0.014847999811172486,
+          0.01454080045223236,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.01730560064315796,
+          0.014233599603176116,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.11550719738006592,
+          0.014847999811172486,
+          0.01454080045223236,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 17,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.7879530787467957e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 85.28887078467733,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.0903123151510954,
+      "process_seconds": 13.931374792940915
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "softmax_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "S",
+              "Y",
+              400053,
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cc7990f754182655deb8f38ccdfcb01d2fca4728f9a172baf89767ad4808359b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fuse boundary masking explicitly and tidy indexing; preserve two-launch structure with same tile size (256) for good occupancy and memory coalescing. Use a consistent mask for loads and stores to avoid out-of-bounds memory access and ensure correctness on irregular shapes. Minor code clarity improvements should help compiler optimization without changing algorithm or resource use.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",
+        "worker_seconds": 12.941965245641768,
+        "process_seconds": 14.97667496278882
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10073,
+        "output_tokens": 1454,
+        "tokens": 11527
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "softmax_apply",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "S",
+                "Y",
+                400053,
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offsets = tl.arange(0, BLOCK)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    base_idx = tl.program_id(0) * BLOCK\n    offsets = tl.arange(0, BLOCK)\n    i = base_idx + offsets\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    res = tl.exp(x - mx) / denom\n    tl.store(Y + i, res, mask)\n",
+        "rationale": "Fix indexing in softmax_apply to compute row from global index i (i // N) for correct per-row loading of max and denom values. This corrects NaNs from invalid memory loads that caused verification failures. Preserve explicit masking in loads and stores to handle irregular shapes, ensuring correctness while maintaining occupancy and memory coalescing. No other changes to tile size or launch configuration to keep performance stable."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15488,
+        "output_tokens": 1952,
+        "tokens": 17440
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "softmax_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cc7990f754182655deb8f38ccdfcb01d2fca4728f9a172baf89767ad4808359b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Preserve two-kernel structure and tile size 256 for occupancy and memory coalescing. Fix softmax_apply indexing to compute row from global index i (i // N) to ensure correct per-row max and denom loading. Maintain explicit boundary masking to avoid out-of-bounds accesses and NaNs on irregular shapes. No changes to fusion or tile sizes to keep resource usage stable and correctness guaranteed.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.15892410278320312 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 2.6467092037200928 at index (416, 58) (up to 2e-05 allowed)",
+        "worker_seconds": 12.818830042146146,
+        "process_seconds": 14.773757833056152
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30480,
+        "output_tokens": 3445,
+        "tokens": 33925
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "softmax_apply",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "S",
+                "Y",
+                "TOTAL",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offsets = tl.arange(0, BLOCK)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    base_idx = tl.program_id(0) * BLOCK\n    offsets = tl.arange(0, BLOCK)\n    i = base_idx + offsets\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    res = tl.exp(x - mx) / denom\n    tl.store(Y + i, res, mask)\n",
+        "rationale": "Fix softmax_apply indexing to compute row from global index i (i // N) to ensure correct per-row max and denom loading. Preserve explicit boundary masking for loads and stores to avoid out-of-bounds accesses and NaNs on irregular shapes. Keep two-kernel structure and tile size 256 for balanced occupancy and memory coalescing. No fusion or tile size changes to maintain resource usage stability and correctness."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37621,
+        "output_tokens": 3944,
+        "tokens": 41565
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 37621,
+    "output_tokens": 3944,
+    "tokens": 41565
+  }
+}

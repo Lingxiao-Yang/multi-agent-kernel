@@ -1,0 +1,602 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T04:05:47.427778+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "single_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "a979515435d98c51919c59eff9c19d3304d0db7087d543a0e01892ce39f54c61",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "dffa17214485a3508c8e6d8fc66f90154f227e4289e2850258f1364b4570222b",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582814",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "cb52e93a7b30f6b4ace445da39ecf4ad98adbb781056e54795594921f00a6c00",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 37621,
+    "output_tokens": 3944,
+    "tokens": 41565
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 9.313225746154785e-10
+        }
+      ],
+      "first_launch_seconds": 1.2111307438462973,
+      "validation_seconds": 1.9663191828876734,
+      "candidate": {
+        "median_ms": 0.0336896002292633,
+        "p25_ms": 0.031795200705528257,
+        "p75_ms": 0.04193280041217804,
+        "min_ms": 0.03133440017700195,
+        "samples_ms": [
+          0.03389439880847931,
+          0.043110400438308716,
+          0.03430399894714355,
+          0.031641599535942075,
+          0.04270080029964447,
+          0.034406399726867674,
+          0.031539198756217954,
+          0.04403199851512909,
+          0.033792001008987424,
+          0.03184640109539032,
+          0.04362240135669708,
+          0.03358719944953918,
+          0.031539198756217954,
+          0.0421887993812561,
+          0.03389439880847931,
+          0.03133440017700195,
+          0.04362240135669708,
+          0.03338240087032318,
+          0.031539198756217954,
+          0.0419840008020401,
+          0.0336896002292633,
+          0.031744000315666196,
+          0.043110400438308716,
+          0.0336896002292633,
+          0.031744000315666196,
+          0.04044800102710724,
+          0.03358719944953918,
+          0.03328000009059906,
+          0.04188160002231598,
+          0.0336896002292633,
+          0.031744000315666196
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.033792001008987424,
+        "p25_ms": 0.032000000774860385,
+        "p75_ms": 0.03983359932899475,
+        "min_ms": 0.030003198981285097,
+        "samples_ms": [
+          0.039628800749778745,
+          0.03041279911994934,
+          0.032153600454330446,
+          0.033792001008987424,
+          0.033792001008987424,
+          0.04208639860153198,
+          0.04085760116577149,
+          0.031436800956726074,
+          0.03860479891300202,
+          0.034201601147651674,
+          0.03430399894714355,
+          0.04208639860153198,
+          0.03973119854927063,
+          0.030003198981285097,
+          0.03184640109539032,
+          0.033792001008987424,
+          0.03338240087032318,
+          0.03880960047245026,
+          0.043007999658584595,
+          0.0336896002292633,
+          0.03184640109539032,
+          0.03993600010871887,
+          0.03348479866981506,
+          0.031641599535942075,
+          0.0419840008020401,
+          0.03348479866981506,
+          0.03133440017700195,
+          0.04147199988365173,
+          0.033792001008987424,
+          0.031539198756217954,
+          0.04188160002231598
+        ]
+      },
+      "paired_speedup": 1.0030395368014837,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.014336000382900237,
+        "p25_ms": 0.014336000382900237,
+        "p75_ms": 0.014643199741840363,
+        "min_ms": 0.014028799533843995,
+        "samples_ms": [
+          0.014950400590896607,
+          0.019865599274635316,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.021913599967956544,
+          0.014643199741840363,
+          0.026316800713539125,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.014131200313568116,
+          0.01443839967250824,
+          0.01443839967250824,
+          0.014336000382900237,
+          0.014131200313568116,
+          0.014336000382900237,
+          0.014131200313568116,
+          0.014336000382900237,
+          0.014131200313568116,
+          0.014336000382900237,
+          0.01454080045223236,
+          0.014336000382900237,
+          0.014028799533843995,
+          0.014336000382900237,
+          0.014233599603176116,
+          0.014336000382900237
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 95.13986447413802,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.1522531481459737,
+      "process_seconds": 13.973047127947211
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "softmax_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "softmax_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "S",
+              "Y",
+              400053,
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cc7990f754182655deb8f38ccdfcb01d2fca4728f9a172baf89767ad4808359b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fuse boundary masking explicitly and tidy indexing; preserve two-launch structure with same tile size (256) for good occupancy and memory coalescing. Use a consistent mask for loads and stores to avoid out-of-bounds memory access and ensure correctness on irregular shapes. Minor code clarity improvements should help compiler optimization without changing algorithm or resource use.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",
+        "worker_seconds": 12.941965245641768,
+        "process_seconds": 14.97667496278882
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10073,
+        "output_tokens": 1454,
+        "tokens": 11527
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "softmax_apply",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "S",
+                "Y",
+                400053,
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offsets = tl.arange(0, BLOCK)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    base_idx = tl.program_id(0) * BLOCK\n    offsets = tl.arange(0, BLOCK)\n    i = base_idx + offsets\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    res = tl.exp(x - mx) / denom\n    tl.store(Y + i, res, mask)\n",
+        "rationale": "Fix indexing in softmax_apply to compute row from global index i (i // N) for correct per-row loading of max and denom values. This corrects NaNs from invalid memory loads that caused verification failures. Preserve explicit masking in loads and stores to handle irregular shapes, ensuring correctness while maintaining occupancy and memory coalescing. No other changes to tile size or launch configuration to keep performance stable."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15488,
+        "output_tokens": 1952,
+        "tokens": 17440
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "softmax_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cc7990f754182655deb8f38ccdfcb01d2fca4728f9a172baf89767ad4808359b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Preserve two-kernel structure and tile size 256 for occupancy and memory coalescing. Fix softmax_apply indexing to compute row from global index i (i // N) to ensure correct per-row max and denom loading. Maintain explicit boundary masking to avoid out-of-bounds accesses and NaNs on irregular shapes. No changes to fusion or tile sizes to keep resource usage stable and correctness guaranteed.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.15892410278320312 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 2.6467092037200928 at index (416, 58) (up to 2e-05 allowed)",
+        "worker_seconds": 12.818830042146146,
+        "process_seconds": 14.773757833056152
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30480,
+        "output_tokens": 3445,
+        "tokens": 33925
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "softmax_apply",
+              "grid": [
+                1566
+              ],
+              "args": [
+                "X",
+                "S",
+                "Y",
+                "TOTAL",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offsets = tl.arange(0, BLOCK)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    base_idx = tl.program_id(0) * BLOCK\n    offsets = tl.arange(0, BLOCK)\n    i = base_idx + offsets\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    res = tl.exp(x - mx) / denom\n    tl.store(Y + i, res, mask)\n",
+        "rationale": "Fix softmax_apply indexing to compute row from global index i (i // N) to ensure correct per-row max and denom loading. Preserve explicit boundary masking for loads and stores to avoid out-of-bounds accesses and NaNs on irregular shapes. Keep two-kernel structure and tile size 256 for balanced occupancy and memory coalescing. No fusion or tile size changes to maintain resource usage stability and correctness."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37621,
+        "output_tokens": 3944,
+        "tokens": 41565
+      }
+    }
+  ],
+  "wall_seconds": 89.17141588963568,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.021358799999999997,
+  "budget_committed_usd": 0.02135880000000004,
+  "speedup": 1.0
+}

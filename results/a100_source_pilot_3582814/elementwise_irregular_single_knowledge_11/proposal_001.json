@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "B",
+          "Y",
+          399753
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr):\n    BLOCK = 256\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < TOTAL\n    x = tl.load(X + offs, mask, other=0.0)\n    b = tl.load(B + (offs % 781), mask, other=0.0)\n    y = x + b\n    y_relu = tl.maximum(y, 0.0)\n    tl.store(Y + offs, y_relu, mask)\n",
+  "rationale": "Fused bias_add and relu into a single kernel to eliminate intermediate memory traffic and kernel launch overhead. The grid and block sizes remain unchanged to maintain parallelism. Masking ensures correct handling of boundary conditions. This fusion reduces global memory load/store operations and improves data locality, leading to better performance."
+}

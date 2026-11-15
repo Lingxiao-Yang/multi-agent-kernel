@@ -1,0 +1,8 @@
+{
+  "status": "incorrect",
+  "error_type": "AssertionError",
+  "error": "Tensor-likes are not close!\n\nMismatched elements: 400030 / 400653 (99.8%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 0.0002 allowed)",
+  "traceback": "Traceback (most recent call last):\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-source-v1/kernel_study/worker.py\", line 16, in main\n    result = evaluate(read_json(args.request))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-source-v1/kernel_study/bench.py\", line 182, in evaluate\n    result[\"validation\"], result[\"first_launch_seconds\"] = validate(case, config, seeds, request.get(\"source\"))\n                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-source-v1/kernel_study/bench.py\", line 156, in validate\n    torch.testing.assert_close(actual, expected, atol=case[\"atol\"], rtol=case[\"rtol\"], equal_nan=False)\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-venv/lib/python3.12/site-packages/torch/testing/_comparison.py\", line 1600, in assert_close\n    raise error_metas[0].to_error(msg)\nAssertionError: Tensor-likes are not close!\n\nMismatched elements: 400030 / 400653 (99.8%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 0.0002 allowed)\n",
+  "worker_seconds": 13.0504527753219,
+  "process_seconds": 15.092079295776784
+}

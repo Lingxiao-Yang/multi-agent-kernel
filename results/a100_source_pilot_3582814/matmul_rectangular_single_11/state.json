@@ -1,0 +1,501 @@
+{
+  "incumbent": {
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            16,
+            16,
+            64
+          ],
+          "num_warps": 8,
+          "num_stages": 2
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/matmul_rectangular_single_11/candidate_001.py",
+    "rationale": "Implemented double buffering on the K dimension with blocking size BK=64 to overlap memory loads and computation, improving latency hiding and memory throughput on A100. Increased number of warps from 4 to 8 and num_stages from 1 to 2 to improve instruction-level parallelism and resource utilization. Maintained blocking sizes BM=16, BN=16, BK=64 to balance register pressure and parallelism.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.7903510071337223,
+      "validation_seconds": 3.4492277642711997,
+      "candidate": {
+        "median_ms": 0.1325055956840515,
+        "p25_ms": 0.1324031949043274,
+        "p75_ms": 0.13255679607391357,
+        "min_ms": 0.11182080507278443,
+        "samples_ms": [
+          0.13301759958267212,
+          0.1325055956840515,
+          0.13260799646377563,
+          0.1325055956840515,
+          0.1325055956840515,
+          0.13260799646377563,
+          0.1325055956840515,
+          0.13260799646377563,
+          0.1325055956840515,
+          0.13260799646377563,
+          0.13260799646377563,
+          0.1325055956840515,
+          0.1324031949043274,
+          0.1325055956840515,
+          0.1324031949043274,
+          0.1324031949043274,
+          0.1325055956840515,
+          0.1325055956840515,
+          0.1324031949043274,
+          0.13271039724349976,
+          0.1324031949043274,
+          0.1324031949043274,
+          0.1388543963432312,
+          0.1324031949043274,
+          0.1325055956840515,
+          0.1325055956840515,
+          0.1325055956840515,
+          0.1324031949043274,
+          0.1324031949043274,
+          0.11182080507278443,
+          0.11182080507278443
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19568639993667603,
+        "p25_ms": 0.19548159837722778,
+        "p75_ms": 0.19568639993667603,
+        "min_ms": 0.1657855987548828,
+        "samples_ms": [
+          0.19568639993667603,
+          0.1955839991569519,
+          0.1955839991569519,
+          0.19527679681777954,
+          0.19578880071640015,
+          0.19548159837722778,
+          0.19630080461502075,
+          0.1955839991569519,
+          0.19578880071640015,
+          0.19537919759750366,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.19548159837722778,
+          0.1955839991569519,
+          0.20183041095733642,
+          0.19578880071640015,
+          0.19548159837722778,
+          0.1955839991569519,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.19548159837722778,
+          0.19548159837722778,
+          0.19568639993667603,
+          0.19568639993667603,
+          0.20131840705871581,
+          0.19302400350570678,
+          0.1657855987548828,
+          0.1657855987548828
+        ]
+      },
+      "paired_speedup": 1.476816121813254,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.11192320585250855,
+          "p25_ms": 0.11182080507278443,
+          "p75_ms": 0.11212799549102784,
+          "min_ms": 0.1117184042930603,
+          "samples_ms": [
+            0.11212799549102784,
+            0.11315200328826905,
+            0.11182080507278443,
+            0.11192320585250855,
+            0.1117184042930603,
+            0.11212799549102784,
+            0.11212799549102784,
+            0.11182080507278443,
+            0.11192320585250855,
+            0.11192320585250855,
+            0.11192320585250855,
+            0.11212799549102784,
+            0.11192320585250855,
+            0.1117184042930603,
+            0.11192320585250855,
+            0.11182080507278443,
+            0.11192320585250855,
+            0.11182080507278443,
+            0.11202559471130372,
+            0.11202559471130372,
+            0.11202559471130372,
+            0.11182080507278443,
+            0.11223039627075196,
+            0.1117184042930603,
+            0.11212799549102784,
+            0.11182080507278443,
+            0.1117184042930603,
+            0.1117184042930603,
+            0.11202559471130372,
+            0.11212799549102784,
+            0.11212799549102784
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.16588799953460692,
+          "p25_ms": 0.16583679914474486,
+          "p75_ms": 0.16609280109405516,
+          "min_ms": 0.16537599563598632,
+          "samples_ms": [
+            0.16609280109405516,
+            0.16588799953460692,
+            0.16588799953460692,
+            0.1657855987548828,
+            0.16599040031433104,
+            0.1657855987548828,
+            0.16599040031433104,
+            0.17315839529037474,
+            0.16588799953460692,
+            0.16588799953460692,
+            0.16588799953460692,
+            0.16537599563598632,
+            0.16599040031433104,
+            0.16588799953460692,
+            0.1657855987548828,
+            0.1657855987548828,
+            0.16568319797515868,
+            0.1657855987548828,
+            0.16660480499267577,
+            0.16619520187377929,
+            0.16599040031433104,
+            0.16609280109405516,
+            0.16609280109405516,
+            0.16609280109405516,
+            0.16588799953460692,
+            0.16588799953460692,
+            0.16599040031433104,
+            0.1721343994140625,
+            0.16619520187377929,
+            0.1657855987548828,
+            0.16609280109405516
+          ]
+        }
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 10.927402669487984,
+        "achieved_tflops": 1.5302860000229088,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.7489577578380704,
+      "process_seconds": 16.29484193585813,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 176,
+            "spills": 0,
+            "shared_bytes": 8192,
+            "num_warps": 8
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "matmul_simt",
+            "grid": [
+              17,
+              49
+            ],
+            "args": [
+              "A",
+              "B",
+              "Y",
+              "M",
+              "N",
+              "K",
+              16,
+              16,
+              64
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "bae72848eb8cb63bf8026a3462566beac1c041ef8c02dd75b82b3e14a2790990",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Implemented double buffering on the K dimension with blocking size BK=64 to overlap memory loads and computation, improving latency hiding and memory throughput on A100. Increased number of warps from 4 to 8 and num_stages from 1 to 2 to improve instruction-level parallelism and resource utilization. Maintained blocking sizes BM=16, BN=16, BK=64 to balance register pressure and parallelism.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.7903510071337223,
+        "validation_seconds": 3.4492277642711997,
+        "candidate": {
+          "median_ms": 0.1325055956840515,
+          "p25_ms": 0.1324031949043274,
+          "p75_ms": 0.13255679607391357,
+          "min_ms": 0.11182080507278443
+        },
+        "incumbent": {
+          "median_ms": 0.19568639993667603,
+          "p25_ms": 0.19548159837722778,
+          "p75_ms": 0.19568639993667603,
+          "min_ms": 0.1657855987548828
+        },
+        "paired_speedup": 1.476816121813254,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.11192320585250855,
+            "p25_ms": 0.11182080507278443,
+            "p75_ms": 0.11212799549102784,
+            "min_ms": 0.1117184042930603
+          },
+          "incumbent": {
+            "median_ms": 0.16588799953460692,
+            "p25_ms": 0.16583679914474486,
+            "p75_ms": 0.16609280109405516,
+            "min_ms": 0.16537599563598632
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 10.927402669487984,
+          "achieved_tflops": 1.5302860000229088,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.7489577578380704,
+        "process_seconds": 16.29484193585813,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 176,
+              "spills": 0,
+              "shared_bytes": 8192,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7409,
+        "output_tokens": 1988,
+        "tokens": 9397
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                17,
+                49
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                16,
+                16,
+                64
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n    rows = pid_m * BM + tl.arange(0, BM)\n    cols = pid_n * BN + tl.arange(0, BN)\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Double buffering along K dimension\n    for k_start in range(0, K, 2*BK):\n        # Load first BK block\n        k0 = k_start + tl.arange(0, BK)\n        mask_a0 = (rows[:, None] < M) & (k0[None, :] < K)\n        mask_b0 = (k0[:, None] < K) & (cols[None, :] < N)\n        a0 = tl.load(A + rows[:, None]*K + k0[None, :], mask=mask_a0, other=0).to(tl.float32)\n        b0 = tl.load(B + k0[:, None]*N + cols[None, :], mask=mask_b0, other=0).to(tl.float32)\n\n        # Load second BK block if within bounds\n        k1_start = k_start + BK\n        if k1_start < K:\n            k1 = k1_start + tl.arange(0, BK)\n            mask_a1 = (rows[:, None] < M) & (k1[None, :] < K)\n            mask_b1 = (k1[:, None] < K) & (cols[None, :] < N)\n            a1 = tl.load(A + rows[:, None]*K + k1[None, :], mask=mask_a1, other=0).to(tl.float32)\n            b1 = tl.load(B + k1[:, None]*N + cols[None, :], mask=mask_b1, other=0).to(tl.float32)\n        else:\n            a1 = tl.zeros((BM, BK), dtype=tl.float32)\n            b1 = tl.zeros((BK, BN), dtype=tl.float32)\n\n        acc += tl.dot(a0, b0)\n        acc += tl.dot(a1, b1)\n\n    mask = (rows[:, None] < M) & (cols[None, :] < N)\n    tl.store(Y + rows[:, None]*N + cols[None, :], acc, mask)\n",
+        "rationale": "Maintained the proven double buffering technique on the K dimension to overlap memory loads and computation, which is optimal for the A100 architecture. The kernel uses BM=16, BN=16, BK=64 blocking to balance parallelism and register pressure. The use of 8 warps and 2 pipeline stages improves latency hiding and throughput. This approach already demonstrated a significant speedup over prior versions and aligns with best practices for high-performance matmul on this GPU."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13356,
+        "output_tokens": 2744,
+        "tokens": 16100
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30398,
+        "output_tokens": 4992,
+        "tokens": 35390
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                17,
+                25
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                16,
+                32,
+                64
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n    rows = pid_m * BM + tl.arange(0, BM)\n    cols = pid_n * BN + tl.arange(0, BN)\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Double buffering along K dimension\n    for k_start in range(0, K, 2*BK):\n        # Load first BK block\n        k0 = k_start + tl.arange(0, BK)\n        mask_a0 = (rows[:, None] < M) & (k0[None, :] < K)\n        mask_b0 = (k0[:, None] < K) & (cols[None, :] < N)\n        a0 = tl.load(A + rows[:, None]*K + k0[None, :], mask=mask_a0, other=0).to(tl.float32)\n        b0 = tl.load(B + k0[:, None]*N + cols[None, :], mask=mask_b0, other=0).to(tl.float32)\n\n        # Load second BK block if within bounds\n        k1_start = k_start + BK\n        if k1_start < K:\n            k1 = k1_start + tl.arange(0, BK)\n            mask_a1 = (rows[:, None] < M) & (k1[None, :] < K)\n            mask_b1 = (k1[:, None] < K) & (cols[None, :] < N)\n            a1 = tl.load(A + rows[:, None]*K + k1[None, :], mask=mask_a1, other=0).to(tl.float32)\n            b1 = tl.load(B + k1[:, None]*N + cols[None, :], mask=mask_b1, other=0).to(tl.float32)\n        else:\n            a1 = tl.zeros((BM, BK), dtype=tl.float32)\n            b1 = tl.zeros((BK, BN), dtype=tl.float32)\n\n        acc += tl.dot(a0, b0)\n        acc += tl.dot(a1, b1)\n\n    mask = (rows[:, None] < M) & (cols[None, :] < N)\n    tl.store(Y + rows[:, None]*N + cols[None, :], acc, mask)\n",
+        "rationale": "Increased BN from 16 to 32 and reduced grid dimension in N from 49 to 25 to improve data parallelism, memory coalescing, and workload balance on the N dimension. Maintained BM=16 and BK=64 with double buffering along K and 8 warps and 2 stages to optimize latency hiding and resource utilization on NVIDIA A100. This change enhances throughput by increasing the tile size on N per kernel instance without raising register pressure or warp count, balancing compute and memory efficiency."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37849,
+        "output_tokens": 5758,
+        "tokens": 43607
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 37849,
+    "output_tokens": 5758,
+    "tokens": 43607
+  }
+}

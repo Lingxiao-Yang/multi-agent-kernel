@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add_relu",
+        "grid": [
+          393
+        ],
+        "args": [
+          "X",
+          "B",
+          "Y",
+          "TOTAL",
+          "N",
+          2048
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef bias_add_relu(X, B, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    offs = pid * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < TOTAL\n    x = tl.load(X + offs, mask, other=0.0)\n    b = tl.load(B + (offs % N), mask, other=0.0)\n    r = x + b\n    r = tl.maximum(r, 0.0)\n    tl.store(Y + offs, r, mask)\n",
+  "rationale": "Increased BLOCK size to 2048 to further improve memory throughput by processing more elements per program instance, better leveraging the NVIDIA A100's large SM count and high bandwidth. Retained 8 warps and 2 stages to maintain good latency hiding and instruction pipelining. Reduced grid size accordingly to cover TOTAL elements with larger blocks. This increases per-thread work and device utilization while avoiding oversubscription, hypothesized to improve efficiency and throughput beyond prior configurations."
+}

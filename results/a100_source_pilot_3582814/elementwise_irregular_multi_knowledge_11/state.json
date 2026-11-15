@@ -1,0 +1,455 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "bias_add",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "B",
+            "T",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "relu",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "T",
+            "Y",
+            "TOTAL",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/elementwise_irregular_multi_knowledge_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0
+        }
+      ],
+      "first_launch_seconds": 1.2019069464877248,
+      "validation_seconds": 1.8479488315060735,
+      "candidate": {
+        "median_ms": 0.034201601147651674,
+        "p25_ms": 0.03353599905967712,
+        "p75_ms": 0.04136960059404373,
+        "min_ms": 0.031539198756217954,
+        "samples_ms": [
+          0.036556801199913024,
+          0.0347135990858078,
+          0.04618239998817444,
+          0.03399679958820343,
+          0.04147199988365173,
+          0.04177919924259186,
+          0.031744000315666196,
+          0.031641599535942075,
+          0.03409920036792755,
+          0.03348479866981506,
+          0.03911679983139038,
+          0.0421887993812561,
+          0.03358719944953918,
+          0.031641599535942075,
+          0.0392192006111145,
+          0.034201601147651674,
+          0.032051199674606325,
+          0.04270080029964447,
+          0.033792001008987424,
+          0.032051199674606325,
+          0.042393600940704344,
+          0.035123199224472046,
+          0.03850240111351013,
+          0.04249599874019623,
+          0.03389439880847931,
+          0.03184640109539032,
+          0.03358719944953918,
+          0.03389439880847931,
+          0.04126720130443573,
+          0.0419840008020401,
+          0.031539198756217954
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.034201601147651674,
+        "p25_ms": 0.032153600454330446,
+        "p75_ms": 0.04229120016098022,
+        "min_ms": 0.029900801181793214,
+        "samples_ms": [
+          0.034201601147651674,
+          0.04659200012683869,
+          0.03461120128631592,
+          0.043110400438308716,
+          0.03409920036792755,
+          0.032153600454330446,
+          0.04208639860153198,
+          0.03389439880847931,
+          0.031436800956726074,
+          0.04229120016098022,
+          0.03430399894714355,
+          0.031744000315666196,
+          0.042393600940704344,
+          0.034201601147651674,
+          0.029900801181793214,
+          0.04259839951992035,
+          0.03328000009059906,
+          0.031641599535942075,
+          0.04136959910392761,
+          0.03399679958820343,
+          0.032153600454330446,
+          0.04259839951992035,
+          0.034406399726867674,
+          0.032051199674606325,
+          0.045772799849510194,
+          0.03358719944953918,
+          0.03184640109539032,
+          0.04229120016098022,
+          0.03389439880847931,
+          0.03184640109539032,
+          0.04382719993591309
+        ]
+      },
+      "paired_speedup": 1.0,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.019251200556755065,
+        "p25_ms": 0.019046400487422944,
+        "p75_ms": 0.020172800123691558,
+        "min_ms": 0.018636800348758698,
+        "samples_ms": [
+          0.019763199985027312,
+          0.019251200556755065,
+          0.02969599962234497,
+          0.02099200040102005,
+          0.01955839991569519,
+          0.019046400487422944,
+          0.01935359984636307,
+          0.019148799777030944,
+          0.021299199759960176,
+          0.018943999707698823,
+          0.01935359984636307,
+          0.027238398790359497,
+          0.019046400487422944,
+          0.020172800123691558,
+          0.019046400487422944,
+          0.018636800348758698,
+          0.019148799777030944,
+          0.025190401077270507,
+          0.019251200556755065,
+          0.020070399343967437,
+          0.019148799777030944,
+          0.018636800348758698,
+          0.019148799777030944,
+          0.018943999707698823,
+          0.020172800123691558,
+          0.020275199413299562,
+          0.019148799777030944,
+          0.018636800348758698,
+          0.019148799777030944,
+          0.025804799795150758,
+          0.019046400487422944
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 18,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 12,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.6761943697929382e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3208348,
+        "logical_gbps": 93.8069532519617,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.0311710005626082,
+      "process_seconds": 13.622593648731709
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_fused",
+            "grid": [
+              56,
+              31
+            ],
+            "num_warps": 4,
+            "num_stages": 1,
+            "args": [
+              "X",
+              "B",
+              "Y",
+              513,
+              781,
+              16
+            ]
+          }
+        ]
+      },
+      "source_hash": "fd7d0e52da7d2489916c6afa1919d732b4cb47d6b6ee1603a5e13d8e1270ffd3",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Changed grid to 2D decomposition (56x31) with smaller block size 16 to increase parallelism and better fit irregular shape 513x781 with masking, improving GPU utilization and reducing masking overhead per launch. Fused bias add and ReLU to reduce intermediate memory traffic and synchronization overhead, lowering latency and improving throughput.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 146205 / 400653 (36.5%)\nGreatest absolute difference: nan at index (0, 496) (up to 1e-06 allowed)\nGreatest relative difference: nan at index (0, 496) (up to 1e-06 allowed)",
+        "worker_seconds": 12.690812934190035,
+        "process_seconds": 14.786939395591617
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 8595,
+        "output_tokens": 1220,
+        "tokens": 9815
+      },
+      "review": {
+        "measured_outcome": "The fused kernel with a 2D grid and block size 16 was incorrect, failing validation with NaNs and mismatched elements (36.5% mismatch). The error indicates a serious correctness issue possibly related to indexing or masking logic. The approach aimed to improve parallelism and reduce memory traffic by fusing bias addition and ReLU and using a finer-grained 2D grid. However, the implementation likely mishandled program_id usage or indexing, causing invalid memory accesses or masking errors.",
+        "failures": [
+          "Incorrect indexing or program_id usage: The original code decomposed pid into 2D indices manually, but the proposed code uses tl.program_id(0) and tl.program_id(1) assuming a 2D grid, which may mismatch the launched grid shape leading to invalid memory accesses.",
+          "Masking errors: The mask logic may be inconsistent or incorrectly applied leading to NaNs and large validation errors.",
+          "Shape and grid mismatch: The grid dimensions (56,31) must match the launch grid size; a mismatch can cause out-of-bounds accesses or insufficient coverage of input data, resulting in NaNs or missing writes."
+        ],
+        "next_directions": [
+          "Verify that the launch grid is indeed 2D with dimensions matching the code assumptions (56,31). If the launch grid is 1D, switch back to manual pid decomposition or launch a 2D grid.",
+          "Add explicit bounds checks on memory loads and stores, ensure masks are applied correctly to avoid invalid memory accesses.",
+          "Test smaller block sizes or different grid configurations and validate correctness before performance tuning.",
+          "Add debug instrumentation or compare intermediate results to isolate the cause of NaNs.",
+          "Consider retaining the fusion but revert to the original program_id(0) based indexing if 2D grid launch is not supported or mismatched.",
+          "Ensure all masks are properly broadcasted and combined to prevent loading/storing invalid data."
+        ],
+        "retention": false
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13357,
+        "output_tokens": 1605,
+        "tokens": 14962
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "bias_add_relu_fused",
+            "grid": [
+              33,
+              49
+            ],
+            "args": [
+              "X",
+              "B",
+              "Y",
+              513,
+              781,
+              16
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "1a306c9e707cfc227454145531c5362e794344d64bf45155de72e85131e43608",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Reimplemented kernel to use a 1D launch grid of size 33*49 with manual 2D decomposition of program_id to pid_m and pid_n, matching the launch grid dimensions and fully covering the 513x781 shape with 16x16 blocks. This prevents out-of-bounds memory accesses and masking errors caused by mismatched program_id usage in a 2D launch grid. Explicit combined masks are used to guard all loads and stores. The kernel fuses bias addition and ReLU to reduce memory traffic and kernel overhead, applying the operations in a single pass.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 392205 / 400653 (97.9%)\nGreatest absolute difference: nan at index (0, 528) (up to 1e-06 allowed)\nGreatest relative difference: nan at index (0, 528) (up to 1e-06 allowed)",
+        "worker_seconds": 12.275455116294324,
+        "process_seconds": 14.360499722883105
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K07",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 27334,
+        "output_tokens": 3429,
+        "tokens": 30763
+      },
+      "review": {
+        "measured_outcomes": {
+          "attempt_1": {
+            "status": "incorrect",
+            "error": "Tensor-likes are not close; 36.5% mismatched elements; NaNs present due to invalid memory accesses.",
+            "root_cause": [
+              "Incorrect indexing or program_id usage causing out-of-bounds accesses.",
+              "Masking logic inconsistent or incomplete, leading to boundary errors."
+            ],
+            "performance": "Kernel attempted to increase parallelism with 2D grid and block size 16; fusion of bias add and ReLU to reduce memory traffic."
+          },
+          "attempt_2": {
+            "status": "incorrect",
+            "error": "Tensor-likes are not close; 97.9% mismatched elements; NaNs present.",
+            "root_cause": [
+              "Manual 2D decomposition of 1D program_id inconsistent with launch grid or masking logic.",
+              "Likely incorrect masking or indexing leading to large-scale data corruption."
+            ],
+            "performance": "Fused kernel with manual 2D decomposition and combined mask still fails correctness validation."
+          }
+        },
+        "failures": [
+          "Mismatched launch grid dimensions and program_id usage causing invalid indexing.",
+          "Incomplete or incorrect masks leading to invalid memory loads/stores and NaNs.",
+          "Excessive mismatches indicate severe logic errors in index calculations or masking."
+        ],
+        "next_directions": [
+          "Verify that the launch grid dimensions match the indexing strategy exactly: if using 2D indexing (program_id(0), program_id(1)), launch grid must be 2D with correct dimensions.",
+          "If launching 1D grid, manually decompose program_id correctly and ensure grid size matches coverage of the input shape with the chosen block size.",
+          "Augment masking to explicitly combine row and column bounds and apply masks consistently to all loads and stores.",
+          "Add debug checks or logging in kernel (e.g., output mask sums or partial results) to isolate where NaNs or invalid accesses occur.",
+          "Test with reduced input size or smaller block sizes to simplify debugging and verify correctness incrementally.",
+          "Consider splitting fusion into separate bias add and ReLU kernels temporarily to isolate correctness issues.",
+          "Ensure all offsets and pointer calculations use safe integer arithmetic and respect tensor shape boundaries.",
+          "Review and potentially simplify kernel indexing and masking logic, avoiding complex manual program_id decompositions if possible."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 34115,
+        "output_tokens": 3938,
+        "tokens": 38053
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 34115,
+    "output_tokens": 3938,
+    "tokens": 38053
+  }
+}

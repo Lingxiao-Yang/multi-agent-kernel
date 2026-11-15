@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          "TOTAL",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offsets = tl.arange(0, BLOCK)\n    mask = offsets < N\n    x = tl.load(X + row * N + offsets, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    base_idx = tl.program_id(0) * BLOCK\n    offsets = tl.arange(0, BLOCK)\n    i = base_idx + offsets\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    res = tl.exp(x - mx) / denom\n    tl.store(Y + i, res, mask)\n",
+  "rationale": "Preserve two-kernel structure and tile size 256 for occupancy and memory coalescing. Fix softmax_apply indexing to compute row from global index i (i // N) to ensure correct per-row max and denom loading. Maintain explicit boundary masking to avoid out-of-bounds accesses and NaNs on irregular shapes. No changes to fusion or tile sizes to keep resource usage stable and correctness guaranteed."
+}

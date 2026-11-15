@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt",
+        "grid": [
+          17,
+          25
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          16,
+          32,
+          64
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n    rows = pid_m * BM + tl.arange(0, BM)\n    cols = pid_n * BN + tl.arange(0, BN)\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Double buffering along K dimension\n    for k_start in range(0, K, 2*BK):\n        # Load first BK block\n        k0 = k_start + tl.arange(0, BK)\n        mask_a0 = (rows[:, None] < M) & (k0[None, :] < K)\n        mask_b0 = (k0[:, None] < K) & (cols[None, :] < N)\n        a0 = tl.load(A + rows[:, None]*K + k0[None, :], mask=mask_a0, other=0).to(tl.float32)\n        b0 = tl.load(B + k0[:, None]*N + cols[None, :], mask=mask_b0, other=0).to(tl.float32)\n\n        # Load second BK block if within bounds\n        k1_start = k_start + BK\n        if k1_start < K:\n            k1 = k1_start + tl.arange(0, BK)\n            mask_a1 = (rows[:, None] < M) & (k1[None, :] < K)\n            mask_b1 = (k1[:, None] < K) & (cols[None, :] < N)\n            a1 = tl.load(A + rows[:, None]*K + k1[None, :], mask=mask_a1, other=0).to(tl.float32)\n            b1 = tl.load(B + k1[:, None]*N + cols[None, :], mask=mask_b1, other=0).to(tl.float32)\n        else:\n            a1 = tl.zeros((BM, BK), dtype=tl.float32)\n            b1 = tl.zeros((BK, BN), dtype=tl.float32)\n\n        acc += tl.dot(a0, b0)\n        acc += tl.dot(a1, b1)\n\n    mask = (rows[:, None] < M) & (cols[None, :] < N)\n    tl.store(Y + rows[:, None]*N + cols[None, :], acc, mask)\n",
+  "rationale": "Adjusted the grid and blocking sizes to increase BN from 16 to 32 and reduce grid dimension in N from 49 to 25, enabling better data parallelism and memory coalescing on the N dimension. Maintained BM=16 and BK=64 with double buffering and 8 warps and 2 stages to balance resource usage and latency hiding on NVIDIA A100. This modification improves throughput by increasing workload per kernel instance on N dimension while preserving register pressure and parallelism."
+}

@@ -1,0 +1,476 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "softmax_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-source-v1/results/a100-source-pilot-3582814/softmax_irregular_multi_knowledge_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 2.980232238769531e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 1.2535981526598334,
+      "validation_seconds": 1.9689792972058058,
+      "candidate": {
+        "median_ms": 0.03328000009059906,
+        "p25_ms": 0.03143679946660995,
+        "p75_ms": 0.04147200137376785,
+        "min_ms": 0.030720001459121703,
+        "samples_ms": [
+          0.03573760092258453,
+          0.04444159865379334,
+          0.03287039995193482,
+          0.031231999397277832,
+          0.0421887993812561,
+          0.03317759931087494,
+          0.03112959861755371,
+          0.0421887993812561,
+          0.03348479866981506,
+          0.030720001459121703,
+          0.04321280121803284,
+          0.032767999172210696,
+          0.031641599535942075,
+          0.04126720130443573,
+          0.03328000009059906,
+          0.031027200818061828,
+          0.04167680144309997,
+          0.03870719969272614,
+          0.03112959861755371,
+          0.030822399258613586,
+          0.03287039995193482,
+          0.03348479866981506,
+          0.031027200818061828,
+          0.04167680144309997,
+          0.033792001008987424,
+          0.032051199674606325,
+          0.04177919924259186,
+          0.03358719944953918,
+          0.031027200818061828,
+          0.04167680144309997,
+          0.03297280073165894
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03307519853115082,
+        "p25_ms": 0.03210240006446838,
+        "p75_ms": 0.04034560024738312,
+        "min_ms": 0.03061760067939758,
+        "samples_ms": [
+          0.04659200012683869,
+          0.034815999865531924,
+          0.03993600010871887,
+          0.0336896002292633,
+          0.032767999172210696,
+          0.04362240135669708,
+          0.0392192006111145,
+          0.03133440017700195,
+          0.03133440017700195,
+          0.03307519853115082,
+          0.032767999172210696,
+          0.03973119854927063,
+          0.04157440066337585,
+          0.03266560137271881,
+          0.030720001459121703,
+          0.040755200386047366,
+          0.032767999172210696,
+          0.031539198756217954,
+          0.04177919924259186,
+          0.03297280073165894,
+          0.03061760067939758,
+          0.04188160002231598,
+          0.03297280073165894,
+          0.031231999397277832,
+          0.03829759955406189,
+          0.03307519853115082,
+          0.03266560137271881,
+          0.04116480052471161,
+          0.04136959910392761,
+          0.031231999397277832,
+          0.031231999397277832
+        ]
+      },
+      "paired_speedup": 0.9938461070044861,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.01454080045223236,
+        "p25_ms": 0.01443839967250824,
+        "p75_ms": 0.014643199741840363,
+        "min_ms": 0.014336000382900237,
+        "samples_ms": [
+          0.014745600521564484,
+          0.01454080045223236,
+          0.014847999811172486,
+          0.014847999811172486,
+          0.014643199741840363,
+          0.016076800227165223,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.01454080045223236,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01454080045223236,
+          0.014643199741840363,
+          0.01454080045223236,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.014643199741840363
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 17,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.6761943697929382e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 96.31081704550272,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.156994533725083,
+      "process_seconds": 13.969406442716718
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused",
+            "grid": [
+              513,
+              16
+            ],
+            "num_warps": 8,
+            "num_stages": 2,
+            "args": [
+              "X",
+              "Y",
+              781,
+              40053,
+              49
+            ]
+          }
+        ]
+      },
+      "source_hash": "d73dbf9e2aad6ab45f2d7b59114e074e9c788910b924327963c6732e64511223",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fused softmax statistics and application into a single kernel launch with 2D grid (rows x blocks) and 8 warps to enhance parallel reduction efficiency and memory coalescing. Boundary masking handles non-multiple dimensions. This reduces memory traffic and kernel launches, addressing bottlenecks K05, K06, K01, and K07.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 4:29:\ndef softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    col = block_id * BLOCK + tl.arange(0, BLOCK)\n                             ^\narange's range must be a power of 2",
+        "worker_seconds": 10.943150871433318,
+        "process_seconds": 13.240964419208467
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9282,
+        "output_tokens": 1074,
+        "tokens": 10356
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused",
+              "grid": [
+                513,
+                16
+              ],
+              "args": [
+                "X",
+                "Y",
+                781,
+                40053,
+                64
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    # Use power-of-two BLOCK (64) for arange compatibility\n    offs_in_block = tl.arange(0, BLOCK)\n    col = block_id * BLOCK + offs_in_block\n\n    mask = col < N\n    offs = row * N + col\n\n    # Load input with masking for boundary\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Compute max per row block (reduction over BLOCK dimension)\n    mx = tl.max(x, axis=0)\n\n    # Compute exp and sum for normalization\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, axis=0)\n\n    # Normalize\n    y = exps / denom\n\n    # Store output with masking\n    tl.store(Y + offs, y, mask)\n",
+        "rationale": "Corrected arange usage to use a power-of-two BLOCK=64 instead of 49 to fix compilation error. This preserves the previous fusion and 2D grid decomposition design to reduce kernel launches and memory traffic (K05), improves parallel reduction efficiency by using 8 warps (K06), and maintains masking to handle irregular shape boundaries without padding (K07). The power-of-two block size ensures arange compiles, enabling proper vectorization and memory coalescing (K01). This approach keeps the fusion benefits and addresses the compilation failure from the original attempt."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 14123,
+        "output_tokens": 1499,
+        "tokens": 15622
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused",
+            "grid": [
+              513,
+              13
+            ],
+            "args": [
+              "X",
+              "Y",
+              781,
+              40053,
+              64
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          },
+          {
+            "kernel": "softmax_fused_final_reduce",
+            "grid": [
+              513
+            ],
+            "args": [
+              "Y",
+              781
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "948254cdff2dbfb88896fb9b5fa9d4b3f09349d37fdff5c2930ae3bcb958cec9",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Split softmax into two kernels: first computes partial exponentials per block with block-wise max subtraction and stores partial exponentials; second kernel performs row-wise max and sum reduction and normalizes outputs. This improves parallel reduction efficiency and numerical stability over large irregular dimension 781 with power-of-two block size 64, balances resource use and memory coalescing, and reduces kernel overhead compared to separate stats and apply kernels.",
+      "accepted": false,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 3:18:\ndef softmax_fused_final_reduce(Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    offs_in_row = tl.arange(0, N)\n                  ^\narange's range must be a power of 2",
+        "worker_seconds": 13.14720697235316,
+        "process_seconds": 15.20929670613259
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 27916,
+        "output_tokens": 3238,
+        "tokens": 31154
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_partial_exp",
+              "grid": [
+                513,
+                13
+              ],
+              "args": [
+                "X",
+                "Y",
+                781,
+                40053,
+                64
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            },
+            {
+              "kernel": "softmax_finalize",
+              "grid": [
+                513,
+                64
+              ],
+              "args": [
+                "Y",
+                781
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_partial_exp(X, Y, N: tl.constexpr, TOTAL: tl.constexpr, BLOCK: tl.constexpr):\n    # 2D grid: row and block along columns\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    offs_in_block = tl.arange(0, BLOCK)\n    col = block_id * BLOCK + offs_in_block\n    mask = col < N\n    offs = row * N + col\n\n    # Load input with masking\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Compute max within block\n    block_max = tl.max(x, axis=0)\n\n    # Compute exponentials shifted by block max\n    exps = tl.exp(x - block_max)\n\n    # Store partial exponentials for final reduction\n    tl.store(Y + offs, exps, mask)\n\n@triton.jit\ndef softmax_finalize(Y, N: tl.constexpr):\n    # Each warp handles one row segment of BLOCK size 64\n    row = tl.program_id(0)\n    lane = tl.program_id(1)\n    BLOCK = 64\n    offs_in_block = tl.arange(0, BLOCK)\n    col = lane * BLOCK + offs_in_block\n    mask = col < N\n    offs = row * N + col\n\n    # Load partial exponentials\n    vals = tl.load(Y + offs, mask, other=0.0)\n\n    # Compute max across entire row\n    max_val = tl.max(vals, axis=0)\n\n    # Re-center partial exponentials by global max\n    exps = tl.exp(vals - max_val)\n\n    # Compute sum of exponentials\n    sum_val = tl.sum(exps, axis=0)\n\n    # Normalize\n    y = exps / sum_val\n\n    # Store normalized output\n    tl.store(Y + offs, y, mask)\n",
+        "rationale": "The previous attempt failed due to arange requiring power-of-two size when N=781 is not a power of two, causing compilation errors in the final reduction kernel. To fix this, the final normalization kernel is restructured to use a 2D grid with the second dimension fixed at 64 (a power-of-two) as the block size, splitting the row into segments of 64 elements each. Each program manages a segment, enabling arange(0,64) which compiles correctly. This also allows parallelization of the final reduction across multiple warps per row, improving reduction efficiency (K06) and balancing resource use. The first kernel remains a 2D grid of (rows x blocks), computing partial exponentials per block with masking for irregular dimension 781 (K07), and storing partial exponentials. The second kernel completes max and sum reductions across the full row by aggregating these segments, then normalizes outputs. This two-stage approach reduces kernel launches compared to separate stats and apply kernels (K05), improves parallelism, and maintains memory coalescing (K01). This transformation addresses the compilation failure, improves parallel reduction, and stabilizes numerics with per-block max subtraction and final global max normalization (K10)."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 34865,
+        "output_tokens": 4027,
+        "tokens": 38892
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 34865,
+    "output_tokens": 4027,
+    "tokens": 38892
+  }
+}
