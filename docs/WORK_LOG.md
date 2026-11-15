@@ -1,5 +1,24 @@
 # Development Log
 
+## 2026-11-14 - Source-generation revision
+
+Reviewed completed A100 jobs 3582405 and 3582416 and their raw traces. Both
+completed successfully; all 48 model proposals were configuration-only.
+Reclassified that pilot as a parameter-selection control. Added `source-v1`,
+which exposes baseline-only source, accepts new JIT functions and declarative
+launch sequences, and rejects config-only/null/cosmetic/constant-only proposals.
+The trusted validator and paired timing remain unchanged. Failed proposals are
+saved, reviewers receive the actual submitted code, and repair context includes
+the previous proposal. Model CLI and campaign entry points default to source-v1.
+
+Validation: 34 CPU integrity tests pass; all four irregular family baselines
+pass the new ABI on the RTX 4060 Laptop GPU, including fresh and edge inputs.
+The A100 pilot launcher validates all 12 cases before requesting inference.
+Planned source pilot: 4 families x 4 variants x 1 seed x 2 attempts ($1.25 cap).
+Separate local smoke: 2 families x 4 variants x 1 attempt ($0.50 cap).
+These ceilings plus prior pilot spend remain below the approved $5 total.
+See SOURCE_EXPERIMENTS.md for scope, interpretation and remaining gates.
+
 Dates are in America/Chicago time. Logs of machine events use UTC.
 Credentials are never stored in this repository. Later experimental records
 are on the `results` branch (`reports/WORK_LOG.md`).

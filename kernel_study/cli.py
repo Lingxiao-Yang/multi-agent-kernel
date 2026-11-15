@@ -21,6 +21,7 @@ def main():
     run.add_argument('--seed',type=int,default=11)
     run.add_argument('--output',required=True)
     run.add_argument('--provider',choices=['scripted','llm'],default='scripted')
+    run.add_argument('--search-space',choices=['source-v1','parameter-control'])
     run.add_argument('--protocol',default=str(ROOT/'configs/protocol.json'))
     run.add_argument('--attempts',type=int)
     run.add_argument('--model')
@@ -53,6 +54,9 @@ def main():
     from .providers import ChatProvider, ScriptedProvider
     from .search import search
     protocol = read_json(args.protocol)
+    protocol['search_space'] = args.search_space or ('source-v1' if args.provider == 'llm' else 'parameter-control')
+    if args.provider == 'scripted' and protocol['search_space'] == 'source-v1':
+        p.error('The scripted provider supplies parameter controls, not authored source')
     if args.attempts is not None:
         if args.attempts <= 0:
             p.error('--attempts must be positive')

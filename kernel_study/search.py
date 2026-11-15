@@ -61,7 +61,13 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     start = time.perf_counter()
     starting_cost = getattr(provider, 'spent', 0.)
     starting_completed_cost = getattr(provider, 'completed_cost', 0.)
-    source_text = (ROOT / 'kernel_study/kernels.py').read_text(encoding='utf-8')
+    source_mode = protocol.get('search_space') == 'source-v1'
+    if source_mode:
+        from . import source_space
+        source_text, base_config = source_space.baseline(case)
+    else:
+        source_text = (ROOT / 'kernel_study/kernels.py').read_text(encoding='utf-8')
+        base_config = baseline_config(case['family'])
     # Candidate source stores only the device module; trusted wrapper is never editable.
     base_source = output / 'baseline.py'
     base_source.write_text(source_text, encoding='utf-8')
@@ -75,7 +81,6 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                 'code_hashes':{str(p.relative_to(ROOT)):digest(p.read_text(encoding='utf-8')) for p in sorted((ROOT/'kernel_study').glob('*.py'))}}
     write_json(output/'manifest.json', manifest)
     event(log, 'run_start', manifest=manifest)
-    base_config = baseline_config(case['family'])
     request = {'case':case,'config':base_config,'source':str(base_source),'protocol':protocol,'library':True,'profile':True}
     base_result = run_worker(request, output, 'baseline')
     event(log, 'baseline', result=base_result)
@@ -85,6 +90,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     incumbent = {'id':0, 'config':base_config, 'source':str(base_source), 'result':base_result}
     retained = [incumbent]
     history = []
+    last_proposal = None
     profile_count = 1
     stop = None
     resolved_model = None
@@ -96,7 +102,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             # Same call slot reassigned to implementer/general reasoning.
             replacement = 'advise' if stage == 'implement' else 'implement'
             system = ROLES[replacement] if variant.startswith('multi') else GENERAL
-        prompt = system + '\n' + CONTRACT
+        prompt = system + '\n' + (source_space.CONTRACT if source_mode else CONTRACT)
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)
         budget.charge_tokens(reply.input_tokens, reply.output_tokens)
@@ -112,14 +118,26 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],'config':incumbent['config'],
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history, 'knowledge_cards':cards, 'hardware':manifest['environment'],
-                   'launch_contract':launch_contract(case['family']),
+                   'launch_contract':source_space.contract(case) if source_mode else launch_contract(case['family']),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
+        if source_mode and last_proposal is not None:
+            context['previous_proposal'] = last_proposal
         try:
             for stage in ['analyze','advise']:
                 context[stage] = call(stage, context)
             candidate = call('implement', context)
+            last_proposal = dict(candidate)
+            write_json(output / f'proposal_{attempt:03d}.json', candidate)
             validate_config(candidate['config'])
+            edit = None
+            if source_mode:
+                if not isinstance(candidate.get('source'), str) or not candidate['source'].strip():
+                    raise ValueError('source_edit_required: complete source string is mandatory')
+                # Preserve rejected source as well as successful source for audit.
+                (output / f'proposed_{attempt:03d}.py').write_text(candidate['source'], encoding='utf-8')
+                edit = source_space.check_edit(candidate['source'], candidate['config'],
+                        context['incumbent']['source'], incumbent['config'])
             text = candidate.get('source') or context['incumbent']['source']
             check_source(text)
             candidate_source = output / f'candidate_{attempt:03d}.py'
@@ -140,7 +158,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                     profile_count += 1
                     result['profile'] = prof.get('profile', {'unavailable':prof['status']})
             record = {'attempt':attempt,'parent_id':candidate['parent_id'],'config':candidate['config'],
-                      'source_hash':digest(text),'rationale':candidate.get('rationale'), 'accepted':accepted,
+                      'source_hash':digest(text),'source_edit':edit,'rationale':candidate.get('rationale'), 'accepted':accepted,
                       'result':compact_result(result),'cards':[c['id'] for c in cards], 'budget':budget.snapshot()}
         except Exception as exc:
             record = {'attempt':attempt,'accepted':False,'result':{'status':'proposal_error','error':str(exc)}, 'budget':budget.snapshot()}
@@ -152,6 +170,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         if stop is None and budget.calls < budget.call_cap and budget.tokens < budget.token_safety_cap:
             try:
                 context['measured_result'] = record
+                context['proposed_candidate'] = last_proposal
                 review = call('review', context)
                 record['review'] = review
             except Exception as exc:

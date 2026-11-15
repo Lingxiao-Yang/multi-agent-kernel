@@ -30,13 +30,24 @@ The multi-agent variants assign four specialist role prompts instead. Review
 is advisory only; the automated harness alone decides which candidates to
 keep.
 
-**Search space.** The prototype allows two kinds of change:
+**Search space (revised after the configuration-only A100 pilot).** New model
+runs default to `source-v1`. Only the baseline kernels for the current family
+are exposed. The agent must return complete Triton source plus a declarative
+sequence of one to four launches. Function names, signatures, tiling, device
+algorithms and fusion boundaries may change. There are no `fused` or
+`tensor_core` switches and no supplied optimized implementations in the prompt.
+The trusted harness resolves buffers/scalars and launches the authored kernels;
+host Python, allocations, references and timing remain outside model control.
 
-- configuration changes;
-- edits to existing Triton device functions behind a stable interface.
+Null source and changes only to configuration, literals or identifiers consume
+an attempt and are rejected. An AST screen checks launched device bodies, but
+does not prove semantic novelty: retained source diffs must also be inspected.
+Failed proposals, source and diagnostics remain in the record. The previous
+proposal is available for repair, with repairs consuming the same attempt budget.
 
-New host-side scheduling algorithms are out of scope. This limits how far the
-results generalize, and any final report should state that limit.
+The old `parameter-control` mode remains available explicitly. Job 3582416 is
+a configuration-selection control, not evidence of agent-authored kernel
+optimization. Its cohort must never be pooled with `source-v1` results.
 
 ## Validation and timing
 
@@ -83,9 +94,11 @@ candidates, the same for every variant. The actual number of attempts depends
 on failures and is logged.
 
 **Profiling.** Compiler resource usage is collected for the baseline and for
-each new incumbent, up to 21 invocations. Nsight hardware counters are
-currently unverified. They must not be inferred from resource reports or from
-speedups.
+each new incumbent, up to 21 invocations. Nsight counter access was verified on
+A100 job 3582405. The revised pilot freezes the common feedback mode to timing
+and compiler resources; per-candidate Nsight counters are not yet integrated.
+Hardware-counter bottleneck claims cannot be inferred from resource reports
+or speedups.
 
 ## Analysis
 

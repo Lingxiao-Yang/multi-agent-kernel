@@ -55,6 +55,9 @@ def library_reference(case, inputs):
 
 
 def prepare(case, config, inputs, source=None):
+    if config.get('mode') == 'source-v1':
+        from .source_space import prepare as prepare_source
+        return prepare_source(case, config, inputs, source)
     import torch
     import triton
     from . import kernels
@@ -180,7 +183,7 @@ def evaluate(request):
     result["validation_seconds"] = time.perf_counter() - begin
     inputs = make_inputs(case, seeds[0] + 77)
     fn, compiled = prepare(case, config, inputs, request.get("source"))
-    incumbent, _ = prepare(case, request.get("incumbent_config", config), inputs, request.get("incumbent_source"))
+    incumbent, _ = prepare(case, request.get("incumbent_config", config), inputs, request.get("incumbent_source", request.get("source")))
     fn(); incumbent(); torch.cuda.synchronize()
     result["candidate"], result["incumbent"] = time_pair(fn, incumbent, protocol)
     speedup = result["incumbent"]["median_ms"] / result["candidate"]["median_ms"]

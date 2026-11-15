@@ -33,8 +33,10 @@ be traced to the code on `main`.
 - **Benchmark suite.** Twelve cases cover matrix multiplication, row softmax,
   layer normalization and bias + ReLU. Each family has three shapes, including
   irregular boundaries.
-- **Search space.** Readable Triton baselines, with parameter and device-source
-  transformations.
+- **Search space.** Model runs default to agent-authored Triton source and
+  declarative launch sequences, starting from baseline code only. Predefined
+  optimized kernels are reserved for the explicit `parameter-control` mode.
+  See [the source-generation revision](docs/SOURCE_EXPERIMENTS.md).
 - **Four variants.** `single`, `single_knowledge`, `multi` and
   `multi_knowledge` share a four-call cadence and greedy retention. Only the
   multi-agent variants use specialized role prompts. The single agent receives

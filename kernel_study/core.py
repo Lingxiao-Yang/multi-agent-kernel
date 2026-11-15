@@ -93,6 +93,9 @@ def baseline_config(family):
 
 
 def validate_config(config):
+    if config.get('mode') == 'source-v1':
+        from .source_space import validate_plan
+        return validate_plan(config)
     expected = baseline_config("matmul")
     if set(config) != set(expected):
         raise ValueError("config must contain exactly " + str(sorted(expected)))
