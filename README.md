@@ -15,7 +15,6 @@ that link it to the exact code that produced it.
 | [Four-variant infrastructure control](reports/CONTROL_MATRIX_REPORT.md) | Scripted end-to-end check of all controller paths on a real GPU |
 | [Real-model smoke test](reports/LLM_SMOKE_REPORT.md) | One search per variant with `gpt-4.1-mini` on `softmax_irregular` |
 | [Experiment log](reports/WORK_LOG.md) | Checkpoint of completed runs, cluster jobs and remaining work |
-| [Compute options](reports/COMPUTE_OPTIONS.md) | Assessment of a backup A100 provider |
 
 ## Layout
 

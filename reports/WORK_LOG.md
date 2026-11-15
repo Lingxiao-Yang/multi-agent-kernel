@@ -127,6 +127,3 @@ Do **not** run `scripts/publish_results.py` from a checkout whose local
 
 **Prompt fix.** A gap in the shared launch-API description was fixed before
 the A100 campaign.
-
-**Backup compute.** Runpod was assessed as a fallback A100 provider:
-[`COMPUTE_OPTIONS.md`](COMPUTE_OPTIONS.md). No resources were created.
