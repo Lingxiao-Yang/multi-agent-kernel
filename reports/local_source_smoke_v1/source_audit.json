@@ -1,0 +1,318 @@
+{
+  "runs": [
+    {
+      "run": "matmul_rectangular_multi_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.007866000000000001
+    },
+    {
+      "run": "matmul_rectangular_multi_knowledge_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.009999600000000004
+    },
+    {
+      "run": "matmul_rectangular_single_11",
+      "status": "complete",
+      "speedup": 2.309597551673943,
+      "final_candidate": 1,
+      "cost": 0.0081804
+    },
+    {
+      "run": "matmul_rectangular_single_knowledge_11",
+      "status": "complete",
+      "speedup": 1.82740258687007,
+      "final_candidate": 1,
+      "cost": 0.010087599999999995
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.007812800000000002
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.008439199999999994
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.0080948
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.009096799999999995
+    }
+  ],
+  "candidates": [
+    {
+      "run": "matmul_rectangular_multi_11",
+      "case": "matmul_rectangular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 1,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive shared_memory",
+      "launches": 1,
+      "kernels": [
+        "matmul_simt_shared"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.zeros": 1,
+        "tl.shared_memory": 2,
+        "range": 6,
+        "tl.store": 1,
+        "tl.arange": 3,
+        "tl.barrier": 2,
+        "shared_A[:, k_inner].to": 1,
+        "shared_B[k_inner, :].to": 1,
+        "tl.load(A + idx_m * K + idx_k, mask=idx_m < M and idx_k < K, other=0).to": 1,
+        "val.to": 2,
+        "tl.load(B + idx_k * N + idx_n, mask=idx_k < K and idx_n < N, other=0).to": 1,
+        "tl.load": 2
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "matmul_rectangular_multi_knowledge_11",
+      "case": "matmul_rectangular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:13:\ndef matmul_tiled_pipeline(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline buffers\n    a_ptrs = tl.zeros(BK, dtype=tl.int32)\n             ^",
+      "launches": 1,
+      "kernels": [
+        "matmul_tiled_pipeline"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.zeros": 3,
+        "tl.load(A + offs_m[:, None] * K + offs_k[None, :], mask=mask_a, other=0).to": 1,
+        "tl.load(B + offs_k[:, None] * N + offs_n[None, :], mask=mask_b, other=0).to": 1,
+        "range": 1,
+        "tl.dot": 2,
+        "tl.store": 1,
+        "tl.arange": 4,
+        "tl.load(A + offs_m[:, None] * K + offs_k_next[None, :], mask=mask_a_next, other=0).to": 1,
+        "tl.load(B + offs_k_next[:, None] * N + offs_n[None, :], mask=mask_b_next, other=0).to": 1,
+        "tl.load": 4
+      },
+      "has_dot": true,
+      "has_reduction": false
+    },
+    {
+      "run": "matmul_rectangular_single_11",
+      "case": "matmul_rectangular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "matmul_simt"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.zeros": 1,
+        "range": 1,
+        "tl.store": 1,
+        "tl.arange": 3,
+        "tl.load(A + offs_m[:, None] * K + k_offs[None, :], mask=(offs_m[:, None] < M) & (k_offs[None, :] < K), other=0).to": 1,
+        "tl.load(B + k_offs[:, None] * N + offs_n[None, :], mask=(k_offs[:, None] < K) & (offs_n[None, :] < N), other=0).to": 1,
+        "tl.dot": 1,
+        "tl.load": 2
+      },
+      "has_dot": true,
+      "has_reduction": false
+    },
+    {
+      "run": "matmul_rectangular_single_knowledge_11",
+      "case": "matmul_rectangular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "matmul_simt"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.zeros": 1,
+        "tl.load(A + rows[:, None] * K + k_range[None, :], mask=mask_a, other=0).to": 1,
+        "tl.load(B + k_range[:, None] * N + cols[None, :], mask=mask_b, other=0).to": 1,
+        "range": 1,
+        "tl.dot": 2,
+        "tl.store": 1,
+        "tl.arange": 4,
+        "tl.load(A + rows[:, None] * K + k_range_next[None, :], mask=mask_a_next, other=0).to": 1,
+        "tl.load(B + k_range_next[:, None] * N + cols[None, :], mask=mask_b_next, other=0).to": 1,
+        "tl.load": 4
+      },
+      "has_dot": true,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 1,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (3, 729) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (3, 729) (up to 2e-05 allowed)",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 3:11:\ndef softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, TOTAL)\n           ^\narange's range must be a power of 2",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.exp": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 1,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (512, 181) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (512, 181) (up to 2e-05 allowed)",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    }
+  ],
+  "counts": {
+    "searches": 8,
+    "attempts": 8,
+    "source_supplied": 8,
+    "structural_screen": 7,
+    "correct": 2,
+    "retained": 2
+  },
+  "caveat": "Static primitive counts and launch changes require manual review; not causal attribution."
+}

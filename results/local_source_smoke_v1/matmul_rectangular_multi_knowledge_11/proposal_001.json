@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_tiled_pipeline",
+        "grid": [
+          33,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          8,
+          16,
+          64
+        ],
+        "num_warps": 4,
+        "num_stages": 3
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_tiled_pipeline(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    # Software pipeline buffers\n    a_ptrs = tl.zeros(BK, dtype=tl.int32)\n    b_ptrs = tl.zeros(BK, dtype=tl.int32)\n\n    # Initialize pipeline: load first tiles\n    k = 0\n    offs_k = k + tl.arange(0, BK)\n    mask_a = (offs_m[:, None] < M) & (offs_k[None, :] < K)\n    mask_b = (offs_k[:, None] < K) & (offs_n[None, :] < N)\n    a_tile = tl.load(A + offs_m[:, None] * K + offs_k[None, :], mask=mask_a, other=0).to(tl.float32)\n    b_tile = tl.load(B + offs_k[:, None] * N + offs_n[None, :], mask=mask_b, other=0).to(tl.float32)\n\n    # Pipeline loop with 3 stages\n    for k in range(BK, K, BK):\n        # Preload next tiles\n        offs_k_next = k + tl.arange(0, BK)\n        mask_a_next = (offs_m[:, None] < M) & (offs_k_next[None, :] < K)\n        mask_b_next = (offs_k_next[:, None] < K) & (offs_n[None, :] < N)\n        a_tile_next = tl.load(A + offs_m[:, None] * K + offs_k_next[None, :], mask=mask_a_next, other=0).to(tl.float32)\n        b_tile_next = tl.load(B + offs_k_next[:, None] * N + offs_n[None, :], mask=mask_b_next, other=0).to(tl.float32)\n\n        # Compute dot product for current tiles\n        acc += tl.dot(a_tile, b_tile)\n\n        # Advance pipeline\n        a_tile = a_tile_next\n        b_tile = b_tile_next\n\n    # Last accumulation for the final tile\n    acc += tl.dot(a_tile, b_tile)\n\n    # Store result with boundary masking\n    mask = (offs_m[:, None] < M) & (offs_n[None, :] < N)\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask)\n",
+  "rationale": "Implemented a software pipeline with 3 stages to overlap loads and computation as advised. Reduced tile size BM from 16 to 8 and increased BK to 64 to improve parallelism and operand reuse, increasing grid size accordingly. Preserved boundary masking for partial tiles on edges. Used explicit pipeline stages by preloading next tiles while computing current ones to hide latency and improve throughput, matching the shared plan. This transformation balances register usage, increases parallelism, and overlaps memory with compute efficiently."
+}

@@ -1,0 +1,442 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T03:51:30.025813+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 1,
+      "call_cap": 4,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "4f483e858ba243ed17bb61a76182bbc0955a45b148f426491755f6575605b986",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "dffa17214485a3508c8e6d8fc66f90154f227e4289e2850258f1364b4570222b",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 12092,
+    "output_tokens": 1860,
+    "tokens": 13952
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.563039081999989,
+      "validation_seconds": 2.943339801999997,
+      "candidate": {
+        "median_ms": 0.023347200453281404,
+        "p25_ms": 0.022486399859189987,
+        "p75_ms": 0.025548800081014636,
+        "min_ms": 0.021503999829292297,
+        "samples_ms": [
+          0.02457599937915802,
+          0.027238398790359497,
+          0.021503999829292297,
+          0.026214399933815004,
+          0.024883200228214265,
+          0.02263039946556091,
+          0.02189760059118271,
+          0.022835199534893037,
+          0.02447360008955002,
+          0.02754560112953186,
+          0.02908160090446472,
+          0.022835199534893037,
+          0.023449599742889404,
+          0.028262400627136232,
+          0.027750399708747864,
+          0.023347200453281404,
+          0.022726400196552275,
+          0.02447360008955002,
+          0.02447360008955002,
+          0.02252800017595291,
+          0.022118400037288665,
+          0.023244799673557283,
+          0.022444799542427063,
+          0.021724799275398256,
+          0.02232320010662079,
+          0.027340799570083618,
+          0.023347200453281404,
+          0.02221119999885559,
+          0.02805759906768799,
+          0.02232320010662079,
+          0.02252800017595291
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.02324160039424896,
+        "p25_ms": 0.02221759930253029,
+        "p75_ms": 0.025497600436210632,
+        "min_ms": 0.02181120067834854,
+        "samples_ms": [
+          0.0247871994972229,
+          0.02242559939622879,
+          0.021913599967956544,
+          0.052934402227401735,
+          0.02221439927816391,
+          0.02181120067834854,
+          0.025804799795150758,
+          0.02232320010662079,
+          0.03133440017700195,
+          0.02815679907798767,
+          0.02314240038394928,
+          0.02222079932689667,
+          0.022118400037288665,
+          0.02181120067834854,
+          0.02324160039424896,
+          0.02222079932689667,
+          0.022118400037288665,
+          0.02744320034980774,
+          0.02242559939622879,
+          0.023552000522613525,
+          0.027955201268196107,
+          0.024371199309825897,
+          0.02590720057487488,
+          0.025190401077270507,
+          0.026009601354599,
+          0.021904000639915468,
+          0.02263039946556091,
+          0.023552000522613525,
+          0.022118400037288665,
+          0.024063999950885772,
+          0.023843200504779817
+        ]
+      },
+      "paired_speedup": 0.995476971243565,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.010444799810647965,
+        "p25_ms": 0.009523200243711472,
+        "p75_ms": 0.012585600465536117,
+        "min_ms": 0.008806400001049042,
+        "samples_ms": [
+          0.0130048006772995,
+          0.00942080020904541,
+          0.010864000022411346,
+          0.009523200243711472,
+          0.010035199671983719,
+          0.008908800035715102,
+          0.009523200243711472,
+          0.008806400001049042,
+          0.009001599997282029,
+          0.015462400019168853,
+          0.009523200243711472,
+          0.008806400001049042,
+          0.013209599256515502,
+          0.012800000607967377,
+          0.013209599256515502,
+          0.011468800157308579,
+          0.009523200243711472,
+          0.010444799810647965,
+          0.010239999741315842,
+          0.012902399897575379,
+          0.010137599706649781,
+          0.011366400122642516,
+          0.009830400347709656,
+          0.01257600039243698,
+          0.01135680004954338,
+          0.01157120019197464,
+          0.008908800035715102,
+          0.012595200538635254,
+          0.013107199966907502,
+          0.011161600053310395,
+          0.009523200243711472
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 137.2851535846351,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.0534074549999985,
+      "process_seconds": 15.32256034000001
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "softmax_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_stats",
+            "grid": [
+              24
+            ],
+            "num_warps": 8,
+            "num_stages": 2,
+            "args": [
+              "X",
+              "S",
+              "N",
+              64
+            ]
+          },
+          {
+            "kernel": "softmax_apply",
+            "grid": [
+              48
+            ],
+            "num_warps": 8,
+            "num_stages": 2,
+            "args": [
+              "X",
+              "S",
+              "Y",
+              39993,
+              "N",
+              64
+            ]
+          }
+        ]
+      },
+      "source_hash": "e158ec4e491c2affce80eac48d9c76cbeaf321b95359e4596e9f21026a0a4299",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Changed configs to increase num_warps from 4 to 8 and num_stages from 1 to 2 to improve instruction-level parallelism and hide latency, potentially increasing compute throughput. Reduced BLOCK size to 64 to better match warp size and improve memory coalescing for irregular shapes. Adjusted grid sizes to 24 (SM count) for softmax_stats and 48 for softmax_apply to balance workload per SM and cover entire input. Kernel source unchanged except for BLOCK size parameter usage. This transformation aligns kernel launch parameters with recommendations to balance compute and memory bandwidth utilization, reduce launch overhead impact, and maintain full workload coverage.",
+      "accepted": false,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "Tensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (3, 729) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (3, 729) (up to 2e-05 allowed)",
+        "worker_seconds": 14.83215931800001,
+        "process_seconds": 15.532850179999997
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7434,
+        "output_tokens": 1421,
+        "tokens": 8855
+      },
+      "review": {
+        "measured_outcome": "The proposed kernel configuration increases num_warps from 4 to 8 and num_stages from 1 to 2, and reduces BLOCK size from 256 to 64 with adjusted grid sizes to better match the hardware SM count and warp size. This aims to improve instruction-level parallelism, hide latency, and improve memory coalescing for irregular shapes. However, the kernel output is entirely incorrect, showing NaNs and mismatches on all elements compared to the reference, indicating a functional correctness failure rather than a performance issue.",
+        "failure_analysis": "The failure is likely due to incorrect indexing or masking in the kernels after changing BLOCK size and grid sizes. The stats kernel still loads BLOCK elements per row but the grid size is set to 24 (number of SMs) which is much smaller than the number of rows (513), so only a fraction of rows are processed, leaving others unprocessed or containing stale data in S. The apply kernel grid size 48 * BLOCK=3072 is smaller than TOTAL=39993, so many output elements are not processed. Masking prevents out-of-bounds loads/stores but does not cover missing launches. This causes the output to be mostly uninitialized or zero, hence NaNs or large mismatches. The usage of grid sizes must fully cover the workload dimension (rows for stats, total elements for apply) for correctness.",
+        "next_directions": [
+          "Restore grid sizes to fully cover the workload dimensions: for softmax_stats grid size should be number of rows (e.g., 513), for softmax_apply grid size should be ceil(TOTAL / BLOCK) (e.g., 1566 for BLOCK=256).",
+          "Keep increased num_warps and num_stages to improve latency hiding and IPC, and keep BLOCK size reduced to 64 or tune it between 64 and 256 for balance.",
+          "Verify masking and indexing logic carefully to ensure no out-of-bounds accesses and proper coverage of all elements.",
+          "Consider splitting kernels or adding multiple launches if needed to cover full workload.",
+          "After restoring correct grid sizes, rerun correctness and performance tests to compare improvements and verify no regressions."
+        ],
+        "retain": false
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 12092,
+        "output_tokens": 1860,
+        "tokens": 13952
+      }
+    }
+  ],
+  "wall_seconds": 76.403128332,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.007812800000000002,
+  "budget_committed_usd": 0.007812799999999998,
+  "speedup": 1.0
+}

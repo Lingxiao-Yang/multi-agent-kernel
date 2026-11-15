@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt",
+        "grid": [
+          17,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          32,
+          32,
+          32
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n    rows = pid_m * BM + tl.arange(0, BM)\n    cols = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), tl.float32)\n\n    # We use a double buffer pipeline with 2 stages\n    k_ptrs = [0, BK]\n    # Load first tiles\n    k = 0\n    k_range = k + tl.arange(0, BK)\n    mask_a = (rows[:, None] < M) & (k_range[None, :] < K)\n    a = tl.load(A + rows[:, None] * K + k_range[None, :], mask=mask_a, other=0).to(tl.float32)\n    mask_b = (k_range[:, None] < K) & (cols[None, :] < N)\n    b = tl.load(B + k_range[:, None] * N + cols[None, :], mask=mask_b, other=0).to(tl.float32)\n\n    for i in range(k + BK, K + BK, BK):\n        # Next k range\n        k_next = i\n        k_range_next = k_next + tl.arange(0, BK)\n        mask_a_next = (rows[:, None] < M) & (k_range_next[None, :] < K)\n        mask_b_next = (k_range_next[:, None] < K) & (cols[None, :] < N)\n\n        # Prefetch next tiles\n        a_next = tl.load(A + rows[:, None] * K + k_range_next[None, :], mask=mask_a_next, other=0).to(tl.float32)\n        b_next = tl.load(B + k_range_next[:, None] * N + cols[None, :], mask=mask_b_next, other=0).to(tl.float32)\n\n        # Compute dot product on current tiles\n        acc += tl.dot(a, b)\n\n        # Swap buffers\n        a = a_next\n        b = b_next\n\n    # Last dot product\n    acc += tl.dot(a, b)\n\n    mask = (rows[:, None] < M) & (cols[None, :] < N)\n    tl.store(Y + rows[:, None] * N + cols[None, :], acc, mask)\n",
+  "rationale": "Implemented software pipelining with 2 stages to overlap memory loads and computation, reducing stalls and improving throughput. Maintained tile sizes of 32x32x32 for high arithmetic intensity and warp utilization. Prefetches next tiles of A and B while computing current tile's dot product, enabling better latency hiding. Boundary masks ensure correctness on edge tiles. This approach balances register usage and occupancy on the target hardware to improve performance over the previous single-stage loop."
+}

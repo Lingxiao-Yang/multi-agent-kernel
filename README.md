@@ -10,6 +10,7 @@ that link it to the exact code that produced it.
 
 | Report | Summary |
 | --- | --- |
+| [Source-generation revision](reports/SOURCE_PILOT_REPORT.md) | 8 completed local source searches; 2 validated generated matmuls; A100 source pilot running |
 | **[A100 pilot](reports/A100_PILOT_REPORT.md)** | **Lonestar6 A100-PCIE-40GB: 24/24 engineering evaluations correct; 24-search LLM pilot (2 cases × 4 variants × 3 seeds). Multi-agent variants reached 6.3× on matmul by enabling tensor cores; single agents never did.** |
 | [GPU engineering pilot](reports/GPU_PILOT_REPORT.md) | 24/24 correct baseline/transformation evaluations on an RTX 4060 Laptop GPU, including a numerical failure that was found and fixed |
 | [Four-variant infrastructure control](reports/CONTROL_MATRIX_REPORT.md) | Scripted end-to-end check of all controller paths on a real GPU |

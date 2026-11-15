@@ -1,0 +1,8 @@
+softmax_irregular multi 11 complete 1.0 0.007812799999999998
+matmul_rectangular single 11 complete 2.309597551673943 0.015993199999999996
+matmul_rectangular multi 11 complete 1.0 0.023859199999999997
+matmul_rectangular multi_knowledge 11 complete 1.0 0.03385880000000001
+softmax_irregular single_knowledge 11 complete 1.0 0.0429556
+softmax_irregular single 11 complete 1.0 0.051050399999999996
+softmax_irregular multi_knowledge 11 complete 1.0 0.059489600000000004
+matmul_rectangular single_knowledge 11 complete 1.82740258687007 0.06957720000000002

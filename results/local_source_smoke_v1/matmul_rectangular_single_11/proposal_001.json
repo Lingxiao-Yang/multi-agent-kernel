@@ -1,0 +1,29 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "matmul_simt",
+        "grid": [
+          17,
+          49
+        ],
+        "args": [
+          "A",
+          "B",
+          "Y",
+          "M",
+          "N",
+          "K",
+          32,
+          32,
+          16
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    for k_start in range(0, K, BK):\n        k_offs = k_start + tl.arange(0, BK)\n        a = tl.load(A + offs_m[:, None] * K + k_offs[None, :], mask=(offs_m[:, None] < M) & (k_offs[None, :] < K), other=0).to(tl.float32)\n        b = tl.load(B + k_offs[:, None] * N + offs_n[None, :], mask=(k_offs[:, None] < K) & (offs_n[None, :] < N), other=0).to(tl.float32)\n        acc += tl.dot(a, b)\n\n    tl.store(Y + offs_m[:, None] * N + offs_n[None, :], acc, mask=(offs_m[:, None] < M) & (offs_n[None, :] < N))\n",
+  "rationale": "Improved kernel using blocking with BM=32, BN=32, BK=16 for better memory coalescing and data reuse. Used tl.dot for efficient inner product computation. Increased num_warps to 8 and num_stages to 2 to better hide latency and improve throughput on the target GPU architecture. This transformation should better utilize computational resources and reduce global memory traffic compared to the incumbent."
+}

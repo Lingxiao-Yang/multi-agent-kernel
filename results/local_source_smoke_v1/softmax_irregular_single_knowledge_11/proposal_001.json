@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1570
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400053,
+          781,
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    idx = row * N + offs\n    mask = offs < N\n    x = tl.load(X + idx, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    exps = tl.exp(x - mx)\n    denom = tl.sum(exps, 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0)\n    mx = tl.load(S + row * 2, mask, other=0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1)\n    y = tl.exp(x - mx) / denom\n    tl.store(Y + i, y, mask)\n",
+  "rationale": "Increased num_warps from 4 to 8 and num_stages from 1 to 2 to improve GPU occupancy and latency hiding on Ampere architecture, optimizing throughput for large softmax operations. Kept BLOCK size at 256 balancing register and shared memory usage. Adjusted grid sizes to cover entire input efficiently. Preserved stable numerics and masking to handle irregular dimensions."
+}

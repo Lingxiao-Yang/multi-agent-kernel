@@ -1,5 +1,7 @@
 # A100 Pilot (Lonestar6, 2026-11-14)
 
+> Scope correction: this is a configuration-selection control. All 48 proposals used supplied device code. See [the source-generation revision](SOURCE_PILOT_REPORT.md); these effects are not evidence of agents authoring optimized kernels.
+
 Two jobs ran on an NVIDIA **A100-PCIE-40GB** (108 SMs) on TACC Lonestar6,
 allocation `ASC26098`, using code commit `0ef781a`.
 

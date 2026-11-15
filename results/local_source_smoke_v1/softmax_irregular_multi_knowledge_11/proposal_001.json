@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          781
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, TOTAL: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, TOTAL)\n    col = offs\n    # Load elements of the row with mask for boundary\n    x = tl.load(X + row * N + col, col < N, other=-float('inf'))\n    # Compute max for numeric stability\n    mx = tl.max(x, 0)\n    # Subtract max, exponentiate\n    exps = tl.exp(x - mx)\n    # Reduce sum of exps\n    denom = tl.sum(exps, 0)\n    # Compute softmax output\n    out = exps / denom\n    # Store result with mask\n    tl.store(Y + row * N + col, out, col < N)\n",
+  "rationale": "We fuse softmax_stats and softmax_apply kernels into a single softmax_fused kernel that processes a full row at once to eliminate intermediate scratch memory and inter-kernel traffic. The kernel loads the entire row with masking for boundary elements, computes max and sum reductions for stable softmax in one pass, and writes out the normalized softmax results. This reduces kernel launches and memory overhead while improving memory coalescing by contiguous accesses and reduces masking overhead by processing the full row in one launch. The implementation trades slightly more register pressure for reduced latency and improved throughput, consistent with the analysis and using a single launch per row with grid size equal to the number of rows."
+}

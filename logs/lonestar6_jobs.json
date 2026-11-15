@@ -63,6 +63,25 @@
       "ended": "2026-11-14T20:03:42",
       "elapsed": "00:34:48",
       "outcome": "24 searches complete (2 cases x 4 variants x 3 seeds); cumulative estimated inference cost ~$0.448"
+    },
+    {
+      "job_id": 3582814,
+      "name": "kernel-source-pilot",
+      "script": "cluster/source_pilot.sbatch",
+      "partition": "gpu-a100-small",
+      "time_limit": "02:00:00",
+      "commit": "ea03292",
+      "state": "RUNNING",
+      "submitted": "2026-11-14T21:51:31",
+      "started": "2026-11-14T21:57:22",
+      "queue_wait_seconds": 351,
+      "node": "v330-016",
+      "dollar_cap_usd": 1.25,
+      "preflight": "12/12 passed; archived",
+      "searches_planned": 16,
+      "attempts_per_search": 2,
+      "expected_output": "$SCRATCH/kernel-study-source-v1/results/a100-source-pilot-3582814",
+      "note": "Frozen original source gate. Main gate-v2 update was not applied while this job ran."
     }
   ]
 }

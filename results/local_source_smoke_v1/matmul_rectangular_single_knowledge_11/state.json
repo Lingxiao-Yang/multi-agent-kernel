@@ -1,0 +1,454 @@
+{
+  "incumbent": {
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            32,
+            32,
+            32
+          ],
+          "num_warps": 4,
+          "num_stages": 2
+        }
+      ]
+    },
+    "source": "/mnt/e/2026-2027 Master/CS 395T ML Found/Project/results/local_source_smoke_v1/matmul_rectangular_single_knowledge_11/candidate_001.py",
+    "rationale": "Implemented software pipelining with 2 stages to overlap memory loads and computation, reducing stalls and improving throughput. Maintained tile sizes of 32x32x32 for high arithmetic intensity and warp utilization. Prefetches next tiles of A and B while computing current tile's dot product, enabling better latency hiding. Boundary masks ensure correctness on edge tiles. This approach balances register usage and occupancy on the target hardware to improve performance over the previous single-stage loop.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.9309679780000124,
+      "validation_seconds": 3.402521610000008,
+      "candidate": {
+        "median_ms": 0.16783360242843628,
+        "p25_ms": 0.1671679973602295,
+        "p75_ms": 0.17152000069618226,
+        "min_ms": 0.16537599563598632,
+        "samples_ms": [
+          0.16721919775009156,
+          0.1691648006439209,
+          0.16640000343322753,
+          0.17489919662475586,
+          0.16650240421295165,
+          0.16773120164871216,
+          0.1674239993095398,
+          0.4478911876678467,
+          0.2732032060623169,
+          0.4328447818756104,
+          0.170905601978302,
+          0.1703935980796814,
+          0.16772799491882323,
+          0.19116480350494386,
+          0.16588799953460692,
+          0.16732159852981568,
+          0.16565760374069213,
+          0.16711679697036744,
+          0.16814080476760865,
+          0.16608959436416626,
+          0.1903488039970398,
+          0.1687551975250244,
+          0.16680959463119507,
+          0.16800960302352905,
+          0.16773120164871216,
+          0.16783360242843628,
+          0.16752640008926392,
+          0.19056639671325684,
+          0.16537599563598632,
+          0.1721343994140625,
+          0.1691648006439209
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.30789759159088137,
+        "p25_ms": 0.30443520545959474,
+        "p75_ms": 0.46622720956802366,
+        "min_ms": 0.301363205909729,
+        "samples_ms": [
+          0.3788800001144409,
+          0.6680575847625733,
+          0.30351359844207765,
+          0.6024191856384278,
+          0.3051520109176636,
+          0.3033087968826294,
+          0.30310399532318116,
+          0.30801920890808104,
+          0.301363205909729,
+          0.30607359409332274,
+          0.30789759159088137,
+          0.3042304039001465,
+          0.30248959064483644,
+          0.30382080078125,
+          0.840601634979248,
+          0.30494720935821534,
+          0.5923840045928955,
+          0.3104768037796021,
+          0.3051520109176636,
+          0.30167040824890134,
+          0.37662720680236816,
+          0.6918144226074219,
+          0.5535744190216064,
+          0.324403190612793,
+          0.3298304080963135,
+          0.3052544116973877,
+          0.304640007019043,
+          0.7046976089477539,
+          0.3349503993988037,
+          0.5649407863616943,
+          0.30566399097442626
+        ]
+      },
+      "paired_speedup": 1.83454080193606,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.12338880300521851,
+          "p25_ms": 0.12108800411224366,
+          "p75_ms": 0.14238719940185546,
+          "min_ms": 0.11816960573196411,
+          "samples_ms": [
+            0.16640000343322753,
+            0.17326079607009887,
+            0.16721919775009156,
+            0.1210368037223816,
+            0.1264448046684265,
+            0.3096575975418091,
+            0.2012160062789917,
+            0.11816960573196411,
+            0.12492799758911133,
+            0.1245919942855835,
+            0.12338880300521851,
+            0.12492799758911133,
+            0.12400640249252319,
+            0.12113920450210572,
+            0.14202879667282103,
+            0.2031615972518921,
+            0.12072960138320923,
+            0.12144960165023803,
+            0.4211711883544922,
+            0.12154879570007324,
+            0.12083200216293336,
+            0.12083200216293336,
+            0.12001279592514039,
+            0.12113920450210572,
+            0.12031359672546386,
+            0.12174719572067261,
+            0.12021759748458863,
+            0.12625919580459594,
+            0.12165119647979736,
+            0.14274560213088988,
+            0.12163840532302857
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.21923840045928955,
+          "p25_ms": 0.21749600172042846,
+          "p75_ms": 0.23905279636383056,
+          "min_ms": 0.21483519077301025,
+          "samples_ms": [
+            0.3515392065048218,
+            0.591871976852417,
+            0.2927615880966187,
+            0.21678080558776855,
+            0.21483519077301025,
+            0.2165760040283203,
+            0.23449599742889404,
+            0.21493759155273437,
+            0.4700160026550293,
+            0.22128639221191407,
+            0.2189311981201172,
+            0.21882879734039307,
+            0.21923840045928955,
+            0.2214911937713623,
+            0.21975040435791016,
+            0.45742077827453614,
+            0.21778879165649415,
+            0.22024641036987305,
+            0.22425599098205568,
+            0.21739521026611328,
+            0.21635520458221436,
+            0.21975040435791016,
+            0.21841919422149658,
+            0.24360959529876708,
+            0.6443967819213867,
+            0.21616640090942382,
+            0.21759679317474365,
+            0.4997119903564453,
+            0.21891520023345948,
+            0.2190335988998413,
+            0.21626880168914794
+          ]
+        }
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 8.627247339324661,
+        "achieved_tflops": 1.2081696100544652,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.84424268500004,
+      "process_seconds": 15.658778236999979,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 96,
+            "spills": 0,
+            "shared_bytes": 8192,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "matmul_simt",
+            "grid": [
+              17,
+              49
+            ],
+            "args": [
+              "A",
+              "B",
+              "Y",
+              "M",
+              "N",
+              "K",
+              32,
+              32,
+              32
+            ],
+            "num_warps": 4,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "a71e1aa02ad21bdc35bff4b8186e01c1edf049210056a9d5837dd7ec6621b5e2",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Implemented software pipelining with 2 stages to overlap memory loads and computation, reducing stalls and improving throughput. Maintained tile sizes of 32x32x32 for high arithmetic intensity and warp utilization. Prefetches next tiles of A and B while computing current tile's dot product, enabling better latency hiding. Boundary masks ensure correctness on edge tiles. This approach balances register usage and occupancy on the target hardware to improve performance over the previous single-stage loop.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.9309679780000124,
+        "validation_seconds": 3.402521610000008,
+        "candidate": {
+          "median_ms": 0.16783360242843628,
+          "p25_ms": 0.1671679973602295,
+          "p75_ms": 0.17152000069618226,
+          "min_ms": 0.16537599563598632
+        },
+        "incumbent": {
+          "median_ms": 0.30789759159088137,
+          "p25_ms": 0.30443520545959474,
+          "p75_ms": 0.46622720956802366,
+          "min_ms": 0.301363205909729
+        },
+        "paired_speedup": 1.83454080193606,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.12338880300521851,
+            "p25_ms": 0.12108800411224366,
+            "p75_ms": 0.14238719940185546,
+            "min_ms": 0.11816960573196411
+          },
+          "incumbent": {
+            "median_ms": 0.21923840045928955,
+            "p25_ms": 0.21749600172042846,
+            "p75_ms": 0.23905279636383056,
+            "min_ms": 0.21483519077301025
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 8.627247339324661,
+          "achieved_tflops": 1.2081696100544652,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.84424268500004,
+        "process_seconds": 15.658778236999979,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 96,
+              "spills": 0,
+              "shared_bytes": 8192,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9390,
+        "output_tokens": 1658,
+        "tokens": 11048
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                17,
+                49
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                32,
+                32,
+                32
+              ],
+              "num_warps": 4,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(A, B, Y, M: tl.constexpr, N: tl.constexpr, K: tl.constexpr, BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n    rows = pid_m * BM + tl.arange(0, BM)\n    cols = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), tl.float32)\n\n    # Load first tiles\n    k = 0\n    k_range = k + tl.arange(0, BK)\n    mask_a = (rows[:, None] < M) & (k_range[None, :] < K)\n    a = tl.load(A + rows[:, None] * K + k_range[None, :], mask=mask_a, other=0).to(tl.float32)\n    mask_b = (k_range[:, None] < K) & (cols[None, :] < N)\n    b = tl.load(B + k_range[:, None] * N + cols[None, :], mask=mask_b, other=0).to(tl.float32)\n\n    for i in range(BK, K, BK):\n        k_range_next = i + tl.arange(0, BK)\n        mask_a_next = (rows[:, None] < M) & (k_range_next[None, :] < K)\n        mask_b_next = (k_range_next[:, None] < K) & (cols[None, :] < N)\n\n        a_next = tl.load(A + rows[:, None] * K + k_range_next[None, :], mask=mask_a_next, other=0).to(tl.float32)\n        b_next = tl.load(B + k_range_next[:, None] * N + cols[None, :], mask=mask_b_next, other=0).to(tl.float32)\n\n        acc += tl.dot(a, b)\n\n        a = a_next\n        b = b_next\n\n    acc += tl.dot(a, b)\n\n    mask = (rows[:, None] < M) & (cols[None, :] < N)\n    tl.store(Y + rows[:, None] * N + cols[None, :], acc, mask)\n",
+        "rationale": "Implemented software pipelining with 2 stages to overlap memory loads and computation, reducing stalls and improving throughput. Maintained tile sizes of 32x32x32 for high arithmetic intensity and warp utilization. Prefetches next tiles of A and B while computing current tile's dot product, enabling better latency hiding. Boundary masks ensure correctness on edge tiles. This approach balances register usage and occupancy on the target hardware to improve performance over the previous single-stage loop."
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15827,
+        "output_tokens": 2348,
+        "tokens": 18175
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 15827,
+    "output_tokens": 2348,
+    "tokens": 18175
+  }
+}

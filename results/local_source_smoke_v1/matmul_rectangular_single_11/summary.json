@@ -1,0 +1,584 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T03:52:42.232780+00:00",
+    "case": {
+      "id": "matmul_rectangular",
+      "family": "matmul",
+      "shape": [
+        257,
+        769,
+        513
+      ],
+      "dtype": "float16",
+      "atol": 0.05,
+      "rtol": 0.01
+    },
+    "variant": "single",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 1,
+      "call_cap": 4,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "4f483e858ba243ed17bb61a76182bbc0955a45b148f426491755f6575605b986",
+    "case_hash": "157cdba1b21ccceb7f11e6b21647854f445e1a3d10b11b750db83178e2769a30",
+    "baseline_hash": "e09ecab37ba32285b4d544ec49101ebac0b5e350a6407a9145ae7ddf7eebd32c",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 12451,
+    "output_tokens": 2000,
+    "tokens": 14451
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.68408599899999,
+      "validation_seconds": 3.1885608259999856,
+      "candidate": {
+        "median_ms": 0.13230079412460327,
+        "p25_ms": 0.12293120026588439,
+        "p75_ms": 0.13490079641342162,
+        "min_ms": 0.12020800113677979,
+        "samples_ms": [
+          0.13537280559539794,
+          0.13526400327682495,
+          0.13352960348129272,
+          0.15748800039291383,
+          0.132096004486084,
+          0.13230079412460327,
+          0.13363200426101685,
+          0.1342463970184326,
+          0.13484159708023072,
+          0.13239359855651855,
+          0.3546112060546875,
+          0.1335039973258972,
+          0.13178880214691163,
+          0.13844480514526367,
+          0.13670400381088257,
+          0.13495999574661255,
+          0.13445119857788085,
+          0.12165119647979736,
+          0.12020800113677979,
+          0.1259392023086548,
+          0.12226560115814208,
+          0.12052479982376099,
+          0.3681279897689819,
+          0.12451839447021484,
+          0.12216320037841796,
+          0.12349439859390259,
+          0.12298239469528198,
+          0.12288000583648681,
+          0.12257280349731445,
+          0.12318719625473022,
+          0.1214303970336914
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.30556159019470214,
+        "p25_ms": 0.27985759973526003,
+        "p75_ms": 0.36024320125579834,
+        "min_ms": 0.27648000717163085,
+        "samples_ms": [
+          0.3059711933135986,
+          0.30556159019470214,
+          0.5484543800354004,
+          0.45096960067749026,
+          0.5414912223815918,
+          0.31754240989685056,
+          0.30432639122009275,
+          0.3064831972122192,
+          0.30453760623931886,
+          0.3058687925338745,
+          0.5070847988128662,
+          0.3315711975097656,
+          0.5941152095794677,
+          0.3078144073486328,
+          0.3054464101791382,
+          0.3059711933135986,
+          0.30443520545959474,
+          0.8209407806396485,
+          0.27791359424591067,
+          0.2785279989242554,
+          0.2771967887878418,
+          0.27648000717163085,
+          0.28129279613494873,
+          0.2822144031524658,
+          0.6876031875610351,
+          0.2785279989242554,
+          0.2798559904098511,
+          0.27985920906066897,
+          0.2795520067214966,
+          0.27873280048370364,
+          0.3889152050018311
+        ]
+      },
+      "paired_speedup": 2.309597551673943,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.12349439859390259,
+          "p25_ms": 0.12159839868545533,
+          "p75_ms": 0.12554240226745605,
+          "min_ms": 0.11989439725875854,
+          "samples_ms": [
+            0.12554240226745605,
+            0.12544000148773193,
+            0.1235967993736267,
+            0.12225279808044434,
+            0.33669118881225585,
+            0.12124160528182984,
+            0.12154879570007324,
+            0.1252351999282837,
+            0.1216480016708374,
+            0.12144639492034912,
+            0.12052479982376099,
+            0.12298239469528198,
+            0.33044478893280027,
+            0.12001279592514039,
+            0.3665855884552002,
+            0.12093440294265748,
+            0.12001279592514039,
+            0.12380160093307495,
+            0.1218559980392456,
+            0.3389343976974487,
+            0.24535040855407714,
+            0.12267520427703857,
+            0.12410880327224731,
+            0.1381376028060913,
+            0.12206079959869384,
+            0.1243008017539978,
+            0.12554240226745605,
+            0.12267520427703857,
+            0.15605759620666504,
+            0.12349439859390259,
+            0.11989439725875854
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.279040002822876,
+          "p25_ms": 0.27740159034729006,
+          "p75_ms": 0.3101696014404297,
+          "min_ms": 0.27175679206848147,
+          "samples_ms": [
+            0.279040002822876,
+            0.2786303997039795,
+            0.27873280048370364,
+            0.27842559814453127,
+            0.3443711996078491,
+            0.27842559814453127,
+            0.2932735919952393,
+            0.2791264057159424,
+            0.2775039911270142,
+            0.27648000717163085,
+            0.2770944118499756,
+            0.27729918956756594,
+            0.3974143981933594,
+            0.2762752056121826,
+            0.27781119346618655,
+            0.2747391939163208,
+            0.2762752056121826,
+            0.27175679206848147,
+            0.36823039054870604,
+            0.30996479988098147,
+            0.31784958839416505,
+            0.28631041049957273,
+            0.2780159950256348,
+            0.2770944118499756,
+            0.5697535991668701,
+            0.2821120023727417,
+            0.2964479923248291,
+            0.7563168048858643,
+            0.2826240062713623,
+            0.31037440299987795,
+            0.5294079780578613
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.026009601354599,
+        "p25_ms": 0.02462240010499954,
+        "p75_ms": 0.029180800914764403,
+        "min_ms": 0.022732800245285033,
+        "samples_ms": [
+          0.026316800713539125,
+          0.023958399891853333,
+          0.18831360340118408,
+          0.023654399812221526,
+          0.03153280019760132,
+          0.025494399666786193,
+          0.026931199431419372,
+          0.026521599292755126,
+          0.02959359884262085,
+          0.02539519965648651,
+          0.025999999046325682,
+          0.02344000041484833,
+          0.03532800078392029,
+          0.0252703994512558,
+          0.02928000092506409,
+          0.025491198897361754,
+          0.027750399708747864,
+          0.024156799912452696,
+          0.029491201043128967,
+          0.026009601354599,
+          0.028364801406860353,
+          0.02959359884262085,
+          0.02314240038394928,
+          0.025088000297546386,
+          0.02908160090446472,
+          0.02558720111846924,
+          0.028569599986076354,
+          0.02314240038394928,
+          0.022732800245285033,
+          0.023347200453281404,
+          0.03766719996929169
+        ]
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 10.944318283050531,
+        "achieved_tflops": 1.5326548819429322,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.9644787979999876,
+      "process_seconds": 15.817675917000003
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            32,
+            32,
+            16
+          ],
+          "num_warps": 8,
+          "num_stages": 2
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "matmul_simt",
+            "grid": [
+              17,
+              49
+            ],
+            "args": [
+              "A",
+              "B",
+              "Y",
+              "M",
+              "N",
+              "K",
+              32,
+              32,
+              16
+            ],
+            "num_warps": 8,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "7bc3cd81b46eaf856c4a4f44a7dbd5906808a8ae3f06f7d131f8f55f2592c1ca",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Improved kernel using blocking with BM=32, BN=32, BK=16 for better memory coalescing and data reuse. Used tl.dot for efficient inner product computation. Increased num_warps to 8 and num_stages to 2 to better hide latency and improve throughput on the target GPU architecture. This transformation should better utilize computational resources and reduce global memory traffic compared to the incumbent.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+          "memory_bytes": 8585216000,
+          "capability": [
+            8,
+            9
+          ],
+          "sm_count": 24
+        },
+        "first_launch_seconds": 2.751687879000002,
+        "validation_seconds": 3.212250382999997,
+        "candidate": {
+          "median_ms": 0.13434879779815673,
+          "p25_ms": 0.10618879795074462,
+          "p75_ms": 0.13803520202636718,
+          "min_ms": 0.10301439762115479
+        },
+        "incumbent": {
+          "median_ms": 0.304640007019043,
+          "p25_ms": 0.2564095973968506,
+          "p75_ms": 0.33075199127197263,
+          "min_ms": 0.23541760444641113
+        },
+        "paired_speedup": 2.267530577212375,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.10465279817581177,
+            "p25_ms": 0.10357760190963745,
+            "p75_ms": 0.10791680216789246,
+            "min_ms": 0.09994239807128906
+          },
+          "incumbent": {
+            "median_ms": 0.23797760009765626,
+            "p25_ms": 0.2363231897354126,
+            "p75_ms": 0.2573728084564209,
+            "min_ms": 0.23388159275054932
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 10.777483860892916,
+          "achieved_tflops": 1.509291198158991,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.6131342360000076,
+        "process_seconds": 15.357992271,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 40,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7104,
+        "output_tokens": 1467,
+        "tokens": 8571
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "matmul_simt",
+              "grid": [
+                17,
+                49
+              ],
+              "args": [
+                "A",
+                "B",
+                "Y",
+                "M",
+                "N",
+                "K",
+                32,
+                32,
+                16
+              ],
+              "num_warps": 8,
+              "num_stages": 2
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef matmul_simt(\n    A, B, Y,\n    M: tl.constexpr, N: tl.constexpr, K: tl.constexpr,\n    BM: tl.constexpr, BN: tl.constexpr, BK: tl.constexpr\n):\n    pid_m = tl.program_id(0)\n    pid_n = tl.program_id(1)\n\n    offs_m = pid_m * BM + tl.arange(0, BM)\n    offs_n = pid_n * BN + tl.arange(0, BN)\n\n    acc = tl.zeros((BM, BN), dtype=tl.float32)\n\n    for k_start in range(0, K, BK):\n        k_offs = k_start + tl.arange(0, BK)\n        a = tl.load(\n            A + offs_m[:, None] * K + k_offs[None, :],\n            mask=(offs_m[:, None] < M) & (k_offs[None, :] < K),\n            other=0\n        ).to(tl.float32)\n        b = tl.load(\n            B + k_offs[:, None] * N + offs_n[None, :],\n            mask=(k_offs[:, None] < K) & (offs_n[None, :] < N),\n            other=0\n        ).to(tl.float32)\n        acc += tl.dot(a, b)\n\n    tl.store(\n        Y + offs_m[:, None] * N + offs_n[None, :],\n        acc,\n        mask=(offs_m[:, None] < M) & (offs_n[None, :] < N)\n    )\n",
+        "rationale": "Retained the proven blocking strategy with BM=32, BN=32, BK=16 for effective memory coalescing and data reuse. Maintained use of tl.dot for efficient inner product computation. Kept 8 warps and 2 pipeline stages to maximize latency hiding and throughput on the GPU. This configuration demonstrated significant speedup and is well-suited for the rectangular matrix multiplication shape and hardware characteristics."
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 12451,
+        "output_tokens": 2000,
+        "tokens": 14451
+      }
+    }
+  ],
+  "wall_seconds": 78.265055909,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.0081804,
+  "budget_committed_usd": 0.008180399999999997,
+  "speedup": 2.309597551673943
+}

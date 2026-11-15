@@ -1,5 +1,26 @@
 # Experiment Log
 
+## Checkpoint 3 - 2026-11-14: source-generation revision
+
+Reviewed the completed A100 pilot: all 48 proposals were configuration-only.
+Reclassified it as a parameter-selection control. New experiments expose only
+baseline source and require agents to author kernels plus launch sequences.
+
+Completed local source smoke: 8 searches, 32 calls, $0.0695772; two authored
+matmul kernels passed and improved by 2.31x and 1.83x. Six proposals failed.
+Source inspection also found three cosmetic rewrites; main's gate-v2 check
+now rejects all three in offline replay. There are 37 passing integrity tests.
+
+A100 job 3582814 is running at frozen commit ea03292: all 12 baseline-interface
+checks passed, followed by 16 planned searches (4 families x 4 arms x one seed,
+2 attempts). API ceiling $1.25. It retains the original gate, so gate-v2 replay
+must be reported separately. No completed full campaign is claimed yet.
+
+See [SOURCE_PILOT_REPORT.md](SOURCE_PILOT_REPORT.md) for raw evidence, failure
+mechanisms, version differences, and remaining work. Keep code on main and
+artifacts on results. The full primary matrix and ablations remain outstanding.
+
+
 The implementation log is in `docs/WORK_LOG.md` on `main`. This file records
 the experiments. Code lives on `main`; results live on this branch. Every
 Lonestar6 job is listed in [`logs/lonestar6_jobs.json`](../logs/lonestar6_jobs.json).

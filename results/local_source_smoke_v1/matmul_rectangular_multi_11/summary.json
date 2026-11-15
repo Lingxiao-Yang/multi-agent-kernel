@@ -1,0 +1,376 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T03:53:55.564657+00:00",
+    "case": {
+      "id": "matmul_rectangular",
+      "family": "matmul",
+      "shape": [
+        257,
+        769,
+        513
+      ],
+      "dtype": "float16",
+      "atol": 0.05,
+      "rtol": 0.01
+    },
+    "variant": "multi",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 1,
+      "call_cap": 4,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1"
+    },
+    "protocol_hash": "4f483e858ba243ed17bb61a76182bbc0955a45b148f426491755f6575605b986",
+    "case_hash": "157cdba1b21ccceb7f11e6b21647854f445e1a3d10b11b750db83178e2769a30",
+    "baseline_hash": "e09ecab37ba32285b4d544ec49101ebac0b5e350a6407a9145ae7ddf7eebd32c",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memory_bytes": 8585216000,
+      "capability": [
+        8,
+        9
+      ],
+      "sm_count": 24
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": null,
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+      "kernel_study/bench.py": "21934f5ced7bd0c8e8e2b4b4cb474234780877a3a8d547092d68fef7c56e42da",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "16c8cb55eb7626d6ae7b6fd67271e26487c118be7738e11142552701755f1c8a",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "6bec8d962f73871ab7a979faa2e6590cceb55f9651fc7eb1089ca653935dc008",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 1,
+    "call_cap": 4,
+    "token_safety_cap": 500000,
+    "attempts": 1,
+    "calls": 4,
+    "input_tokens": 11181,
+    "output_tokens": 2121,
+    "tokens": 13302
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+        "platform": "Linux-6.18.58.1-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+        "memory_bytes": 8585216000,
+        "capability": [
+          8,
+          9
+        ],
+        "sm_count": 24
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.5517797360000145,
+      "validation_seconds": 3.0664443820000145,
+      "candidate": {
+        "median_ms": 0.30668799877166747,
+        "p25_ms": 0.23249440193176268,
+        "p75_ms": 0.308787202835083,
+        "min_ms": 0.2243583917617798,
+        "samples_ms": [
+          0.30750720500946044,
+          0.30760960578918456,
+          0.30699520111083983,
+          0.8284159660339355,
+          0.3096575975418091,
+          0.3110912084579468,
+          0.3079168081283569,
+          0.3065727949142456,
+          0.30556159019470214,
+          0.3067903995513916,
+          0.5919551849365234,
+          0.3067807912826538,
+          0.3034111976623535,
+          0.781004810333252,
+          0.3167232036590576,
+          0.33155839443206786,
+          0.30668799877166747,
+          0.3064831972122192,
+          0.30658559799194335,
+          0.3072000026702881,
+          0.23396799564361573,
+          0.2274303913116455,
+          0.2243583917617798,
+          0.23193600177764892,
+          0.23305280208587648,
+          0.2292543888092041,
+          0.22691199779510499,
+          0.22497279644012452,
+          0.22712318897247313,
+          0.22527999877929689,
+          0.48578557968139646
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.3068928003311157,
+        "p25_ms": 0.27100160121917727,
+        "p75_ms": 0.33264639377593996,
+        "min_ms": 0.22292160987854004,
+        "samples_ms": [
+          0.3074048042297363,
+          0.3090431928634644,
+          0.30935039520263674,
+          0.3057663917541504,
+          0.3069888114929199,
+          0.5921792030334473,
+          0.33761279582977294,
+          0.30595519542694094,
+          0.8238080024719239,
+          0.3041280031204224,
+          0.3240959882736206,
+          0.3068928003311157,
+          0.30556159019470214,
+          0.3043328046798706,
+          0.3042304039001465,
+          0.30576319694519044,
+          0.5867519855499268,
+          0.31088640689849856,
+          0.8345600128173828,
+          0.32767999172210693,
+          0.22732799053192138,
+          0.22517120838165283,
+          0.4844543933868408,
+          0.23601279258728028,
+          0.39587841033935545,
+          0.43540477752685547,
+          0.22505600452423097,
+          0.22292160987854004,
+          0.2257920026779175,
+          0.23787519931793213,
+          0.23130879402160645
+        ]
+      },
+      "paired_speedup": 1.0006677847201995,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.027647998929023743,
+        "p25_ms": 0.025497600436210632,
+        "p75_ms": 0.034712000191211706,
+        "min_ms": 0.023244799673557283,
+        "samples_ms": [
+          0.031231999397277832,
+          0.025897601246833803,
+          0.02887679934501648,
+          0.025497600436210632,
+          0.027647998929023743,
+          0.024780799448490144,
+          0.035724800825119016,
+          0.023244799673557283,
+          0.03686400055885315,
+          0.024371199309825897,
+          0.036236798763275145,
+          0.034918400645256045,
+          0.023552000522613525,
+          0.02529279887676239,
+          0.03450559973716736,
+          0.025702399015426636,
+          0.029491201043128967,
+          0.025190401077270507,
+          0.027955201268196107,
+          0.025600001215934753,
+          0.0458624005317688,
+          0.026624000072479247,
+          0.037376001477241516,
+          0.025702399015426636,
+          0.028262400627136232,
+          0.02640640139579773,
+          0.03348479866981506,
+          0.025497600436210632,
+          0.040140798687934874,
+          0.02385919988155365,
+          0.03563520014286041
+        ]
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 4.721221586104543,
+        "achieved_tflops": 0.6611652846284525,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.802203372000008,
+      "process_seconds": 15.19718438999999
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "matmul_simt",
+          "grid": [
+            17,
+            49
+          ],
+          "args": [
+            "A",
+            "B",
+            "Y",
+            "M",
+            "N",
+            "K",
+            16,
+            16,
+            32
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive shared_memory"
+      },
+      "budget": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 7074,
+        "output_tokens": 1968,
+        "tokens": 9042
+      },
+      "review": {
+        "error": "The proposed source uses unsupported Triton primitive 'shared_memory', causing proposal rejection. Suggest rewriting to use only supported primitives (e.g., global memory loads with vectorization and loop unrolling) for tiling and blocking without shared memory. Increase num_warps to improve occupancy, use multi-stage pipelines to hide latency, and consider cooperative loading of tiles via vectorized global memory loads and registers. Next directions: implement tiled matmul with double-buffered registers or global memory buffering without shared memory primitive; increase num_warps to 8 or more; apply loop unrolling on K dimension tiles; use multiple stages for pipelining; carefully mask out-of-bound accesses to maintain correctness. Avoid unsupported features and fully conform to launch_contract primitives."
+      },
+      "budget_after_review": {
+        "candidate_cap": 1,
+        "call_cap": 4,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 11181,
+        "output_tokens": 2121,
+        "tokens": 13302
+      }
+    }
+  ],
+  "wall_seconds": 47.15241709,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.007866000000000001,
+  "budget_committed_usd": 0.007866000000000001,
+  "speedup": 1.0
+}

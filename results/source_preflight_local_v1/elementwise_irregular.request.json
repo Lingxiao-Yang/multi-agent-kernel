@@ -1,0 +1,91 @@
+{
+  "case": {
+    "id": "elementwise_irregular",
+    "family": "elementwise",
+    "shape": [
+      513,
+      781
+    ],
+    "dtype": "float32",
+    "atol": 1e-06,
+    "rtol": 1e-06
+  },
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "bias_add",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "B",
+          "T",
+          "TOTAL",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "relu",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "T",
+          "Y",
+          "TOTAL",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "/mnt/e/2026-2027 Master/CS 395T ML Found/Project/results/source_preflight_local_v1/elementwise_irregular.py",
+  "protocol": {
+    "schema_version": 1,
+    "status": "development-not-frozen",
+    "proposal": "proposal_final.pdf",
+    "candidate_cap": 20,
+    "call_cap": 100,
+    "token_safety_cap": 500000,
+    "max_output_tokens": 4096,
+    "profile_cap": 21,
+    "temperature": 0.7,
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "warmup": 10,
+    "timing_repeats": 31,
+    "inner_repeats": 10,
+    "validation_seeds": [
+      101,
+      202,
+      303
+    ],
+    "final_validation_seeds": [
+      10001,
+      10002,
+      10003,
+      10004,
+      10005
+    ],
+    "improvement_threshold": 1.01,
+    "target_speedup": 1.1,
+    "worker_timeout_s": 180,
+    "feedback_mode": "timing-and-compiler-resources",
+    "model": null,
+    "endpoint": null,
+    "input_usd_per_million": null,
+    "output_usd_per_million": null
+  },
+  "final": true,
+  "library": true,
+  "profile": true
+}
