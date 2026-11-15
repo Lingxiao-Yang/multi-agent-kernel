@@ -94,3 +94,37 @@ performance claims.
 - An Nsight counter probe.
 
 Peak-fraction fields stay null until the hardware's peak values are verified.
+
+## 2026-11-14 (evening) — First A100 runs
+
+**First attempt failed.** A100 job 3582290 failed during environment setup.
+NumPy 2.5.4 raised a spurious `X86_V2` CPU-baseline error on the EPYC 7763
+compute nodes.
+
+**Fix (`0ef781a`).**
+
+- NumPy is pinned to `>=1.26,<2.3`, in `pyproject.toml` and
+  `cluster/pilot.sbatch`.
+- `cluster/pilot.sbatch` now checks that NumPy and Torch import, so a broken
+  environment fails within seconds.
+
+**Reruns.**
+
+- Engineering pilot, job 3582405: 24/24 evaluations correct. Nsight counter
+  access verified.
+- LLM pilot, job 3582416: 24 searches, $0.448.
+
+Results, analysis and continuation notes are on the `results` branch:
+`reports/A100_PILOT_REPORT.md`, `reports/WORK_LOG.md` and
+`logs/lonestar6_jobs.json`.
+
+**New tooling.** `scripts/ls6_remote.py` runs a local script on Lonestar6, or
+downloads results as a tar.gz.
+
+- It authenticates with the password and TACC token, read from environment
+  variables or prompted for.
+- It checks the pinned host key first.
+- It stores no credentials.
+
+**Cluster API key.** The OpenAI key lives in `~/.openai_env` (mode 600) on
+Lonestar6. Source it before submitting LLM jobs.
