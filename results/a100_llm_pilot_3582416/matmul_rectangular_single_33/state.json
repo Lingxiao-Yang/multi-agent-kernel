@@ -1,0 +1,435 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 32,
+      "fused": false,
+      "num_stages": 2,
+      "num_warps": 8,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/matmul_rectangular_single_33/candidate_002.py",
+    "rationale": "Adopt incumbent with increased block_n from 16 to 32 to improve memory coalescing and better match workload dimensions. Increased num_warps from 4 to 8 and num_stages from 1 to 2 to enhance latency hiding and throughput. Retained block_m and block_k at 16 and 32 respectively, and tensor_core remains false. 'block' and 'fused' keys included as required. Source is unchanged to preserve correctness.",
+    "id": 2,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 3.814697265625e-06
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 0.5
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 2.6080035315826535,
+      "validation_seconds": 3.5009457925334573,
+      "candidate": {
+        "median_ms": 0.1931264042854309,
+        "p25_ms": 0.19102720022201536,
+        "p75_ms": 0.19322880506515502,
+        "min_ms": 0.16424959897994995,
+        "samples_ms": [
+          0.19363839626312257,
+          0.19322880506515502,
+          0.19333120584487914,
+          0.1931264042854309,
+          0.19333120584487914,
+          0.19333120584487914,
+          0.19302400350570678,
+          0.19322880506515502,
+          0.1931264042854309,
+          0.19333120584487914,
+          0.19322880506515502,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.19322880506515502,
+          0.19322880506515502,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.19302400350570678,
+          0.1931264042854309,
+          0.19322880506515502,
+          0.18903039693832396,
+          0.16424959897994995,
+          0.1644544005393982,
+          0.1644544005393982,
+          0.16455680131912231,
+          0.16435199975967407,
+          0.1644544005393982,
+          0.16455680131912231
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19742720127105712,
+        "p25_ms": 0.197324800491333,
+        "p75_ms": 0.19752960205078124,
+        "min_ms": 0.1679360032081604,
+        "samples_ms": [
+          0.19752960205078124,
+          0.19752960205078124,
+          0.197324800491333,
+          0.19742720127105712,
+          0.19763200283050536,
+          0.19773440361022948,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.1978368043899536,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.197324800491333,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.197324800491333,
+          0.19742720127105712,
+          0.1679360032081604,
+          0.16957440376281738,
+          0.16814080476760865,
+          0.16803840398788453,
+          0.16803840398788453,
+          0.16814080476760865,
+          0.16803840398788453
+        ]
+      },
+      "paired_speedup": 1.0222693370258675,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.1644544005393982,
+          "p25_ms": 0.1644544005393982,
+          "p75_ms": 0.16455680131912231,
+          "min_ms": 0.16424959897994995,
+          "samples_ms": [
+            0.16506880521774292,
+            0.16455680131912231,
+            0.1644544005393982,
+            0.16465920209884644,
+            0.1644544005393982,
+            0.16435199975967407,
+            0.16455680131912231,
+            0.1657855987548828,
+            0.17059839963912965,
+            0.1644544005393982,
+            0.16424959897994995,
+            0.1644544005393982,
+            0.16435199975967407,
+            0.1644544005393982,
+            0.1644544005393982,
+            0.1644544005393982,
+            0.16435199975967407,
+            0.16455680131912231,
+            0.16455680131912231,
+            0.16455680131912231,
+            0.1662976026535034,
+            0.16435199975967407,
+            0.16424959897994995,
+            0.16465920209884644,
+            0.16435199975967407,
+            0.16455680131912231,
+            0.1644544005393982,
+            0.1644544005393982,
+            0.1644544005393982,
+            0.16455680131912231,
+            0.1644544005393982
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.16824320554733277,
+          "p25_ms": 0.16814080476760865,
+          "p75_ms": 0.16824320554733277,
+          "min_ms": 0.1679360032081604,
+          "samples_ms": [
+            0.16834559440612792,
+            0.16824320554733277,
+            0.16803840398788453,
+            0.16834559440612792,
+            0.16814080476760865,
+            0.16814080476760865,
+            0.16824320554733277,
+            0.16814080476760865,
+            0.16844799518585205,
+            0.1691648006439209,
+            0.16824320554733277,
+            0.16803840398788453,
+            0.16814080476760865,
+            0.1679360032081604,
+            0.16824320554733277,
+            0.16824320554733277,
+            0.16803840398788453,
+            0.16803840398788453,
+            0.16824320554733277,
+            0.16824320554733277,
+            0.17469439506530762,
+            0.16803840398788453,
+            0.16855039596557617,
+            0.16814080476760865,
+            0.16844799518585205,
+            0.16814080476760865,
+            0.1679360032081604,
+            0.16824320554733277,
+            0.16814080476760865,
+            0.16814080476760865,
+            0.16824320554733277
+          ]
+        }
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 7.49737978790314,
+        "achieved_tflops": 1.0499416625616567,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.8482977598905563,
+      "process_seconds": 16.512174878269434,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 23,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 8
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "config must contain exactly ['block', 'block_k', 'block_m', 'block_n', 'fused', 'num_stages', 'num_warps', 'tensor_core']"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10332,
+        "output_tokens": 564,
+        "tokens": 10896
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 32,
+          "fused": false,
+          "num_stages": 2,
+          "num_warps": 8,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "Added missing keys 'block' and 'fused' to the advised configuration to satisfy the required config keys. Retained the suggested improvements: increased block_n from 16 to 32 to better match workload and memory coalescing, increased num_warps from 4 to 8 and num_stages from 1 to 2 to improve latency hiding and throughput. Kept tensor_core false as in the incumbent."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 14219,
+        "output_tokens": 719,
+        "tokens": 14938
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 32,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Adopt incumbent with increased block_n from 16 to 32 to improve memory coalescing and better match workload dimensions. Increased num_warps from 4 to 8 and num_stages from 1 to 2 to enhance latency hiding and throughput. Retained block_m and block_k at 16 and 32 respectively, and tensor_core remains false. 'block' and 'fused' keys included as required. Source is unchanged to preserve correctness.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6080035315826535,
+        "validation_seconds": 3.5009457925334573,
+        "candidate": {
+          "median_ms": 0.1931264042854309,
+          "p25_ms": 0.19102720022201536,
+          "p75_ms": 0.19322880506515502,
+          "min_ms": 0.16424959897994995
+        },
+        "incumbent": {
+          "median_ms": 0.19742720127105712,
+          "p25_ms": 0.197324800491333,
+          "p75_ms": 0.19752960205078124,
+          "min_ms": 0.1679360032081604
+        },
+        "paired_speedup": 1.0222693370258675,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.1644544005393982,
+            "p25_ms": 0.1644544005393982,
+            "p75_ms": 0.16455680131912231,
+            "min_ms": 0.16424959897994995
+          },
+          "incumbent": {
+            "median_ms": 0.16824320554733277,
+            "p25_ms": 0.16814080476760865,
+            "p75_ms": 0.16824320554733277,
+            "min_ms": 0.1679360032081604
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 7.49737978790314,
+          "achieved_tflops": 1.0499416625616567,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.8482977598905563,
+        "process_seconds": 16.512174878269434,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 23,
+              "spills": 0,
+              "shared_bytes": 0,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 25486,
+        "output_tokens": 1198,
+        "tokens": 26684
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 32,
+          "fused": false,
+          "num_stages": 2,
+          "num_warps": 8,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "Retain the incumbent configuration as it provides a confirmed speedup over the previous best. The increased block_n from 16 to 32 improves memory coalescing and better matches workload dimensions. Increasing num_warps to 8 and num_stages to 2 enhances latency hiding and throughput. The block_m and block_k remain at 16 and 32, respectively, and tensor_core remains false, consistent with the incumbent. No source code changes needed as performance gains come from configuration tuning."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 31290,
+        "output_tokens": 1367,
+        "tokens": 32657
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 31290,
+    "output_tokens": 1367,
+    "tokens": 32657
+  }
+}

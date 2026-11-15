@@ -1,0 +1,127 @@
+{
+  "jobs": [
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 33
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single_knowledge",
+      "seed": 33
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi",
+      "seed": 33
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single_knowledge",
+      "seed": 22
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single",
+      "seed": 33
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi_knowledge",
+      "seed": 33
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 33
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 33
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi",
+      "seed": 22
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 33
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "single",
+      "seed": 22
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi_knowledge",
+      "seed": 22
+    },
+    {
+      "case": "matmul_rectangular",
+      "variant": "multi",
+      "seed": 11
+    }
+  ],
+  "shared_dollar_cap": 4.49,
+  "phase": "pilot",
+  "note": "Reduced pilot caps, not the full proposed primary study."
+}

@@ -1,0 +1,603 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 16,
+      "fused": true,
+      "num_stages": 1,
+      "num_warps": 4,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/softmax_irregular_multi_knowledge_33/candidate_001.py",
+    "rationale": "Fused softmax_stats and softmax_apply into a single kernel with masking for irregular dimensions (513, 781) as advised. This reduces kernel launches, intermediate memory traffic, and applies boundary masking to avoid wasted work or incorrect computations. The configuration preserves block size 256 and num_warps 4 from incumbent, disables block_k and tensor_core as irrelevant for this kernel, and sets fused=true to use the fused kernel entry point. This addresses identified bottlenecks K05 (fusion) and K07 (masking) and partially K09 (launch overhead) by reducing launches and increasing work per kernel.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 2.980232238769531e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.894129840657115,
+      "validation_seconds": 3.4598841490224004,
+      "candidate": {
+        "median_ms": 0.02447360008955002,
+        "p25_ms": 0.023756800591945647,
+        "p75_ms": 0.0318463996052742,
+        "min_ms": 0.022015999257564544,
+        "samples_ms": [
+          0.029798400402069092,
+          0.02467840015888214,
+          0.0364544004201889,
+          0.024166400730609893,
+          0.02467840015888214,
+          0.026214399933815004,
+          0.02447360008955002,
+          0.035123199224472046,
+          0.026214399933815004,
+          0.024063999950885772,
+          0.03461120128631592,
+          0.024166400730609893,
+          0.023756800591945647,
+          0.031231999397277832,
+          0.02242559939622879,
+          0.02232320010662079,
+          0.03287039995193482,
+          0.02447360008955002,
+          0.02222079932689667,
+          0.03430399894714355,
+          0.02447360008955002,
+          0.024268800020217897,
+          0.03553279936313629,
+          0.023756800591945647,
+          0.02242559939622879,
+          0.03266560137271881,
+          0.024371199309825897,
+          0.022015999257564544,
+          0.02222079932689667,
+          0.03246079981327057,
+          0.02242559939622879
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.04403199851512909,
+        "p25_ms": 0.03947519958019256,
+        "p75_ms": 0.0507392019033432,
+        "min_ms": 0.037478399276733396,
+        "samples_ms": [
+          0.03973119854927063,
+          0.05560320019721985,
+          0.04423680007457733,
+          0.055193597078323366,
+          0.053350400924682614,
+          0.04229120016098022,
+          0.0536575973033905,
+          0.04136959910392761,
+          0.04126720130443573,
+          0.050995200872421265,
+          0.042803201079368594,
+          0.05294079780578613,
+          0.053964799642562865,
+          0.03891200125217438,
+          0.037478399276733396,
+          0.04782080054283142,
+          0.03891200125217438,
+          0.04915199875831604,
+          0.04997119903564453,
+          0.03809280097484589,
+          0.040038400888442995,
+          0.052019202709198,
+          0.042393600940704344,
+          0.04925439953804016,
+          0.050483202934265135,
+          0.037785598635673524,
+          0.03911679983139038,
+          0.04904960095882416,
+          0.0392192006111145,
+          0.037887999415397645,
+          0.04403199851512909
+        ]
+      },
+      "paired_speedup": 1.7991631126607446,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.024371199309825897,
+          "p25_ms": 0.022681599855422972,
+          "p75_ms": 0.030771198868751525,
+          "min_ms": 0.021913599967956544,
+          "samples_ms": [
+            0.03522560000419617,
+            0.022835199534893037,
+            0.022937600314617158,
+            0.03317759931087494,
+            0.022732800245285033,
+            0.024371199309825897,
+            0.03624959886074066,
+            0.024371199309825897,
+            0.024166400730609893,
+            0.026419198513031004,
+            0.02447360008955002,
+            0.030003198981285097,
+            0.025497600436210632,
+            0.02263039946556091,
+            0.025702399015426636,
+            0.025600001215934753,
+            0.022732800245285033,
+            0.021913599967956544,
+            0.03287039995193482,
+            0.024063999950885772,
+            0.02232320010662079,
+            0.04095999896526337,
+            0.02252800017595291,
+            0.02232320010662079,
+            0.03266560137271881,
+            0.02232320010662079,
+            0.02242559939622879,
+            0.03287039995193482,
+            0.024268800020217897,
+            0.02242559939622879,
+            0.031539198756217954
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.0419840008020401,
+          "p25_ms": 0.03860480040311813,
+          "p75_ms": 0.049407999217510226,
+          "min_ms": 0.03758080005645752,
+          "samples_ms": [
+            0.03993600010871887,
+            0.05120000243186951,
+            0.051097601652145386,
+            0.03870719969272614,
+            0.03819519877433777,
+            0.04321280121803284,
+            0.04147199988365173,
+            0.05580800175666809,
+            0.04567039906978607,
+            0.048844799399375916,
+            0.05355520248413086,
+            0.03850240111351013,
+            0.037990400195121767,
+            0.051097601652145386,
+            0.0419840008020401,
+            0.03829759955406189,
+            0.04802559912204742,
+            0.040140798687934874,
+            0.0392192006111145,
+            0.04925439953804016,
+            0.05939199924468994,
+            0.03809280097484589,
+            0.048844799399375916,
+            0.04095999896526337,
+            0.03829759955406189,
+            0.04956159889698029,
+            0.05079039931297302,
+            0.03758080005645752,
+            0.03819519877433777,
+            0.04802559912204742,
+            0.04095999896526337
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 130.96659209400903,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.639625429175794,
+      "process_seconds": 16.165072661824524,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 1,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "b9d66c9618832225017012f929ff0c4f96e62385420036c2144b76f8f40a97f9",
+      "rationale": "Fused softmax_stats and softmax_apply into a single kernel with masking for irregular dimensions (513, 781) as advised. This reduces kernel launches, intermediate memory traffic, and applies boundary masking to avoid wasted work or incorrect computations. The configuration preserves block size 256 and num_warps 4 from incumbent, disables block_k and tensor_core as irrelevant for this kernel, and sets fused=true to use the fused kernel entry point. This addresses identified bottlenecks K05 (fusion) and K07 (masking) and partially K09 (launch overhead) by reducing launches and increasing work per kernel.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.894129840657115,
+        "validation_seconds": 3.4598841490224004,
+        "candidate": {
+          "median_ms": 0.02447360008955002,
+          "p25_ms": 0.023756800591945647,
+          "p75_ms": 0.0318463996052742,
+          "min_ms": 0.022015999257564544
+        },
+        "incumbent": {
+          "median_ms": 0.04403199851512909,
+          "p25_ms": 0.03947519958019256,
+          "p75_ms": 0.0507392019033432,
+          "min_ms": 0.037478399276733396
+        },
+        "paired_speedup": 1.7991631126607446,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.024371199309825897,
+            "p25_ms": 0.022681599855422972,
+            "p75_ms": 0.030771198868751525,
+            "min_ms": 0.021913599967956544
+          },
+          "incumbent": {
+            "median_ms": 0.0419840008020401,
+            "p25_ms": 0.03860480040311813,
+            "p75_ms": 0.049407999217510226,
+            "min_ms": 0.03758080005645752
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 130.96659209400903,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.639625429175794,
+        "process_seconds": 16.165072661824524,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 24,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 13317,
+        "output_tokens": 1379,
+        "tokens": 14696
+      },
+      "review": {
+        "outcome": "The fused softmax kernel with masking for irregular dimensions (513, 781) significantly outperforms the baseline separate softmax_stats and softmax_apply kernels. The median runtime was reduced from approximately 0.044 ms to 0.024 ms, yielding a confirmed speedup of about 1.8x. This confirms that fusion (K05) and masking (K07) effectively reduce kernel launch overhead, intermediate memory traffic, and avoid wasted computation on partial tiles. The configuration preserved moderate register and shared memory usage without spills, maintaining occupancy and avoiding resource bottlenecks (K04). Numerical stability was preserved (K10).",
+        "failures": "No significant failures were observed. The fused kernel runs correctly with boundary masking and stable numerics. Some uncertainty remains around memory traffic efficiency (K01) and launch overhead due to small/medium workload sizes (K09), but these did not prevent a large speedup.",
+        "next_steps": [
+          {
+            "action": "Explore tuning launch parameters such as num_warps and num_stages to further improve latency and occupancy tradeoffs, given the moderate register usage and shared memory.",
+            "rationale": "Adjusting warp counts and pipeline stages may improve latency hiding and throughput without increasing resource pressure."
+          },
+          {
+            "action": "Investigate memory access patterns and strides to improve memory coalescing and reduce potential excess memory transactions (K01).",
+            "rationale": "Better memory efficiency could further reduce kernel runtime and increase throughput."
+          },
+          {
+            "action": "Consider kernel fusion or launch consolidation in other parts of the pipeline to reduce remaining launch overhead (K09).",
+            "rationale": "While fusion of softmax stages yielded large gains, further reducing kernel launches in related operations might improve end-to-end performance."
+          },
+          {
+            "action": "Profile hardware counters if possible to precisely identify any hidden bottlenecks in compute, memory bandwidth, or occupancy.",
+            "rationale": "Current profiling shows no obvious hardware bottlenecks, but more detailed data could reveal optimization opportunities."
+          }
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 20181,
+        "output_tokens": 1817,
+        "tokens": 21998
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 2,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "b9d66c9618832225017012f929ff0c4f96e62385420036c2144b76f8f40a97f9",
+      "rationale": "Increased num_warps from 4 to 8 and num_stages from 1 to 2 as advised to improve occupancy and latency hiding without increasing resource pressure. Kept block size and block_m/n/k unchanged to preserve memory access patterns and workload tile size. Disabled tensor cores as kernel does not benefit from them. Preserved fused kernel implementation with masking for irregular dimensions, maintaining correctness and numerical stability. This configuration aims to further reduce launch overhead and improve throughput by enabling pipelined execution and higher warp parallelism, addressing bottlenecks K04 and K09 while preserving gains from fusion (K05) and masking (K07).",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.880721991881728,
+        "validation_seconds": 3.4351807292550802,
+        "candidate": {
+          "median_ms": 0.02396160066127777,
+          "p25_ms": 0.023756800591945647,
+          "p75_ms": 0.03230720013380051,
+          "min_ms": 0.022118400037288665
+        },
+        "incumbent": {
+          "median_ms": 0.02447360008955002,
+          "p25_ms": 0.023603200167417526,
+          "p75_ms": 0.03153920024633408,
+          "min_ms": 0.022015999257564544
+        },
+        "paired_speedup": 1.021367496917668,
+        "confirmed": false,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.02396160066127777,
+            "p25_ms": 0.02222079932689667,
+            "p75_ms": 0.03041280061006546,
+            "min_ms": 0.021913599967956544
+          },
+          "incumbent": {
+            "median_ms": 0.022937600314617158,
+            "p25_ms": 0.02232320010662079,
+            "p75_ms": 0.024831999838352204,
+            "min_ms": 0.021913599967956544
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 133.76502034689526,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.5655252281576395,
+        "process_seconds": 17.923426586203277
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 32687,
+        "output_tokens": 2948,
+        "tokens": 35635
+      },
+      "review": {
+        "review": {
+          "measured_outcomes": {
+            "attempt_1": {
+              "config": {
+                "block": 256,
+                "block_k": 32,
+                "block_m": 16,
+                "block_n": 16,
+                "fused": true,
+                "num_stages": 1,
+                "num_warps": 4,
+                "tensor_core": false
+              },
+              "performance": {
+                "median_ms": 0.02447,
+                "speedup_over_baseline": 1.8
+              },
+              "observations": [
+                "Fusing softmax_stats and softmax_apply with masking for irregular dimensions halved runtime from ~0.044 ms to ~0.024 ms.",
+                "No register or shared memory pressure, no spills detected.",
+                "Numerical stability preserved.",
+                "Significant reduction in kernel launches and intermediate memory traffic."
+              ],
+              "status": "accepted"
+            },
+            "attempt_2": {
+              "config": {
+                "block": 256,
+                "block_k": 32,
+                "block_m": 16,
+                "block_n": 16,
+                "fused": true,
+                "num_stages": 2,
+                "num_warps": 8,
+                "tensor_core": false
+              },
+              "performance": {
+                "median_ms": 0.02396,
+                "speedup_over_incumbent": 1.02
+              },
+              "observations": [
+                "Increased num_warps to 8 and num_stages to 2 to improve occupancy and latency hiding.",
+                "No statistically significant improvement over incumbent (4 warps, 1 stage).",
+                "Correctness and numerical stability maintained.",
+                "No increase in resource pressure observed."
+              ],
+              "status": "rejected"
+            }
+          },
+          "failures": [
+            "No correctness or stability failures observed.",
+            "No significant performance gain from increasing num_warps and num_stages beyond 4 warps and 1 stage.",
+            "Uncertainty remains around memory coalescing efficiency and potential launch overhead in small/medium workloads."
+          ],
+          "next_directions": [
+            {
+              "action": "Investigate memory access patterns and data layout to improve memory coalescing and reduce redundant memory transactions.",
+              "rationale": "Improving memory efficiency (bottleneck K01) could yield further runtime reduction and throughput improvement."
+            },
+            {
+              "action": "Explore fusion or kernel launch consolidation opportunities in other pipeline stages to reduce overall launch overhead.",
+              "rationale": "While fusion of softmax stages greatly improved performance, reducing launches elsewhere may further enhance end-to-end throughput (addressing K09)."
+            },
+            {
+              "action": "Profile hardware counters in detail if possible to detect any hidden bottlenecks in compute, memory bandwidth, or occupancy.",
+              "rationale": "Current compiler resource profiling shows no pressure, but hardware counters could reveal further optimization paths."
+            },
+            {
+              "action": "Consider tuning other launch parameters or tile sizes cautiously, balancing occupancy and reuse, while monitoring resource usage.",
+              "rationale": "Adjustments may uncover better latency hiding or throughput without causing spills or pressure."
+            }
+          ],
+          "summary": "The initial fused kernel with 4 warps and 1 stage significantly improved performance by reducing kernel launches and masking boundaries, achieving a confirmed ~1.8x speedup. Increasing warp count and stages to 8 and 2 respectively did not yield further significant gains, indicating that current resource usage and occupancy are well balanced. Memory access inefficiencies and remaining launch overhead remain potential targets for future optimization."
+        },
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": true,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The incumbent configuration with 4 warps and 1 stage fused kernel provides a substantial speedup over baseline by effectively reducing kernel launches and masking boundaries without resource pressure or spills. Increasing to 8 warps and 2 stages did not improve performance significantly, indicating diminishing returns on occupancy and latency hiding. Preserving the incumbent configuration maintains the best validated performance and stability. Future work should focus on memory access pattern improvements and further launch overhead reductions."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 39042,
+        "output_tokens": 3895,
+        "tokens": 42937
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 39042,
+    "output_tokens": 3895,
+    "tokens": 42937
+  }
+}

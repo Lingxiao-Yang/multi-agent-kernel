@@ -1,0 +1,39 @@
+{
+  "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+  "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+  "torch": "2.11.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "gpu": "NVIDIA A100-PCIE-40GB",
+  "memory_bytes": 42406903808,
+  "capability": [
+    8,
+    0
+  ],
+  "sm_count": 108
+}
+available
+softmax_irregular single_knowledge 33 complete 1.6666667427551145 0.019003199999999998
+softmax_irregular multi 11 complete 1.8382978791914857 0.037525600000000006
+matmul_rectangular single_knowledge 33 complete 1.0 0.055624000000000014
+matmul_rectangular single_knowledge 11 complete 1.0 0.07363040000000001
+matmul_rectangular multi 33 complete 6.3071895971877705 0.09322720000000002
+matmul_rectangular single_knowledge 22 complete 1.0 0.11173120000000004
+softmax_irregular single_knowledge 11 complete 1.0 0.13037040000000005
+matmul_rectangular single 33 complete 1.0227995637450105 0.14507360000000008
+matmul_rectangular multi_knowledge 33 complete 4.948718006121953 0.16891520000000004
+softmax_irregular single 33 complete 1.7428570885526202 0.1851888000000001
+softmax_irregular multi_knowledge 33 complete 1.721030040774092 0.2070376000000001
+matmul_rectangular multi 22 complete 6.348684583393966 0.22474680000000008
+matmul_rectangular multi_knowledge 11 complete 1.022811659096171 0.24665560000000003
+softmax_irregular single 11 complete 1.0 0.2630816
+softmax_irregular multi 33 complete 1.7533040059884657 0.28163080000000007
+matmul_rectangular single 11 complete 1.0 0.2971600000000001
+softmax_irregular multi_knowledge 22 complete 1.8680850924173562 0.31887880000000013
+matmul_rectangular single 22 complete 1.0 0.3351232
+softmax_irregular single 22 complete 1.6794871109212866 0.35023360000000003
+softmax_irregular multi_knowledge 11 complete 1.6331877718157994 0.3726288
+softmax_irregular multi 22 complete 1.7118643179465127 0.39053279999999996
+softmax_irregular single_knowledge 22 complete 1.7142856803453876 0.40995319999999985
+matmul_rectangular multi_knowledge 22 complete 4.971649717685333 0.43079759999999984
+matmul_rectangular multi 11 complete 6.202572198318922 0.4477623999999999

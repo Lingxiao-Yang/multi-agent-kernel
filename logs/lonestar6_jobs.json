@@ -1,0 +1,68 @@
+{
+  "cluster": "Lonestar6 (ls6.tacc.utexas.edu)",
+  "allocation": "ASC26098",
+  "timezone": "America/Chicago",
+  "jobs": [
+    {
+      "job_id": 3582290,
+      "name": "kernel-pilot",
+      "script": "cluster/pilot.sbatch",
+      "partition": "gpu-a100-small",
+      "commit": "a3572bc",
+      "submitted": "2026-11-14T16:16:25",
+      "started": "2026-11-14T16:34:38",
+      "ended": "2026-11-14T16:57:03",
+      "state": "FAILED",
+      "exit_code": "2:0",
+      "note": "NumPy 2.5.4 raised a spurious X86_V2 baseline error on the EPYC 7763 node during pytest collection; no GPU work ran. Fixed in 0ef781a (numpy<2.3)."
+    },
+    {
+      "job_id": 3582326,
+      "name": "kernel-llm-pilot",
+      "script": "cluster/llm_pilot.sbatch",
+      "partition": "gpu-a100-small",
+      "commit": "5bf0834",
+      "submitted": "2026-11-14T16:47:54",
+      "dependency": "afterok:3582290",
+      "state": "CANCELLED",
+      "note": "DependencyNeverSatisfied after 3582290 failed; cancelled manually. No inference spend."
+    },
+    {
+      "job_id": 3582405,
+      "name": "kernel-pilot",
+      "script": "cluster/pilot.sbatch",
+      "partition": "gpu-a100-small",
+      "time_limit": "00:30:00",
+      "commit": "0ef781a",
+      "submitted": "2026-11-14T17:41:07",
+      "state": "COMPLETED",
+      "queue_snapshot": "~17:55: reason Priority, 11th of 50 pending in gpu-a100-small, all 24 nodes allocated; Slurm estimated start 2026-11-14T20:40:00",
+      "expected_output": "$SCRATCH/kernel-study/results/a100-pilot-3582405",
+      "exit_code": "0:0",
+      "started": "2026-11-14T19:17:22",
+      "ended": "2026-11-14T19:28:37",
+      "elapsed": "00:11:15",
+      "outcome": "24/24 evaluations correct on A100-PCIE-40GB; baseline self-ratios 0.97-1.05"
+    },
+    {
+      "job_id": 3582416,
+      "name": "kernel-llm-pilot",
+      "script": "cluster/llm_pilot.sbatch",
+      "partition": "gpu-a100-small",
+      "time_limit": "01:00:00",
+      "commit": "0ef781a",
+      "submitted": "2026-11-14T17:55:18",
+      "dependency": "afterok:3582405 (verified via scontrol: Reason=Dependency)",
+      "dollar_cap_usd": 4.49,
+      "model": "gpt-4.1-mini-2025-04-14",
+      "state": "COMPLETED",
+      "key_check": "API key from ~/.openai_env verified before submit (models list + 12-token completion, ~$0.000006)",
+      "expected_output": "$SCRATCH/kernel-study-llm/results/a100-llm-pilot-3582416",
+      "exit_code": "0:0",
+      "started": "2026-11-14T19:28:54",
+      "ended": "2026-11-14T20:03:42",
+      "elapsed": "00:34:48",
+      "outcome": "24 searches complete (2 cases x 4 variants x 3 seeds); cumulative estimated inference cost ~$0.448"
+    }
+  ]
+}

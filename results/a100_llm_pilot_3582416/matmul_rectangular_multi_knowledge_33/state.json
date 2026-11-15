@@ -1,0 +1,657 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 16,
+      "fused": false,
+      "num_stages": 2,
+      "num_warps": 4,
+      "tensor_core": true
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/matmul_rectangular_multi_knowledge_33/candidate_002.py",
+    "rationale": "Applied the advised configuration to revert to the smaller tile size 16x16 to reduce register and shared memory pressure, which should improve occupancy and reduce masking overhead. Increased num_stages from 1 to 2 to potentially improve pipeline efficiency without increasing resource consumption per block. Enabled tensor cores to leverage hardware acceleration for FP16 matrix multiplication, which was previously disabled and identified as a missed opportunity for performance gains.",
+    "id": 2,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.0625
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 3.281396101228893,
+      "validation_seconds": 4.223692956380546,
+      "candidate": {
+        "median_ms": 0.03973119854927063,
+        "p25_ms": 0.03973119854927063,
+        "p75_ms": 0.03993600010871887,
+        "min_ms": 0.039628800749778745,
+        "samples_ms": [
+          0.040550398826599124,
+          0.03993600010871887,
+          0.040038400888442995,
+          0.040038400888442995,
+          0.040038400888442995,
+          0.04126720130443573,
+          0.03973119854927063,
+          0.03993600010871887,
+          0.03983359932899475,
+          0.03973119854927063,
+          0.03973119854927063,
+          0.03983359932899475,
+          0.039628800749778745,
+          0.03983359932899475,
+          0.03973119854927063,
+          0.03973119854927063,
+          0.039628800749778745,
+          0.03973119854927063,
+          0.03973119854927063,
+          0.03993600010871887,
+          0.039628800749778745,
+          0.03993600010871887,
+          0.03973119854927063,
+          0.03973119854927063,
+          0.039628800749778745,
+          0.039628800749778745,
+          0.03983359932899475,
+          0.03973119854927063,
+          0.039628800749778745,
+          0.03983359932899475,
+          0.03973119854927063
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19763200283050536,
+        "p25_ms": 0.19752960205078124,
+        "p75_ms": 0.19763200283050536,
+        "min_ms": 0.197324800491333,
+        "samples_ms": [
+          0.19875839948654175,
+          0.19916800260543824,
+          0.19752960205078124,
+          0.19937280416488648,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19773440361022948,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19763200283050536,
+          0.19763200283050536,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.197324800491333,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19773440361022948,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19773440361022948,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19752960205078124
+        ]
+      },
+      "paired_speedup": 4.974227056992053,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.03983359932899475,
+          "p25_ms": 0.03973119854927063,
+          "p75_ms": 0.040038400888442995,
+          "min_ms": 0.039628800749778745,
+          "samples_ms": [
+            0.04843519926071167,
+            0.03993600010871887,
+            0.04679679870605469,
+            0.039628800749778745,
+            0.04669440090656281,
+            0.03973119854927063,
+            0.0477183997631073,
+            0.040038400888442995,
+            0.040243199467658995,
+            0.03993600010871887,
+            0.040038400888442995,
+            0.03983359932899475,
+            0.03973119854927063,
+            0.03973119854927063,
+            0.03983359932899475,
+            0.03973119854927063,
+            0.03973119854927063,
+            0.03983359932899475,
+            0.03973119854927063,
+            0.039628800749778745,
+            0.039628800749778745,
+            0.03983359932899475,
+            0.03973119854927063,
+            0.03983359932899475,
+            0.03993600010871887,
+            0.03983359932899475,
+            0.03993600010871887,
+            0.039628800749778745,
+            0.040038400888442995,
+            0.040755200386047366,
+            0.03983359932899475
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.19752960205078124,
+          "p25_ms": 0.19742720127105712,
+          "p75_ms": 0.19768320322036742,
+          "min_ms": 0.197324800491333,
+          "samples_ms": [
+            0.19742720127105712,
+            0.1978368043899536,
+            0.19773440361022948,
+            0.19742720127105712,
+            0.197324800491333,
+            0.19763200283050536,
+            0.19773440361022948,
+            0.19763200283050536,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.19763200283050536,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.19773440361022948,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.197324800491333,
+            0.19742720127105712,
+            0.1978368043899536,
+            0.19773440361022948,
+            0.20162560939788818,
+            0.19742720127105712,
+            0.19773440361022948
+          ]
+        }
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 36.443451314573565,
+        "achieved_tflops": 5.103582710915284,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 4.499999862164259,
+      "process_seconds": 16.932660721242428,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 48,
+            "spills": 0,
+            "shared_bytes": 2048,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_m": 32,
+        "block_n": 32,
+        "block_k": 32,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Applied the advised configuration to increase tile size to 32x32 for better operand reuse (K02) and increased num_stages to 2 for improved software pipelining (K08). Kept num_warps at 4 and tensor_core false as per advice to balance resource usage and uncertainty about tensor cores.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.3208259716629982,
+        "validation_seconds": 2.1158272912725806,
+        "candidate": {
+          "median_ms": 0.2362368106842041,
+          "p25_ms": 0.23603200912475586,
+          "p75_ms": 0.23633921146392822,
+          "min_ms": 0.23582720756530762
+        },
+        "incumbent": {
+          "median_ms": 0.19722239971160888,
+          "p25_ms": 0.19711999893188475,
+          "p75_ms": 0.197324800491333,
+          "min_ms": 0.1969151973724365
+        },
+        "paired_speedup": 0.8348504161582643,
+        "confirmed": false,
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 6.129197206000107,
+          "achieved_tflops": 0.8583398049301478,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.3630346888676286,
+        "process_seconds": 14.46695125196129
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 13446,
+        "output_tokens": 976,
+        "tokens": 14422
+      },
+      "review": {
+        "summary": "The attempted configuration increased the tile size from 16x16 to 32x32 to improve operand reuse and increased num_stages from 1 to 2 to enable better software pipelining. However, the new configuration resulted in worse performance (median latency ~0.236 ms) compared to the incumbent (median latency ~0.197 ms), indicating a speedup less than 1 (about 0.83x).",
+        "measured_outcomes": {
+          "incumbent": {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 1,
+              "num_warps": 4,
+              "tensor_core": false
+            },
+            "median_ms": 0.197,
+            "achieved_tflops": 1.027,
+            "logical_gbps": 7.334
+          },
+          "candidate": {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 32,
+              "block_n": 32,
+              "fused": false,
+              "num_stages": 2,
+              "num_warps": 4,
+              "tensor_core": false
+            },
+            "median_ms": 0.236,
+            "achieved_tflops": 0.858,
+            "logical_gbps": 6.129
+          }
+        },
+        "analysis": {
+          "performance_degradation_reasons": [
+            "Larger tile sizes (32x32) increased register pressure and resource usage, possibly reducing occupancy and overall throughput despite improved reuse.",
+            "Increasing num_stages to 2 may have introduced shared memory usage or pipeline overhead that negatively affected performance.",
+            "No change in tensor_core usage means potential acceleration from tensor cores was not leveraged.",
+            "Masking effects from dimension mismatches could be more pronounced with larger tiles, causing more wasted work on boundaries."
+          ],
+          "hypotheses_considered": [
+            "Reuse improvements (K02) did not translate to net performance gain due to resource and occupancy tradeoffs.",
+            "Pipeline depth increase (K08) may have added overhead without sufficient stall hiding benefits.",
+            "Register and shared memory usage (K04) might have increased, limiting active warps and hurting latency hiding.",
+            "Masking inefficiencies (K07) might have increased with larger tiles on irregular dimension sizes."
+          ]
+        },
+        "suggested_next_directions": [
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 2,
+              "num_warps": 4,
+              "tensor_core": false
+            },
+            "source": null,
+            "rationale": "Keep the original smaller tile size (16x16) that achieved better performance but increase num_stages from 1 to 2 to test if software pipelining alone improves performance without increasing tile size. This isolates pipeline improvements from tile size tradeoffs."
+          },
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 1,
+              "num_warps": 4,
+              "tensor_core": true
+            },
+            "source": null,
+            "rationale": "Enable tensor cores with original tile size and pipeline depth to evaluate potential speedups from tensor core acceleration, which was previously disabled."
+          },
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 32,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 1,
+              "num_warps": 4,
+              "tensor_core": false
+            },
+            "source": null,
+            "rationale": "Try asymmetric tile size increasing block_m to 32 but keeping block_n at 16 and num_stages at 1 to balance reuse and resource pressure and observe effects on performance."
+          }
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 19747,
+        "output_tokens": 1878,
+        "tokens": 21625
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 4,
+        "tensor_core": true
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Applied the advised configuration to revert to the smaller tile size 16x16 to reduce register and shared memory pressure, which should improve occupancy and reduce masking overhead. Increased num_stages from 1 to 2 to potentially improve pipeline efficiency without increasing resource consumption per block. Enabled tensor cores to leverage hardware acceleration for FP16 matrix multiplication, which was previously disabled and identified as a missed opportunity for performance gains.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.281396101228893,
+        "validation_seconds": 4.223692956380546,
+        "candidate": {
+          "median_ms": 0.03973119854927063,
+          "p25_ms": 0.03973119854927063,
+          "p75_ms": 0.03993600010871887,
+          "min_ms": 0.039628800749778745
+        },
+        "incumbent": {
+          "median_ms": 0.19763200283050536,
+          "p25_ms": 0.19752960205078124,
+          "p75_ms": 0.19763200283050536,
+          "min_ms": 0.197324800491333
+        },
+        "paired_speedup": 4.974227056992053,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.03983359932899475,
+            "p25_ms": 0.03973119854927063,
+            "p75_ms": 0.040038400888442995,
+            "min_ms": 0.039628800749778745
+          },
+          "incumbent": {
+            "median_ms": 0.19752960205078124,
+            "p25_ms": 0.19742720127105712,
+            "p75_ms": 0.19768320322036742,
+            "min_ms": 0.197324800491333
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 36.443451314573565,
+          "achieved_tflops": 5.103582710915284,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.499999862164259,
+        "process_seconds": 16.932660721242428,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 48,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 37758,
+        "output_tokens": 2654,
+        "tokens": 40412
+      },
+      "review": {
+        "summary": "The configuration reverting to smaller tile sizes (16x16) while increasing pipeline stages to 2 and enabling tensor cores resulted in a significant speedup (~5x) compared to the previous best. This confirms that smaller tiles reduce resource pressure and masking overhead, while tensor cores provide substantial hardware acceleration benefits. Increasing num_stages to 2 further helped pipeline efficiency without causing significant overhead.",
+        "measured_outcomes": {
+          "incumbent": {
+            "median_ms": 0.1974,
+            "achieved_tflops": 1.027,
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 1,
+              "num_warps": 4,
+              "tensor_core": false
+            }
+          },
+          "candidate": {
+            "median_ms": 0.0397,
+            "achieved_tflops": 5.104,
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 2,
+              "num_warps": 4,
+              "tensor_core": true
+            }
+          }
+        },
+        "failures": [
+          "Larger tile sizes (32x32) increased register and shared memory usage, reducing occupancy and worsening performance.",
+          "Increasing num_stages alone with larger tiles introduced pipeline overhead that overshadowed stall hiding benefits.",
+          "Not leveraging tensor cores previously limited peak throughput and performance.",
+          "Dimension mismatches caused masking overhead that was more impactful at larger tile sizes."
+        ],
+        "suggested_next_directions": [
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 32,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 2,
+              "num_warps": 4,
+              "tensor_core": true
+            },
+            "rationale": "Explore asymmetric tile sizes (larger block_m) with tensor cores enabled and pipeline depth at 2 to balance reuse and resource usage, potentially improving performance by better leveraging tensor cores and reuse without the overhead of large block_n.",
+            "source": null
+          },
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 32,
+              "fused": false,
+              "num_stages": 2,
+              "num_warps": 4,
+              "tensor_core": true
+            },
+            "rationale": "Test increasing block_n to 32 asymmetrically with tensor cores and 2 pipeline stages to evaluate if increasing output width dimension improves reuse and performance without excessive resource pressure.",
+            "source": null
+          },
+          {
+            "config": {
+              "block": 256,
+              "block_k": 32,
+              "block_m": 16,
+              "block_n": 16,
+              "fused": false,
+              "num_stages": 3,
+              "num_warps": 4,
+              "tensor_core": true
+            },
+            "rationale": "Evaluate increasing num_stages to 3 with current best tile size and tensor core enabled to observe if deeper pipelining yields further latency hiding and throughput improvements.",
+            "source": null
+          }
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 45932,
+        "output_tokens": 3418,
+        "tokens": 49350
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 45932,
+    "output_tokens": 3418,
+    "tokens": 49350
+  }
+}

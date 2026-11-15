@@ -1,0 +1,666 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T01:46:31.463594+00:00",
+    "case": {
+      "id": "matmul_rectangular",
+      "family": "matmul",
+      "shape": [
+        257,
+        769,
+        513
+      ],
+      "dtype": "float16",
+      "atol": 0.05,
+      "rtol": 0.01
+    },
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 2,
+      "call_cap": 8,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6
+    },
+    "protocol_hash": "f279cdc8ab67316f9d528e91fa1e0db4345779d12e914f96505291b45b440375",
+    "case_hash": "157cdba1b21ccceb7f11e6b21647854f445e1a3d10b11b750db83178e2769a30",
+    "baseline_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3582416",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+      "kernel_study/bench.py": "69d4d2d7e783cd701d1c0cfa621308e53e189911011fba74ba2c136a56220cc8",
+      "kernel_study/cli.py": "d914b762d3d5cd308141fb07f409ffbcd2115e7cbccc3db77006f27b75214419",
+      "kernel_study/core.py": "d3ddee48e0b1161a71c4f2d98b2c8e48ae4779616b43ea8956dd2567ee455426",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/search.py": "ac099edd3bb93ea7ce4632dc6a3676c4f36485801acacc5d773190037a68a74b",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 44520,
+    "output_tokens": 2563,
+    "tokens": 47083
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 2,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.0
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 1.1840577507391572,
+      "validation_seconds": 1.998874437995255,
+      "candidate": {
+        "median_ms": 0.19302400350570678,
+        "p25_ms": 0.19297280311584472,
+        "p75_ms": 0.19317760467529296,
+        "min_ms": 0.19271680116653442,
+        "samples_ms": [
+          0.1938431978225708,
+          0.19333120584487914,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.19353599548339845,
+          0.19292160272598266,
+          0.19302400350570678,
+          0.1931264042854309,
+          0.19292160272598266,
+          0.19322880506515502,
+          0.19302400350570678,
+          0.19292160272598266,
+          0.19302400350570678,
+          0.19271680116653442,
+          0.1931264042854309,
+          0.19322880506515502,
+          0.19302400350570678,
+          0.19701759815216063,
+          0.19322880506515502,
+          0.19292160272598266,
+          0.19322880506515502,
+          0.19292160272598266,
+          0.19302400350570678,
+          0.19292160272598266,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.1931264042854309,
+          0.19302400350570678,
+          0.19302400350570678,
+          0.19302400350570678,
+          0.19281920194625854
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19742720127105712,
+        "p25_ms": 0.197324800491333,
+        "p75_ms": 0.19752960205078124,
+        "min_ms": 0.19722239971160888,
+        "samples_ms": [
+          0.19742720127105712,
+          0.19773440361022948,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19763200283050536,
+          0.197324800491333,
+          0.197324800491333,
+          0.19752960205078124,
+          0.197324800491333,
+          0.197324800491333,
+          0.197324800491333,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19722239971160888,
+          0.197324800491333,
+          0.19742720127105712,
+          0.197324800491333,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.197324800491333,
+          0.197324800491333
+        ]
+      },
+      "paired_speedup": 1.022811659096171,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.1931264042854309,
+          "p25_ms": 0.19292160272598266,
+          "p75_ms": 0.1931264042854309,
+          "min_ms": 0.10772479772567749,
+          "samples_ms": [
+            0.1937407970428467,
+            0.1931264042854309,
+            0.19302400350570678,
+            0.19302400350570678,
+            0.1931264042854309,
+            0.19302400350570678,
+            0.19302400350570678,
+            0.1931264042854309,
+            0.1931264042854309,
+            0.1931264042854309,
+            0.19322880506515502,
+            0.1931264042854309,
+            0.19322880506515502,
+            0.19322880506515502,
+            0.1931264042854309,
+            0.19281920194625854,
+            0.1931264042854309,
+            0.19292160272598266,
+            0.1931264042854309,
+            0.1931264042854309,
+            0.1931264042854309,
+            0.19302400350570678,
+            0.1931264042854309,
+            0.19302400350570678,
+            0.19292160272598266,
+            0.10803200006484985,
+            0.10792959928512573,
+            0.10792959928512573,
+            0.10772479772567749,
+            0.10782719850540161,
+            0.10792959928512573
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.19742720127105712,
+          "p25_ms": 0.19727360010147094,
+          "p75_ms": 0.19752960205078124,
+          "min_ms": 0.11008000373840332,
+          "samples_ms": [
+            0.19773440361022948,
+            0.19752960205078124,
+            0.197324800491333,
+            0.19742720127105712,
+            0.20203518867492676,
+            0.19763200283050536,
+            0.19742720127105712,
+            0.19752960205078124,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.197324800491333,
+            0.19752960205078124,
+            0.19742720127105712,
+            0.19742720127105712,
+            0.19773440361022948,
+            0.19722239971160888,
+            0.19763200283050536,
+            0.19752960205078124,
+            0.197324800491333,
+            0.19742720127105712,
+            0.19742720127105712,
+            0.19742720127105712,
+            0.197324800491333,
+            0.19742720127105712,
+            0.17520639896392823,
+            0.11028480529785156,
+            0.11694079637527466,
+            0.11028480529785156,
+            0.11008000373840332,
+            0.11028480529785156,
+            0.11028480529785156
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.023552000522613525,
+        "p25_ms": 0.023244799673557283,
+        "p75_ms": 0.025702399015426636,
+        "min_ms": 0.022937600314617158,
+        "samples_ms": [
+          0.02396160066127777,
+          0.02314240038394928,
+          0.023654399812221526,
+          0.02314240038394928,
+          0.025702399015426636,
+          0.023244799673557283,
+          0.023654399812221526,
+          0.02314240038394928,
+          0.031539198756217954,
+          0.023244799673557283,
+          0.02815999984741211,
+          0.024371199309825897,
+          0.023449599742889404,
+          0.04556800127029419,
+          0.023552000522613525,
+          0.031539198756217954,
+          0.023756800591945647,
+          0.027955201268196107,
+          0.023552000522613525,
+          0.027136000990867614,
+          0.023347200453281404,
+          0.023039999604225158,
+          0.025702399015426636,
+          0.02314240038394928,
+          0.023449599742889404,
+          0.022937600314617158,
+          0.029798400402069092,
+          0.024371199309825897,
+          0.023347200453281404,
+          0.02314240038394928,
+          0.023552000522613525
+        ]
+      },
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 7.501357207924616,
+        "achieved_tflops": 1.0504986650222754,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.618742046877742,
+      "process_seconds": 14.66927892062813
+    },
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 32,
+      "fused": false,
+      "num_stages": 1,
+      "num_warps": 8,
+      "tensor_core": false
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 32,
+        "block_n": 32,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Increased tile sizes from 16x16 to 32x32 to improve data reuse and reduce masking overhead, supported by moderate register usage and zero spills. Increased num_stages from 1 to 2 to enable overlap of memory and computation, improving throughput without excessive resource pressure. Kept num_warps and tensor_core unchanged as per analysis and hardware capability. This configuration balances pipeline overlap, reuse, and resource usage for the given workload and hardware.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.2270070658996701,
+        "validation_seconds": 2.0905550848692656,
+        "candidate": {
+          "median_ms": 0.23633921146392822,
+          "p25_ms": 0.23613440990447998,
+          "p75_ms": 0.23644158840179444,
+          "min_ms": 0.23603200912475586
+        },
+        "incumbent": {
+          "median_ms": 0.19752960205078124,
+          "p25_ms": 0.19742720127105712,
+          "p75_ms": 0.19763200283050536,
+          "min_ms": 0.19722239971160888
+        },
+        "paired_speedup": 0.8357885296614422,
+        "confirmed": false,
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 6.126541554535884,
+          "achieved_tflops": 0.8579679044539269,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.3426407547667623,
+        "process_seconds": 14.407260423526168
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 13082,
+        "output_tokens": 797,
+        "tokens": 13879
+      },
+      "review": {
+        "measured_outcome": {
+          "summary": "The attempted configuration increased tile sizes from 16x16 to 32x32 and increased pipeline stages from 1 to 2 to improve reuse and pipeline overlap. However, this configuration resulted in a slowdown (median runtime increased from ~0.198 ms to ~0.236 ms, speedup ~0.836 relative to incumbent).",
+          "details": {
+            "tile_size_increase": "Larger tiles aimed to improve operand reuse and reduce masking overhead.",
+            "pipeline_stages": "Two stages intended to overlap memory and computation for better throughput.",
+            "register_usage": "Moderate register usage (23 per thread) with zero spills suggested room for larger tiles, but performance did not improve as expected.",
+            "masking_inefficiencies": "Masking overhead remains due to input dimensions not multiples of tile sizes, though larger tiles reduce relative overhead.",
+            "throughput": "Achieved 0.86 TFLOPS vs incumbent 1.03 TFLOPS, indicating reduced efficiency.",
+            "resource_usage": "No spills, occupancy appears adequate, no shared memory used.",
+            "launch_overhead": "No evidence of launch overhead impacting performance."
+          }
+        },
+        "failures": [
+          "Larger tile sizes increased register pressure or other resource contention that outweighed reuse benefits.",
+          "Increasing pipeline stages to 2 may have introduced additional resource contention or synchronization overhead.",
+          "Masking inefficiencies due to shape not divisible by tile sizes may still impact performance.",
+          "Potential unmeasured factors such as memory access patterns or occupancy changes could contribute to slowdown."
+        ],
+        "next_directions": [
+          "Try intermediate tile sizes, e.g. block_m=16 or 24, block_n=32, to balance reuse and resource pressure.",
+          "Experiment with increasing number of warps (e.g., from 4 to 8) to improve occupancy and hide latency.",
+          "Test single-stage pipeline (num_stages=1) with larger tiles to isolate stage count impact.",
+          "Consider enabling tensor cores if precision and hardware permit, for potentially higher throughput.",
+          "Profile memory access patterns and occupancy to identify bottlenecks not visible from compiler stats.",
+          "Explore padding or boundary handling strategies to reduce masking overhead for non-multiple dimensions."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 19275,
+        "output_tokens": 1281,
+        "tokens": 20556
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 32,
+        "fused": false,
+        "num_stages": 1,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Applied the advised configuration to reduce masking overhead by keeping block_m small (16) and increasing block_n to 32 for better balance and reuse. Reduced pipeline stages to 1 to avoid overhead observed with 2 stages. Increased num_warps to 8 to improve occupancy and latency hiding. Kept block_k at 32 to balance register usage and memory bandwidth. Tensor cores remain disabled due to precision constraints. This balances reuse, masking, pipeline overhead, and resource usage given prior results and hardware capabilities.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.7018607119098306,
+        "validation_seconds": 3.458119119517505,
+        "candidate": {
+          "median_ms": 0.19302400350570678,
+          "p25_ms": 0.19292160272598266,
+          "p75_ms": 0.19317760467529296,
+          "min_ms": 0.15738879442214965
+        },
+        "incumbent": {
+          "median_ms": 0.19742720127105712,
+          "p25_ms": 0.197324800491333,
+          "p75_ms": 0.19742720127105712,
+          "min_ms": 0.16097279787063598
+        },
+        "paired_speedup": 1.022811659096171,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.157695996761322,
+            "p25_ms": 0.1575935959815979,
+            "p75_ms": 0.15779839754104613,
+            "min_ms": 0.15738879442214965
+          },
+          "incumbent": {
+            "median_ms": 0.16117759943008422,
+            "p25_ms": 0.1610751986503601,
+            "p75_ms": 0.16163840293884277,
+            "min_ms": 0.16087039709091186
+          }
+        },
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 7.501357207924616,
+          "achieved_tflops": 1.0504986650222754,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.79972873814404,
+        "process_seconds": 15.686739520169795,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 23,
+              "spills": 0,
+              "shared_bytes": 0,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 36512,
+        "output_tokens": 2183,
+        "tokens": 38695
+      },
+      "review": {
+        "measured_outcome": {
+          "summary": "The second attempt configuration with block_m=16, block_n=32, num_warps=8, num_stages=1, and block_k=32 showed improved performance over the incumbent (median runtime reduced from ~0.197 ms to ~0.193 ms, with a confirmed speedup of approximately 2.3%). Register usage remained moderate (23 per thread) with no spills, and occupancy improved with increased warps. Masking overhead due to non-multiple input dimensions persists but is mitigated by smaller block_m and balanced block_n. Reducing pipeline stages to 1 avoided pipeline overhead observed previously.",
+          "failures": [
+            "Masking overhead remains due to input dimensions not being multiples of tile sizes, causing some inefficiency at tile boundaries.",
+            "Performance gains are modest, indicating potential unexploited optimizations like memory access patterns or tensor core usage.",
+            "Memory traffic and coalescing inefficiencies remain unprofiled, leaving uncertainty about memory bottlenecks.",
+            "Further tuning of tile sizes and pipeline stages might yield better balance between reuse and overhead."
+          ]
+        },
+        "next_directions": [
+          "Explore intermediate tile sizes such as block_m=24 with block_n=32 to further balance reuse and masking overhead.",
+          "Test configurations with tensor_core enabled to leverage hardware acceleration if precision permits.",
+          "Conduct detailed profiling of memory access patterns and bandwidth utilization to identify hidden bottlenecks.",
+          "Experiment with pipeline stages count, including re-testing 2 or more stages combined with adjusted tile sizes to manage pipeline overhead.",
+          "Investigate padding or boundary handling techniques to reduce masking overhead for input shapes not divisible by tile sizes.",
+          "Consider increasing block_k to 64 if register and memory bandwidth allow, to improve compute intensity."
+        ]
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 44520,
+        "output_tokens": 2563,
+        "tokens": 47083
+      }
+    }
+  ],
+  "wall_seconds": 97.16465028375387,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.021908800000000006,
+  "budget_committed_usd": 0.02190879999999995,
+  "speedup": 1.022811659096171
+}

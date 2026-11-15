@@ -1,0 +1,376 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "num_warps": 4,
+      "num_stages": 1,
+      "block": 256,
+      "block_m": 16,
+      "block_n": 16,
+      "block_k": 32,
+      "fused": false,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/matmul_rectangular_single_knowledge_33/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 0.03125
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 3.814697265625e-06
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 0.5
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 0.0625
+        }
+      ],
+      "first_launch_seconds": 1.4965924452990294,
+      "validation_seconds": 3.417081780731678,
+      "candidate": {
+        "median_ms": 0.19752960205078124,
+        "p25_ms": 0.19742720127105712,
+        "p75_ms": 0.19763200283050536,
+        "min_ms": 0.19722239971160888,
+        "samples_ms": [
+          0.19814399480819703,
+          0.2036736011505127,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.197324800491333,
+          0.19916800260543824,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19773440361022948,
+          0.19742720127105712,
+          0.19773440361022948,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19722239971160888,
+          0.197324800491333,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19763200283050536,
+          0.19742720127105712
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.19752960205078124,
+        "p25_ms": 0.19742720127105712,
+        "p75_ms": 0.19763200283050536,
+        "min_ms": 0.197324800491333,
+        "samples_ms": [
+          0.19793920516967772,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19763200283050536,
+          0.19742720127105712,
+          0.19773440361022948,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19752960205078124,
+          0.19773440361022948,
+          0.19752960205078124,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.2036736011505127,
+          0.197324800491333,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19916800260543824,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19763200283050536,
+          0.19752960205078124,
+          0.19742720127105712,
+          0.19742720127105712,
+          0.19742720127105712
+        ]
+      },
+      "paired_speedup": 1.0,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.0392192006111145,
+        "p25_ms": 0.03901439905166626,
+        "p75_ms": 0.03932160139083862,
+        "min_ms": 0.03880960047245026,
+        "samples_ms": [
+          0.040038400888442995,
+          0.03901439905166626,
+          0.039628800749778745,
+          0.03901439905166626,
+          0.0392192006111145,
+          0.03901439905166626,
+          0.03932160139083862,
+          0.03901439905166626,
+          0.03932160139083862,
+          0.03901439905166626,
+          0.0394239991903305,
+          0.03901439905166626,
+          0.0394239991903305,
+          0.03901439905166626,
+          0.0392192006111145,
+          0.03901439905166626,
+          0.03932160139083862,
+          0.03901439905166626,
+          0.03932160139083862,
+          0.03880960047245026,
+          0.040038400888442995,
+          0.03891200125217438,
+          0.03932160139083862,
+          0.03901439905166626,
+          0.0394239991903305,
+          0.03911679983139038,
+          0.0392192006111145,
+          0.03911679983139038,
+          0.0394239991903305,
+          0.03901439905166626,
+          0.03932160139083862
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 23,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 2.2348947823047638e-05,
+      "throughput": {
+        "flops": 202771458,
+        "minimum_bytes": 1447942,
+        "logical_gbps": 7.330253212517285,
+        "achieved_tflops": 1.026537065304628,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 4.671637877821922,
+      "process_seconds": 16.504245377145708
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 32,
+        "block_n": 32,
+        "fused": false,
+        "num_stages": 2,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Increased num_stages from 1 to 2 to enable software pipelining (K08) to overlap memory loads and computation, improving throughput. Increased block_m and block_n from 16 to 32 to improve operand reuse and data locality (K02). Maintained block_k, num_warps, fused, and tensor_core consistent with the current strategy to balance register usage and maintain correctness. Source not changed as no kernel device functions need modification.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.8584965420886874,
+        "validation_seconds": 3.728387546725571,
+        "candidate": {
+          "median_ms": 0.23644158840179444,
+          "p25_ms": 0.23633921146392822,
+          "p75_ms": 0.23654398918151856,
+          "min_ms": 0.23613440990447998
+        },
+        "incumbent": {
+          "median_ms": 0.19763200283050536,
+          "p25_ms": 0.19752960205078124,
+          "p75_ms": 0.19773440361022948,
+          "min_ms": 0.197324800491333
+        },
+        "paired_speedup": 0.8358597324877617,
+        "confirmed": false,
+        "throughput": {
+          "flops": 202771458,
+          "minimum_bytes": 1447942,
+          "logical_gbps": 6.123888820859449,
+          "achieved_tflops": 0.8575964125880534,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.9789110077545047,
+        "process_seconds": 15.734323501586914
+      },
+      "cards": [
+        "K01",
+        "K02",
+        "K03",
+        "K04",
+        "K07",
+        "K08",
+        "K09",
+        "K11",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 12679,
+        "output_tokens": 491,
+        "tokens": 13170
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": false,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "Revert to incumbent configuration with block_m=16 and block_n=16 and num_stages=1 as the attempted increase to block_m=32 and block_n=32 with num_stages=2 decreased performance significantly (median_ms 0.236 vs 0.197). The incumbent balances register pressure, occupancy, and operand reuse better for the given problem shape and hardware. Retaining num_warps=4 and tensor_core=false preserves correctness and resource balance. No source code changes are needed since the initial kernel matches the incumbent design well."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 18632,
+        "output_tokens": 672,
+        "tokens": 19304
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "config must contain exactly ['block', 'block_k', 'block_m', 'block_n', 'fused', 'num_stages', 'num_warps', 'tensor_core']"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 34420,
+        "output_tokens": 1138,
+        "tokens": 35558
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": false,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "Retain the incumbent configuration as it delivers the best performance balance for the given rectangular matmul shape on the NVIDIA A100. Attempts to increase tile sizes and pipeline stages led to worse performance due to increased register pressure and occupancy loss, and the current configuration avoids excess masking overhead while maintaining good operand reuse and parallelism. No source changes are needed since the kernel device functions already match this configuration."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 40102,
+        "output_tokens": 1286,
+        "tokens": 41388
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 40102,
+    "output_tokens": 1286,
+    "tokens": 41388
+  }
+}

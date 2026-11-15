@@ -1,0 +1,95 @@
+{
+  "started_utc": "2026-11-15T01:59:10.206160+00:00",
+  "case": {
+    "id": "softmax_irregular",
+    "family": "softmax",
+    "shape": [
+      513,
+      781
+    ],
+    "dtype": "float32",
+    "atol": 2e-06,
+    "rtol": 2e-05
+  },
+  "variant": "single_knowledge",
+  "seed": 22,
+  "provider": "llm",
+  "model": "gpt-4.1-mini-2025-04-14",
+  "protocol": {
+    "schema_version": 1,
+    "status": "development-not-frozen",
+    "proposal": "proposal_final.pdf",
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "max_output_tokens": 4096,
+    "profile_cap": 21,
+    "temperature": 0.7,
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "warmup": 10,
+    "timing_repeats": 31,
+    "inner_repeats": 10,
+    "validation_seeds": [
+      101,
+      202,
+      303
+    ],
+    "final_validation_seeds": [
+      10001,
+      10002,
+      10003,
+      10004,
+      10005
+    ],
+    "improvement_threshold": 1.01,
+    "target_speedup": 1.1,
+    "worker_timeout_s": 180,
+    "feedback_mode": "timing-and-compiler-resources",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "endpoint": "https://api.openai.com/v1",
+    "input_usd_per_million": 0.4,
+    "output_usd_per_million": 1.6
+  },
+  "protocol_hash": "f279cdc8ab67316f9d528e91fa1e0db4345779d12e914f96505291b45b440375",
+  "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+  "baseline_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+  "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+  "environment": {
+    "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+    "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA A100-PCIE-40GB",
+    "memory_bytes": 42406903808,
+    "capability": [
+      8,
+      0
+    ],
+    "sm_count": 108
+  },
+  "drop_role": null,
+  "drop_category": null,
+  "scheduler_job_id": "3582416",
+  "queue_wait_seconds": null,
+  "code_hashes": {
+    "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+    "kernel_study/analysis.py": "5ef01c82bd2b4d2f0c8769741ea0a92d1c2331acbe864378b808ca321038904e",
+    "kernel_study/bench.py": "69d4d2d7e783cd701d1c0cfa621308e53e189911011fba74ba2c136a56220cc8",
+    "kernel_study/cli.py": "d914b762d3d5cd308141fb07f409ffbcd2115e7cbccc3db77006f27b75214419",
+    "kernel_study/core.py": "d3ddee48e0b1161a71c4f2d98b2c8e48ae4779616b43ea8956dd2567ee455426",
+    "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+    "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+    "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+    "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+    "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+    "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+    "kernel_study/search.py": "ac099edd3bb93ea7ce4632dc6a3676c4f36485801acacc5d773190037a68a74b",
+    "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+    "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+  }
+}

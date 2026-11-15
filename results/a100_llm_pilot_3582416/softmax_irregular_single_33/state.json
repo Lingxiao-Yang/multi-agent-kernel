@@ -1,0 +1,489 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 16,
+      "fused": true,
+      "num_stages": 3,
+      "num_warps": 8,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/softmax_irregular_single_33/candidate_001.py",
+    "rationale": "Applied the advised configuration as it matches the analysis for optimizing softmax with irregular shape on A100. Fused=true reduces kernel launches and memory traffic. Increased num_warps to 8 improves GPU occupancy. Increased num_stages to 3 provides better instruction-level parallelism and latency hiding. Block size 256 is a good balance for this shape. Other fields are ignored per launch contract.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 3.5762786865234375e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 1.2978540565818548,
+      "validation_seconds": 1.9626720724627376,
+      "candidate": {
+        "median_ms": 0.024268800020217897,
+        "p25_ms": 0.022732800245285033,
+        "p75_ms": 0.03287039995193482,
+        "min_ms": 0.02222079932689667,
+        "samples_ms": [
+          0.037887999415397645,
+          0.024268800020217897,
+          0.02222079932689667,
+          0.03317759931087494,
+          0.02467840015888214,
+          0.02447360008955002,
+          0.03604480028152466,
+          0.024166400730609893,
+          0.02222079932689667,
+          0.03328000009059906,
+          0.024371199309825897,
+          0.02242559939622879,
+          0.029286399483680725,
+          0.024063999950885772,
+          0.02232320010662079,
+          0.022732800245285033,
+          0.03297280073165894,
+          0.023756800591945647,
+          0.022732800245285033,
+          0.03297280073165894,
+          0.024268800020217897,
+          0.02457599937915802,
+          0.03563520014286041,
+          0.022732800245285033,
+          0.022732800245285033,
+          0.03338240087032318,
+          0.02396160066127777,
+          0.022835199534893037,
+          0.032767999172210696,
+          0.02457599937915802,
+          0.02242559939622879
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.043315199017524716,
+        "p25_ms": 0.038348799943923956,
+        "p75_ms": 0.0504831999540329,
+        "min_ms": 0.03758080005645752,
+        "samples_ms": [
+          0.04208639860153198,
+          0.052019202709198,
+          0.051507198810577394,
+          0.037887999415397645,
+          0.03809280097484589,
+          0.05007359981536865,
+          0.043315199017524716,
+          0.05058559775352478,
+          0.051097601652145386,
+          0.03758080005645752,
+          0.037990400195121767,
+          0.048844799399375916,
+          0.040345600247383116,
+          0.03809280097484589,
+          0.04761599898338318,
+          0.040345600247383116,
+          0.03932160139083862,
+          0.04925439953804016,
+          0.051507198810577394,
+          0.03809280097484589,
+          0.03860479891300202,
+          0.0506879985332489,
+          0.043724799156188966,
+          0.055193597078323366,
+          0.0506879985332489,
+          0.03809280097484589,
+          0.037887999415397645,
+          0.040652799606323245,
+          0.040140798687934874,
+          0.04730879962444305,
+          0.050380802154541014
+        ]
+      },
+      "paired_speedup": 1.7848100846123258,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.023039999604225158,
+          "p25_ms": 0.02232320010662079,
+          "p75_ms": 0.031487999856472014,
+          "min_ms": 0.021913599967956544,
+          "samples_ms": [
+            0.02529279887676239,
+            0.03409920036792755,
+            0.021913599967956544,
+            0.02232320010662079,
+            0.03184640109539032,
+            0.02252800017595291,
+            0.02222079932689667,
+            0.03307519853115082,
+            0.02242559939622879,
+            0.02252800017595291,
+            0.03256320059299469,
+            0.042905598878860474,
+            0.02222079932689667,
+            0.024268800020217897,
+            0.02222079932689667,
+            0.02252800017595291,
+            0.02396160066127777,
+            0.021913599967956544,
+            0.022118400037288665,
+            0.03297280073165894,
+            0.02396160066127777,
+            0.023039999604225158,
+            0.03246079981327057,
+            0.02447360008955002,
+            0.022118400037288665,
+            0.032358399033546446,
+            0.02447360008955002,
+            0.02242559939622879,
+            0.02232320010662079,
+            0.03112959861755371,
+            0.02232320010662079
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.04116480052471161,
+          "p25_ms": 0.037887999415397645,
+          "p75_ms": 0.05053440034389496,
+          "min_ms": 0.037171199917793274,
+          "samples_ms": [
+            0.0579584002494812,
+            0.04126720130443573,
+            0.037273600697517395,
+            0.04116480052471161,
+            0.05990399718284607,
+            0.05079039931297302,
+            0.0506879985332489,
+            0.037887999415397645,
+            0.037785598635673524,
+            0.040345600247383116,
+            0.040345600247383116,
+            0.04935680031776428,
+            0.06707199811935424,
+            0.048537600040435794,
+            0.04915199875831604,
+            0.03829759955406189,
+            0.037887999415397645,
+            0.050995200872421265,
+            0.050380802154541014,
+            0.037171199917793274,
+            0.037785598635673524,
+            0.04167680144309997,
+            0.040345600247383116,
+            0.051507198810577394,
+            0.05242879986763001,
+            0.037887999415397645,
+            0.03758080005645752,
+            0.05027840137481689,
+            0.040243199467658995,
+            0.03768320083618164,
+            0.037887999415397645
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 132.07179577604933,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.148579778149724,
+      "process_seconds": 14.23406327329576,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 23,
+            "spills": 0,
+            "shared_bytes": 32,
+            "num_warps": 8
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 3,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Applied the advised configuration as it matches the analysis for optimizing softmax with irregular shape on A100. Fused=true reduces kernel launches and memory traffic. Increased num_warps to 8 improves GPU occupancy. Increased num_stages to 3 provides better instruction-level parallelism and latency hiding. Block size 256 is a good balance for this shape. Other fields are ignored per launch contract.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.2978540565818548,
+        "validation_seconds": 1.9626720724627376,
+        "candidate": {
+          "median_ms": 0.024268800020217897,
+          "p25_ms": 0.022732800245285033,
+          "p75_ms": 0.03287039995193482,
+          "min_ms": 0.02222079932689667
+        },
+        "incumbent": {
+          "median_ms": 0.043315199017524716,
+          "p25_ms": 0.038348799943923956,
+          "p75_ms": 0.0504831999540329,
+          "min_ms": 0.03758080005645752
+        },
+        "paired_speedup": 1.7848100846123258,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.023039999604225158,
+            "p25_ms": 0.02232320010662079,
+            "p75_ms": 0.031487999856472014,
+            "min_ms": 0.021913599967956544
+          },
+          "incumbent": {
+            "median_ms": 0.04116480052471161,
+            "p25_ms": 0.037887999415397645,
+            "p75_ms": 0.05053440034389496,
+            "min_ms": 0.037171199917793274
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 132.07179577604933,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.148579778149724,
+        "process_seconds": 14.23406327329576,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 23,
+              "spills": 0,
+              "shared_bytes": 32,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10244,
+        "output_tokens": 441,
+        "tokens": 10685
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": true,
+          "num_stages": 3,
+          "num_warps": 8,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The advised configuration from analysis and confirmed by measurement shows a significant speedup (median ~0.023 ms vs ~0.041 ms incumbent). Fused=true reduces kernel launches and memory traffic, important for softmax with irregular shape. Increasing num_warps to 8 improves GPU occupancy on A100. Increasing num_stages to 3 improves instruction-level parallelism and latency hiding. Block size 256 is a suitable balance. Other fields are ignored per launch contract. No source changes needed."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15651,
+        "output_tokens": 611,
+        "tokens": 16262
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 3,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "The incumbent configuration is optimal per analysis and measurement. The launch contract states block_k, block_m, block_n, and tensor_core do not impact performance. The chosen parameters maximize GPU occupancy and latency hiding for the irregular softmax shape on A100. The fused kernel reduces kernel launches and memory traffic, improving performance. No source changes are necessary as the current implementation is suitable and no further tuning is recommended given the budget and results.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.2058708583936095,
+        "validation_seconds": 1.9407905200496316,
+        "candidate": {
+          "median_ms": 0.022732800245285033,
+          "p25_ms": 0.02227199971675873,
+          "p75_ms": 0.031436800956726074,
+          "min_ms": 0.02170879989862442
+        },
+        "incumbent": {
+          "median_ms": 0.02263039946556091,
+          "p25_ms": 0.02232320010662079,
+          "p75_ms": 0.0248319998383522,
+          "min_ms": 0.020479999482631683
+        },
+        "paired_speedup": 0.9954954612445794,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 140.9955643570479,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.06779548805207,
+        "process_seconds": 14.259267314337194
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 29449,
+        "output_tokens": 1088,
+        "tokens": 30537
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": true,
+          "num_stages": 3,
+          "num_warps": 8,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The incumbent configuration is optimal according to the launch contract, analysis, and measured results. The ignored fields block_k, block_m, block_n, and tensor_core do not affect performance for this kernel family. The chosen parameters maximize GPU occupancy and instruction-level parallelism on the A100 for the irregular softmax shape. The fused kernel reduces kernel launches and memory traffic, improving performance. Given the confirmed speedup and stable performance, no further tuning or source changes are recommended."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 35676,
+        "output_tokens": 1252,
+        "tokens": 36928
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 35676,
+    "output_tokens": 1252,
+    "tokens": 36928
+  }
+}

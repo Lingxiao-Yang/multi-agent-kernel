@@ -1,0 +1,435 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 256,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 16,
+      "fused": true,
+      "num_stages": 1,
+      "num_warps": 4,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/softmax_irregular_single_22/candidate_002.py",
+    "rationale": "Set fused=true to select the fused softmax kernel, which is optimized for this softmax_irregular case. Keep all required config keys to satisfy the launch contract. Other keys (block_k, block_m, block_n, tensor_core) are ignored but must be present. No source changes are needed since the existing kernel code supports fused softmax efficiently.",
+    "id": 2,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 2.980232238769531e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 1.4121233290061355,
+      "validation_seconds": 2.140885503962636,
+      "candidate": {
+        "median_ms": 0.026111999154090883,
+        "p25_ms": 0.024268800020217897,
+        "p75_ms": 0.031487999856472014,
+        "min_ms": 0.023654399812221526,
+        "samples_ms": [
+          0.037785598635673524,
+          0.024985599517822265,
+          0.024166400730609893,
+          0.026726400852203368,
+          0.024371199309825897,
+          0.035020801424980166,
+          0.024166400730609893,
+          0.03133440017700195,
+          0.026316800713539125,
+          0.024063999950885772,
+          0.034918400645256045,
+          0.026111999154090883,
+          0.023654399812221526,
+          0.03850240111351013,
+          0.02447360008955002,
+          0.031641599535942075,
+          0.026624000072479247,
+          0.023756800591945647,
+          0.03604480028152466,
+          0.02467840015888214,
+          0.03133440017700195,
+          0.026111999154090883,
+          0.023756800591945647,
+          0.03706879913806915,
+          0.024166400730609893,
+          0.02396160066127777,
+          0.03635199964046478,
+          0.02467840015888214,
+          0.03041279911994934,
+          0.02682879865169525,
+          0.024371199309825897
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.0506879985332489,
+        "p25_ms": 0.043161600828170776,
+        "p75_ms": 0.054016000032424925,
+        "min_ms": 0.040550398826599124,
+        "samples_ms": [
+          0.040550398826599124,
+          0.05724160075187683,
+          0.05079039931297302,
+          0.053350400924682614,
+          0.05570560097694397,
+          0.04106239974498749,
+          0.053350400924682614,
+          0.04352000057697296,
+          0.04106239974498749,
+          0.054681599140167236,
+          0.04321280121803284,
+          0.05242879986763001,
+          0.05437440276145935,
+          0.04085760116577149,
+          0.05242879986763001,
+          0.04392960071563721,
+          0.04106239974498749,
+          0.0536575973033905,
+          0.04321280121803284,
+          0.06891520023345947,
+          0.04423680007457733,
+          0.05130239725112915,
+          0.055193597078323366,
+          0.04095999896526337,
+          0.0506879985332489,
+          0.043110400438308716,
+          0.04106239974498749,
+          0.05488640069961548,
+          0.04362240135669708,
+          0.05058559775352478,
+          0.0549888014793396
+        ]
+      },
+      "paired_speedup": 1.9411764773019218,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.026009601354599,
+          "p25_ms": 0.024012800306081772,
+          "p75_ms": 0.03363839983940124,
+          "min_ms": 0.023756800591945647,
+          "samples_ms": [
+            0.037273600697517395,
+            0.024166400730609893,
+            0.03133440017700195,
+            0.026214399933815004,
+            0.02457599937915802,
+            0.03594239950180054,
+            0.025600001215934753,
+            0.03358719944953918,
+            0.026726400852203368,
+            0.02396160066127777,
+            0.03543039858341217,
+            0.024371199309825897,
+            0.02396160066127777,
+            0.0336896002292633,
+            0.02396160066127777,
+            0.024166400730609893,
+            0.026009601354599,
+            0.023756800591945647,
+            0.03532800078392029,
+            0.026419198513031004,
+            0.02385919988155365,
+            0.0347135990858078,
+            0.024371199309825897,
+            0.03604480028152466,
+            0.027238398790359497,
+            0.02385919988155365,
+            0.03614720106124878,
+            0.024063999950885772,
+            0.02385919988155365,
+            0.026316800713539125,
+            0.02385919988155365
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.04904960095882416,
+          "p25_ms": 0.04142080098390579,
+          "p75_ms": 0.053657600283622736,
+          "min_ms": 0.0392192006111145,
+          "samples_ms": [
+            0.0392192006111145,
+            0.056729602813720706,
+            0.04392960071563721,
+            0.052019202709198,
+            0.05570560097694397,
+            0.04095999896526337,
+            0.058880001306533813,
+            0.04126720130443573,
+            0.040755200386047366,
+            0.05324800014495849,
+            0.0421887993812561,
+            0.05283839702606201,
+            0.054067200422286986,
+            0.04116480052471161,
+            0.05324800014495849,
+            0.042803201079368594,
+            0.04095999896526337,
+            0.0562175989151001,
+            0.04362240135669708,
+            0.05314559936523437,
+            0.05580800175666809,
+            0.04157440066337585,
+            0.05324800014495849,
+            0.04904960095882416,
+            0.04095999896526337,
+            0.04413439929485321,
+            0.04095999896526337,
+            0.05601279735565186,
+            0.04403199851512909,
+            0.05027840137481689,
+            0.0549888014793396
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 122.74908485886068,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.3349149134010077,
+      "process_seconds": 14.353937446139753,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "config must contain exactly ['block', 'block_k', 'block_m', 'block_n', 'fused', 'num_stages', 'num_warps', 'tensor_core']"
+      },
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10638,
+        "output_tokens": 451,
+        "tokens": 11089
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": true,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "The launch contract requires exactly the keys ['block', 'block_k', 'block_m', 'block_n', 'fused', 'num_stages', 'num_warps', 'tensor_core'] in the config. The previous attempt omitted some keys causing a proposal error. For fused=true, only 'block', 'num_warps', 'num_stages', and 'fused' affect kernel behavior; other keys are ignored but must be present to satisfy the contract. Therefore, we keep the incumbent values for ignored keys (block_k=32, block_m=16, block_n=16, tensor_core=false) and set fused=true to select the fused softmax kernel. No source changes are necessary as the existing kernel code is already optimal for this configuration."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 14599,
+        "output_tokens": 677,
+        "tokens": 15276
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "block": 256,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 1,
+        "num_warps": 4,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Set fused=true to select the fused softmax kernel, which is optimized for this softmax_irregular case. Keep all required config keys to satisfy the launch contract. Other keys (block_k, block_m, block_n, tensor_core) are ignored but must be present. No source changes are needed since the existing kernel code supports fused softmax efficiently.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.4121233290061355,
+        "validation_seconds": 2.140885503962636,
+        "candidate": {
+          "median_ms": 0.026111999154090883,
+          "p25_ms": 0.024268800020217897,
+          "p75_ms": 0.031487999856472014,
+          "min_ms": 0.023654399812221526
+        },
+        "incumbent": {
+          "median_ms": 0.0506879985332489,
+          "p25_ms": 0.043161600828170776,
+          "p75_ms": 0.054016000032424925,
+          "min_ms": 0.040550398826599124
+        },
+        "paired_speedup": 1.9411764773019218,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.026009601354599,
+            "p25_ms": 0.024012800306081772,
+            "p75_ms": 0.03363839983940124,
+            "min_ms": 0.023756800591945647
+          },
+          "incumbent": {
+            "median_ms": 0.04904960095882416,
+            "p25_ms": 0.04142080098390579,
+            "p75_ms": 0.053657600283622736,
+            "min_ms": 0.0392192006111145
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 122.74908485886068,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.3349149134010077,
+        "process_seconds": 14.353937446139753,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 24,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 26523,
+        "output_tokens": 1153,
+        "tokens": 27676
+      },
+      "review": {
+        "config": {
+          "block": 256,
+          "block_k": 32,
+          "block_m": 16,
+          "block_n": 16,
+          "fused": true,
+          "num_stages": 1,
+          "num_warps": 4,
+          "tensor_core": false
+        },
+        "source": null,
+        "rationale": "This configuration uses fused=true to select the fused softmax kernel, which is confirmed to be optimal for the softmax_irregular case on the target hardware. All required config keys are present to satisfy the launch contract; keys block_k, block_m, block_n, and tensor_core are ignored for fused=true but must be included. Performance measurements confirm almost 2x speedup over the non-fused incumbent. No source code changes are necessary since the existing kernel supports this configuration efficiently."
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 32496,
+        "output_tokens": 1320,
+        "tokens": 33816
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 32496,
+    "output_tokens": 1320,
+    "tokens": 33816
+  }
+}

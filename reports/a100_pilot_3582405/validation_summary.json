@@ -1,0 +1,20 @@
+{
+  "evaluations": 24,
+  "passed": 24,
+  "failed": 0,
+  "hardware": {
+    "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+    "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "torch": "2.11.0+cu128",
+    "triton": "3.6.0",
+    "cuda": "12.8",
+    "gpu": "NVIDIA A100-PCIE-40GB",
+    "memory_bytes": 42406903808,
+    "capability": [
+      8,
+      0
+    ],
+    "sm_count": 108
+  },
+  "warning": "Predefined transforms on NVIDIA A100-PCIE-40GB; small-sample engineering pilot. Not evidence about LLM roles or knowledge."
+}

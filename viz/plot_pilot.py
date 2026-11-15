@@ -52,10 +52,12 @@ def main(source, output):
     fig.savefig(output / 'pilot_speedups.png', dpi=180)
     plt.close(fig)
 
+    hardware = read_json(source / 'manifest.json')['environment']
     summary = {'evaluations': len(rows), 'passed': sum(r['status'] == 'ok' for r in table),
                'failed': sum(r['status'] != 'ok' for r in table),
-               'hardware': read_json(source / 'manifest.json')['environment'],
-               'warning': 'Predefined transforms, laptop GPU, small sample pilot. Do not infer LLM or A100 effects.'}
+               'hardware': hardware,
+               'warning': f"Predefined transforms on {hardware.get('gpu', 'unknown GPU')}; small-sample "
+                          'engineering pilot. Not evidence about LLM roles or knowledge.'}
     (output / 'validation_summary.json').write_text(json.dumps(summary, indent=2), encoding='utf-8')
     print('Wrote', output)
 

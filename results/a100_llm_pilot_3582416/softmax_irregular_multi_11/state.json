@@ -1,0 +1,528 @@
+{
+  "incumbent": {
+    "config": {
+      "block": 512,
+      "block_k": 32,
+      "block_m": 16,
+      "block_n": 16,
+      "fused": true,
+      "num_stages": 3,
+      "num_warps": 8,
+      "tensor_core": false
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-llm/results/a100-llm-pilot-3582416/softmax_irregular_multi_11/candidate_001.py",
+    "rationale": "Applied advised configuration to better match irregular shape [513,781] by increasing block size to 512 for improved thread utilization, enabling fused softmax to reduce kernel launches and improve data locality, increasing number of warps to 8 for higher occupancy on A100, and increasing pipeline stages to 3 to better hide memory latency. Tensor core flag remains false as it is ignored for softmax operations per launch contract.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 3.5762786865234375e-07
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 6.984919309616089e-10
+        }
+      ],
+      "first_launch_seconds": 2.8952503744512796,
+      "validation_seconds": 3.5403292886912823,
+      "candidate": {
+        "median_ms": 0.02396160066127777,
+        "p25_ms": 0.021964799612760544,
+        "p75_ms": 0.029030399024486543,
+        "min_ms": 0.021196800470352172,
+        "samples_ms": [
+          0.025702399015426636,
+          0.03522560000419617,
+          0.02396160066127777,
+          0.02396160066127777,
+          0.0347135990858078,
+          0.02385919988155365,
+          0.023654399812221526,
+          0.02590720057487488,
+          0.02314240038394928,
+          0.02222079932689667,
+          0.02959359884262085,
+          0.02160640060901642,
+          0.022015999257564544,
+          0.031539198756217954,
+          0.02396160066127777,
+          0.021913599967956544,
+          0.021196800470352172,
+          0.03225600123405457,
+          0.024780799448490144,
+          0.021503999829292297,
+          0.028262400627136232,
+          0.030105599761009218,
+          0.02170879989862442,
+          0.021401600539684297,
+          0.029900801181793214,
+          0.028774398565292358,
+          0.022118400037288665,
+          0.02160640060901642,
+          0.029286399483680725,
+          0.023039999604225158,
+          0.02160640060901642
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03901439905166626,
+        "p25_ms": 0.03696639984846115,
+        "p75_ms": 0.04403200000524521,
+        "min_ms": 0.03635199964046478,
+        "samples_ms": [
+          0.05355520248413086,
+          0.04085760116577149,
+          0.05079039931297302,
+          0.04270080029964447,
+          0.040550398826599124,
+          0.054579198360443115,
+          0.043007999658584595,
+          0.040345600247383116,
+          0.051609599590301515,
+          0.03819519877433777,
+          0.037273600697517395,
+          0.04915199875831604,
+          0.04915199875831604,
+          0.037376001477241516,
+          0.03686400055885315,
+          0.050995200872421265,
+          0.04505600035190582,
+          0.03676159977912903,
+          0.03706879913806915,
+          0.0394239991903305,
+          0.03840000033378601,
+          0.0364544004201889,
+          0.03676159977912903,
+          0.03901439905166626,
+          0.03880960047245026,
+          0.03635199964046478,
+          0.0364544004201889,
+          0.03829759955406189,
+          0.0394239991903305,
+          0.036556801199913024,
+          0.0364544004201889
+        ]
+      },
+      "paired_speedup": 1.628205043693679,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.023449599742889404,
+          "p25_ms": 0.021964799612760544,
+          "p75_ms": 0.029235200583934785,
+          "min_ms": 0.01955839991569519,
+          "samples_ms": [
+            0.03706879913806915,
+            0.023756800591945647,
+            0.023449599742889404,
+            0.03409920036792755,
+            0.021503999829292297,
+            0.023449599742889404,
+            0.03522560000419617,
+            0.023552000522613525,
+            0.023347200453281404,
+            0.03358719944953918,
+            0.02396160066127777,
+            0.023756800591945647,
+            0.02682879865169525,
+            0.02181120067834854,
+            0.02232320010662079,
+            0.032153600454330446,
+            0.023449599742889404,
+            0.022937600314617158,
+            0.021196800470352172,
+            0.03020800054073334,
+            0.022015999257564544,
+            0.021401600539684297,
+            0.03020800054073334,
+            0.022732800245285033,
+            0.01955839991569519,
+            0.022015999257564544,
+            0.021503999829292297,
+            0.031027200818061828,
+            0.02181120067834854,
+            0.021913599967956544,
+            0.028262400627136232
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.0394239991903305,
+          "p25_ms": 0.03845119923353195,
+          "p75_ms": 0.047718399763107294,
+          "min_ms": 0.03635199964046478,
+          "samples_ms": [
+            0.04095999896526337,
+            0.05273600220680237,
+            0.05355520248413086,
+            0.03993600010871887,
+            0.04720639884471893,
+            0.04147199988365173,
+            0.040652799606323245,
+            0.05355520248413086,
+            0.052223998308181765,
+            0.0394239991903305,
+            0.05120000243186951,
+            0.04157440066337585,
+            0.03932160139083862,
+            0.0494592010974884,
+            0.04894720017910004,
+            0.03635199964046478,
+            0.037376001477241516,
+            0.048230400681495665,
+            0.03983359932899475,
+            0.03819519877433777,
+            0.036556801199913024,
+            0.03870719969272614,
+            0.03880960047245026,
+            0.036556801199913024,
+            0.037171199917793274,
+            0.03911679983139038,
+            0.0394239991903305,
+            0.03676159977912903,
+            0.036556801199913024,
+            0.03880960047245026,
+            0.03870719969272614
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 133.76502034689526,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.7326830653473735,
+      "process_seconds": 15.465451061725616,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 23,
+            "spills": 0,
+            "shared_bytes": 32,
+            "num_warps": 8
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "block": 512,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 3,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "Applied advised configuration to better match irregular shape [513,781] by increasing block size to 512 for improved thread utilization, enabling fused softmax to reduce kernel launches and improve data locality, increasing number of warps to 8 for higher occupancy on A100, and increasing pipeline stages to 3 to better hide memory latency. Tensor core flag remains false as it is ignored for softmax operations per launch contract.",
+      "accepted": true,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.8952503744512796,
+        "validation_seconds": 3.5403292886912823,
+        "candidate": {
+          "median_ms": 0.02396160066127777,
+          "p25_ms": 0.021964799612760544,
+          "p75_ms": 0.029030399024486543,
+          "min_ms": 0.021196800470352172
+        },
+        "incumbent": {
+          "median_ms": 0.03901439905166626,
+          "p25_ms": 0.03696639984846115,
+          "p75_ms": 0.04403200000524521,
+          "min_ms": 0.03635199964046478
+        },
+        "paired_speedup": 1.628205043693679,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.023449599742889404,
+            "p25_ms": 0.021964799612760544,
+            "p75_ms": 0.029235200583934785,
+            "min_ms": 0.01955839991569519
+          },
+          "incumbent": {
+            "median_ms": 0.0394239991903305,
+            "p25_ms": 0.03845119923353195,
+            "p75_ms": 0.047718399763107294,
+            "min_ms": 0.03635199964046478
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 133.76502034689526,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.7326830653473735,
+        "process_seconds": 15.465451061725616,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 23,
+              "spills": 0,
+              "shared_bytes": 32,
+              "num_warps": 8
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10473,
+        "output_tokens": 618,
+        "tokens": 11091
+      },
+      "review": {
+        "measured_outcomes": {
+          "performance": {
+            "median_ms": 0.02345,
+            "min_ms": 0.01956,
+            "speedup_vs_incumbent": 1.63,
+            "incumbent_median_ms": 0.03942,
+            "notes": "The new configuration significantly improves performance over the previous best, reducing median runtime by about 38%. The logical bandwidth utilization also roughly doubled, indicating better occupancy and memory efficiency."
+          },
+          "resource_utilization": {
+            "num_warps": 8,
+            "num_stages": 3,
+            "registers_per_thread": 23,
+            "shared_memory_bytes": 32,
+            "spills": 0,
+            "notes": "Increased warps to 8 and pipeline stages to 3 improved hardware utilization without register pressure or spills."
+          },
+          "accuracy": {
+            "validation": "passed",
+            "atol": 2e-06,
+            "rtol": 2e-05,
+            "notes": "Numerical accuracy verified within acceptable tolerance."
+          }
+        },
+        "failures": {
+          "tensor_core_usage": "Not applicable for softmax; configuration field is ignored per launch contract.",
+          "block_k_and_m_n": "block_k, block_m, block_n settings remain ignored for this softmax operation; tuning these would not affect performance."
+        },
+        "next_directions": {
+          "1": "Consider tuning block size further to balance between occupancy and register/shared memory usage, but current block=512 is a good match for shape [513,781].",
+          "2": "Explore fusion for other operations if applicable to reduce kernel launches further.",
+          "3": "Since tensor cores are not used for softmax, focus tuning on warp and stage counts if new hardware or Triton versions allow.",
+          "4": "Monitor any future updates to launch contracts that might enable tensor core usage in softmax and re-evaluate.",
+          "5": "Investigate whether similar gains can be achieved for related kernels (e.g., layernorm) using similar tuning strategies."
+        }
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 16009,
+        "output_tokens": 1069,
+        "tokens": 17078
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "block": 512,
+        "block_k": 32,
+        "block_m": 16,
+        "block_n": 16,
+        "fused": true,
+        "num_stages": 3,
+        "num_warps": 8,
+        "tensor_core": false
+      },
+      "source_hash": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "rationale": "The incumbent configuration is already optimal for the softmax_irregular case on the NVIDIA A100. It uses a block size of 512, which closely matches the input shape's dimension 513 for efficient thread utilization. The number of warps is set to 8 to maximize occupancy without register pressure or spills. Three pipeline stages effectively hide memory latency. The kernel fusion is enabled to reduce kernel launches and improve data locality. The ignored fields (block_k, block_m, block_n, tensor_core) have no effect on softmax performance. Given the confirmed speedup of 1.63x from the previous best, no further tuning is necessary at this time.",
+      "accepted": false,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.187533052638173,
+        "validation_seconds": 1.8106097290292382,
+        "candidate": {
+          "median_ms": 0.024371199309825897,
+          "p25_ms": 0.022681599855422972,
+          "p75_ms": 0.030873601138591764,
+          "min_ms": 0.02222079932689667
+        },
+        "incumbent": {
+          "median_ms": 0.02447360008955002,
+          "p25_ms": 0.02257919982075691,
+          "p75_ms": 0.03292159885168076,
+          "min_ms": 0.022118400037288665
+        },
+        "paired_speedup": 1.0042017127849279,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 131.51687609840886,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 1.9376672180369496,
+        "process_seconds": 13.615896158851683
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30740,
+        "output_tokens": 1774,
+        "tokens": 32514
+      },
+      "review": {
+        "measured_outcomes": {
+          "accuracy": {
+            "passed": true,
+            "notes": "Numerical accuracy is within the specified atol=2e-06 and rtol=2e-05."
+          },
+          "performance": {
+            "improvement": "The incumbent config reduced median runtime from ~0.0394 ms to ~0.0235 ms, a 1.63x speedup, mainly by increasing warps to 8, pipeline stages to 3, block size to 512, and enabling fusion.",
+            "latest_attempt": "Attempt 2 did not confirm improvement over incumbent; performance remained similar (~0.0244 ms vs ~0.0245 ms)."
+          },
+          "resource_utilization": {
+            "notes": "Config achieves high occupancy (8 warps), hides memory latency well (3 stages), registers per thread are moderate (23), no spills observed, minimal shared memory (32 bytes)."
+          },
+          "failures": {
+            "block_k_m_n_tuning": "block_k, block_m, block_n tuning has no effect on softmax kernel performance and are ignored.",
+            "tensor_core_usage": "Tensor core flag is ignored for softmax and does not affect performance."
+          }
+        },
+        "failures": [
+          "No further measurable performance improvement found beyond incumbent configuration.",
+          "Ignored parameters cannot be tuned for this kernel.",
+          "Attempt 2 failed to confirm speedup over incumbent."
+        ],
+        "next_directions": {
+          "1": "Maintain incumbent configuration: block=512, num_warps=8, num_stages=3, fused=true as optimal under current constraints.",
+          "2": "Consider exploring kernel fusion for other related operations to reduce kernel launches further if applicable.",
+          "3": "Monitor Triton or hardware updates for potential support of tensor cores in softmax to revisit tuning.",
+          "4": "Investigate tuning for related kernels like layernorm using similar strategies to improve their performance.",
+          "5": "If new input shapes arise, re-assess block size and warp count to ensure good thread utilization and occupancy."
+        }
+      },
+      "budget_after_review": {
+        "candidate_cap": 2,
+        "call_cap": 8,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37426,
+        "output_tokens": 2220,
+        "tokens": 39646
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 2,
+    "call_cap": 8,
+    "token_safety_cap": 500000,
+    "attempts": 2,
+    "calls": 8,
+    "input_tokens": 37426,
+    "output_tokens": 2220,
+    "tokens": 39646
+  }
+}
