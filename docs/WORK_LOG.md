@@ -26,6 +26,16 @@ still rejecting baseline drift within a family or changed case definitions.
 The original shared-module hash check incorrectly rejected the new family-only
 modules. This is an analysis fix; search and measurement logic are unchanged.
 
+The completed local source smoke has 8 searches, 32 real model calls and
+$0.0695772 inference cost. Two generated tiled matmul kernels passed validation
+and were retained; six proposals failed policy, compilation or correctness.
+Three of those failures only rearranged temporaries and changed launch knobs.
+Gate version 2 now rejects those three in offline replay; both validated matmul
+sources still pass. There are 37 passing CPU tests. The running A100 job
+3582814 is frozen at `ea03292` (original gate); no code was changed in its
+checkout after it started. All 12 source-interface baseline checks passed on
+A100 before inference. Full logs and the completed laptop report are on results.
+
 Dates are in America/Chicago time. Logs of machine events use UTC.
 Credentials are never stored in this repository. Later experimental records
 are on the `results` branch (`reports/WORK_LOG.md`).

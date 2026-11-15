@@ -28,6 +28,15 @@ is a conservative structural filter, not a semantic equivalence checker.
 Manual inspection must identify the transformation actually executed in every
 retained candidate; comments and the agent's rationale are not sufficient.
 
+The first local source pilot exposed a loophole: lifting expressions into
+temporary variables passed the initial AST check. Gate version 2 additionally
+inlines straight-line temporaries and normalizes associative grouping and
+equivalent positional/keyword calls for comparison. It rejects all three such
+saved softmax proposals while allowing both validated tiled matmul proposals.
+This is an offline replay, not a new GPU result. New runs record
+`source_gate_version=2`; the already-running A100 job 3582814 remains frozen
+on the original gate at commit `ea03292`. The cohorts must stay separate.
+
 ## Review and next gates
 
 Report authored, compiled, correct and retained counts separately; classify

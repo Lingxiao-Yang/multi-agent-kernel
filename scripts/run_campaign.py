@@ -35,6 +35,9 @@ protocol=read_json(ROOT/'configs/protocol.json')
 protocol.update(candidate_cap=args.attempts,call_cap=4*args.attempts,model=args.model,endpoint=args.endpoint,
                 input_usd_per_million=args.input_price,output_usd_per_million=args.output_price,
                 search_space=args.search_space)
+if args.search_space == 'source-v1':
+    from kernel_study.source_space import GATE_VERSION
+    protocol['source_gate_version'] = GATE_VERSION
 provider=ChatProvider(args.model,args.endpoint,protocol['max_output_tokens'],protocol['temperature'],
                       input_price=args.input_price,output_price=args.output_price,dollar_cap=args.dollar_cap)
 jobs=[(c,v,s) for c in cases() if c['id'] in chosen for s in seeds for v in VARIANTS]

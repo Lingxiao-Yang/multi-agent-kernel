@@ -64,6 +64,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     source_mode = protocol.get('search_space') == 'source-v1'
     if source_mode:
         from . import source_space
+        protocol = {**protocol, 'source_gate_version':source_space.GATE_VERSION}
         source_text, base_config = source_space.baseline(case)
     else:
         source_text = (ROOT / 'kernel_study/kernels.py').read_text(encoding='utf-8')
