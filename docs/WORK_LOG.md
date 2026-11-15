@@ -1,5 +1,30 @@
 # Development Log
 
+## 2026-11-15 - Longer reduction repair rounds
+
+1. Audited the downloaded 3582814 raw summaries: 16 complete searches, 32
+   attempts, 5 correct, 10 numerically incorrect, 7 runtime/compiler errors
+   and 10 policy rejections; $0.3224324. All retained candidates were first
+   attempts. No reduction family produced a correct candidate.
+2. User approved a $25 total inference ceiling. The fixed phase ceilings and
+   existing spend reserve $21.3739192 at most; no unbounded account spending.
+3. Added common API correctness guidance (versioned, all four arms), resolved
+   logical/padded dimensions, clearer failure diagnostics, and a history view
+   that removes duplicate generated code while retaining full raw logs.
+4. Added an 8-attempt/32-call, 2-seed, 4-arm reduction round (16 searches).
+   A matched larger-model phase runs only if the complete mini round misses
+   the predeclared 6-of-8 final validated-incumbent threshold for either case.
+   Incomplete matrices cannot trigger a selective comparison. Each phase has
+   its own immutable output and durable event/decision logs.
+5. Added prefix and recovery analysis; tests cover incomplete/duplicate
+   matrices, threshold decisions, dimensions, context preservation and caps.
+   Initial validation: 41 tests passed (logs/tests_repair_round.log).
+6. Started a separate four-arm, four-attempt local softmax smoke with a $0.50
+   ceiling to exercise guidance and repeated repairs before broadening runs.
+
+Design and source citations: REPAIR_ROUND.md. The complete action journal,
+machine outputs, budget updates and subsequent outcomes live on results.
+
 ## 2026-11-14 - Source-generation revision
 
 Reviewed completed A100 jobs 3582405 and 3582416 and their raw traces. Both

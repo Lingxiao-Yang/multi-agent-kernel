@@ -153,7 +153,12 @@ def validate(case, config, seeds, source=None):
         actual.fill_(float('nan'))
         actual = fn()
         torch.cuda.synchronize()
-        torch.testing.assert_close(actual, expected, atol=case["atol"], rtol=case["rtol"], equal_nan=False)
+        try:
+            torch.testing.assert_close(actual, expected, atol=case["atol"], rtol=case["rtol"], equal_nan=False)
+        except AssertionError as exc:
+            nonfinite = int((~torch.isfinite(actual)).sum().item())
+            raise AssertionError(f'validation seed={seed} edge={edge} nonfinite_outputs={nonfinite}/{actual.numel()}; '
+                                 f'logical_shape={case["shape"]}\n{exc}') from None
         if not all(torch.equal(x, y) for x, y in zip(inputs, snapshots)):
             raise AssertionError("candidate mutated an input")
         records.append({"seed": seed, "edge": edge, "max_abs_error": float((actual.float()-expected.float()).abs().max())})

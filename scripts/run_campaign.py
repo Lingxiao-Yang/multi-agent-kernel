@@ -20,6 +20,7 @@ p.add_argument('--input-price',type=float,default=.4)
 p.add_argument('--output-price',type=float,default=1.6)
 p.add_argument('--validated-pilot',help='Require 24 successful GPU engineering evaluations from this directory')
 p.add_argument('--search-space', choices=['parameter-control','source-v1'], default='source-v1')
+p.add_argument('--shared-api-guidance',action='store_true')
 args=p.parse_args()
 if not 1<=args.attempts<=20 or args.dollar_cap<=0:
     p.error('attempts must be 1..20 and dollar cap positive')
@@ -38,6 +39,10 @@ protocol.update(candidate_cap=args.attempts,call_cap=4*args.attempts,model=args.
 if args.search_space == 'source-v1':
     from kernel_study.source_space import GATE_VERSION
     protocol['source_gate_version'] = GATE_VERSION
+if args.shared_api_guidance:
+    from kernel_study.api_guidance import VERSION
+    protocol['shared_api_guidance'] = VERSION
+    protocol['history_context_version'] = 'diagnostics-without-redundant-source-v1'
 provider=ChatProvider(args.model,args.endpoint,protocol['max_output_tokens'],protocol['temperature'],
                       input_price=args.input_price,output_price=args.output_price,dollar_cap=args.dollar_cap)
 jobs=[(c,v,s) for c in cases() if c['id'] in chosen for s in seeds for v in VARIANTS]
@@ -58,3 +63,5 @@ for case,variant,seed in jobs:
 if completed==len(jobs):
     from kernel_study.analysis import analyze
     analyze(output,output/'analysis')
+else:
+    raise SystemExit(2)

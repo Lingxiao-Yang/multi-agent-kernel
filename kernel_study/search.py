@@ -62,6 +62,12 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     starting_cost = getattr(provider, 'spent', 0.)
     starting_completed_cost = getattr(provider, 'completed_cost', 0.)
     source_mode = protocol.get('search_space') == 'source-v1'
+    shared_guidance = None
+    if protocol.get('shared_api_guidance'):
+        from .api_guidance import VERSION, guidance, history_context
+        if protocol['shared_api_guidance'] != VERSION:
+            raise ValueError('unknown shared API guidance version')
+        shared_guidance = guidance(case)
     if source_mode:
         from . import source_space
         protocol = {**protocol, 'source_gate_version':source_space.GATE_VERSION}
@@ -81,6 +87,8 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                 'scheduler_job_id':os.environ.get('SLURM_JOB_ID'), 'queue_wait_seconds':None,
                 'code_hashes':{str(p.relative_to(ROOT)):digest(p.read_text(encoding='utf-8')) for p in sorted((ROOT/'kernel_study').glob('*.py'))}}
     write_json(output/'manifest.json', manifest)
+    if shared_guidance:
+        write_json(output/'shared_api_guidance.json', shared_guidance)
     event(log, 'run_start', manifest=manifest)
     request = {'case':case,'config':base_config,'source':str(base_source),'protocol':protocol,'library':True,'profile':True}
     base_result = run_worker(request, output, 'baseline')
@@ -118,10 +126,18 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         cards = select_cards(case['family'], incumbent['result'].get('profile'), drop_category) if 'knowledge' in variant else []
         context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],'config':incumbent['config'],
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
-                   'history':history, 'knowledge_cards':cards, 'hardware':manifest['environment'],
+                   'history':history_context(history) if shared_guidance else history,
+                   'knowledge_cards':cards, 'hardware':manifest['environment'],
                    'launch_contract':source_space.contract(case) if source_mode else launch_contract(case['family']),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
+        if shared_guidance:
+            context['shared_api_guidance'] = shared_guidance
+            context['stage_instructions'] = {
+                'analyze':'Inspect the current code and previous failure. Distinguish compiler/API mistakes, output coverage, and numerical errors from performance hypotheses.',
+                'advise':'Give a concise implementable plan. If the previous proposal failed, identify the exact repair and verify shape/constexpr/masking invariants before proposing more optimization.',
+                'implement':'Return complete source and launch config. Re-check all resolved dimensions and reduction invariants. Repairs consume this attempt; no unmeasured speedup claims.',
+                'review':'Return concise diagnosis, outcome, and next_step fields. Explain the measured result. Do not return source/config; only implement supplies executable proposals.'}
         if source_mode and last_proposal is not None:
             context['previous_proposal'] = last_proposal
         try:
@@ -160,6 +176,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                     result['profile'] = prof.get('profile', {'unavailable':prof['status']})
             record = {'attempt':attempt,'parent_id':candidate['parent_id'],'config':candidate['config'],
                       'source_hash':digest(text),'source_edit':edit,'rationale':candidate.get('rationale'), 'accepted':accepted,
+                      'previous_failure_attempt':history[-1]['attempt'] if history and history[-1]['result']['status']!='ok' else None,
                       'result':compact_result(result),'cards':[c['id'] for c in cards], 'budget':budget.snapshot()}
         except Exception as exc:
             record = {'attempt':attempt,'accepted':False,'result':{'status':'proposal_error','error':str(exc)}, 'budget':budget.snapshot()}
