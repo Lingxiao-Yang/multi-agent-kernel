@@ -58,6 +58,21 @@ def checkpoint_curve(summary, axis, checkpoints):
     return [max([v for p,v in observations if p <= cp],default=1.) for cp in checkpoints]
 
 
+def validate_cohort(summaries):
+    # Source-v1 exposes one family at a time, so different families necessarily
+    # have different source hashes. Each family's baseline must remain frozen.
+    fingerprints = {(s['manifest']['protocol_hash'],s['manifest']['knowledge_hash'],
+                     s['manifest']['provider'],s['manifest']['model'],s['resolved_model'],
+                     s['manifest']['environment'].get('gpu')) for s in summaries}
+    baselines, case_definitions = {}, {}
+    for s in summaries:
+        m=s['manifest']
+        baselines.setdefault(m['case']['family'],set()).add(m['baseline_hash'])
+        case_definitions.setdefault(m['case']['id'],set()).add(m['case_hash'])
+    if len(fingerprints)!=1 or any(len(x)!=1 for x in [*baselines.values(),*case_definitions.values()]):
+        raise ValueError('Incompatible experiment manifests; analyze cohorts separately')
+
+
 def analyze(input_dir, output_dir, allow_controls=False):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True,exist_ok=True)
@@ -92,11 +107,7 @@ def analyze(input_dir, output_dir, allow_controls=False):
     if not rows:
         raise ValueError('No eligible complete runs. Scripted controls require --allow-controls.')
     # Refuse accidental mixing of hardware, source, protocol, model or provider.
-    fingerprints = {(s['manifest']['protocol_hash'],s['manifest']['baseline_hash'],s['manifest']['knowledge_hash'],
-                     s['manifest']['provider'],s['manifest']['model'],s['resolved_model'],
-                     s['manifest']['environment'].get('gpu')) for s in summaries}
-    if len(fingerprints) != 1:
-        raise ValueError('Incompatible experiment manifests; analyze cohorts separately')
+    validate_cohort(summaries)
     with (output_dir/'runs.csv').open('w',newline='',encoding='utf-8') as f:
         w = csv.DictWriter(f,fieldnames=list(rows[0])); w.writeheader(); w.writerows(rows)
     report = {'n_runs':len(rows), 'evidence_type':'engineering-control' if allow_controls else 'LLM-study',

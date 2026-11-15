@@ -11,13 +11,20 @@ The trusted validator and paired timing remain unchanged. Failed proposals are
 saved, reviewers receive the actual submitted code, and repair context includes
 the previous proposal. Model CLI and campaign entry points default to source-v1.
 
-Validation: 34 CPU integrity tests pass; all four irregular family baselines
+Validation: 36 CPU integrity tests pass; all four irregular family baselines
 pass the new ABI on the RTX 4060 Laptop GPU, including fresh and edge inputs.
 The A100 pilot launcher validates all 12 cases before requesting inference.
 Planned source pilot: 4 families x 4 variants x 1 seed x 2 attempts ($1.25 cap).
 Separate local smoke: 2 families x 4 variants x 1 attempt ($0.50 cap).
 These ceilings plus prior pilot spend remain below the approved $5 total.
 See SOURCE_EXPERIMENTS.md for scope, interpretation and remaining gates.
+
+Added a source-audit exporter that counts supplied, structurally changed,
+correct and retained proposals and records static primitive/launch features.
+Fixed cohort validation to allow distinct baseline source per family while
+still rejecting baseline drift within a family or changed case definitions.
+The original shared-module hash check incorrectly rejected the new family-only
+modules. This is an analysis fix; search and measurement logic are unchanged.
 
 Dates are in America/Chicago time. Logs of machine events use UTC.
 Credentials are never stored in this repository. Later experimental records
