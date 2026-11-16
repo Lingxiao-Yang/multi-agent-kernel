@@ -1,0 +1,43 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_partial_reduction",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "S",
+          "N",
+          512
+        ],
+        "num_warps": 2,
+        "num_stages": 2
+      },
+      {
+        "kernel": "layernorm_finalize",
+        "grid": [
+          513
+        ],
+        "args": [
+          "S",
+          "W",
+          "B",
+          "Y",
+          "N",
+          512
+        ],
+        "num_warps": 2,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_partial_reduction(X, W, B, Y, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    seg = tl.program_id(1)\n    n_segs = 2\n    seg_size = (N + n_segs - 1) // n_segs\n    seg_start = seg * seg_size\n    seg_end = tl.minimum(seg_start + seg_size, N)\n    col = tl.arange(0, BLOCK)\n    cols = seg_start + col\n    seg_mask = cols < seg_end\n    offs_X = row * N + cols\n    x = tl.load(X + offs_X, seg_mask, other=0)\n    part_sum = tl.sum(tl.where(seg_mask, x, 0), 0)\n    part_sq_sum = tl.sum(tl.where(seg_mask, x * x, 0), 0)\n    offs_S = row * 4 + seg * 2\n    tl.store(S + offs_S + 0, part_sum)\n    tl.store(S + offs_S + 1, part_sq_sum)\n\n@triton.jit\ndef layernorm_finalize(S, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    sum0 = tl.load(S + row * 4 + 0)\n    sq_sum0 = tl.load(S + row * 4 + 1)\n    sum1 = tl.load(S + row * 4 + 2)\n    sq_sum1 = tl.load(S + row * 4 + 3)\n    total_sum = sum0 + sum1\n    total_sq_sum = sq_sum0 + sq_sum1\n    mean = tl.div_rn(total_sum, N)\n    var = tl.div_rn(total_sq_sum, N) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n    x = tl.load(Y + offs, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    norm = tl.where(mask, (x - mean) * inv * w + b, 0)\n    tl.store(Y + offs, norm, mask)\n",
+  "rationale": "This repairs the previous failed split-row reduction by using a two-stage approach. First, layernorm_partial_reduction splits each row into 2 segments, each segment program accumulates partial sum and partial sum of squares for its columns and writes these to a scratch buffer S of shape [513, 4] (2 segments \u00d7 2 partials per row). Second, layernorm_finalize runs one program per row, aggregates the partials to compute mean and variance for the whole row, then normalizes and writes the outputs. This changes the parallel decomposition and reduces data traffic per program, while ensuring correct global statistics. Masking and reduction invariants are preserved. S is used as transient workspace for partials. This is a correct cross-program reduction pattern for split-row layernorm."
+}

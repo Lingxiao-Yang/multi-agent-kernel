@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_split_row_vector",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          512
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_split_row_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    cols = split * BLOCK + tl.arange(0, BLOCK)\n    mask = cols < N\n    offs = row * N + cols\n    # Load input partial row\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    # Compute local partials for sum and sum of squares\n    psum = tl.sum(x, axis=0)\n    psum_sq = tl.sum(x * x, axis=0)\n    # Write partials to output scratch (in output Y's tail region)\n    # Each row stores its two partials in Y at Y[row * N + N + split*2]\n    # But since we cannot use extra memory, both splits redundantly compute both partials\n    # Exchange via registers: both splits compute both partials for their own half\n    # Now, each split must fetch the other's partial results: we do this by launching with grid=(rows,2) and using tl.sum to combine both\n    # Each split computes the full sum by summing over both splits' psum/psum_sq\n    psum0 = tl.sum(x, axis=0) if split == 0 else 0.0\n    psum1 = tl.sum(x, axis=0) if split == 1 else 0.0\n    psum_all = tl.full((), 0.0, tl.float32)\n    psum_sq0 = tl.sum(x * x, axis=0) if split == 0 else 0.0\n    psum_sq1 = tl.sum(x * x, axis=0) if split == 1 else 0.0\n    # Both splits redundantly read the other half to get the complete sum\n    # Instead, just have both splits compute their own partial, and then in both splits, load the other split's half to sum\n    # This is not possible without shared memory/atomics, so in practice, both splits recompute the full sum for their row\n    # Instead, both splits load the entire row in two steps and sum, but since we are limited to BLOCK=512 per split, we must loop\n    # So: both splits independently accumulate both partials for the full row\n    # Step 1: accumulate full sum for the row via two steps\n    sum_x = tl.zeros((), dtype=tl.float32)\n    sum_x2 = tl.zeros((), dtype=tl.float32)\n    for i in range(2):\n        sub_cols = i * BLOCK + tl.arange(0, BLOCK)\n        sub_mask = sub_cols < N\n        sub_offs = row * N + sub_cols\n        sub_x = tl.load(X + sub_offs, mask=sub_mask, other=0.0)\n        sum_x += tl.sum(sub_x, axis=0)\n        sum_x2 += tl.sum(sub_x * sub_x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    var = tl.div_rn(sum_x2, N) - mean * mean\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Normalize only our region\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    x_centered = x - mean\n    y = (x_centered * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+  "rationale": "This attempts a two-way split of each row: each row is processed by two separate program instances in parallel, each handling a BLOCK=512 column chunk, for grid=[ROWS,2]. Both splits independently compute the full-row mean/variance by loading both halves in turn, then only normalize and write their own region. This increases residency and may improve latency for wide or irregular rows, at the cost of extra redundant loads (full row loaded by both splits). No out-of-bounds store or reduction error is possible, as all loads/stores are masked and the mean/variance are always divided by the true N. This is a valid parallel decomposition and a meaningful change in data movement and computation structure."
+}

@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_layernorm_rowwise_2d",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          512
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_layernorm_rowwise_2d(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    offs = split * BLOCK\n    cols = tl.arange(0, BLOCK) + offs\n    mask = cols < N\n    x_ptrs = X + row * N + cols\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    # Partial sum and sumsq for this split\n    part_sum = tl.sum(x, 0)\n    part_sumsq = tl.sum(x * x, 0)\n    # Use shared memory for inter-split reduction and broadcast, size 2 per row\n    sum_smem = tl.zeros((2,), dtype=tl.float32)\n    sumsq_smem = tl.zeros((2,), dtype=tl.float32)\n    # Store partials\n    tl.store(sum_smem + split, part_sum)\n    tl.store(sumsq_smem + split, part_sumsq)\n    tl.barrier()\n    # Only one split computes mean/var\n    if split == 0:\n        total_sum = tl.load(sum_smem + 0) + tl.load(sum_smem + 1)\n        total_sumsq = tl.load(sumsq_smem + 0) + tl.load(sumsq_smem + 1)\n        mean = tl.div_rn(total_sum, N)\n        var = tl.div_rn(total_sumsq, N) - mean * mean\n        inv_std = tl.rsqrt(var + 1e-5)\n        tl.store(sum_smem + 0, mean)\n        tl.store(sum_smem + 1, inv_std)\n    tl.barrier()\n    mean = tl.load(sum_smem + 0)\n    inv_std = tl.load(sum_smem + 1)\n    centered = tl.where(mask, x - mean, 0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    normed = (centered * inv_std) * w + b\n    tl.store(Y + row * N + cols, normed, mask=mask)\n",
+  "rationale": "This kernel increases parallelism and may improve occupancy for small row counts by splitting each row across two programs (a 2D grid: [rows, 2]). Each split computes partial sums for its tile in the row, stores them in shared memory, and synchronizes. One split then computes the mean and variance for the full row and broadcasts them to both splits using shared memory. Both splits then normalize and affine-transform their tile. This changes both the parallel decomposition (2D grid per row) and the data movement pattern (use of shared memory and synchronization for reductions and broadcasts), as required."
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_split_col_unrolled",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_split_col_unrolled(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = RB // 2\n    # Unroll both halves explicitly\n    offs0 = tl.arange(0, tile)\n    cols0 = offs0\n    col_mask0 = cols0 < N\n    x_ptr0 = X + row * N + cols0\n    x0 = tl.load(x_ptr0, col_mask0, other=-float('inf'))\n    offs1 = tl.arange(0, tile)\n    cols1 = tile + offs1\n    col_mask1 = cols1 < N\n    x_ptr1 = X + row * N + cols1\n    x1 = tl.load(x_ptr1, col_mask1, other=-float('inf'))\n    # Compute the global max over both halves\n    mx0 = tl.max(x0, 0)\n    mx1 = tl.max(x1, 0)\n    mx = tl.maximum(mx0, mx1)\n    # Compute exponentials and sums for both halves\n    x0_shifted = x0 - mx\n    x1_shifted = x1 - mx\n    exp_x0 = tl.exp(x0_shifted)\n    exp_x1 = tl.exp(x1_shifted)\n    sum0 = tl.sum(exp_x0, 0)\n    sum1 = tl.sum(exp_x1, 0)\n    denom = sum0 + sum1\n    # Each program writes its own tile only\n    if part == 0:\n        softmax = exp_x0 / denom\n        tl.store(Y + row * N + cols0, softmax, col_mask0)\n    else:\n        softmax = exp_x1 / denom\n        tl.store(Y + row * N + cols1, softmax, col_mask1)\n",
+  "rationale": "This kernel explicitly unrolls the row split by forming two tiles per row (RB//2 each), using two separate tl.arange(0, tile) for the first and second halves. Both tiles are always loaded and reduced per program, so every program can compute the global max and denominator for the entire row. Only the outputs for the assigned tile (part==0 or part==1) are written, with proper masking for irregular row widths. This avoids passing non-contract scalars and ensures all tl.arange extents are compile-time constants. The launch config uses grid [513,2], so there are two programs per row, each covering half the columns, and all data movement and reduction is explicit and correct for the full row. This is a structural change from the incumbent and repairs the previous constexpr errors."
+}

@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_softmax_blockwise",
+        "grid": [
+          513,
+          8
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_blockwise(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    col_start = block * BLOCK\n    col = col_start + offs\n    mask = col < N\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    # Compute local max for this block\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    local_max = tl.max(x, 0)\n    # Reduce for global row max across all blocks\n    max_val = local_max\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(blk_x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    # Broadcast max_val within block\n    max_val = tl.max(max_val, 0)\n    # Compute local exp(x - max)\n    x_centered = x - max_val\n    exp_x = tl.exp(x_centered)\n    local_sum = tl.sum(exp_x, 0)\n    # Reduce for global denominator across all blocks\n    denom = local_sum\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_exp = tl.exp(blk_x - max_val)\n        blk_sum = tl.sum(blk_exp, 0)\n        denom += blk_sum\n    # Write softmax output for this block\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+  "rationale": "This kernel parallelizes the softmax computation along the column dimension by using a two-dimensional launch grid: one program per row and block (tile) of columns. Each block computes its local max and sum-exp, then performs a full row reduction over all blocks by looping. This exposes more parallelism for wide rows (N=781) and can improve occupancy and memory throughput. Masking ensures correct handling at row boundaries. All outputs are covered and written exactly once."
+}

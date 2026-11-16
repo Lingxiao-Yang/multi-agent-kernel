@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply_split",
+        "grid": [
+          513,
+          8
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          781,
+          98
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_split(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+  "rationale": "This implementation increases parallelism in the memory-bound apply kernel by splitting each row into 8 column chunks (CHUNK=98), giving a [513,8] grid. Each kernel instance writes only a fraction of a row; masking is used for irregular N=781. This maximizes concurrent output programs and SM occupancy for this irregular shape. All pointer math and masking is updated for chunked coverage. The stats kernel remains a single-row reduction with correct masking. This structure increases parallel throughput, maintains correct coverage, and leverages more of the GPU's available parallelism for this case."
+}

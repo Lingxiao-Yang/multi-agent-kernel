@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_parallel_tile",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_parallel_tile(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile = tl.program_id(1)\n    num_tiles = tl.num_programs(1)\n    tile_size = (N + num_tiles - 1) // num_tiles\n    col_start = tile * tile_size\n    col_end = tl.minimum(col_start + tile_size, N)\n    # Local accumulators\n    local_mean = 0.0\n    local_var = 0.0\n    count = 0.0\n    # 1. Partial mean\n    for off in range(col_start, col_end, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = (offs < col_end) & (offs < N)\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        local_mean += tl.sum(x, 0)\n        count += tl.sum(mask, 0)\n    # Global reduction: sum over tiles\n    total_mean = tl.sum(local_mean, axis=0)\n    total_count = tl.sum(count, axis=0)\n    mean = total_mean / N\n    # 2. Partial variance\n    for off in range(col_start, col_end, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = (offs < col_end) & (offs < N)\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        local_var += tl.sum(centered * centered, 0)\n    total_var = tl.sum(local_var, axis=0)\n    var = total_var / N\n    inv_std = tl.rsqrt(var + 1e-5)\n    # 3. Write output for assigned tile\n    for off in range(col_start, col_end, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = (offs < col_end) & (offs < N)\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + offs, mask=mask, other=0.0)\n        b = tl.load(B + offs, mask=mask, other=0.0)\n        y = (centered * inv_std) * w + b\n        y_ptrs = Y + row * N + offs\n        tl.store(y_ptrs, y, mask)\n",
+  "rationale": "This kernel increases parallelism by splitting each row among 4 independent program tiles (grid [513, 4]). Each tile computes partial sums for mean and variance over its segment, then all tiles participate in a block reduction to get the global row mean and variance (using tl.sum(axis=0)), maintaining correct normalization over irregular widths. Each tile writes its own output segment, so all output is covered and each element is written once per launch. Blocked tiling manages register pressure for wide rows, and all loops are masked for leftover columns. This design maximizes concurrency and memory throughput for irregular row widths."
+}

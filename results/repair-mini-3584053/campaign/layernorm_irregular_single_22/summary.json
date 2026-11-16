@@ -1,0 +1,1557 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T19:57:22.683026+00:00",
+    "case": {
+      "id": "layernorm_irregular",
+      "family": "layernorm",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-05,
+      "rtol": 0.0002
+    },
+    "variant": "single",
+    "seed": 22,
+    "provider": "llm",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 0.4,
+      "output_usd_per_million": 1.6,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "c60cec4dd1b16789431ab52990e38e9769d1ad9b0e16712d157b694263f0f340",
+    "case_hash": "d56bbe0d9cb78bb9ecc73c04286ae77beed62029ec85e1fdd71d90872378f76b",
+    "baseline_hash": "f1ddf0c51eeac383cd1e63cae99169f71122e2f826500a5f89f22073cdd5301d",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584053",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 215810,
+    "output_tokens": 19162,
+    "tokens": 234972
+  },
+  "profile_invocations": 1,
+  "final": {
+    "candidate_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.117061804048717,
+      "validation_seconds": 1.9657269259914756,
+      "candidate": {
+        "median_ms": 0.03624959886074066,
+        "p25_ms": 0.03502079993486404,
+        "p75_ms": 0.04423680007457733,
+        "min_ms": 0.03338240087032318,
+        "samples_ms": [
+          0.03829759955406189,
+          0.04505600035190582,
+          0.034508800506591795,
+          0.03553279936313629,
+          0.034406399726867674,
+          0.03624959886074066,
+          0.04464640021324158,
+          0.033792001008987424,
+          0.03614720106124878,
+          0.04454399943351746,
+          0.03573760092258453,
+          0.04362240135669708,
+          0.03338240087032318,
+          0.03635199964046478,
+          0.04444159865379334,
+          0.03409920036792755,
+          0.0421887993812561,
+          0.04505600035190582,
+          0.03604480028152466,
+          0.045465600490570066,
+          0.0336896002292633,
+          0.03553279936313629,
+          0.04413439929485321,
+          0.03583999872207642,
+          0.04433920085430145,
+          0.03348479866981506,
+          0.043724799156188966,
+          0.040755200386047366,
+          0.03604480028152466,
+          0.04505600035190582,
+          0.0336896002292633
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03624959886074066,
+        "p25_ms": 0.034918400645256045,
+        "p75_ms": 0.04423679858446121,
+        "min_ms": 0.03348479866981506,
+        "samples_ms": [
+          0.043724799156188966,
+          0.036556801199913024,
+          0.045363199710845944,
+          0.03358719944953918,
+          0.03665919899940491,
+          0.04464640021324158,
+          0.034406399726867674,
+          0.04362240135669708,
+          0.034815999865531924,
+          0.03635199964046478,
+          0.04526079893112182,
+          0.03358719944953918,
+          0.03604480028152466,
+          0.04362240135669708,
+          0.03522560000419617,
+          0.04444159865379334,
+          0.03348479866981506,
+          0.03624959886074066,
+          0.04403199851512909,
+          0.034201601147651674,
+          0.03614720106124878,
+          0.0336896002292633,
+          0.035020801424980166,
+          0.06430720090866089,
+          0.03614720106124878,
+          0.0447488009929657,
+          0.033792001008987424,
+          0.03563520014286041,
+          0.04454399943351746,
+          0.03563520014286041,
+          0.04454399943351746
+        ]
+      },
+      "paired_speedup": 1.0,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.02969599962234497,
+        "p25_ms": 0.029542399942874907,
+        "p75_ms": 0.03261439949274063,
+        "min_ms": 0.029286399483680725,
+        "samples_ms": [
+          0.029286399483680725,
+          0.02959359884262085,
+          0.037478399276733396,
+          0.02969599962234497,
+          0.037990400195121767,
+          0.042803201079368594,
+          0.029900801181793214,
+          0.029798400402069092,
+          0.02969599962234497,
+          0.029491201043128967,
+          0.03553279936313629,
+          0.029491201043128967,
+          0.029798400402069092,
+          0.03358719944953918,
+          0.02969599962234497,
+          0.02969599962234497,
+          0.02969599962234497,
+          0.02969599962234497,
+          0.02969599962234497,
+          0.029491201043128967,
+          0.03409920036792755,
+          0.029491201043128967,
+          0.031436800956726074,
+          0.03665919899940491,
+          0.02969599962234497,
+          0.029388800263404846,
+          0.031641599535942075,
+          0.029388800263404846,
+          0.02959359884262085,
+          0.029388800263404846,
+          0.03706879913806915
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 88.59331140014669,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.176315980963409,
+      "process_seconds": 13.983285843394697
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "7ba2464668721c0a4e2f53edef095f018c91ea10a5edc7ed33c8e7437ef23a24",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Unify block size in layernorm_apply to padded RB=1024 to match layernorm_stats, reducing grid size from 1566 to 392 and simplifying masking. Mask loads in layernorm_stats exclude padding from sums ensuring numerical correctness. Masking in layernorm_apply ensures no out-of-bounds memory access while preserving correctness. This aligns memory access patterns and improves coalescing and efficiency.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 4.73471543751657,
+        "validation_seconds": 5.600576040335,
+        "candidate": {
+          "median_ms": 0.03553279936313629,
+          "p25_ms": 0.03353600054979324,
+          "p75_ms": 0.043724799156188966,
+          "min_ms": 0.032767999172210696
+        },
+        "incumbent": {
+          "median_ms": 0.03522560000419617,
+          "p25_ms": 0.03374080061912536,
+          "p75_ms": 0.04357120096683502,
+          "min_ms": 0.03266560137271881
+        },
+        "paired_speedup": 0.9913544847451893,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 90.3804951357635,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 5.803943507373333,
+        "process_seconds": 17.212144250050187
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9883,
+        "output_tokens": 1756,
+        "tokens": 11639
+      },
+      "review": {
+        "implement": {
+          "config": {
+            "mode": "source-v1",
+            "launches": [
+              {
+                "kernel": "layernorm_stats",
+                "grid": [
+                  513
+                ],
+                "args": [
+                  "X",
+                  "S",
+                  781,
+                  1024
+                ],
+                "num_warps": 4,
+                "num_stages": 1
+              },
+              {
+                "kernel": "layernorm_apply",
+                "grid": [
+                  392
+                ],
+                "args": [
+                  "X",
+                  "W",
+                  "B",
+                  "S",
+                  "Y",
+                  400653,
+                  781,
+                  1024
+                ],
+                "num_warps": 4,
+                "num_stages": 1
+              }
+            ]
+          },
+          "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0)\n    mean = tl.div_rn(tl.sum(tl.where(mask, x, 0), 0), N)\n    centered = tl.where(mask, x - mean, 0)\n    inv = tl.rsqrt(tl.sum(centered * centered, 0) / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + 2 * row, mask, other=0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+          "rationale": "Unify block size in layernorm_apply to padded RB=1024 to match layernorm_stats, reducing grid size from 1566 to 392 and simplifying masking. Mask loads in layernorm_stats exclude padding from sums ensuring numerical correctness. Masking in layernorm_apply ensures no out-of-bounds memory access while preserving correctness. This aligns memory access patterns and improves coalescing and efficiency."
+        }
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15233,
+        "output_tokens": 2319,
+        "tokens": 17552
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "847009a899b4a162d5a72250e5093ca7ff37fe7c13ed95870808c10453c4933b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Unify block size to 1024 in both kernels for memory access alignment and grid size reduction. In layernorm_stats, mask loads and sums exclude padding to ensure numerical correctness. In layernorm_apply, mask loads and stores prevent out-of-bounds access. This preserves exact computation on logical dimensions and improves efficiency.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.1638736156746745,
+        "validation_seconds": 3.9559136629104614,
+        "candidate": {
+          "median_ms": 0.035020801424980166,
+          "p25_ms": 0.03348480015993118,
+          "p75_ms": 0.04331520050764084,
+          "min_ms": 0.032358399033546446
+        },
+        "incumbent": {
+          "median_ms": 0.034918400645256045,
+          "p25_ms": 0.03363839983940124,
+          "p75_ms": 0.04341759979724884,
+          "min_ms": 0.032358399033546446
+        },
+        "paired_speedup": 0.9970760012461886,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 91.70184202892835,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.225284211337566,
+        "process_seconds": 15.887556351721287
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 28870,
+        "output_tokens": 3997,
+        "tokens": 32867
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0)\n    sum_x = tl.sum(tl.where(mask, x, 0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + 2 * row, mask, other=0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "Unify block size to 1024 in both kernels to align memory access and reduce grid size. In layernorm_stats, mask loads and sums to exclude padding ensuring numerical correctness. In layernorm_apply, mask loads and stores prevent out-of-bounds access. This preserves exact computation on logical dimensions and improves efficiency."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 35433,
+        "output_tokens": 4559,
+        "tokens": 39992
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "847009a899b4a162d5a72250e5093ca7ff37fe7c13ed95870808c10453c4933b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Unify block size 1024 in both kernels to improve memory alignment and reduce grid size for better efficiency. Added masking in layernorm_stats to mask loads and sums, ensuring padding does not affect numerical accuracy. Masked loads and stores in layernorm_apply prevent out-of-bounds memory accesses while preserving exact computation on logical data dimensions. This maintains correctness and improves memory coalescing and overall performance on irregular shapes.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.2672733534127474,
+        "validation_seconds": 2.1361105907708406,
+        "candidate": {
+          "median_ms": 0.03809280097484589,
+          "p25_ms": 0.03691520094871521,
+          "p75_ms": 0.04664320051670075,
+          "min_ms": 0.035020801424980166
+        },
+        "incumbent": {
+          "median_ms": 0.03911679983139038,
+          "p25_ms": 0.03681280016899109,
+          "p75_ms": 0.046489599347114566,
+          "min_ms": 0.03461120128631592
+        },
+        "paired_speedup": 1.0268816897245407,
+        "confirmed": false,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.03840000033378601,
+            "p25_ms": 0.037324799597263335,
+            "p75_ms": 0.04669440090656281,
+            "min_ms": 0.03461120128631592
+          },
+          "incumbent": {
+            "median_ms": 0.037990400195121767,
+            "p25_ms": 0.03671039938926697,
+            "p75_ms": 0.04587520062923431,
+            "min_ms": 0.03461120128631592
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 84.30653346076221,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.442516571842134,
+        "process_seconds": 15.016640636138618
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 51108,
+        "output_tokens": 6284,
+        "tokens": 57392
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0)\n    # sum only logical elements\n    sum_x = tl.sum(tl.where(mask, x, 0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + 2 * row, mask, other=0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "This proposal unifies block size to 1024 in both kernels, with masking on loads and sums in layernorm_stats to exclude padding from mean and variance calculations, preserving numerical correctness. In layernorm_apply, masking covers all loads and stores to prevent out-of-bounds access, preserving exact computation on logical data. The grid sizes and launch parameters are set to cover all output elements exactly, ensuring correctness and improved memory alignment and coalescing for better performance on irregular shapes."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 58534,
+        "output_tokens": 6885,
+        "tokens": 65419
+      }
+    },
+    {
+      "attempt": 4,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "launch argument count does not match kernel signature"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 76949,
+        "output_tokens": 8685,
+        "tokens": 85634
+      },
+      "review": {
+        "config": {
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask=mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask=mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask=mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask=mask, other=0.0)\n    w = tl.load(W + col, mask=mask, other=0.0)\n    b = tl.load(B + col, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask=mask)\n",
+        "rationale": "The previous failure was due to mismatch in the number of launch arguments for layernorm_apply kernel (missing Y). This fix correctly includes Y buffer in launch args. The kernel signatures and launches now match exactly the config args count and order. Masking correctly covers all loads and stores to prevent out-of-bounds access and preserve correctness. The block size is unified to 1024 for both kernels for better memory alignment and coalescing. Grid sizes cover all outputs exactly. This repair ensures successful launch and correctness without changing the prior optimization rationale."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 84449,
+        "output_tokens": 9317,
+        "tokens": 93766
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "847009a899b4a162d5a72250e5093ca7ff37fe7c13ed95870808c10453c4933b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Repair previous launch argument count mismatch by including all required arguments in layernorm_apply launch: X, W, B, S, Y, TOTAL, N, BLOCK. Retain unified block size 1024 in both kernels for aligned memory access and reduced grid size. Mask loads and sums in layernorm_stats exclude padding from mean/variance computation, preserving numerical correctness. Mask loads and stores in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and improved memory coalescing and efficiency.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.4708844255656004,
+        "validation_seconds": 2.4262343365699053,
+        "candidate": {
+          "median_ms": 0.034815999865531924,
+          "p25_ms": 0.03399679958820343,
+          "p75_ms": 0.04352000057697296,
+          "min_ms": 0.03266560137271881
+        },
+        "incumbent": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03363839983940124,
+          "p75_ms": 0.04341759979724884,
+          "min_ms": 0.03225600123405457
+        },
+        "paired_speedup": 1.0088235110330481,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 92.24126873861174,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.7250589076429605,
+        "process_seconds": 14.461812583729625
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 103638,
+        "output_tokens": 11121,
+        "tokens": 114759
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0)\n    sum_x = tl.sum(tl.where(mask, x, 0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + 2 * row, mask, other=0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "Repair previous launch argument count mismatch by including all required arguments in layernorm_apply launch: X, W, B, S, Y, TOTAL, N, BLOCK. Retain unified block size 1024 in both kernels for aligned memory access and reduced grid size. Mask loads and sums in layernorm_stats exclude padding from mean/variance computation, preserving numerical correctness. Mask loads and stores in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and improved memory coalescing and efficiency."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 112191,
+        "output_tokens": 11732,
+        "tokens": 123923
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "b736f45f91c0c91e5bada6f0e73d6c61f63e640523c645060adfa487a4038f58",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Repair previous launch argument count mismatch by including all required arguments in layernorm_apply launch: X, W, B, S, Y, TOTAL, N, BLOCK. Retain unified block size 1024 in both kernels for aligned memory access and reduced grid size. Mask loads and sums in layernorm_stats exclude padding from mean/variance computation, preserving numerical correctness. Mask loads and stores in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and improved memory coalescing and efficiency.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.3499947572126985,
+        "validation_seconds": 5.2578573459759355,
+        "candidate": {
+          "median_ms": 0.03553279936313629,
+          "p25_ms": 0.034201601147651674,
+          "p75_ms": 0.04285439997911453,
+          "min_ms": 0.03297280073165894
+        },
+        "incumbent": {
+          "median_ms": 0.03901439905166626,
+          "p25_ms": 0.03527680039405823,
+          "p75_ms": 0.0433664008975029,
+          "min_ms": 0.03317759931087494
+        },
+        "paired_speedup": 1.0979827019241826,
+        "confirmed": false,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.03532800078392029,
+            "p25_ms": 0.03384319990873337,
+            "p75_ms": 0.0434688001871109,
+            "min_ms": 0.032767999172210696
+          },
+          "incumbent": {
+            "median_ms": 0.03543039858341217,
+            "p25_ms": 0.03415039926767349,
+            "p75_ms": 0.04362240135669708,
+            "min_ms": 0.03297280073165894
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 90.3804951357635,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 5.587603164836764,
+        "process_seconds": 17.611471544019878
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 133852,
+        "output_tokens": 13594,
+        "tokens": 147446
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "This proposal fixes the previous launch argument count mismatch by including all required arguments for layernorm_apply launch, ensuring kernel signature matches launch args. It retains unified block size 1024 in both kernels for aligned memory access and reduced grid size, improving memory coalescing and efficiency. Masking in layernorm_stats excludes padding from mean and variance computations, preserving numerical correctness. Masking in layernorm_apply prevents out-of-bounds memory access and preserves correctness on irregular shapes. Grid sizes cover all outputs exactly, guaranteeing correctness and efficient execution."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 143391,
+        "output_tokens": 14215,
+        "tokens": 157606
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              392
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "b736f45f91c0c91e5bada6f0e73d6c61f63e640523c645060adfa487a4038f58",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implementation fixes the previous argument count mismatch by including the output buffer Y in the layernorm_apply launch arguments and matching the kernel signature. It uses a unified block size of 1024 in both kernels to ensure aligned memory access and reduce grid size, improving memory coalescing and efficiency. Masking in layernorm_stats excludes padding elements from mean and variance computations, preserving numerical correctness. Masking in layernorm_apply prevents out-of-bounds memory access and preserves correctness on irregular shapes. The grid sizes are set to cover all output elements exactly, ensuring correctness and efficient execution.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.1778661794960499,
+        "validation_seconds": 1.9536217572167516,
+        "candidate": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03409919887781143,
+          "p75_ms": 0.042905598878860474,
+          "min_ms": 0.03246079981327057
+        },
+        "incumbent": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03374079912900925,
+          "p75_ms": 0.043059200048446655,
+          "min_ms": 0.03225600123405457
+        },
+        "paired_speedup": 1.0,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 91.43449545912694,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.257215928286314,
+        "process_seconds": 15.029725264757872
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 167728,
+        "output_tokens": 16064,
+        "tokens": 183792
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                392
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "This implementation fixes the previous argument count mismatch by including the output buffer Y in the layernorm_apply launch arguments and matching the kernel signature. It uses a unified block size of 1024 in both kernels to ensure aligned memory access and reduce grid size, improving memory coalescing and efficiency. Masking in layernorm_stats excludes padding elements from mean and variance computations, preserving numerical correctness. Masking in layernorm_apply prevents out-of-bounds memory access and preserves correctness on irregular shapes. The grid sizes are set to cover all output elements exactly, ensuring correctness and efficient execution."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 178032,
+        "output_tokens": 16694,
+        "tokens": 194726
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              393
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "b736f45f91c0c91e5bada6f0e73d6c61f63e640523c645060adfa487a4038f58",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fixes previous launch argument count mismatch by including all required arguments in layernorm_apply launch, matching kernel signature. Uses unified block size 1024 in both kernels for aligned memory access and reduced grid size, improving memory coalescing and efficiency. Masks in layernorm_stats exclude padding from mean and variance computations, preserving numerical correctness. Masks in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and efficient execution.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.238080257549882,
+        "validation_seconds": 2.076929605565965,
+        "candidate": {
+          "median_ms": 0.03573760092258453,
+          "p25_ms": 0.03420159965753555,
+          "p75_ms": 0.04398079961538315,
+          "min_ms": 0.03317759931087494
+        },
+        "incumbent": {
+          "median_ms": 0.03563520014286041,
+          "p25_ms": 0.034918400645256045,
+          "p75_ms": 0.0434688001871109,
+          "min_ms": 0.03287039995193482
+        },
+        "paired_speedup": 0.9971346487430439,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 89.86255140508037,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.375863967463374,
+        "process_seconds": 14.452947770245373
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 204734,
+        "output_tokens": 18556,
+        "tokens": 223290
+      },
+      "review": {
+        "config": {
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply",
+              "grid": [
+                393
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                400653,
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+        "rationale": "Fixes previous launch argument count mismatch by including all required arguments in layernorm_apply launch, matching kernel signature. Uses unified block size 1024 in both kernels for aligned memory access and reduced grid size, improving memory coalescing and efficiency. Masks in layernorm_stats exclude padding from mean and variance computations, preserving numerical correctness. Masks in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and efficient execution."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 215810,
+        "output_tokens": 19162,
+        "tokens": 234972
+      }
+    }
+  ],
+  "wall_seconds": 309.1355128251016,
+  "resolved_model": "gpt-4.1-mini-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.11698320000000001,
+  "budget_committed_usd": 0.11698320000000001,
+  "speedup": 1.0
+}

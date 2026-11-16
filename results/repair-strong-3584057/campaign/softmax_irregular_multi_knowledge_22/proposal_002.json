@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_persistent",
+        "grid": [
+          1
+        ],
+        "args": [
+          "X",
+          "Y",
+          513,
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_persistent(X, Y, M: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    # Persistent kernel: single program processes all rows\n    offs = tl.arange(0, BLOCK)\n    for row_id in range(M):\n        col = offs\n        mask = col < N\n        x_ptrs = X + row_id * N + col\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        mx = tl.max(x, 0)\n        x_centered = x - mx\n        exp_x = tl.exp(x_centered)\n        denom = tl.sum(exp_x, 0)\n        norm = exp_x / denom\n        y_ptrs = Y + row_id * N + col\n        tl.store(y_ptrs, norm, mask=mask)\n",
+  "rationale": "This changes the parallel decomposition from one program per row to a persistent kernel: a single program instance loops over all rows, processing one row per iteration with BLOCK-wide vectorization and masking. This tests whether launch overhead can be further reduced for small/moderate M, at the cost of possible underutilization for large M. All per-row computation, padding, and masking invariants are preserved. The computation for each row (load, masked reductions, exponentiation, normalization, and store) matches the previous fused logic, but all rows are processed within a single kernel instance."
+}

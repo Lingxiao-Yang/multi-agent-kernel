@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_multi_tile",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_multi_tile(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    max_acc = -float('inf')\n    sum_acc = 0.0\n    # First pass: find max value over the row, tiled by BLOCK\n    for off in range(0, N, BLOCK):\n        cols = off + tl.arange(0, BLOCK)\n        mask = cols < N\n        x = tl.load(X + row * N + cols, mask, other=-float('inf'))\n        max_acc = tl.maximum(max_acc, tl.max(x, 0))\n    # Second pass: compute sum of exponentials\n    for off in range(0, N, BLOCK):\n        cols = off + tl.arange(0, BLOCK)\n        mask = cols < N\n        x = tl.load(X + row * N + cols, mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_acc)\n        sum_acc = sum_acc + tl.sum(exp_x, 0)\n    # Third pass: write normalized output tile by tile\n    for off in range(0, N, BLOCK):\n        cols = off + tl.arange(0, BLOCK)\n        mask = cols < N\n        x = tl.load(X + row * N + cols, mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_acc)\n        y = exp_x / sum_acc\n        tl.store(Y + row * N + cols, y, mask)\n",
+  "rationale": "This kernel processes each row in tiles of size BLOCK, looping over them to cover the entire row even when N > BLOCK and N is not a multiple of BLOCK. All tl.arange extents are strictly constexpr, as required. The first loop accumulates the row max, the second accumulates the sum of exponentials, and the third normalizes and writes the output. All loads/stores are masked for correct boundary behavior. This structure supports arbitrary N > BLOCK and repairs the previous failure by keeping all tiling parameters compile-time constants and not relying on inter-program communication or nonlocal arrays."
+}

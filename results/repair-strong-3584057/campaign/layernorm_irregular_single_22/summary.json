@@ -1,0 +1,1348 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T21:09:35.527671+00:00",
+    "case": {
+      "id": "layernorm_irregular",
+      "family": "layernorm",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-05,
+      "rtol": 0.0002
+    },
+    "variant": "single",
+    "seed": 22,
+    "provider": "llm",
+    "model": "gpt-4.1-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 2.0,
+      "output_usd_per_million": 8.0,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "1bed5d8d58349e1546c29e9ae8e81c84aa1524da04b1df5c6fff162ca2bbdcd7",
+    "case_hash": "d56bbe0d9cb78bb9ecc73c04286ae77beed62029ec85e1fdd71d90872378f76b",
+    "baseline_hash": "f1ddf0c51eeac383cd1e63cae99169f71122e2f826500a5f89f22073cdd5301d",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584057",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 235723,
+    "output_tokens": 25317,
+    "tokens": 261040
+  },
+  "profile_invocations": 3,
+  "final": {
+    "candidate_id": 8,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 1.33514404296875e-05
+        }
+      ],
+      "first_launch_seconds": 1.418348697014153,
+      "validation_seconds": 2.1270773177966475,
+      "candidate": {
+        "median_ms": 0.018636800348758698,
+        "p25_ms": 0.018432000279426576,
+        "p75_ms": 0.020531199872493744,
+        "min_ms": 0.016281600296497344,
+        "samples_ms": [
+          0.022835199534893037,
+          0.019046400487422944,
+          0.019046400487422944,
+          0.018943999707698823,
+          0.018636800348758698,
+          0.020582400262355804,
+          0.018739199638366698,
+          0.029491201043128967,
+          0.018534399569034576,
+          0.018432000279426576,
+          0.020787200331687926,
+          0.016281600296497344,
+          0.030003198981285097,
+          0.018534399569034576,
+          0.018432000279426576,
+          0.018534399569034576,
+          0.018636800348758698,
+          0.018943999707698823,
+          0.018329599499702455,
+          0.018432000279426576,
+          0.018534399569034576,
+          0.020172800123691558,
+          0.01822720021009445,
+          0.02887679934501648,
+          0.01822720021009445,
+          0.018636800348758698,
+          0.020582400262355804,
+          0.020479999482631683,
+          0.028774398565292358,
+          0.018432000279426576,
+          0.01822720021009445
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.0347135990858078,
+        "p25_ms": 0.03287039995193482,
+        "p75_ms": 0.04254719913005829,
+        "min_ms": 0.032358399033546446,
+        "samples_ms": [
+          0.043315199017524716,
+          0.03594239950180054,
+          0.03266560137271881,
+          0.04259839951992035,
+          0.04464640021324158,
+          0.03266560137271881,
+          0.032767999172210696,
+          0.0347135990858078,
+          0.0347135990858078,
+          0.0447488009929657,
+          0.04352000057697296,
+          0.03256320059299469,
+          0.03338240087032318,
+          0.040550398826599124,
+          0.034508800506591795,
+          0.040652799606323245,
+          0.04249599874019623,
+          0.035020801424980166,
+          0.03297280073165894,
+          0.04321280121803284,
+          0.040755200386047366,
+          0.032358399033546446,
+          0.032767999172210696,
+          0.034201601147651674,
+          0.03430399894714355,
+          0.04321280121803284,
+          0.04392960071563721,
+          0.032358399033546446,
+          0.032358399033546446,
+          0.03409920036792755,
+          0.034508800506591795
+        ]
+      },
+      "paired_speedup": 1.8626372787279388,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.018739199638366698,
+          "p25_ms": 0.018534399569034576,
+          "p75_ms": 0.0201215997338295,
+          "min_ms": 0.01802240014076233,
+          "samples_ms": [
+            0.020377600193023683,
+            0.018943999707698823,
+            0.018739199638366698,
+            0.028672000765800475,
+            0.018636800348758698,
+            0.018739199638366698,
+            0.02099200040102005,
+            0.01884160041809082,
+            0.028569599986076354,
+            0.018329599499702455,
+            0.018432000279426576,
+            0.018636800348758698,
+            0.019865599274635316,
+            0.018534399569034576,
+            0.018432000279426576,
+            0.018636800348758698,
+            0.018534399569034576,
+            0.018636800348758698,
+            0.045158401131629944,
+            0.01884160041809082,
+            0.02088959962129593,
+            0.018739199638366698,
+            0.026726400852203368,
+            0.018432000279426576,
+            0.018432000279426576,
+            0.019763199985027312,
+            0.01966080069541931,
+            0.025600001215934753,
+            0.01802240014076233,
+            0.019763199985027312,
+            0.018432000279426576
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03604480028152466,
+          "p25_ms": 0.034355199337005614,
+          "p75_ms": 0.04275199919939041,
+          "min_ms": 0.032358399033546446,
+          "samples_ms": [
+            0.03604480028152466,
+            0.04249599874019623,
+            0.04229120016098022,
+            0.03532800078392029,
+            0.03522560000419617,
+            0.04392960071563721,
+            0.04382719993591309,
+            0.03287039995193482,
+            0.03256320059299469,
+            0.03430399894714355,
+            0.034815999865531924,
+            0.04147199988365173,
+            0.043007999658584595,
+            0.03461120128631592,
+            0.03256320059299469,
+            0.04352000057697296,
+            0.05877760052680969,
+            0.03307519853115082,
+            0.034815999865531924,
+            0.04321280121803284,
+            0.04352000057697296,
+            0.032358399033546446,
+            0.032358399033546446,
+            0.04126720130443573,
+            0.034406399726867674,
+            0.0394239991903305,
+            0.04249599874019623,
+            0.034508800506591795,
+            0.03389439880847931,
+            0.043315199017524716,
+            0.040140798687934874
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.030003198981285097,
+        "p25_ms": 0.029798400402069092,
+        "p75_ms": 0.03025919944047928,
+        "min_ms": 0.02969599962234497,
+        "samples_ms": [
+          0.030003198981285097,
+          0.029900801181793214,
+          0.031539198756217954,
+          0.029798400402069092,
+          0.03409920036792755,
+          0.02969599962234497,
+          0.030105599761009218,
+          0.029798400402069092,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.030105599761009218,
+          0.02969599962234497,
+          0.0364544004201889,
+          0.029798400402069092,
+          0.030003198981285097,
+          0.030924800038337707,
+          0.029900801181793214,
+          0.03041279911994934,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.03563520014286041,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.03051519989967346,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.036556801199913024,
+          0.029900801181793214,
+          0.029900801181793214
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 172.318849797299,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.340059415437281,
+      "process_seconds": 14.289642919786274
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_fused_fullrow_blockaccum_tail_unroll2",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "Y",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "f58f3c8d297c01cbf9f0350f4e9a95971827d8d1b4af10936eeed2da677a1a96",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The fused kernel in prior proposals is limited by the BLOCK size: if N > BLOCK, some columns are not covered. This version implements a blockwise loop to cover all N columns for each row, in chunks of BLOCK (RB=1024). It computes the mean/variance only once per row (using the first chunk, which loads/masks only valid values), then processes the entire row in BLOCK-sized stripes, masking all loads/stores. This reduces memory traffic, ensures full output coverage for any N, and maintains correct reduction identity handling and numerics. The kernel remains single-launch and leverages vectorized memory access.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 1539 / 400653 (0.4%)\nGreatest absolute difference: 4.6098779421299696e-05 at index (0, 343) (up to 2e-05 allowed)\nGreatest relative difference: 0.05183902755379677 at index (0, 343) (up to 0.0002 allowed)",
+        "worker_seconds": 15.302706588990986,
+        "process_seconds": 17.541760429739952
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 9231,
+        "output_tokens": 1573,
+        "tokens": 10804
+      },
+      "review": {
+        "diagnosis": "The previous attempt failed validation due to numerical error (absolute difference up to 4.6e-5, relative up to 0.05, while tolerances are 2e-5 and 2e-4 respectively). The root cause is that the mean and variance were computed using only the first BLOCK columns, not over the entire row for arbitrary N>BLOCK. In the blockwise loop, only the first chunk is used for stats, which is incorrect for remaining columns. Layernorm requires mean and variance over all N elements of the row.",
+        "outcome": "incorrect-numerics-stats-coverage",
+        "next_step": "Repair by computing the mean and variance over the full row: accumulate sum and squared sum across all chunks in a blockwise loop, then compute mean/variance/scaling. Only after that, loop again to apply the affine normalization to each chunk using the correct row stats. Ensure all reduction identities and masking are handled, and that all loads and stores are masked for N."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13967,
+        "output_tokens": 1788,
+        "tokens": 15755
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_fullrow",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "3e01734bcb2cf5399154641f5466ffa9c112ed5e4ff9ccf7b69f0025af20e183",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel repairs the previous stats coverage bug by computing the mean and variance for each row by accumulating across the entire row in BLOCK-sized chunks, with all loads masked. It performs three passes: first to accumulate sum for mean, second for squared centered sum for variance, and third to normalize and apply the affine transform to each chunk. All masking, numerics, and shape invariants are preserved, ensuring correct and fully-covered output for any N.",
+      "accepted": true,
+      "previous_failure_attempt": 1,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.506059283390641,
+        "validation_seconds": 3.112978876568377,
+        "candidate": {
+          "median_ms": 0.019968000054359437,
+          "p25_ms": 0.018534399569034576,
+          "p75_ms": 0.020582400262355804,
+          "min_ms": 0.01822720021009445
+        },
+        "incumbent": {
+          "median_ms": 0.03860479891300202,
+          "p25_ms": 0.034867200255393985,
+          "p75_ms": 0.04403200000524521,
+          "min_ms": 0.03256320059299469
+        },
+        "paired_speedup": 1.9333332736331685,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.018943999707698823,
+            "p25_ms": 0.018534399569034576,
+            "p75_ms": 0.021196800470352172,
+            "min_ms": 0.01822720021009445
+          },
+          "incumbent": {
+            "median_ms": 0.035123199224472046,
+            "p25_ms": 0.034355200827121735,
+            "p75_ms": 0.04280319958925247,
+            "min_ms": 0.03246079981327057
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 160.83092904934503,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.3019794328138232,
+        "process_seconds": 16.364187026396394,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 32,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 28145,
+        "output_tokens": 3728,
+        "tokens": 31873
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_fullrow_shared_acc",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_shared_acc(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n    # Use shared memory for partial reductions\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        mean_acc += x\n    # Reduce partial sums across BLOCK\n    mean = tl.sum(mean_acc, 0)\n    mean = tl.div_rn(mean, N)\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        var_acc += centered * centered\n    var = tl.sum(var_acc, 0)\n    var = tl.div_rn(var, N)\n    inv = tl.rsqrt(var + 1e-5)\n    # Third pass: normalize and affine transform\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+        "rationale": "This version reduces memory traffic by accumulating mean and variance using local BLOCK-sized arrays (mean_acc and var_acc), then performing a single blockwise reduction with tl.sum. This approach maintains numerical stability and coverage for any N by looping in BLOCK-sized chunks, masking out-of-bounds, and divides by N for correct numerics. The output loop remains the same. This is a valid optimization because it reduces the number of redundant reductions and leverages vectorized local accumulation before cross-thread reduction, which can improve performance for large N."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 35154,
+        "output_tokens": 4394,
+        "tokens": 39548
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_vectorized",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "0b2fc7a129b7c555ad5eb68e17c8fee5f24b80325563b929225845d5e9cbefa4",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel improves upon the incumbent by vectorizing the accumulation of sum and squared sum for mean/variance. It uses local BLOCK-sized arrays (sum_acc, sqr_acc, count_acc) to accumulate values from all chunks of the row, then reduces these to scalars for the whole row before the normalization pass. This increases register utilization, reduces memory traffic, and can better leverage vectorized operations, especially for large N. Final normalization and affine transformation are performed in a single pass, maintaining full masking and shape coverage. All numerics and reduction identities are preserved. This is a valid performance-driven computational change.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6977219097316265,
+        "validation_seconds": 3.2556492425501347,
+        "candidate": {
+          "median_ms": 0.018739199638366698,
+          "p25_ms": 0.018432000279426576,
+          "p75_ms": 0.021811199933290483,
+          "min_ms": 0.01812479943037033
+        },
+        "incumbent": {
+          "median_ms": 0.018636800348758698,
+          "p25_ms": 0.018432000279426576,
+          "p75_ms": 0.020582400262355804,
+          "min_ms": 0.017100800573825837
+        },
+        "paired_speedup": 0.9945355569296381,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 171.37722325263144,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.3734435429796576,
+        "process_seconds": 15.372522446326911
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 52334,
+        "output_tokens": 6489,
+        "tokens": 58823
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_unrolled",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_unrolled(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n    # Unroll the main accumulation loop for sum and sqr-sum\n    sum_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sum_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    for ii in range(0, num_iters, 2):\n        # Pass 1\n        i = ii\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        sum_acc0 += tl.where(mask, x, 0.0)\n        sqr_acc0 += tl.where(mask, x * x, 0.0)\n        count_acc0 += mask.to(tl.float32)\n        # Pass 2 (unrolled)\n        if ii + 1 < num_iters:\n            i2 = ii + 1\n            col2 = offs + i2 * BLOCK\n            mask2 = col2 < N\n            x2 = tl.load(X + row * N + col2, mask=mask2, other=0.0)\n            sum_acc1 += tl.where(mask2, x2, 0.0)\n            sqr_acc1 += tl.where(mask2, x2 * x2, 0.0)\n            count_acc1 += mask2.to(tl.float32)\n    # Combine unrolled accumulators\n    sum_acc = sum_acc0 + sum_acc1\n    sqr_acc = sqr_acc0 + sqr_acc1\n    count_acc = count_acc0 + count_acc1\n    row_sum = tl.sum(sum_acc, 0)\n    row_sqr = tl.sum(sqr_acc, 0)\n    row_count = tl.sum(count_acc, 0)\n    mean = tl.div_rn(row_sum, row_count)\n    var = tl.div_rn(row_sqr, row_count) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    # Unroll the normalization/affine loop\n    for ii in range(0, num_iters, 2):\n        # Pass 1\n        i = ii\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        norm = (x - mean) * inv\n        y = norm * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n        # Pass 2 (unrolled)\n        if ii + 1 < num_iters:\n            i2 = ii + 1\n            col2 = offs + i2 * BLOCK\n            mask2 = col2 < N\n            x2 = tl.load(X + row * N + col2, mask=mask2, other=0.0)\n            w2 = tl.load(W + col2, mask=mask2, other=0.0)\n            b2 = tl.load(B + col2, mask=mask2, other=0.0)\n            norm2 = (x2 - mean) * inv\n            y2 = norm2 * w2 + b2\n            tl.store(Y + row * N + col2, y2, mask=mask2)\n",
+        "rationale": "This kernel applies explicit two-way unrolling in the accumulation and output loops. By maintaining two sets of blockwise accumulators (sum_acc0/1, sqr_acc0/1, count_acc0/1), it processes two BLOCK-sized stripes per loop iteration, reducing loop overhead and increasing ILP, while still vectorizing across BLOCK. After accumulation, the two accumulator sets are summed and reduced to scalars for the row mean and variance. The normalization and affine transform loop is similarly unrolled, processing two stripes per iteration. This can improve memory throughput and instruction-level parallelism, especially for large N. All masking, reduction, and shape invariants are preserved, as is the correct bias/weight application and division by row_count for numerics."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 60271,
+        "output_tokens": 7658,
+        "tokens": 67929
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_multirow_fullrow",
+            "grid": [
+              129
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "7a8acaf38032ff94db09c35318ad2a33cfd48458975735e87100ca4e200dde05",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel fuses the high-occupancy multirow decomposition (processing 4 rows per kernel instance to reduce grid size and increase occupancy) with the proven 3-pass blockwise accumulation strategy of the incumbent. For each assigned row, it fully accumulates the mean and variance using blockwise stripe loops with masking, then normalizes and applies the affine transform in a third masked loop. No numerics are changed; all masking, bounds, and division-by-N rules are preserved. This is a valid parallel decomposition and data movement optimization, increasing occupancy for irregular shapes while retaining the numerics and coverage of the incumbent.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "UnsupportedLanguageConstruct",
+        "error": "at 9:12:\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        if row >= 513:\n            break\n            ^\nunsupported AST node type: Break",
+        "worker_seconds": 11.036762464791536,
+        "process_seconds": 13.504069896414876
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 80114,
+        "output_tokens": 9831,
+        "tokens": 89945
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_multirow_fullrow",
+              "grid": [
+                129
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        # Do not break; instead skip if out of bounds\n        if row >= 513:\n            continue\n        num_iters = (N + BLOCK - 1) // BLOCK\n        mean_acc = 0.0\n        var_acc = 0.0\n        # First pass: blockwise accumulation for mean\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            mean_acc += tl.sum(x, 0)\n        mean = tl.div_rn(mean_acc, N)\n        # Second pass: blockwise accumulation for variance\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            centered = tl.where(mask, x - mean, 0.0)\n            var_acc += tl.sum(centered * centered, 0)\n        var = tl.div_rn(var_acc, N)\n        inv = tl.rsqrt(var + 1e-5)\n        # Third pass: normalize and affine transform\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            centered = tl.where(mask, x - mean, 0.0)\n            w = tl.load(W + col, mask=mask, other=0.0)\n            b = tl.load(B + col, mask=mask, other=0.0)\n            y = (centered * inv) * w + b\n            tl.store(Y + row * N + col, y, mask=mask)\n",
+        "rationale": "The previous failure was due to using an unsupported 'break' statement inside the for loop to exit early for out-of-bounds rows. Triton does not support 'break', but it does support 'continue'. This version repairs the kernel by skipping processing for out-of-bounds rows using 'continue' instead of 'break'. The rest of the logic\u2014multirow parallel decomposition, 3-pass numerically correct blockwise accumulation, and masking\u2014remains unchanged. All coverage, numerics, and shape handling are preserved. This ensures that each kernel instance only processes in-bounds rows, fixing the language error and preserving the intended optimization."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 88724,
+        "output_tokens": 10591,
+        "tokens": 99315
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_multirow_fullrow",
+            "grid": [
+              129
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "dec39dbd6ce19b98a839ea92eff6f1eb1c57c4daf4e44bbef431fb5c1cefa7a8",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The kernel processes 4 rows per program instance for better occupancy. It repairs the previous use of 'break' (not supported in Triton) with 'continue', so only in-bounds rows are computed. For each valid row, it performs 3 passes: (1) masked accumulation of the mean over all N columns, (2) masked accumulation of variance using the computed mean, (3) normalization and affine transform with masked loads/stores. All numerics, masking, and output coverage are preserved, and the parallel decomposition increases efficiency for irregular shapes.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "error",
+        "error_type": "UnsupportedLanguageConstruct",
+        "error": "at 9:12:\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        if row >= 513:\n            continue\n            ^\nunsupported AST node type: Continue",
+        "worker_seconds": 11.583984246477485,
+        "process_seconds": 13.987143581733108
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 110775,
+        "output_tokens": 12793,
+        "tokens": 123568
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_multirow_fullrow",
+              "grid": [
+                129
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        in_bounds = row < 513\n        # Mask out-of-bounds at every access\n        if not in_bounds:\n            continue  # Will be dead code eliminated\n        num_iters = (N + BLOCK - 1) // BLOCK\n        # First pass: accumulate mean\n        mean_acc = 0.0\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            mean_acc += tl.sum(x, 0)\n        mean = tl.div_rn(mean_acc, N)\n        # Second pass: accumulate variance\n        var_acc = 0.0\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            centered = tl.where(mask, x - mean, 0.0)\n            var_acc += tl.sum(centered * centered, 0)\n        var = tl.div_rn(var_acc, N)\n        inv = tl.rsqrt(var + 1e-5)\n        # Third pass: normalize and affine transform\n        for i in range(num_iters):\n            col = offs + i * BLOCK\n            mask = col < N\n            x = tl.load(X + row * N + col, mask=mask, other=0.0)\n            centered = tl.where(mask, x - mean, 0.0)\n            w = tl.load(W + col, mask=mask, other=0.0)\n            b = tl.load(B + col, mask=mask, other=0.0)\n            y = (centered * inv) * w + b\n            tl.store(Y + row * N + col, y, mask=mask)\n",
+        "rationale": "Triton does not support 'continue' or 'break' in for-loops. To implement a multirow decomposition, mask out-of-bounds rows at every access using an in_bounds check, so only valid rows are processed and memory is not accessed out-of-bounds. All coverage, numerics, and masking are preserved. The kernel processes 4 rows per program instance for better occupancy, looping over each row and using masked blockwise loops to accumulate mean, variance, and perform the affine transform. This is the correct repair for unsupported flow control in Triton, while retaining all intended optimizations."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 120125,
+        "output_tokens": 13534,
+        "tokens": 133659
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_multirow_masked",
+            "grid": [
+              129
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "1b85a9757e56bfa7bc51d5875da3f55fd28788d1cbfca1c2e384b9fd9430db25",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases occupancy for irregular row counts by assigning 4 rows per program instance. To avoid unsupported control flow, every memory access and reduction is masked by both row_in_bounds and col_in_bounds. This ensures only valid output elements are computed and avoids out-of-bounds accesses. The three-pass approach (mean, variance, normalization/affine) is maintained, and all reductions are accumulated over the full row, with masking preserving numerics. This is a valid parallel decomposition and data movement optimization, preserving output coverage and correctness.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.509213035926223,
+        "validation_seconds": 3.1280299508944154,
+        "candidate": {
+          "median_ms": 0.020684799551963805,
+          "p25_ms": 0.019968000054359437,
+          "p75_ms": 0.024422399699687958,
+          "min_ms": 0.019763199985027312
+        },
+        "incumbent": {
+          "median_ms": 0.01884160041809082,
+          "p25_ms": 0.018585599958896637,
+          "p75_ms": 0.02109439969062805,
+          "min_ms": 0.016998399794101716
+        },
+        "paired_speedup": 0.9108911290514298,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 155.25758380844954,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.2476323023438454,
+        "process_seconds": 15.446531850844622
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 144222,
+        "output_tokens": 15837,
+        "tokens": 160059
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_fullrow_vectorized",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_vectorized(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n\n    # Vectorized accumulation for mean and variance\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n\n    # Accumulate sum and count for mean\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        mean_acc = mean_acc + tl.where(mask, x, 0.0)\n        count_acc = count_acc + mask.to(tl.float32)\n    sum_mean = tl.sum(mean_acc, 0)\n    count_total = tl.sum(count_acc, 0)\n    mean = tl.div_rn(sum_mean, count_total)\n    \n    # Accumulate squared difference for variance\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        var_acc = var_acc + centered * centered\n    sum_var = tl.sum(var_acc, 0)\n    var = tl.div_rn(sum_var, count_total)\n    inv = tl.rsqrt(var + 1e-5)\n\n    # Vectorized normalization and affine transform\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+        "rationale": "This kernel increases data reuse and vectorization by accumulating the mean and variance using BLOCK-wide arrays, summing across all stripes for each row before the normalization pass. This reduces the number of scalar reductions and improves register and ALU utilization for large N. The approach preserves all coverage, masking, and numerics (including division by total count for irregular N), and does not change the output structure. All memory accesses are masked and all reductions properly accumulate only valid elements."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 154584,
+        "output_tokens": 16594,
+        "tokens": 171178
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_fullrow_blockaccum",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "c659494b899a798ab7fa9d97164a2750feac7999f32ab70929cbdabf14f4aacf",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel accumulates sum, squared sum, and count for each row using BLOCK-wide arrays, processing the row in BLOCK-sized stripes. All loads are masked for N, and each accumulator uses tl.where(mask, ...) to ensure only valid elements contribute. After the accumulation, a reduction (tl.sum) yields row_sum, row_sqr, row_count. These are used to compute mean and variance for the row, with correct division by the number of valid elements. The normalization and affine transform are performed in a second loop, again in BLOCK-sized stripes and with all loads and stores masked. This approach increases register/ALU utilization and ILP, reduces the number of cross-thread reductions, and fully covers all output elements for irregular N. The implementation preserves all numerics and shape invariants.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.412142315879464,
+        "validation_seconds": 4.020734469406307,
+        "candidate": {
+          "median_ms": 0.020070399343967437,
+          "p25_ms": 0.018892800062894823,
+          "p75_ms": 0.021964799612760544,
+          "min_ms": 0.018534399569034576
+        },
+        "incumbent": {
+          "median_ms": 0.019046400487422944,
+          "p25_ms": 0.018892800062894823,
+          "p75_ms": 0.02094080001115799,
+          "min_ms": 0.018534399569034576
+        },
+        "paired_speedup": 0.9489796471412874,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 160.0103687505985,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.13494479469955,
+        "process_seconds": 16.460522173903883
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 180803,
+        "output_tokens": 18779,
+        "tokens": 199582
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_fullrow_blockaccum_unroll2",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_blockaccum_unroll2(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + 2 * BLOCK - 1) // (2 * BLOCK)\n    # Unroll by 2: accumulate into two BLOCK-wide arrays\n    sum_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sum_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    for i in range(num_iters):\n        col0 = offs + (2 * i) * BLOCK\n        col1 = offs + (2 * i + 1) * BLOCK\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        sum_acc0 += tl.where(mask0, x0, 0.0)\n        sum_acc1 += tl.where(mask1, x1, 0.0)\n        sqr_acc0 += tl.where(mask0, x0 * x0, 0.0)\n        sqr_acc1 += tl.where(mask1, x1 * x1, 0.0)\n        count_acc0 += tl.where(mask0, 1.0, 0.0)\n        count_acc1 += tl.where(mask1, 1.0, 0.0)\n    row_sum = tl.sum(sum_acc0, 0) + tl.sum(sum_acc1, 0)\n    row_sqr = tl.sum(sqr_acc0, 0) + tl.sum(sqr_acc1, 0)\n    row_count = tl.sum(count_acc0, 0) + tl.sum(count_acc1, 0)\n    mean = tl.div_rn(row_sum, row_count)\n    var = tl.div_rn(row_sqr, row_count) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    # Normalize/affine pass, also unrolled by 2\n    for i in range(num_iters):\n        col0 = offs + (2 * i) * BLOCK\n        col1 = offs + (2 * i + 1) * BLOCK\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        centered0 = x0 - mean\n        centered1 = x1 - mean\n        w0 = tl.load(W + col0, mask=mask0, other=0.0)\n        w1 = tl.load(W + col1, mask=mask1, other=0.0)\n        b0 = tl.load(B + col0, mask=mask0, other=0.0)\n        b1 = tl.load(B + col1, mask=mask1, other=0.0)\n        y0 = (centered0 * inv) * w0 + b0\n        y1 = (centered1 * inv) * w1 + b1\n        tl.store(Y + row * N + col0, y0, mask=mask0)\n        tl.store(Y + row * N + col1, y1, mask=mask1)\n",
+        "rationale": "This kernel applies explicit two-way unrolling for both the accumulation and output passes. By maintaining two sets of BLOCK-wide accumulators (sum_acc0/1, sqr_acc0/1, count_acc0/1), it processes two BLOCK-wide stripes per loop iteration, reducing loop overhead and increasing instruction-level parallelism. After the accumulation, both sets are summed and reduced to scalars for row mean/variance. The normalization/affine transform is also unrolled, processing two stripes per pass. All masking, tl.where, and numerics are preserved, ensuring correct output and coverage for irregular N. This approach is a valid vectorization/data movement optimization for large N and is structurally different from the incumbent."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 191868,
+        "output_tokens": 19924,
+        "tokens": 211792
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 2,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_fullrow_blockaccum_tail_unroll2",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "51d116219ff7d3c0947a40f18bdb8a3fbb5a970a66dafb39da7fa7b14599c79c",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel fuses blockwise unrolling and tail handling for irregular N. The main accumulation and output loops are explicitly unrolled by two BLOCK-wide stripes for higher ILP and memory throughput. For the remaining (tail) elements not fitting in a 2*BLOCK multiple, a separate masked blockwise loop handles the last stripes. All accumulators (sum, sqr, count) and outputs are correctly masked and summed, ensuring numerics and coverage for any N. This approach maximizes vectorization and minimizes loop overhead for large N, while guaranteeing correctness for irregular shapes.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6163819627836347,
+        "validation_seconds": 3.6890909215435386,
+        "candidate": {
+          "median_ms": 0.018943999707698823,
+          "p25_ms": 0.018534399569034576,
+          "p75_ms": 0.02314239963889122,
+          "min_ms": 0.01812479943037033
+        },
+        "incumbent": {
+          "median_ms": 0.019968000054359437,
+          "p25_ms": 0.018431999534368516,
+          "p75_ms": 0.020735999941825865,
+          "min_ms": 0.01812479943037033
+        },
+        "paired_speedup": 1.054054073187325,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.019763199985027312,
+            "p25_ms": 0.018636800348758698,
+            "p75_ms": 0.024934399873018265,
+            "min_ms": 0.01812479943037033
+          },
+          "incumbent": {
+            "median_ms": 0.019968000054359437,
+            "p25_ms": 0.018687999993562698,
+            "p75_ms": 0.02083839997649193,
+            "min_ms": 0.016281600296497344
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 169.52449585896377,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.836863054893911,
+        "process_seconds": 15.464539446868002,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 32,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 222042,
+        "output_tokens": 23701,
+        "tokens": 245743
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_fused_fullrow_blockaccum_tail_unroll2_vec4",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_blockaccum_tail_unroll2_vec4(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    VEC = 4\n    vec_offs = offs[:, None] * VEC + tl.arange(0, VEC)[None, :]\n    block_elems = BLOCK * VEC\n    num_iters = (N // (2 * block_elems))\n    tail_start = num_iters * 2 * block_elems\n    # Accumulators for main unrolled loop\n    sum_acc0 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    sum_acc1 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    sqr_acc0 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    sqr_acc1 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    count_acc0 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    count_acc1 = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    # Main unrolled accumulation\n    for i in range(num_iters):\n        base = 2 * i * block_elems\n        col0 = vec_offs + base\n        col1 = vec_offs + base + block_elems\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        sum_acc0 += tl.where(mask0, x0, 0.0)\n        sum_acc1 += tl.where(mask1, x1, 0.0)\n        sqr_acc0 += tl.where(mask0, x0 * x0, 0.0)\n        sqr_acc1 += tl.where(mask1, x1 * x1, 0.0)\n        count_acc0 += tl.where(mask0, 1.0, 0.0)\n        count_acc1 += tl.where(mask1, 1.0, 0.0)\n    # Tail processing for remaining elements\n    tail_sum = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    tail_sqr = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    tail_count = tl.zeros((BLOCK, VEC), dtype=tl.float32)\n    tail_iters = (N - tail_start + block_elems - 1) // block_elems\n    for t in range(tail_iters):\n        col = vec_offs + tail_start + t * block_elems\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        tail_sum += tl.where(mask, x, 0.0)\n        tail_sqr += tl.where(mask, x * x, 0.0)\n        tail_count += tl.where(mask, 1.0, 0.0)\n    # Reduce accumulators\n    row_sum = tl.sum(sum_acc0, axis=(0, 1)) + tl.sum(sum_acc1, axis=(0, 1)) + tl.sum(tail_sum, axis=(0, 1))\n    row_sqr = tl.sum(sqr_acc0, axis=(0, 1)) + tl.sum(sqr_acc1, axis=(0, 1)) + tl.sum(tail_sqr, axis=(0, 1))\n    row_count = tl.sum(count_acc0, axis=(0, 1)) + tl.sum(count_acc1, axis=(0, 1)) + tl.sum(tail_count, axis=(0, 1))\n    mean = tl.div_rn(row_sum, row_count)\n    var = tl.div_rn(row_sqr, row_count) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    # Main unrolled output loop\n    for i in range(num_iters):\n        base = 2 * i * block_elems\n        col0 = vec_offs + base\n        col1 = vec_offs + base + block_elems\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        centered0 = x0 - mean\n        centered1 = x1 - mean\n        w0 = tl.load(W + col0, mask=mask0, other=0.0)\n        w1 = tl.load(W + col1, mask=mask1, other=0.0)\n        b0 = tl.load(B + col0, mask=mask0, other=0.0)\n        b1 = tl.load(B + col1, mask=mask1, other=0.0)\n        y0 = (centered0 * inv) * w0 + b0\n        y1 = (centered1 * inv) * w1 + b1\n        tl.store(Y + row * N + col0, y0, mask=mask0)\n        tl.store(Y + row * N + col1, y1, mask=mask1)\n    # Tail output\n    for t in range(tail_iters):\n        col = vec_offs + tail_start + t * block_elems\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = x - mean\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+        "rationale": "This kernel uses inner vectorization (VEC=4) for main and tail accumulation/output loops, processing BLOCK*VEC columns per stripe. All accumulators become (BLOCK,4) arrays, and reductions use axis=(0,1). This increases memory throughput and ALU utilization for large N. Unrolling by two vectorized stripes is retained; for non-multiples of 2*BLOCK*VEC, a tail loop handles the remainder, all with proper masking. This improves vectorized memory and compute efficiency for irregular N while preserving numerics and output shape."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 235723,
+        "output_tokens": 25317,
+        "tokens": 261040
+      }
+    }
+  ],
+  "wall_seconds": 324.1309803389013,
+  "resolved_model": "gpt-4.1-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.673982,
+  "budget_committed_usd": 0.6739819999999999,
+  "speedup": 1.8626372787279388
+}

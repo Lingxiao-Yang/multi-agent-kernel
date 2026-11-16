@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_softmax_rowblock",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_rowblock(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    col_start = block_id * (N // 2)\n    col = col_start + offs\n    mask = col < N\n    # 1. Compute row max (across all columns, blockwise)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    max_val = tl.max(max_val, 0)\n    # 2. Compute denominator (sum of exp(x - max))\n    denom = 0.0\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_val)\n        blk_sum = tl.sum(exp_x, 0)\n        denom = denom + blk_sum\n    # 3. Compute and store the softmax for this block\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x - max_val)\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+  "rationale": "This variant uses a 2D grid (row, block) with BLOCK=RB=1024, launching two column blocks per row to balance parallelism and resource usage relative to the original single-row kernel. Each program instance covers a half-row tile (N//2), with correct masking and blockwise reduction for max and denominator. This design increases columnwise concurrency for wide rows, reduces per-program register pressure versus full-row vectorization, and maintains numerically stable reductions and full output coverage. All device logic is inlined, and boundary masking is correct for non-multiple-of-tile N."
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_row_col_parallel",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024,
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_row_col_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr, SPLIT: tl.constexpr):\n    row_id = tl.program_id(0)\n    part = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    tile_cols = (N + SPLIT - 1) // SPLIT\n    col_start = part * tile_cols\n    col = col_start + offs\n    mask = col < N\n    x_ptrs = X + row_id * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    local_max = tl.max(x, 0)\n    smem_max = tl.zeros((SPLIT,), dtype=tl.float32)\n    tl.store(smem_max + part, local_max)\n    tl.barrier()\n    if offs[0] == 0:\n        row_max = smem_max[0]\n        for i in range(1, SPLIT):\n            row_max = tl.maximum(row_max, smem_max[i])\n        smem_max[0] = row_max\n    tl.barrier()\n    row_max = smem_max[0]\n    x_centered = x - row_max\n    exp_x = tl.where(mask, tl.exp(x_centered), 0.0)\n    local_sum = tl.sum(exp_x, 0)\n    smem_sum = tl.zeros((SPLIT,), dtype=tl.float32)\n    tl.store(smem_sum + part, local_sum)\n    tl.barrier()\n    if offs[0] == 0:\n        denom = smem_sum[0]\n        for i in range(1, SPLIT):\n            denom = denom + smem_sum[i]\n        smem_sum[0] = denom\n    tl.barrier()\n    denom = smem_sum[0]\n    norm = exp_x / denom\n    y_ptrs = Y + row_id * N + col\n    tl.store(y_ptrs, norm, mask=mask)\n",
+  "rationale": "This kernel increases parallelism by splitting each row into SPLIT (2) partitions, with grid=[M, SPLIT]. Each program instance computes softmax over its partition of the row, using explicit cross-partition reduction for max and sum via per-partition shared memory and synchronization barriers. All reductions and normalization are performed collectively. This tests explicit reduction and partitioning overhead and increases occupancy for wide rows. Masking ensures correct handling for N=781 < BLOCK=1024. Data movement and computation are structurally different from the incumbent."
+}

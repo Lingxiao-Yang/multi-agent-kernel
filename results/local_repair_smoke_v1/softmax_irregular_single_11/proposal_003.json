@@ -1,0 +1,52 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_stats_finalize",
+        "grid": [
+          513
+        ],
+        "args": [
+          "S",
+          781
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1571
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    offs = block_id * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    s_ptr = S + row * ((N + BLOCK - 1) // BLOCK * 2) + block_id * 2\n    tl.store(s_ptr, mx)\n    x_exp = tl.where(mask, tl.exp(x - mx), 0.0)\n    denom = tl.sum(x_exp, 0)\n    tl.store(s_ptr + 1, denom)\n\n@triton.jit\ndef softmax_stats_finalize(S, N: tl.constexpr):\n    row = tl.program_id(0)\n    num_blocks = (N + 256 - 1) // 256\n    mx = -float('inf')\n    for i in range(num_blocks):\n        mx_block = tl.load(S + row * num_blocks * 2 + i * 2)\n        mx = tl.maximum(mx, mx_block)\n    denom = 0.0\n    for i in range(num_blocks):\n        val = tl.load(S + row * num_blocks * 2 + i * 2 + 1)\n        denom += tl.exp(val - mx)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    x = tl.load(X + i, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=-float('inf'))\n    denom = tl.load(S + row * 2 + 1, mask, other=1.0)\n    out = tl.exp(x - mx) / denom\n    tl.store(Y + i, out, mask)\n",
+  "rationale": "Split the softmax max and sum reduction into two stages with softmax_stats and softmax_stats_finalize to compute stable per-row max and denom across blocks of size 256 covering all 781 columns with masking. Launch softmax_stats with a 2D grid (513,4) to cover all input columns, using masking to avoid out-of-bounds loads. softmax_stats_finalize reduces partial max and sum results to global max and denom per row. softmax_apply launches with grid=1571 (covering all 400,653 elements) and uses masking with appropriate 'other' values (-inf for max and 1.0 for denom) to avoid numerical errors from padding. This ensures full input coverage, correct masking, and numerical stability for irregular softmax on RTX 4060, fixing previous numerical mismatches and coverage errors without speculative optimizations."
+}

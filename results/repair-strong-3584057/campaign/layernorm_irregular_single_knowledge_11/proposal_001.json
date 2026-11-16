@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_row_parallel",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_row_parallel(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    cols = tl.arange(0, BLOCK)\n    offs = row * N + cols\n    mask = cols < N\n    # Load input row with padding masked\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    # Compute row mean (masked reduction)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    # Center and mask again for variance (to avoid padding contribution)\n    x_centered = x - mean\n    x_centered = tl.where(mask, x_centered, 0.0)\n    sum_var = tl.sum(x_centered * x_centered, axis=0)\n    var = tl.div_rn(sum_var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Load weight and bias\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    # Final layernorm: (x - mean) / sqrt(var + eps) * w + b\n    y = (x_centered * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+  "rationale": "This kernel fuses layernorm into a single pass, assigning each row to a program instance (grid=513). Each thread processes BLOCK=1024 columns and masks padding. Reductions (mean, variance) are correctly masked to avoid padded values contributing. The logic ensures correct output coverage and numerics for irregular row width (N=781), using the required epsilon and division-by-N. Data movement is minimized by loading weights/biases per row in parallel. No helper function calls or nonstandard primitives are used. This is a valid and optimized kernel under the contract."
+}

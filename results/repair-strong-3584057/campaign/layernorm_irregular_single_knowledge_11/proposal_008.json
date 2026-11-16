@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_split4_interleaved_unroll",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_split4_interleaved_unroll(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n    mask = cols < N\n    offs = row * N + cols\n    # Interleaved reduction: each split processes BLOCK elements offset by split, unrolling for ILP\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for u in range(SPLITS):\n            icol = off + ((split + u) % SPLITS) * BLOCK + tl.arange(0, BLOCK)\n            imask = icol < N\n            ioffs = row * N + icol\n            x = tl.load(X + ioffs, mask=imask, other=0.0)\n            mean_acc += tl.where(imask, x, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # Variance pass\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for u in range(SPLITS):\n            icol = off + ((split + u) % SPLITS) * BLOCK + tl.arange(0, BLOCK)\n            imask = icol < N\n            ioffs = row * N + icol\n            x = tl.load(X + ioffs, mask=imask, other=0.0)\n            xc = x - mean\n            var_acc += tl.where(imask, xc * xc, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Normalize and write only this split's region\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+  "rationale": "This kernel increases instruction-level parallelism by interleaving reduction passes across splits: in each outer iteration, every split processes BLOCK elements from a different offset, unrolling the split loop to improve memory throughput. This distributes memory accesses and reduction contributions more evenly than chunked or contiguous approaches, potentially improving cache/bandwidth utilization. All loads and stores are masked for irregular N; reductions always divide by the true N; epsilon is preserved for variance; and each split only normalizes and writes its own region. The mapping covers all outputs and reductions as required."
+}

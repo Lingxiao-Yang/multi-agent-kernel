@@ -1,0 +1,5 @@
+case,family,variant,seed,provider,gpu,speedup,attempts,calls,tokens,valid_attempts,retained_attempts,wall_seconds,estimated_usd,library_ms,candidate_ms,stop_reason
+softmax_irregular,softmax,multi,11,llm,NVIDIA GeForce RTX 4060 Laptop GPU,1.0,4,16,95198,0,0,155.164298303,0.0518504,0.011468800157308579,0.024883200228214265,candidate_cap
+softmax_irregular,softmax,multi_knowledge,11,llm,NVIDIA GeForce RTX 4060 Laptop GPU,1.90030999789358,4,16,98045,1,1,139.685383264,0.04787480000000004,0.010649599879980088,0.012390399724245072,candidate_cap
+softmax_irregular,softmax,single,11,llm,NVIDIA GeForce RTX 4060 Laptop GPU,1.0,4,16,105313,0,0,183.132521952,0.05796040000000002,0.01157120019197464,0.02385919988155365,candidate_cap
+softmax_irregular,softmax,single_knowledge,11,llm,NVIDIA GeForce RTX 4060 Laptop GPU,1.0,4,16,96826,0,0,130.96106077899998,0.047751999999999996,0.011776000261306763,0.023552000522613525,candidate_cap

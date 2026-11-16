@@ -1,0 +1,33 @@
+{
+  "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+  "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+  "torch": "2.11.0+cu128",
+  "triton": "3.6.0",
+  "cuda": "12.8",
+  "gpu": "NVIDIA A100-PCIE-40GB",
+  "memory_bytes": 42406903808,
+  "capability": [
+    8,
+    0
+  ],
+  "sm_count": 108
+}
+softmax_irregular ok 
+layernorm_irregular ok 
+layernorm_irregular single 22 complete 1.0 0.11698320000000001
+softmax_irregular single 22 complete 1.0 0.2066388
+layernorm_irregular multi 11 complete 1.0 0.33830760000000004
+softmax_irregular single_knowledge 22 complete 1.9788359715031918 0.45108
+softmax_irregular multi 22 complete 1.0 0.5697671999999998
+softmax_irregular single_knowledge 11 complete 1.948863578110877 0.6881763999999996
+layernorm_irregular multi 22 complete 1.860962595974551 0.8116407999999997
+softmax_irregular single 11 complete 1.0 0.9233871999999994
+layernorm_irregular multi_knowledge 11 complete 1.838709705180552 1.0706903999999995
+layernorm_irregular multi_knowledge 22 complete 1.0 1.213267199999999
+layernorm_irregular single_knowledge 22 complete 1.0 1.326352399999999
+softmax_irregular multi_knowledge 22 complete 1.8314607007957038 1.4384683999999979
+layernorm_irregular single_knowledge 11 complete 1.0 1.5549255999999971
+layernorm_irregular single 11 complete 1.0 1.6716295999999977
+softmax_irregular multi_knowledge 11 complete 1.0 1.7998391999999979
+softmax_irregular multi 11 complete 1.0 1.9153827999999982
+{"searches": 16, "attempts": 128, "source_supplied": 128, "structural_screen": 93, "correct": 34, "retained": 5}

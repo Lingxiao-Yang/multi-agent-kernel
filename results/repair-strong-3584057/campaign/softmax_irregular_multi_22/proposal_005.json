@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_split_col",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_split_col(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = BLOCK // 2\n    offs = tl.arange(0, tile)\n    start = part * tile\n    cols = start + offs\n    col_mask = cols < N\n    # load x for this tile\n    x_ptr = X + row * N + cols\n    x = tl.load(x_ptr, col_mask, other=-float('inf'))\n    # local tile max\n    mx_local = tl.max(x, 0)\n    # manually exchange max with other part (simulate register exchange for 2 parts)\n    # load the other tile's x\n    other_start = (1 - part) * tile\n    other_cols = other_start + offs\n    other_mask = other_cols < N\n    x_ptr_other = X + row * N + other_cols\n    x_other = tl.load(x_ptr_other, other_mask, other=-float('inf'))\n    mx_other = tl.max(x_other, 0)\n    mx_total = tl.maximum(mx_local, mx_other)\n    # shift and exp\n    x_shifted = x - mx_total\n    exp_x = tl.exp(x_shifted)\n    # local tile sum\n    local_sum = tl.sum(exp_x, 0)\n    # compute sum for the other tile using the same shift\n    x_other_shifted = x_other - mx_total\n    exp_x_other = tl.exp(x_other_shifted)\n    other_sum = tl.sum(exp_x_other, 0)\n    denom = local_sum + other_sum\n    # softmax\n    softmax = exp_x / denom\n    y_ptr = Y + row * N + cols\n    tl.store(y_ptr, softmax, col_mask)\n",
+  "rationale": "This kernel splits each row across two programs (grid [513,2]), each covering half the columns (tile = BLOCK//2). Each part computes its local maximum and local exponentiated sum, then manually loads the data from the other half to compute the global maximum and denominator for the softmax, ensuring correct normalization across the entire row. All loads and stores are masked for irregular N. The reduction and exponentiation are performed for both tiles within each program instance, cooperatively yielding the correct softmax output for their part of the row. This is a structural change from the per-row kernel, increasing intra-row parallelism and exercising segmented reduction logic."
+}

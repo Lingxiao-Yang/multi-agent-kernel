@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_row_split4_vector",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          196
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_split4_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n    mask = cols < N\n    offs = row * N + cols\n    # 1. Compute mean using vector accumulation (all splits cover full row collaboratively)\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for s in range(SPLITS):\n            bcols = off + s * BLOCK + tl.arange(0, BLOCK)\n            bmask = bcols < N\n            boffs = row * N + bcols\n            x = tl.load(X + boffs, mask=bmask, other=0.0)\n            mean_acc += tl.where(bmask, x, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # 2. Compute variance (masked)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for s in range(SPLITS):\n            bcols = off + s * BLOCK + tl.arange(0, BLOCK)\n            bmask = bcols < N\n            boffs = row * N + bcols\n            x = tl.load(X + boffs, mask=bmask, other=0.0)\n            xc = x - mean\n            var_acc += tl.where(bmask, xc * xc, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # 3. Normalize and write only this split's region\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+  "rationale": "This kernel splits each row across 4 program instances (grid=[513,4]), each handling a contiguous BLOCK=196 column chunk. Each split computes the full mean and variance by looping in a strided vectorized manner over every BLOCK in the row, accumulating contributions across all splits, and then only normalizes/writes its own region. All loads and stores are masked for out-of-bounds safety, and the reductions always divide by true N. Reducing BLOCK to 196 further increases occupancy and reduces per-thread register pressure versus larger blocks, which may benefit irregular/wide rows. This mapping increases parallelism, changes memory access patterns, and the strided accumulation reduces excess memory traffic for large N. The structure meaningfully changes computation, decomposition, and memory movement compared to the incumbent and prior attempts."
+}

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_vectorized_loop_fixed",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    max_val = -float('inf')\n    # Loop over row in vector chunks to compute row max\n    for start in range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Second pass: compute sum of exp(x - max_val)\n    sum_exp = 0.0\n    for start in range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1, sum_exp)\n    # Third pass: normalize and store\n    for start in range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x / denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+  "rationale": "This kernel increases memory-level parallelism and arithmetic intensity by processing each row in vectorized chunks of size vec_width=4. It loops over the padded extent RB in increments of vec_width, using start + tl.arange(0, vec_width) to generate static, compile-time offsets in each iteration. All loads, reductions, and stores are masked by offs_v < N, ensuring only valid columns contribute to reductions and output. Each pass (max, sum, normalization) is performed in a vectorized loop for improved memory and compute efficiency, while masking ensures numerical correctness for ragged row width. This design generalizes the incumbent with explicit vectorized access and arithmetic."
+}

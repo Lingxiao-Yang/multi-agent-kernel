@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blockwise",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blockwise(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row_id = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    # Blockwise reduction for row max\n    mx = -float('inf')\n    for start in range(0, N, BLOCK):\n        col = start + offs\n        mask = col < N\n        x_ptrs = X + row_id * N + col\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        mx = tl.maximum(mx, tl.max(x, 0))\n    # Blockwise sum of exp(x - mx)\n    denom = 0.0\n    for start in range(0, N, BLOCK):\n        col = start + offs\n        mask = col < N\n        x_ptrs = X + row_id * N + col\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        exp_x = tl.exp(x - mx)\n        # Masked out-of-bounds columns contribute 0\n        exp_x = tl.where(mask, exp_x, 0.0)\n        denom = denom + tl.sum(exp_x, 0)\n    # Blockwise write softmax output\n    for start in range(0, N, BLOCK):\n        col = start + offs\n        mask = col < N\n        x_ptrs = X + row_id * N + col\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        exp_x = tl.exp(x - mx)\n        norm = exp_x / denom\n        y_ptrs = Y + row_id * N + col\n        tl.store(y_ptrs, norm, mask=mask)\n",
+  "rationale": "This kernel restores grid=[M] (one program per row) for full GPU occupancy and processes each row in BLOCK-sized column blocks. To preserve numerically stable reductions and masking for irregular N, the row maximum and denominator are computed by looping over all blocks: first, a blockwise masked max reduction for the row max, then a blockwise sum for the denominator, and finally a blockwise write of normalized softmax output. All loads and stores are masked to avoid out-of-bounds accesses, ensuring correct output coverage for irregular N. This parallel decomposition maintains high occupancy and full device utilization while handling any N <= BLOCK or N > BLOCK. No shared memory or extra workspace is required."
+}

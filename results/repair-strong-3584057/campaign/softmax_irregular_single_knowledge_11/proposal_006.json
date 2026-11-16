@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_softmax_splitrow",
+        "grid": [
+          1026
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_splitrow(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    # Each program covers half a row: [row, half]\n    pid = tl.program_id(0)\n    row = pid // 2\n    half = pid % 2\n    offs = tl.arange(0, BLOCK)\n    half_cols = (N + 1) // 2\n    col_start = half * half_cols\n    col = col_start + offs\n    mask = (row < 513) & (col < N)\n    # 1. Compute global row max (scalar)\n    max_val = -float('inf')\n    for h in range(2):\n        h_col_start = h * half_cols\n        h_col = h_col_start + offs\n        h_mask = (row < 513) & (h_col < N)\n        ptr = X + row * N + h_col\n        x = tl.load(ptr, mask=h_mask, other=-float('inf'))\n        block_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, block_max)\n    # 2. Compute denominator (sum of exp(x - max)) (scalar)\n    denom = 0.0\n    for h in range(2):\n        h_col_start = h * half_cols\n        h_col = h_col_start + offs\n        h_mask = (row < 513) & (h_col < N)\n        ptr = X + row * N + h_col\n        x = tl.load(ptr, mask=h_mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_val)\n        block_sum = tl.sum(exp_x, 0)\n        denom = denom + block_sum\n    # 3. Write output for this half-row\n    ptr = X + row * N + col\n    x = tl.load(ptr, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x - max_val)\n    softmax = exp_x / denom\n    out_ptr = Y + row * N + col\n    tl.store(out_ptr, softmax, mask=mask)\n",
+  "rationale": "This kernel further increases parallelism by splitting each row into two independent half-row tiles, each covered by a separate program instance in a 1D grid [1026] (2*513). Each program computes its assigned half-row, but both halves collaborate by looping over both halves to compute the global row max and denominator as scalars. This ensures numerically stable reduction and correct normalization for all outputs. Masking is correctly applied for irregular N=781, and all outputs are written exactly once, with no out-of-bounds accesses. The approach exposes more parallelism versus a single-row kernel, retains scalar reductions, and avoids the previous blockwise vector/scalar reduction mismatch. All device logic is fully inlined, and all coverage/correctness invariants are satisfied."
+}

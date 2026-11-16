@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_multi_stage",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_multi_stage(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    # Stage 1: Parallel sub-block reduction for max\n    quarter = BLOCK // 4\n    mx0 = tl.max(x[:quarter], 0)\n    mx1 = tl.max(x[quarter:2*quarter], 0)\n    mx2 = tl.max(x[2*quarter:3*quarter], 0)\n    mx3 = tl.max(x[3*quarter:], 0)\n    mx_local = tl.maximum(tl.maximum(mx0, mx1), tl.maximum(mx2, mx3))\n    # Stage 2: Compute exp and parallel sum in sub-blocks\n    exp_x = tl.exp(x - mx_local) * col_mask\n    sum0 = tl.sum(exp_x[:quarter], 0)\n    sum1 = tl.sum(exp_x[quarter:2*quarter], 0)\n    sum2 = tl.sum(exp_x[2*quarter:3*quarter], 0)\n    sum3 = tl.sum(exp_x[3*quarter:], 0)\n    denom = sum0 + sum1 + sum2 + sum3\n    denom = tl.where(denom == 0, 1, denom)\n    y = exp_x / denom\n    tl.store(Y + row * N + offs, y, col_mask)\n",
+  "rationale": "This kernel increases the reduction split to four sub-blocks (quarter-blocks) for both the row maximum and the normalization sum, improving instruction-level parallelism and further reducing register pressure per reduction. Two pipeline stages are used to enable the compiler to overlap memory and arithmetic operations, potentially hiding latency. Masking and out-of-bounds handling remain correct for irregular row widths. All computation is performed in a single fused kernel and launch."
+}

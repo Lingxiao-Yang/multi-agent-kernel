@@ -1,0 +1,112 @@
+{
+  "case": {
+    "id": "softmax_irregular",
+    "family": "softmax",
+    "shape": [
+      513,
+      781
+    ],
+    "dtype": "float32",
+    "atol": 2e-06,
+    "rtol": 2e-05
+  },
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_softmax",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/softmax_irregular_single_knowledge_11/candidate_001.py",
+  "incumbent_config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          "TOTAL",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "incumbent_source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/softmax_irregular_single_knowledge_11/baseline.py",
+  "protocol": {
+    "schema_version": 1,
+    "status": "development-not-frozen",
+    "proposal": "proposal_final.pdf",
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "max_output_tokens": 4096,
+    "profile_cap": 21,
+    "temperature": 0.7,
+    "seeds": [
+      11,
+      22,
+      33
+    ],
+    "warmup": 10,
+    "timing_repeats": 31,
+    "inner_repeats": 10,
+    "validation_seeds": [
+      101,
+      202,
+      303
+    ],
+    "final_validation_seeds": [
+      10001,
+      10002,
+      10003,
+      10004,
+      10005
+    ],
+    "improvement_threshold": 1.01,
+    "target_speedup": 1.1,
+    "worker_timeout_s": 180,
+    "feedback_mode": "timing-and-compiler-resources",
+    "model": "gpt-4.1-2025-04-14",
+    "endpoint": "https://api.openai.com/v1",
+    "input_usd_per_million": 2.0,
+    "output_usd_per_million": 8.0,
+    "search_space": "source-v1",
+    "source_gate_version": 2,
+    "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+    "history_context_version": "diagnostics-without-redundant-source-v1"
+  }
+}

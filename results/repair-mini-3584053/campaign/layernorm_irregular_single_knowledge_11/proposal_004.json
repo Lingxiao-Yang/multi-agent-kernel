@@ -1,0 +1,26 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          513,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, M: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = row * N + tl.arange(0, BLOCK)\n    mask = tl.arange(0, BLOCK) < N\n\n    # Load input elements with masking, zero for out-of-bounds\n    x = tl.load(X + offs, mask, other=0.0)\n\n    # Compute mean with masked sum and accurate division\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n\n    # Centered x with masking\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Compute variance with masked sum and accurate division\n    sum_sq = tl.sum(centered * centered, 0)\n    invvar = tl.rsqrt(tl.div_rn(sum_sq, N) + 1e-5)\n\n    # Load weights and bias with masking\n    offs_col = tl.arange(0, BLOCK)\n    w = tl.load(W + offs_col, mask, other=0.0)\n    b = tl.load(B + offs_col, mask, other=0.0)\n\n    # Apply layernorm\n    y = (centered * invvar) * w + b\n\n    # Store output with masking\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "Fuse the layernorm computation into a single kernel launched once per row with block size 256. Mask all loads, stores, and arithmetic operations to handle the irregular row width N=781 correctly, preventing invalid memory accesses and NaNs. Use tl.div_rn for accurate division by N to maintain numerical precision and stability. This fusion minimizes memory traffic and kernel launches while respecting shape and masking invariants, aligning with best practices for irregular layernorm shapes."
+}

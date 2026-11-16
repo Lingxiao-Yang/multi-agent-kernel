@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n\n    # Load input with masking; pad with -inf for max reduction identity\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Compute max per row over full padded vector with masking\n    mx = tl.max(x, 0)\n\n    # Compute exponentials with mask zeroing for padding\n    ex = tl.exp(x - mx) * mask\n\n    # Compute sum per row\n    denom = tl.sum(ex, 0)\n\n    # Normalize exponentials by sum\n    y = ex / denom\n\n    # Store with masking\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "The previous failure was caused by unsupported slicing on tl.tensor objects in Triton device code. To repair, revert to the accepted single-stage fused kernel performing full-length masked reductions over the padded dimension BLOCK=1024, with masking to handle the irregular dimension 781. This kernel uses 4 warps and 1 pipeline stage, with grid size 513 to cover all rows. This approach compiles, runs correctly, and gives stable ~1.97x speedup over baseline. It avoids unsupported API usage and preserves numerical correctness by padding masked elements as -inf for max and zero for sums. Retaining this kernel as the incumbent is the best-known solution for the target shape and hardware configuration."
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_unrolled_8warps",
+        "grid": [
+          513
+        ],
+        "num_warps": 8,
+        "num_stages": 1,
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          1024
+        ]
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_unrolled_8warps(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out invalid lanes before summation (no mask argument for tl.sum)\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Manual unrolled reduction for sum (mean)\n    step = RB // 4\n    sum0 = tl.sum(x_masked[0:step], 0)\n    sum0 += tl.sum(x_masked[step:2*step], 0)\n    sum0 += tl.sum(x_masked[2*step:3*step], 0)\n    sum0 += tl.sum(x_masked[3*step:], 0)\n    mean = tl.div_rn(sum0, N)\n\n    # Centered input\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Zero out invalid lanes before variance summation\n    centered_masked = tl.where(mask, centered, 0.0)\n\n    # Manual unrolled reduction for variance\n    sum2 = tl.sum(centered_masked[0:step] * centered_masked[0:step], 0)\n    sum2 += tl.sum(centered_masked[step:2*step] * centered_masked[step:2*step], 0)\n    sum2 += tl.sum(centered_masked[2*step:3*step] * centered_masked[2*step:3*step], 0)\n    sum2 += tl.sum(centered_masked[3*step:] * centered_masked[3*step:], 0)\n    var = tl.div_rn(sum2, N)\n\n    # Compute inverse stddev with epsilon\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load affine parameters with masking\n    w = tl.load(W + offs, mask, other=0.0)\n    b = tl.load(B + offs, mask, other=0.0)\n\n    # Normalize and apply affine transform\n    y = tl.where(mask, centered * inv_std * w + b, 0.0)\n\n    # Store result with masking\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Replaces unsupported pipelining with manual unrolled reductions to partially overlap compute and memory within a single stage kernel. Keeps the fused approach with masking and zero-padding for irregular N=781 within fixed RB=1024 block size. Unrolling the reductions reduces overhead and may improve instruction-level parallelism without using unsupported tl.next_stage. Increases the number of warps to 8 for better hardware utilization while maintaining a single stage to ensure compilation success. This trades increased warp parallelism and partial loop unrolling for throughput improvements without unsupported primitives or multiple kernel launches."
+}

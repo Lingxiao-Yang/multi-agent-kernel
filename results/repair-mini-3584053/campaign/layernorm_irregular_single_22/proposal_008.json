@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          393
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(sum_centered2 / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+  "rationale": "Fixes previous launch argument count mismatch by including all required arguments in layernorm_apply launch, matching kernel signature. Uses unified block size 1024 in both kernels for aligned memory access and reduced grid size, improving memory coalescing and efficiency. Masks in layernorm_stats exclude padding from mean and variance computations, preserving numerical correctness. Masks in layernorm_apply prevent out-of-bounds access, preserving correctness on irregular shapes. Grid sizes cover all outputs exactly, ensuring correctness and efficient execution."
+}

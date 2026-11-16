@@ -1,0 +1,40 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "mean_rowwise_pass",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "T",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "varnorm_rowwise_pass",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "T",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n# Pass 1: compute mean for each row, store to T[row]\n@triton.jit\ndef mean_rowwise_pass(X, T, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    cols = tl.arange(0, BLOCK)\n    acc = 0.0\n    n_tiles = (N + BLOCK - 1) // BLOCK\n    for tile in range(n_tiles):\n        start = tile * BLOCK\n        c = cols + start\n        mask = c < N\n        x_ptrs = X + row * N + c\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        acc += tl.sum(x, 0)\n    mean = tl.div_rn(acc, N)\n    tl.store(T + row, mean)\n\n# Pass 2: compute variance (wrt row mean), normalize, affine, store Y\n@triton.jit\ndef varnorm_rowwise_pass(X, W, B, T, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    mean = tl.load(T + row)\n    cols = tl.arange(0, BLOCK)\n    acc = 0.0\n    n_tiles = (N + BLOCK - 1) // BLOCK\n    # Compute variance (sum of squared deviations from mean)\n    for tile in range(n_tiles):\n        start = tile * BLOCK\n        c = cols + start\n        mask = c < N\n        x_ptrs = X + row * N + c\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        d = tl.where(mask, x - mean, 0.0)\n        acc += tl.sum(d * d, 0)\n    var = tl.div_rn(acc, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Normalize and affine-transform\n    for tile in range(n_tiles):\n        start = tile * BLOCK\n        c = cols + start\n        mask = c < N\n        x_ptrs = X + row * N + c\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + c, mask=mask, other=0.0)\n        b = tl.load(B + c, mask=mask, other=0.0)\n        normed = (centered * inv_std) * w + b\n        tl.store(Y + row * N + c, normed, mask=mask)\n",
+  "rationale": "This repairs the mathematically invalid two-stage split-row reduction for variance by introducing a two-pass rowwise reduction: the first pass computes and stores the row mean in T, the second pass computes the variance using the global mean and then applies normalization and affine transformation. Both passes use tiling with BLOCK=1024 for memory efficiency and mask to N=781. This ensures correct mean/variance computation for each row, regardless of N/BLOCK divisibility. The transformation changes both kernel structure and data movement, guaranteeing mathematically sound layernorm for irregular row width. The use of a temporary buffer (T) is required to pass the global mean between passes."
+}

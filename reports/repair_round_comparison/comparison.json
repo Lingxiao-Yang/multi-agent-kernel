@@ -1,0 +1,243 @@
+{
+  "matched": true,
+  "allowed_protocol_differences": [
+    "input_usd_per_million",
+    "model",
+    "output_usd_per_million"
+  ],
+  "models": {
+    "mini": {
+      "searches": 16,
+      "attempts_by_status": {
+        "ok": 34,
+        "proposal_error": 35,
+        "error": 40,
+        "incorrect": 19
+      },
+      "prefix_searches": {
+        "1": {
+          "any_correct": 5,
+          "any_retained": 2
+        },
+        "2": {
+          "any_correct": 8,
+          "any_retained": 5
+        },
+        "4": {
+          "any_correct": 8,
+          "any_retained": 5
+        },
+        "8": {
+          "any_correct": 10,
+          "any_retained": 5
+        }
+      },
+      "final_improved": 5,
+      "geomean_speedup": 1.2202602891124068,
+      "first_correct_after_2": 2,
+      "first_retained_after_2": 0,
+      "selected_after_2": 0,
+      "searches_with_recovery": 9,
+      "input_tokens": 3625377,
+      "output_tokens": 290770,
+      "calls": 512,
+      "cost_usd": 1.9153828,
+      "cost_after_attempt_2_usd": 1.5820492000000006,
+      "by_case": {
+        "layernorm_irregular": {
+          "improved": 2,
+          "geomean_speedup": 1.1662223269047196
+        },
+        "softmax_irregular": {
+          "improved": 3,
+          "geomean_speedup": 1.276802148983681
+        }
+      },
+      "by_variant": {
+        "single": {
+          "improved": 0,
+          "geomean_speedup": 1.0
+        },
+        "single_knowledge": {
+          "improved": 2,
+          "geomean_speedup": 1.4013538432229449
+        },
+        "multi": {
+          "improved": 1,
+          "geomean_speedup": 1.167977323777159
+        },
+        "multi_knowledge": {
+          "improved": 2,
+          "geomean_speedup": 1.3546518458934034
+        }
+      }
+    },
+    "strong": {
+      "searches": 16,
+      "attempts_by_status": {
+        "incorrect": 22,
+        "error": 36,
+        "proposal_error": 20,
+        "ok": 49,
+        "timeout": 1
+      },
+      "prefix_searches": {
+        "1": {
+          "any_correct": 12,
+          "any_retained": 12
+        },
+        "2": {
+          "any_correct": 14,
+          "any_retained": 14
+        },
+        "4": {
+          "any_correct": 16,
+          "any_retained": 14
+        },
+        "8": {
+          "any_correct": 16,
+          "any_retained": 14
+        }
+      },
+      "final_improved": 14,
+      "geomean_speedup": 1.7141700756353981,
+      "first_correct_after_2": 2,
+      "first_retained_after_2": 0,
+      "selected_after_2": 1,
+      "searches_with_recovery": 13,
+      "input_tokens": 3841910,
+      "output_tokens": 341710,
+      "calls": 512,
+      "cost_usd": 10.417500000000006,
+      "cost_after_attempt_2_usd": 8.710316000000006,
+      "by_case": {
+        "layernorm_irregular": {
+          "improved": 6,
+          "geomean_speedup": 1.5960118767096703
+        },
+        "softmax_irregular": {
+          "improved": 8,
+          "geomean_speedup": 1.8410759287466039
+        }
+      },
+      "by_variant": {
+        "single": {
+          "improved": 3,
+          "geomean_speedup": 1.5855218911518194
+        },
+        "single_knowledge": {
+          "improved": 4,
+          "geomean_speedup": 1.8614073347712576
+        },
+        "multi": {
+          "improved": 3,
+          "geomean_speedup": 1.5564222200471332
+        },
+        "multi_knowledge": {
+          "improved": 4,
+          "geomean_speedup": 1.8796394499376388
+        }
+      }
+    }
+  },
+  "paired_model_geomean_ratio": 1.4047577315510706,
+  "pairing": [
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "speedup_ratio": 1.0
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "speedup_ratio": 0.9564942730896038
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "speedup_ratio": 1.0240760705529572
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "speedup_ratio": 1.887096699743065
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "speedup_ratio": 1.0
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "speedup_ratio": 1.8626372787279388
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "speedup_ratio": 1.8961748659951474
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "speedup_ratio": 1.8846153077350225
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "speedup_ratio": 1.7704918006715193
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "speedup_ratio": 1.862068919375616
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "speedup_ratio": 1.8379888894904761
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "speedup_ratio": 1.0435618120618244
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "speedup_ratio": 1.831521725376262
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "speedup_ratio": 1.8524590033575963
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "speedup_ratio": 0.9247127942222291
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "speedup_ratio": 0.9420337911289909
+    }
+  ],
+  "caveat": "Two cases and two seeds: descriptive results only; model phases ran sequentially on separate Slurm allocations. Prefix retention is not independently fresh-validated at each prefix. No causal effect of guidance or extra attempts is isolated."
+}

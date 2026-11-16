@@ -1,0 +1,552 @@
+{
+  "complete": true,
+  "searches": 16,
+  "expected_searches": 16,
+  "improved_searches_by_case": {
+    "softmax_irregular": 3,
+    "layernorm_irregular": 2
+  },
+  "stronger_required": true,
+  "attempts_by_status": {
+    "ok": 34,
+    "proposal_error": 35,
+    "error": 40,
+    "incorrect": 19
+  },
+  "runs": [
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": 1,
+      "first_retained": null,
+      "recovery_transition_attempts": [
+        7
+      ],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 1,
+          "retained": 0
+        },
+        "2": {
+          "correct": 1,
+          "retained": 0
+        },
+        "4": {
+          "correct": 1,
+          "retained": 0
+        },
+        "8": {
+          "correct": 3,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 261813
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 2,
+      "first_retained": 2,
+      "recovery_transition_attempts": [
+        2
+      ],
+      "final_candidate": 2,
+      "speedup": 1.860962595974551,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 1,
+          "retained": 1
+        },
+        "4": {
+          "correct": 1,
+          "retained": 1
+        },
+        "8": {
+          "correct": 1,
+          "retained": 1
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 255396
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": 2,
+      "first_retained": 2,
+      "recovery_transition_attempts": [
+        2,
+        7
+      ],
+      "final_candidate": 2,
+      "speedup": 1.838709705180552,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 1,
+          "retained": 1
+        },
+        "4": {
+          "correct": 1,
+          "retained": 1
+        },
+        "8": {
+          "correct": 3,
+          "retained": 1
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 300323
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 1,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 1,
+          "retained": 0
+        },
+        "2": {
+          "correct": 2,
+          "retained": 0
+        },
+        "4": {
+          "correct": 3,
+          "retained": 0
+        },
+        "8": {
+          "correct": 3,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 296991
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": 6,
+      "first_retained": null,
+      "recovery_transition_attempts": [
+        6
+      ],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 3,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 225517
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 1,
+      "first_retained": null,
+      "recovery_transition_attempts": [
+        5
+      ],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 1,
+          "retained": 0
+        },
+        "2": {
+          "correct": 2,
+          "retained": 0
+        },
+        "4": {
+          "correct": 3,
+          "retained": 0
+        },
+        "8": {
+          "correct": 7,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 234972
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 241076
+    },
+    {
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 234839
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 246205
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 6,
+      "first_retained": null,
+      "recovery_transition_attempts": [
+        6
+      ],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 3,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 239907
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 272755
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 2,
+      "first_retained": 2,
+      "recovery_transition_attempts": [
+        2
+      ],
+      "final_candidate": 2,
+      "speedup": 1.8314607007957038,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 1,
+          "retained": 1
+        },
+        "4": {
+          "correct": 1,
+          "retained": 1
+        },
+        "8": {
+          "correct": 1,
+          "retained": 1
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 241200
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 205161
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": null,
+      "first_retained": null,
+      "recovery_transition_attempts": [],
+      "final_candidate": 0,
+      "speedup": 1.0,
+      "prefixes": {
+        "1": {
+          "correct": 0,
+          "retained": 0
+        },
+        "2": {
+          "correct": 0,
+          "retained": 0
+        },
+        "4": {
+          "correct": 0,
+          "retained": 0
+        },
+        "8": {
+          "correct": 0,
+          "retained": 0
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 173763
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "status": "complete",
+      "first_correct": 1,
+      "first_retained": 1,
+      "recovery_transition_attempts": [
+        3
+      ],
+      "final_candidate": 1,
+      "speedup": 1.948863578110877,
+      "prefixes": {
+        "1": {
+          "correct": 1,
+          "retained": 1
+        },
+        "2": {
+          "correct": 1,
+          "retained": 1
+        },
+        "4": {
+          "correct": 3,
+          "retained": 1
+        },
+        "8": {
+          "correct": 7,
+          "retained": 1
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 248695
+    },
+    {
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "status": "complete",
+      "first_correct": 1,
+      "first_retained": 1,
+      "recovery_transition_attempts": [
+        3
+      ],
+      "final_candidate": 1,
+      "speedup": 1.9788359715031918,
+      "prefixes": {
+        "1": {
+          "correct": 1,
+          "retained": 1
+        },
+        "2": {
+          "correct": 1,
+          "retained": 1
+        },
+        "4": {
+          "correct": 3,
+          "retained": 1
+        },
+        "8": {
+          "correct": 3,
+          "retained": 1
+        }
+      },
+      "attempts": 8,
+      "calls": 32,
+      "tokens": 237534
+    }
+  ],
+  "first_correct_after_attempt_2": 2,
+  "searches_with_recovery": 9,
+  "caveat": "Recovery transitions are temporal observations, not proof that the next proposal directly repaired the prior source. Prefix correctness is search validation, not independent fresh validation at every prefix."
+}

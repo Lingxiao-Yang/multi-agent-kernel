@@ -1,0 +1,56 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats_split2_stage1_fullrow",
+        "grid": [
+          1026
+        ],
+        "args": [
+          "X",
+          "T",
+          "N",
+          2,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_stats_split2_stage2",
+        "grid": [
+          513
+        ],
+        "args": [
+          "T",
+          "S",
+          "N",
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          "TOTAL",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n# First stage: Each program processes its assigned split of the row, looping over chunk in BLOCK tiles and accumulating all values\n@triton.jit\ndef layernorm_stats_split2_stage1_fullrow(X, T, N: tl.constexpr, SPLIT: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    row = pid // SPLIT\n    split = pid % SPLIT\n    chunk_size = (N + SPLIT - 1) // SPLIT  # ceil division\n    start = split * chunk_size\n    end = min(start + chunk_size, N)\n    sum_x = tl.zeros((), dtype=tl.float32)\n    sum_x2 = tl.zeros((), dtype=tl.float32)\n    for offs_base in range(start, end, BLOCK):\n        offs = offs_base + tl.arange(0, BLOCK)\n        mask = (row < 513) & (offs < end) & (offs < N)\n        x = tl.load(X + row * N + offs, mask, other=0)\n        sum_x += tl.sum(x, 0)\n        sum_x2 += tl.sum(x * x, 0)\n    base = (row * SPLIT + split) * 2\n    tl.store(T + base, sum_x, row < 513)\n    tl.store(T + base + 1, sum_x2, row < 513)\n\n# Second stage: Reduce the partials for each row, compute mean/inv\n@triton.jit\ndef layernorm_stats_split2_stage2(T, S, N: tl.constexpr, SPLIT: tl.constexpr):\n    row = tl.program_id(0)\n    sum_x = tl.zeros((), dtype=tl.float32)\n    sum_x2 = tl.zeros((), dtype=tl.float32)\n    for split in range(0, SPLIT):\n        base = (row * SPLIT + split) * 2\n        sum_x += tl.load(T + base, row < 513, other=0)\n        sum_x2 += tl.load(T + base + 1, row < 513, other=0)\n    mean = tl.div_rn(sum_x, N)\n    var = tl.div_rn(sum_x2, N) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean, row < 513)\n    tl.store(S + 2 * row + 1, inv, row < 513)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, i < TOTAL, other=0)\n    mean = tl.load(S + row * 2, i < TOTAL, other=0)\n    inv = tl.load(S + row * 2 + 1, i < TOTAL, other=0)\n    w = tl.load(W + col, i < TOTAL, other=0)\n    b = tl.load(B + col, i < TOTAL, other=0)\n    tl.store(Y + i, (x - mean) * inv * w + b, i < TOTAL)\n",
+  "rationale": "This repairs the two-stage stats reduction by ensuring each split in the first stage covers its entire assigned chunk of the row. Instead of processing only a single BLOCK window per split, the kernel loops over the full chunk in BLOCK-sized tiles, accumulating all values in registers before writing the two partials to T. All loads are carefully masked for bounds, and every column in the split is reduced. The second stage sums all partials as before to produce the final stats for each row. This guarantees correctness, covering all columns exactly once, and enables measurement of the impact of this two-stage parallel decomposition on performance. The apply kernel remains unchanged. The workspace T is sized [513*2,2] as required by the decomposition."
+}

@@ -1,0 +1,1230 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T21:50:18.281290+00:00",
+    "case": {
+      "id": "layernorm_irregular",
+      "family": "layernorm",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-05,
+      "rtol": 0.0002
+    },
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 2.0,
+      "output_usd_per_million": 8.0,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "1bed5d8d58349e1546c29e9ae8e81c84aa1524da04b1df5c6fff162ca2bbdcd7",
+    "case_hash": "d56bbe0d9cb78bb9ecc73c04286ae77beed62029ec85e1fdd71d90872378f76b",
+    "baseline_hash": "f1ddf0c51eeac383cd1e63cae99169f71122e2f826500a5f89f22073cdd5301d",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584057",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 285773,
+    "output_tokens": 20892,
+    "tokens": 306665
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.2305561183020473,
+      "validation_seconds": 1.9644826389849186,
+      "candidate": {
+        "median_ms": 0.019251200556755065,
+        "p25_ms": 0.018739199638366698,
+        "p75_ms": 0.02099200040102005,
+        "min_ms": 0.018432000279426576,
+        "samples_ms": [
+          0.020684799551963805,
+          0.030822399258613586,
+          0.019251200556755065,
+          0.020377600193023683,
+          0.02088959962129593,
+          0.03112959861755371,
+          0.020172800123691558,
+          0.018739199638366698,
+          0.018432000279426576,
+          0.0289792001247406,
+          0.018739199638366698,
+          0.018739199638366698,
+          0.02099200040102005,
+          0.019148799777030944,
+          0.026931199431419372,
+          0.018739199638366698,
+          0.019046400487422944,
+          0.020479999482631683,
+          0.018636800348758698,
+          0.028774398565292358,
+          0.018636800348758698,
+          0.019865599274635316,
+          0.02099200040102005,
+          0.018739199638366698,
+          0.027955201268196107,
+          0.018739199638366698,
+          0.018534399569034576,
+          0.018636800348758698,
+          0.018534399569034576,
+          0.028672000765800475,
+          0.018534399569034576
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03624959886074066,
+        "p25_ms": 0.035072000324726106,
+        "p75_ms": 0.04234240055084229,
+        "min_ms": 0.03266560137271881,
+        "samples_ms": [
+          0.043315199017524716,
+          0.03635199964046478,
+          0.0394239991903305,
+          0.04710400104522705,
+          0.03624959886074066,
+          0.03840000033378601,
+          0.03614720106124878,
+          0.04167680144309997,
+          0.0449535995721817,
+          0.03573760092258453,
+          0.03532800078392029,
+          0.045875200629234315,
+          0.04444159865379334,
+          0.034508800506591795,
+          0.03348479866981506,
+          0.042803201079368594,
+          0.04095999896526337,
+          0.03348479866981506,
+          0.03389439880847931,
+          0.03522560000419617,
+          0.03573760092258453,
+          0.04362240135669708,
+          0.04403199851512909,
+          0.03266560137271881,
+          0.03338240087032318,
+          0.04188160002231598,
+          0.034918400645256045,
+          0.03297280073165894,
+          0.04188160002231598,
+          0.03594239950180054,
+          0.03522560000419617
+        ]
+      },
+      "paired_speedup": 1.882978609768886,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.018943999707698823,
+          "p25_ms": 0.018739199638366698,
+          "p75_ms": 0.02088959962129593,
+          "min_ms": 0.018432000279426576,
+          "samples_ms": [
+            0.030822399258613586,
+            0.01945600062608719,
+            0.019251200556755065,
+            0.018739199638366698,
+            0.01884160041809082,
+            0.028364801406860353,
+            0.01884160041809082,
+            0.01884160041809082,
+            0.02088959962129593,
+            0.018636800348758698,
+            0.02887679934501648,
+            0.018739199638366698,
+            0.018943999707698823,
+            0.020479999482631683,
+            0.019046400487422944,
+            0.03020800054073334,
+            0.018636800348758698,
+            0.01884160041809082,
+            0.020377600193023683,
+            0.018432000279426576,
+            0.026419198513031004,
+            0.018534399569034576,
+            0.018739199638366698,
+            0.020377600193023683,
+            0.018534399569034576,
+            0.028672000765800475,
+            0.018636800348758698,
+            0.01884160041809082,
+            0.02088959962129593,
+            0.018534399569034576,
+            0.02815999984741211
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03553279936313629,
+          "p25_ms": 0.03384319990873337,
+          "p75_ms": 0.042752000689506534,
+          "min_ms": 0.03266560137271881,
+          "samples_ms": [
+            0.0347135990858078,
+            0.04229120016098022,
+            0.03543039858341217,
+            0.03399679958820343,
+            0.042803201079368594,
+            0.03553279936313629,
+            0.03553279936313629,
+            0.04485119879245758,
+            0.04454399943351746,
+            0.03317759931087494,
+            0.03328000009059906,
+            0.043110400438308716,
+            0.04126720130443573,
+            0.03266560137271881,
+            0.0336896002292633,
+            0.03604480028152466,
+            0.03553279936313629,
+            0.04392960071563721,
+            0.04382719993591309,
+            0.034815999865531924,
+            0.03317759931087494,
+            0.04270080029964447,
+            0.040755200386047366,
+            0.03338240087032318,
+            0.040140798687934874,
+            0.03543039858341217,
+            0.03543039858341217,
+            0.04403199851512909,
+            0.04413439929485321,
+            0.03328000009059906,
+            0.03328000009059906
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.029900801181793214,
+        "p25_ms": 0.029747200012207032,
+        "p75_ms": 0.03061760067939758,
+        "min_ms": 0.029491201043128967,
+        "samples_ms": [
+          0.037171199917793274,
+          0.02969599962234497,
+          0.029900801181793214,
+          0.03112959861755371,
+          0.029798400402069092,
+          0.03133440017700195,
+          0.029900801181793214,
+          0.02959359884262085,
+          0.037478399276733396,
+          0.02959359884262085,
+          0.029900801181793214,
+          0.03061760067939758,
+          0.029900801181793214,
+          0.030924800038337707,
+          0.029900801181793214,
+          0.02969599962234497,
+          0.03553279936313629,
+          0.02959359884262085,
+          0.029798400402069092,
+          0.03051519989967346,
+          0.029798400402069092,
+          0.029900801181793214,
+          0.029900801181793214,
+          0.02959359884262085,
+          0.03573760092258453,
+          0.02959359884262085,
+          0.029798400402069092,
+          0.03061760067939758,
+          0.029798400402069092,
+          0.029491201043128967,
+          0.029798400402069092
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 166.8193103350702,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.186009956523776,
+      "process_seconds": 14.136965742334723
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_fused",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "Y",
+            "N",
+            1024
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "bbca485f814c16127768c786576763becbf7ff6c090a01d1368b07f404c2d8f8",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fuses statistics and apply passes in a single kernel, eliminating intermediate memory traffic. One kernel per row (grid=513), each covering full row with BLOCK=1024 and masking for N=781. All reduction and masking invariants are preserved, including correct handling of padding and epsilon. This changes data movement and kernel structure, not just code style.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.849685925990343,
+        "validation_seconds": 3.5668879728764296,
+        "candidate": {
+          "median_ms": 0.020377600193023683,
+          "p25_ms": 0.019763199985027312,
+          "p75_ms": 0.023705600202083586,
+          "min_ms": 0.017407999932765962
+        },
+        "incumbent": {
+          "median_ms": 0.037478399276733396,
+          "p25_ms": 0.03686400055885315,
+          "p75_ms": 0.040703999996185306,
+          "min_ms": 0.03532800078392029
+        },
+        "paired_speedup": 1.8391959269847786,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.020070399343967437,
+            "p25_ms": 0.01971200034022331,
+            "p75_ms": 0.027494399994611743,
+            "min_ms": 0.017203199863433837
+          },
+          "incumbent": {
+            "median_ms": 0.03809280097484589,
+            "p25_ms": 0.037273600697517395,
+            "p75_ms": 0.0416255995631218,
+            "min_ms": 0.034918400645256045
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 157.59814549210043,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.7764271749183536,
+        "process_seconds": 16.26529406476766,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 32,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 12002,
+        "output_tokens": 1472,
+        "tokens": 13474
+      },
+      "review": {
+        "diagnosis": "The fused layernorm kernel successfully reduced overall latency by fusing the statistics and application passes into a single launch. Measured latency improved by nearly 2x (median 0.020 ms vs 0.038 ms), and logical memory bandwidth increased substantially, confirming that eliminating intermediate memory traffic was the main speedup lever. Validation passed for the irregular row size and masking; mean, variance, and normalization are numerically correct within tolerance. The single-kernel approach slightly increased register and shared memory usage but remains well within hardware resource limits, with no spills and low occupancy pressure. This demonstrates that the fusion did not introduce resource bottlenecks or correctness issues.",
+        "outcome": "The fusion approach is validated and achieves a significant speedup with correct outputs. No functional or numerical regressions observed. The kernel is now bandwidth-efficient, with memory traffic and launch count minimized.",
+        "next_step": "Further major speedups are unlikely for this shape on this hardware. Minor improvements could explore alternative parallel reduction strategies (e.g., splitting rows across multiple warps for much larger N), or tuning num_warps and BLOCK. However, for N=781 and this workload, the current implementation is near optimal. If targeting even wider rows or other hardware, consider more advanced tiling or reduction decompositions. Otherwise, this optimized single-pass fused kernel is appropriate for production use."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 17906,
+        "output_tokens": 1757,
+        "tokens": 19663
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_split_row",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "a99dd026db6055a5e8c3c06abaf8338fcdfcd923bbcaf0a093d6c7eb1a5b6e4b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel splits each row into 2 segments (second grid dimension) and assigns each segment up to 512 columns (BLOCK=512). Each segment computes partial sums and partial sums of squares for its assigned columns, using masking for boundaries. All threads redundantly compute the combined total sum and sum of squares (valid since n_segs=2 is small), then proceed to normalization and output for their segment. This changes the decomposition (parallelizing across both row and segment), the reduction pattern (partial then global within-row), and data movement (each program loads and stores a disjoint slice). The logic preserves masking and all normalization invariants, and produces complete output coverage for [513,781].",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 399574 / 400653 (99.7%)\nGreatest absolute difference: 5.5735273361206055 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 102104.9765625 at index (11, 395) (up to 0.0002 allowed)",
+        "worker_seconds": 12.942558631300926,
+        "process_seconds": 15.200104493647814
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 34360,
+        "output_tokens": 4108,
+        "tokens": 38468
+      },
+      "review": {
+        "diagnosis": "The proposed kernel attempts to split each row into two segments (second grid dimension), each computing partial sums and partial sums of squares, but fails to correctly accumulate and share those partials across the segments of the same row. Instead, each segment redundantly and independently initializes its own sum0/sum1 variables and only one is ever written in each program instance. Thus, the total_sum and total_sq_sum computed in each program only reflect the local segment's data, not the full row. As a result, the computed mean and variance are only over the segment, not the full row, causing nearly all output elements to be numerically incorrect (99.7% mismatch). This is a classic decomposition error: in Triton, distinct program instances cannot communicate partials across grid dimensions without explicit synchronization or a shared buffer, which this code lacks. The reduction is not global across the row but local to each segment.",
+        "outcome": "The attempt is invalid: the code fails to produce correct layernorm results. It does not correctly accumulate statistics across all segments of a row, leading to incorrect normalization for almost every output. No nonfinite outputs were produced, but the results are dramatically wrong.",
+        "next_step": "To repair, use a correct parallel reduction strategy. Options: (1) Restrict to a single program per row (grid=[M]) and cover the entire row with BLOCK, using masking. (2) If splitting a row across multiple programs (segments), you must either use atomic accumulation in a shared scratch buffer followed by a second launch to apply normalization, or use intra-warp/group communication for partials (if all programs for a row run on the same hardware block, which is not guaranteed). The most robust and performant approach for this shape is a single-program-per-row decomposition with vectorized reduction and masking. If you wish to use a tiled approach, implement a two-stage algorithm: first accumulate partials into a scratch buffer, then launch a second kernel to finish reduction and apply normalization. Do not attempt to combine the two stages in a single launch unless you can guarantee correct cross-program reduction."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 41998,
+        "output_tokens": 4543,
+        "tokens": 46541
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_partial_reduction",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "S",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 2
+          },
+          {
+            "kernel": "layernorm_finalize",
+            "grid": [
+              513
+            ],
+            "args": [
+              "S",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "d72f71cb87f2e9a5bb817a35d82eeb02b0393055f17839062466895a0fba10c9",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs the previous failed split-row reduction by using a two-stage approach. First, layernorm_partial_reduction splits each row into 2 segments, each segment program accumulates partial sum and partial sum of squares for its columns and writes these to a scratch buffer S of shape [513, 4] (2 segments \u00d7 2 partials per row). Second, layernorm_finalize runs one program per row, aggregates the partials to compute mean and variance for the whole row, then normalizes and writes the outputs. This changes the parallel decomposition and reduces data traffic per program, while ensuring correct global statistics. Masking and reduction invariants are preserved. S is used as transient workspace for partials. This is a correct cross-program reduction pattern for split-row layernorm.",
+      "accepted": false,
+      "previous_failure_attempt": 2,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=400653/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",
+        "worker_seconds": 13.624660685658455,
+        "process_seconds": 15.890910169109702
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 62644,
+        "output_tokens": 6987,
+        "tokens": 69631
+      },
+      "review": {
+        "diagnosis": "The proposed two-stage split-row reduction failed due to critical errors in scratch buffer addressing and data movement. The first kernel (layernorm_partial_reduction) writes 4 partials per row (2 segments \u00d7 2 values/segment) to S, but the indexing is incorrect: tl.store(S + row * 2 + seg * 2, ...) does not cover all 4 slots per row, leading to overlapping writes and uninitialized locations. In the finalize kernel, the loader assumes a contiguous layout (row * 4 + offset), but the buffer was not written that way, so it reads invalid or uninitialized values (often zeros or garbage). As a result, the computed mean and variance are nan for every row, producing nan outputs everywhere. This is confirmed by 100% nonfinite (nan) outputs. The core mistake is an incorrect mapping from (row, seg) to S address and inconsistent use of S as a [ROWS, 4] buffer.",
+        "outcome": "This attempt is invalid. All output is nan due to reading uninitialized or misaligned values from the scratch buffer. The code fails to correctly communicate partials between the two stages; thus, no correct statistics are computed or applied. This is a classic scratch addressing bug in multi-stage reductions.",
+        "next_step": "To repair, ensure that each segment writes to a unique slot in S, using S as [ROWS, 4] (row-major) so that segment 0 writes slots 0/1 and segment 1 writes 2/3 for each row. In both kernels, use the same offset calculation: offs_S = row * 4 + seg * 2. In finalize, sum S[row*4+0] and S[row*4+2] for the total sum, and S[row*4+1] and S[row*4+3] for sum of squares. Additionally, the finalize kernel must reload X, not Y, since Y is not initialized yet (or else copy X into scratch in the first stage). Finally, be sure to mask all loads and stores, and use only initialized values in the final reduction. Carefully check all row, segment, and column indexing. After repairing addressing, revalidate output correctness before exploring further parallelization or tiling."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 71849,
+        "output_tokens": 7461,
+        "tokens": 79310
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_partial_reduction",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 2
+          },
+          {
+            "kernel": "layernorm_finalize",
+            "grid": [
+              513
+            ],
+            "args": [
+              "S",
+              "W",
+              "B",
+              "X",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "18c5d48dc850ba23e773515be7bb13633ab36f84b9007604ae4dcb28eb7ea06c",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implements a correct two-stage split-row reduction for layernorm with irregular row width. The first kernel divides each row into 2 segments and computes partial sums (sum, sumsq) for each. Each segment writes its two results to unique, non-overlapping slots in S (S as [ROWS, 4], row-major: offs_S = row*4 + seg*2). All accesses are masked for segment boundaries. The second kernel reads all four partials per row, aggregates them to compute the overall mean and variance, and reloads the original X input to apply normalization, scaling, and bias. Masking is correctly applied for N, and all memory accesses are consistent and non-overlapping. This repairs the prior scratch addressing bug, ensuring full output coverage and numerically correct statistics.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",
+        "worker_seconds": 13.159953580237925,
+        "process_seconds": 15.503968532197177
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 95494,
+        "output_tokens": 9743,
+        "tokens": 105237
+      },
+      "review": {
+        "diagnosis": "The revised two-stage split-row reduction partially resolves the scratch buffer addressing bug but still fails validation, with 34% of outputs nonfinite (nan). The layernorm_partial_reduction kernel now correctly writes two partials (sum, sumsq) per segment to non-overlapping slots in S. However, failure analysis indicates that the segmentation and masking logic for irregular row lengths (N=781, BLOCK=512, n_segs=2) does not fully cover all columns in some rows, leaving some S slots uninitialized. In layernorm_finalize, all four partials per row are blindly summed, so if any are uninitialized or nan, the resulting mean/variance and the entire row's output become nan. This is apparent in the first row, where outputs become nan starting from column 512 (the segment boundary). The root cause is an off-by-one or incomplete coverage in the segment boundary computation and/or masking, especially for the final segment in each row.",
+        "outcome": "This attempt is invalid. Output coverage is incomplete: 34% of outputs are nan due to incomplete or misaligned reduction coverage, and the remainder fail numerical tolerances. The core mistake is in the calculation and masking of segment ranges for irregular N. The finalize kernel cannot recover from missing or nan partials.",
+        "next_step": "Double-check the segment partitioning logic: ensure that the union of segment ranges covers every column 0..N-1 in every row. For each segment, seg_start/seg_end and their masking must guarantee no output is skipped or doubly covered, even when N is not a multiple of n_segs or BLOCK. In layernorm_finalize, consider masking out partials from segments that cover no data (e.g., for very short rows), or explicitly zero S in advance. Alternatively, revert to the single-kernel per-row fused approach, which is validated and optimal for this N, unless the goal is to demonstrate two-stage reduction. If continuing with two-stage, use a loop-based or atomic reduction to accumulate correct statistics for any N, and ensure finalize skips or masks uninitialized slots. Always verify that every output element is written exactly once."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 105637,
+        "output_tokens": 10191,
+        "tokens": 115828
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_partial_reduction_v2",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 2
+          },
+          {
+            "kernel": "layernorm_finalize_v2",
+            "grid": [
+              513
+            ],
+            "args": [
+              "S",
+              "W",
+              "B",
+              "X",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "1575638656a7da8e10dc0f3ad59016c81fc703a0097cbffeb9c4671452ea477b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs the incomplete segment coverage by explicitly tracking, for each segment, the number of valid (in-bounds) columns reduced. Each segment writes three values per row: partial sum, partial sumsq, and valid element count. The finalize kernel sums the partials and counts to compute the correct mean and variance over exactly N elements, regardless of segment sizes or irregularities. This ensures every output is covered exactly once, and prevents nan outputs from uninitialized or missing partials. The segment decomposition and masking are now robust for any N, even if not divisible by BLOCK or n_segs. This changes the reduction logic, scratch buffer layout, and parallel decomposition, and adds a correctness safeguard for empty segments/rows.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",
+        "worker_seconds": 23.903872437775135,
+        "process_seconds": 26.23882562573999
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 132584,
+        "output_tokens": 12732,
+        "tokens": 145316
+      },
+      "review": {
+        "diagnosis": "The most recent attempt still fails with 34% nonfinite outputs (all nan), identical to the previous version. Despite the introduction of explicit per-segment valid element counting, the nonzero nan region (columns 512 onward) suggests that not all columns are covered by the reduction. The root cause is that with BLOCK=512 and n_segs=2, seg_size rounds up to 391; segment 0 covers 0..390, segment 1 covers 391..780. However, tl.arange(0, BLOCK) produces [0..511], so, for seg=1, cols = 391..902, but only cols < 781 are valid. The masking expression (cols >= seg_start) & (cols < seg_end) & (cols < N) is redundant: for seg=1, cols >= 391, seg_end=781, cols < 781, cols < 781. However, only the first 390 values of arange(0, BLOCK) + 391 are < 781; the rest (cols 781..902) are not. But the reduction is over BLOCK lanes, so the true valid_count for seg=1 is only 390, not 391. This means segments at the end may not fully cover their intended columns, and so the total reduction omits columns 781\u2013902 (they are masked out, as intended), but also the mapping of valid columns may be off-by-one, or some columns are not covered at all if seg_size * n_segs < N + n_segs-1. The result: the partials for the trailing columns may not be written, so in finalize, those slots remain zero, and the output becomes nan when the total_count < N. The coverage error is thus in the computation of seg_size and the mapping from segment/lane to column index, which needs to guarantee every column 0..N-1 is included. The current code does not, for arbitrary N and BLOCK.",
+        "outcome": "This proposal is invalid: 34% of outputs are nan, identical to the previous failure. Explicit counting does not patch the underlying decomposition bug. The segment and lane mapping does not guarantee every output is covered for irregular N. The main kernel logic and scratch buffer layout are otherwise correct, but output coverage remains incomplete and cannot be fixed by masking or valid_count accumulation alone.",
+        "next_step": "Repair the segment coverage. Instead of mapping each segment to a fixed seg_size and using tl.arange(0, BLOCK), use a loop over the segment's column indices, or dynamically set the number of lanes launched per segment to exactly match the segment's width ((seg_end - seg_start)). Since BLOCK is fixed to 512, but the segment may be shorter, do not rely on tl.arange(0, BLOCK) to exactly span the segment; instead, for each seg, compute the true width (seg_end - seg_start), and process columns [seg_start, seg_end) in chunks of up to BLOCK, masking as needed. Alternatively, switch to a tiled loop: within each program, iterate over the segment columns in steps of BLOCK, accumulating partials in registers and only writing the final sum/sumsq/count. Ensure the finalize kernel only sums initialized partials, or zero-initialize S in advance. The fused single-row kernel avoids this complexity and is validated, but if two-stage is required, use a looped or tiled approach per segment to guarantee complete coverage, with correct accumulation and masking for all N."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 144016,
+        "output_tokens": 13458,
+        "tokens": 157474
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_rowwise_tiled",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "84100a2abd92e101672869174c942d7210b937b854350bc8c697a97b7c0bf9f8",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel changes the reduction and data movement strategy from a single large vector covering the whole row to a tiled approach. Each row is processed by a single program instance, but the reduction (for mean and variance) is computed in tiles of TILE columns (here, 256). The kernel loops over tiles for all passes, ensuring that partial reductions accumulate over the entire row, and that every column is covered exactly once, even if N is not divisible by TILE. All loads and stores use explicit in-bounds masking (mask = tile_col < N) to guarantee correct output and no out-of-bounds memory access. This decomposition is robust for any row width N, reduces per-thread register pressure, and preserves numerical accuracy for mean/variance. The kernel structure and data movement are thus different from the single-vector incumbent, directly addressing previous coverage and masking pitfalls.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 70901 / 400653 (17.7%)\nGreatest absolute difference: 0.014000415802001953 at index (469, 344) (up to 2e-05 allowed)\nGreatest relative difference: 42.78575134277344 at index (114, 202) (up to 0.0002 allowed)",
+        "worker_seconds": 12.621515314094722,
+        "process_seconds": 14.793262283317745
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 175421,
+        "output_tokens": 15657,
+        "tokens": 191078
+      },
+      "review": {
+        "diagnosis": "The proposed kernel implements a per-row, three-pass tiled reduction for mean, variance, and normalization, with explicit masking for in-bounds columns in each tile. All memory accesses are masked, and the tiling is robust to irregular N. However, measured validation shows a high output mismatch rate (17.7% of elements incorrect, none nan). The failure is not due to out-of-bounds accesses or nan propagation, but rather to a silent numerical error: the reduction is performed in tiles, using 'tl.sum(x, 0)' (summing across vector lanes) and accumulating into mean_acc/var_acc scalars. Since each tile's sum is computed independently, this is numerically valid, but the accumulation order differs from a single-pass vector reduction and may be less accurate for FP32. However, the error magnitudes (max abs 0.014, max rel > 40x tolerance) suggest a deeper issue, likely in the handling of the reduction identity or masking. Upon inspection, the masking for each tile is correct (tile_col < N), but the mean and variance are divided by N, not by the total number of valid elements in case of short tiles or rows. In this case, N is always correct (781), so this is not the cause. Instead, the error likely arises from incorrect masking or accumulation in the partial reductions; specifically, when tl.sum(x, 0) is called with a mask, the masked-out elements contribute 'other=0.0', which is correct for sum, but if any tile is partially out of bounds, the partial sum is less accurate, and the final mean/variance may be off. Additionally, using three separate passes over the data may introduce subtle numerical inconsistencies if input values are large or cancellation occurs. The result is a non-catastrophic but significant numerical error for a minority of elements.",
+        "outcome": "This attempt is invalid for correctness: 17.7% of outputs are outside allowed tolerance, with a maximum absolute error of 0.014 (tolerance 2e-5). All outputs are finite, but the numerical error is much higher than allowed. The tiled reduction strategy, while robust for coverage, is not sufficiently accurate for the test tolerances, likely due to partial sum cancellation or masking issues.",
+        "next_step": "Revert to a single-pass vectorized reduction per row (as in the incumbent) for this row width, or explore using FP32 accumulators and explicit reduction-tree order to improve numerical accuracy. If tiling is necessary, accumulate each tile's sum and count of valid elements, and divide by total count rather than N, to avoid bias from padding. Additionally, consider fusing the mean/variance passes to reduce rounding errors. Only proceed with a tiled approach if you can guarantee numerical equivalence with the reference implementation under the provided tolerances. Otherwise, the fused single-row kernel is preferred for both coverage and accuracy."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 187933,
+        "output_tokens": 16263,
+        "tokens": 204196
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_rowwise_splitmean",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 2
+          }
+        ]
+      },
+      "source_hash": "14320f896835ce8df09c3f50302dd39b2c08130dbe97af45b144eb1bb06b6901",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel fuses mean and mean-of-squares reduction into a single loop, improving numerical stability for variance by using E[x^2] - (E[x])^2 rather than three separate passes. All tiles are masked to handle irregular N, and normalization is performed in a second pass as before. This repairs floating-point error from prior tiled reductions and matches standard stable layernorm reduction order.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.066679426468909,
+        "validation_seconds": 3.7350219124928117,
+        "candidate": {
+          "median_ms": 0.020070399343967437,
+          "p25_ms": 0.019302400201559065,
+          "p75_ms": 0.02170879989862442,
+          "min_ms": 0.017407999932765962
+        },
+        "incumbent": {
+          "median_ms": 0.01966080069541931,
+          "p25_ms": 0.019251200556755065,
+          "p75_ms": 0.021503999829292297,
+          "min_ms": 0.018943999707698823
+        },
+        "paired_speedup": 0.9795919034031957,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 160.0103687505985,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.8655228558927774,
+        "process_seconds": 15.78184155933559
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 221497,
+        "output_tokens": 17962,
+        "tokens": 239459
+      },
+      "review": {
+        "diagnosis": "The proposed kernel fuses mean and mean-of-squares reduction into a single tiled pass, then normalizes in a second tiled pass, with correct masking for irregular N. This addresses some floating-point error from the prior three-pass reduction, but validation still fails: 17.7% of outputs are outside tolerance (max abs error 0.014, tolerance 2e-5), though no nans or coverage holes appear. The output error is thus purely numerical. The root cause is that even fused mean/E[x^2] computation, when accumulated in tiles using scalar accumulators, can introduce significant rounding error compared to a single-pass, full-row reduction. In particular, the accumulation order in the tiled loop (summing tile-wise partials) for both mean and mean-of-squares leads to non-associativity, so the result drifts from the reference, especially for wide or high-variance rows. This is a known problem in floating-point reduction: partial sums of large-magnitude values with cancellation may differ from a single, wide reduction. The incumbent kernel, which reduces the entire row as a single vector, matches the reference precisely; the tiled versions, even with correct masking, do not.",
+        "outcome": "The attempt is invalid for strict correctness: output error remains well above tolerance for a substantial fraction of elements. All outputs are finite, and the kernel is robust to coverage and masking, but the tiled reduction introduces enough floating-point error to fail the test. No API or shape bugs are present, only numerical ones.",
+        "next_step": "Do not use a tiled reduction for mean/variance for this N unless you can guarantee numerical equivalence with the reference. For FP32 and N=781, the fused full-row reduction (as in the incumbent) is both correct and efficient. If tiling is required for much larger N, consider using Kahan/Babuska compensated summation in each tile, or accumulating all partials in full precision before dividing by N. Otherwise, revert to the full-row, single-kernel vectorized reduction, which is validated, or explore parallel reductions with explicit tree order and FP32 accumulators for larger rows. Numerical correctness must take precedence over tiled parallelism for layernorm at these tolerances."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 234625,
+        "output_tokens": 18427,
+        "tokens": 253052
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_parallel",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              8
+            ],
+            "num_warps": 8,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "74c3147afd9121411030d9553775d5aed172351bbc8ec69e136c6d5584c7a997",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel changes the reduction order for improved numerical stability. Each row is processed by a single program instance, but reduction is performed in VEC-wide chunks using explicit masking to cover all columns (even irregular N). All partial sums (mean and mean of squares) are accumulated into scalars using a reduction-tree pattern across VEC lanes, minimizing floating-point reduction error from tiling. Normalization is performed similarly in parallel chunks. This approach directly addresses the reduction-order errors in previous tiled attempts by matching the full-row reduction pattern of the incumbent with explicit chunking and masking, ensuring both accuracy and correct coverage for any N.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.571626842021942,
+        "validation_seconds": 3.1796840112656355,
+        "candidate": {
+          "median_ms": 0.10670080184936523,
+          "p25_ms": 0.10659840106964111,
+          "p75_ms": 0.10670080184936523,
+          "min_ms": 0.10649600028991699
+        },
+        "incumbent": {
+          "median_ms": 0.018534399569034576,
+          "p25_ms": 0.018329599499702455,
+          "p75_ms": 0.020428799837827683,
+          "min_ms": 0.01791999936103821
+        },
+        "paired_speedup": 0.173704407537635,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 30.097918144362147,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.330959942191839,
+        "process_seconds": 15.624842833727598
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 271301,
+        "output_tokens": 20470,
+        "tokens": 291771
+      },
+      "review": {
+        "diagnosis": "This attempt introduces a reduction-tree style accumulation over VEC-wide vector chunks to improve numerical stability for mean and variance calculation, addressing the floating-point reduction order error seen in prior tiled approaches. All masking and chunking are correct, and the implementation fully covers each row. However, the measured performance is poor: the kernel is over 5x slower than the incumbent (median 0.1067 ms vs 0.0185 ms), with logical bandwidth dropping from 160 GB/s to 30 GB/s. The output is numerically correct (all outputs are finite and within tolerance), but the performance regression is severe. The slowdown is caused by the low VEC (8) and the inner Python loop over (N+VEC-1)//VEC chunks: this serializes per-row work, drastically reducing parallelism and instruction throughput. Triton programs are most efficient when a single program instance covers all columns in a row in a wide vector, leveraging hardware parallelism and memory coalescing; chunked serial accumulation is much less efficient for moderate N.",
+        "outcome": "Functionally correct but unacceptably slow. The kernel passes all coverage and numerical correctness requirements, but performance is regressed by over 5x. This approach is not viable for production or competitive layernorm.",
+        "next_step": "Revert to a full-row vectorized reduction: set VEC (BLOCK) >= N (e.g., 1024), so each row is processed in a single vectorized pass, using one program per row and masking for N. This matches the incumbent's structure and delivers both correctness and high efficiency. For much larger N (e.g., N > 4096), a true parallel reduction (multiple warps per row with explicit group reduction) may be warranted, but for N=781, a single-kernel, single-pass, wide-vector reduction is optimal. Avoid serial chunking for moderate N. If exploring further, tune BLOCK/VEC for maximum occupancy and vectorization, but preserve the single-pass reduction pattern."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 285773,
+        "output_tokens": 20892,
+        "tokens": 306665
+      }
+    }
+  ],
+  "wall_seconds": 335.3009452102706,
+  "resolved_model": "gpt-4.1-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.7386820000000016,
+  "budget_committed_usd": 0.7386820000000025,
+  "speedup": 1.882978609768886
+}

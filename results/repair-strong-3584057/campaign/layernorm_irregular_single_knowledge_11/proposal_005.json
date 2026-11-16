@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_row_strided_vector",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_strided_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    cols = tl.arange(0, BLOCK)\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    # Strided vector reduction for mean\n    for off in range(0, N, BLOCK):\n        idx = off + cols\n        mask = idx < N\n        offs = row * N + idx\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        mean_acc += tl.where(mask, x, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # Strided vector reduction for variance\n    for off in range(0, N, BLOCK):\n        idx = off + cols\n        mask = idx < N\n        offs = row * N + idx\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        xc = x - mean\n        var_acc += tl.where(mask, xc * xc, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Final strided vector pass: normalize and write\n    for off in range(0, N, BLOCK):\n        idx = off + cols\n        mask = idx < N\n        offs = row * N + idx\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        w = tl.load(W + idx, mask=mask, other=0.0)\n        b = tl.load(B + idx, mask=mask, other=0.0)\n        xc = x - mean\n        y = (xc * inv_std) * w + b\n        tl.store(Y + offs, y, mask=mask)\n",
+  "rationale": "This kernel repairs the previous proposal's compile error by using only compile-time scalars in for-loop bounds and replacing scalar accumulators with BLOCK-wide vectors. Each row is processed by a single program instance that executes three strided vector passes: mean, variance, and normalization, with all loads/stores masked for irregular row width. The approach reduces register pressure per thread, increases occupancy (8 warps), and maintains full output coverage for any N. The decomposition and memory access pattern meaningfully differ from the incumbent."
+}

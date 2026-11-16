@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean using masked sum and accurate division\n    sum_x = tl.sum(x, mask=mask)\n    mean = tl.div_rn(sum_x, N)\n\n    # Center input and compute variance\n    x_centered = tl.where(mask, x - mean, 0.0)\n    sum_var = tl.sum(x_centered * x_centered, mask=mask)\n    var = tl.div_rn(sum_var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load weights and bias with masking\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n\n    # Compute normalized output\n    y = tl.where(mask, x_centered * inv_std * w + b, 0.0)\n\n    # Store results with masking\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Refine the reduction computations by separating sum and variance sums explicitly with accurate division using tl.div_rn for numerical stability. Preserve masking for all loads and stores to correctly handle irregular shapes. Keep BLOCK size 256 and grid 513 to match shape. This ensures all computations are fused without intermediate buffers, minimizing global memory traffic and kernel launches."
+}

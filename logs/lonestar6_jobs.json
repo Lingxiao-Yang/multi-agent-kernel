@@ -98,12 +98,24 @@
       "time_limit": "03:00:00",
       "commit": "0d0fd71",
       "submitted": "2026-11-15T13:36:02",
-      "state": "PENDING",
+      "state": "COMPLETED",
       "dependency": null,
       "dollar_cap_usd": 4.0,
       "model": "gpt-4.1-mini-2025-04-14",
       "expected_output": "$SCRATCH/kernel-study-repair-20261115/results/repair-mini-3584053",
-      "note": "2 cases x 4 variants x 2 seeds; 8 attempts, 32 calls per search."
+      "note": "2 cases x 4 variants x 2 seeds; 8 attempts, 32 calls per search.",
+      "exit_code": "0:0",
+      "node": "v330-012",
+      "started": "2026-11-15T13:55:07",
+      "ended": "2026-11-15T15:09:08",
+      "elapsed": "01:14:01",
+      "fetched_utc": "2026-11-16T00:39:39.421626+00:00",
+      "searches_complete": 16,
+      "attempts_complete": 128,
+      "model_calls": 512,
+      "final_authored_improvements": 5,
+      "completed_estimated_usd": 1.9153828000000004,
+      "report": "reports/REPAIR_ROUND_REPORT.md"
     },
     {
       "job_id": 3584057,
@@ -113,12 +125,24 @@
       "time_limit": "04:00:00",
       "commit": "0d0fd71",
       "submitted": "2026-11-15T13:37:12",
-      "state": "PENDING",
+      "state": "COMPLETED",
       "dependency": "afterany:3584053",
       "dollar_cap_usd": 16.0,
       "model": "gpt-4.1-2025-04-14",
       "expected_output": "$SCRATCH/kernel-study-repair-20261115/results/repair-strong-3584057",
-      "note": "Strong phase checks successful mini completion and the recorded readiness threshold before any inference."
+      "note": "Strong phase checks successful mini completion and the recorded readiness threshold before any inference.",
+      "exit_code": "0:0",
+      "node": "v330-012",
+      "started": "2026-11-15T15:09:19",
+      "ended": "2026-11-15T16:28:38",
+      "elapsed": "01:19:19",
+      "fetched_utc": "2026-11-16T00:39:39.421626+00:00",
+      "searches_complete": 16,
+      "attempts_complete": 128,
+      "model_calls": 512,
+      "final_authored_improvements": 14,
+      "completed_estimated_usd": 10.417500000000006,
+      "report": "reports/REPAIR_ROUND_REPORT.md"
     }
   ]
 }

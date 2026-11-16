@@ -1,0 +1,1139 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T21:41:47.486772+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "single",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 2.0,
+      "output_usd_per_million": 8.0,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "1bed5d8d58349e1546c29e9ae8e81c84aa1524da04b1df5c6fff162ca2bbdcd7",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "dffa17214485a3508c8e6d8fc66f90154f227e4289e2850258f1364b4570222b",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584057",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 223584,
+    "output_tokens": 24379,
+    "tokens": 247963
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 9.313225746154785e-10
+        }
+      ],
+      "first_launch_seconds": 1.210223926231265,
+      "validation_seconds": 1.9387740632519126,
+      "candidate": {
+        "median_ms": 0.01884160041809082,
+        "p25_ms": 0.01817599982023239,
+        "p75_ms": 0.024985600262880325,
+        "min_ms": 0.01658879965543747,
+        "samples_ms": [
+          0.022835199534893037,
+          0.021196800470352172,
+          0.029798400402069092,
+          0.018739199638366698,
+          0.018636800348758698,
+          0.020479999482631683,
+          0.03020800054073334,
+          0.018739199638366698,
+          0.018432000279426576,
+          0.019763199985027312,
+          0.024166400730609893,
+          0.027750399708747864,
+          0.017203199863433837,
+          0.017100800573825837,
+          0.019046400487422944,
+          0.01884160041809082,
+          0.027033600211143493,
+          0.02908160090446472,
+          0.01884160041809082,
+          0.01812479943037033,
+          0.01822720021009445,
+          0.01669120043516159,
+          0.025804799795150758,
+          0.017407999932765962,
+          0.01658879965543747,
+          0.016998399794101716,
+          0.01884160041809082,
+          0.018534399569034576,
+          0.026931199431419372,
+          0.026316800713539125,
+          0.017100800573825837
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.034508800506591795,
+        "p25_ms": 0.03302399963140488,
+        "p75_ms": 0.04188160002231598,
+        "min_ms": 0.031027200818061828,
+        "samples_ms": [
+          0.045875200629234315,
+          0.03522560000419617,
+          0.034508800506591795,
+          0.046079999208450316,
+          0.047513601183891294,
+          0.034508800506591795,
+          0.034918400645256045,
+          0.04433920085430145,
+          0.04423680007457733,
+          0.0347135990858078,
+          0.031744000315666196,
+          0.03389439880847931,
+          0.03389439880847931,
+          0.042803201079368594,
+          0.0419840008020401,
+          0.03266560137271881,
+          0.031436800956726074,
+          0.03328000009059906,
+          0.03543039858341217,
+          0.04444159865379334,
+          0.04147199988365173,
+          0.03328000009059906,
+          0.03112959861755371,
+          0.03297280073165894,
+          0.03287039995193482,
+          0.04157440066337585,
+          0.04177919924259186,
+          0.031027200818061828,
+          0.031027200818061828,
+          0.03307519853115082,
+          0.03338240087032318
+        ]
+      },
+      "paired_speedup": 1.831521725376262,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.01935359984636307,
+          "p25_ms": 0.017305600643157962,
+          "p75_ms": 0.024934399873018265,
+          "min_ms": 0.01679359972476959,
+          "samples_ms": [
+            0.020582400262355804,
+            0.020787200331687926,
+            0.030003198981285097,
+            0.018534399569034576,
+            0.018329599499702455,
+            0.02088959962129593,
+            0.018329599499702455,
+            0.02959359884262085,
+            0.037990400195121767,
+            0.020172800123691558,
+            0.045875200629234315,
+            0.018534399569034576,
+            0.021299199759960176,
+            0.017510400712490083,
+            0.026726400852203368,
+            0.01791999936103821,
+            0.016998399794101716,
+            0.016896000504493712,
+            0.01935359984636307,
+            0.01679359972476959,
+            0.027852800488471986,
+            0.024166400730609893,
+            0.016998399794101716,
+            0.016998399794101716,
+            0.01955839991569519,
+            0.017100800573825837,
+            0.027033600211143493,
+            0.025702399015426636,
+            0.016998399794101716,
+            0.016896000504493712,
+            0.018739199638366698
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03317759931087494,
+          "p75_ms": 0.0419840008020401,
+          "min_ms": 0.030822399258613586,
+          "samples_ms": [
+            0.04382719993591309,
+            0.03522560000419617,
+            0.035123199224472046,
+            0.04362240135669708,
+            0.03665919899940491,
+            0.034508800506591795,
+            0.03604480028152466,
+            0.03604480028152466,
+            0.0449535995721817,
+            0.03358719944953918,
+            0.0347135990858078,
+            0.045158401131629944,
+            0.04556800127029419,
+            0.034815999865531924,
+            0.03112959861755371,
+            0.03317759931087494,
+            0.03317759931087494,
+            0.04188160002231598,
+            0.04413439929485321,
+            0.030924800038337707,
+            0.03133440017700195,
+            0.03266560137271881,
+            0.03328000009059906,
+            0.04341759979724884,
+            0.0419840008020401,
+            0.030822399258613586,
+            0.03112959861755371,
+            0.032767999172210696,
+            0.03328000009059906,
+            0.04177919924259186,
+            0.0419840008020401
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.01443839967250824,
+        "p25_ms": 0.014336000382900237,
+        "p75_ms": 0.01454080045223236,
+        "min_ms": 0.014233599603176116,
+        "samples_ms": [
+          0.01454080045223236,
+          0.014233599603176116,
+          0.01454080045223236,
+          0.015667200088500977,
+          0.01443839967250824,
+          0.014336000382900237,
+          0.01454080045223236,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.01454080045223236,
+          0.014336000382900237,
+          0.01454080045223236,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.014233599603176116,
+          0.01679359972476959,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.021196800470352172,
+          0.01454080045223236,
+          0.014233599603176116,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.01443839967250824,
+          0.014233599603176116,
+          0.01454080045223236,
+          0.014336000382900237,
+          0.01443839967250824
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 170.1142115784652,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.142502749338746,
+      "process_seconds": 14.255529973655939
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_fused_blocked_v2",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "Y",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_blocked_v2",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "612d533f6fc4ce88d9c590afbc5cd1fd22de7ffeccbc7129b303f2e387019585",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version fuses stats and apply, using row-major mapping and masking for ragged shape. Compared to the previous, we explicitly mask the exp_x buffer (multiplying by mask) before the reduction sum, ensuring padded elements contribute zero to the sum and normalization. We also guard against denom==0 for numerical safety, though it should not occur for valid N. All loads and stores are masked by offs < N. Grid covers all 513 rows.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6094729900360107,
+        "validation_seconds": 3.2827607952058315,
+        "candidate": {
+          "median_ms": 0.017407999932765962,
+          "p25_ms": 0.017152000218629837,
+          "p75_ms": 0.018432000279426576,
+          "min_ms": 0.015564799308776855
+        },
+        "incumbent": {
+          "median_ms": 0.03399679958820343,
+          "p25_ms": 0.03312639892101288,
+          "p75_ms": 0.04172800034284592,
+          "min_ms": 0.031231999397277832
+        },
+        "paired_speedup": 1.9529411603577407,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.017612800002098083,
+            "p25_ms": 0.017407999932765962,
+            "p75_ms": 0.020172800123691558,
+            "min_ms": 0.017100800573825837
+          },
+          "incumbent": {
+            "median_ms": 0.034201601147651674,
+            "p25_ms": 0.03297279924154282,
+            "p75_ms": 0.04213759899139404,
+            "min_ms": 0.031641599535942075
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 184.12362203466077,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.5402745297178626,
+        "process_seconds": 15.279806779697537,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 31,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 8658,
+        "output_tokens": 1136,
+        "tokens": 9794
+      },
+      "review": {
+        "diagnosis": "The fused single-kernel softmax proposal is both correct and much faster than the incumbent two-kernel approach. The key transformation is to eliminate intermediate stats storage and memory roundtrips by computing the row-wise max, exponentials, and normalization in a single pass per row, using masking to avoid padded values contributing to reductions. The implementation correctly guards all loads, reductions, and stores with masks, and handles irregular row widths. The performance result confirms a ~2x speedup, with no validation or structural errors.",
+        "outcome": "success",
+        "next_step": "No further action required. This fused softmax kernel is correct and an optimal baseline for this case."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 13328,
+        "output_tokens": 1281,
+        "tokens": 14609
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_blocked_vectorized_loop",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "08d27f1ada5caaa9d2b80504f17b075067efe9e7f9466839dbaa7a544f9fe578",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases memory-level parallelism and arithmetic intensity by processing the row in small vectorized chunks (vec_width=4) within each kernel instance. It uses three explicit for-loops over the padded row extent: one to compute the row max, one for the sum of exponentials, and one for normalization and storage. This can improve L1/L2 cacheline utilization and hide memory latency by issuing multiple independent loads per iteration, while the scalar reductions aggregate into max_val and sum_exp. All accesses and reductions are masked for ragged row width. This approach is a strict generalization of the incumbent, but with explicit vectorized memory access and arithmetic in tight loops, which may yield better hardware utilization for large RB cases.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 10:17:\ndef softmax_fused_blocked_vectorized_loop(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n    mask = offs < N\n    # Load row in vectorized chunks, accumulate max\n    vec_width = 4\n    max_val = -float('inf')\n    for i in range(0, RB, vec_width):\n        offs_v = offs[i:i+vec_width]\n                 ^\nunsupported tensor index: <triton.language.core.slice object at 0x1522fc932c30>",
+        "worker_seconds": 11.61049406323582,
+        "process_seconds": 14.001046491786838
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 26273,
+        "output_tokens": 3024,
+        "tokens": 29297
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_blocked_vectorized_loop_fixed",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    n_iters = (RB + vec_width - 1) // vec_width\n    max_val = -float('inf')\n    # Compute row max in vectorized chunks\n    for it in range(0, n_iters):\n        start = it * vec_width\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        cur_max = tl.max(x_v, 0)\n        max_val = tl.maximum(max_val, cur_max)\n    # Compute sum of exp(x - max_val) in vectorized chunks\n    sum_exp = 0.0\n    for it in range(0, n_iters):\n        start = it * vec_width\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1, sum_exp)\n    # Final normalization and store\n    for it in range(0, n_iters):\n        start = it * vec_width\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x / denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "The previous proposal failed because Triton does not allow slicing a tensor (offs[i:i+vec_width]) with a runtime variable; only compile-time static offsets or tl.arange are supported. The repair is to generate vectorized offsets for each iteration using start + tl.arange(0, vec_width), ensuring all indices remain compile-time known. All vector loads/stores are properly masked for the ragged row width. Each loop covers a chunk of vec_width elements until RB is exhausted, and masking guarantees only real elements (offs_v < N) are processed. This enables true vectorized memory access while maintaining correctness for arbitrary N and RB."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 32450,
+        "output_tokens": 3759,
+        "tokens": 36209
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_blocked_vectorized_loop_fixed",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "0e569e7641f9191a1e6ef87b63e633d8706e0ef7cd12c27ffc8ab5fbf82943a0",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases memory-level parallelism and arithmetic intensity by processing each row in vectorized chunks of size vec_width=4. It loops over the padded extent RB in increments of vec_width, using start + tl.arange(0, vec_width) to generate static, compile-time offsets in each iteration. All loads, reductions, and stores are masked by offs_v < N, ensuring only valid columns contribute to reductions and output. Each pass (max, sum, normalization) is performed in a vectorized loop for improved memory and compute efficiency, while masking ensures numerical correctness for ragged row width. This design generalizes the incumbent with explicit vectorized access and arithmetic.",
+      "accepted": false,
+      "previous_failure_attempt": 2,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 7:25:\ndef softmax_fused_blocked_vectorized_loop_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    max_val = -float('inf')\n    # Loop over row in vector chunks to compute row max\n    for start in range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n                         ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 11.061997552402318,
+        "process_seconds": 13.371368996798992
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 49023,
+        "output_tokens": 5796,
+        "tokens": 54819
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_blocked_vectorized_loop_constexpr",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop_constexpr(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4  # Must be constexpr\n    max_val = -float('inf')\n    # Compute row max in vectorized constexpr chunks\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Compute sum of exp(x - max_val) in vectorized chunks\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1, sum_exp)\n    # Normalize and store\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x / denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "This corrects the previous constexpr error by replacing range() with tl.static_range() for the loop over RB, ensuring the start variable is compile-time constant. This allows start + tl.arange(0, vec_width) to be valid per Triton requirements. All vectorized loads, reductions, and stores remain masked for ragged row bounds, and the three-pass max/sum/normalize structure is preserved. This delivers the intended vectorized memory access and arithmetic while satisfying Triton's constexpr requirements for both the loop and arange extents."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 56458,
+        "output_tokens": 6482,
+        "tokens": 62940
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_blocked_vectorized_loop_fixed_v4",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "5b9167359ecd0bd6d677cb74d9dea048ecd94fdc16419a7f9a3cf0230cd05258",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implements a mathematically equivalent softmax using a numerically safe trick: instead of computing exp(x - max) and summing, we use exp((x - max)/2) and then square the sum for normalization. This can improve numerical stability for large values and may reduce overflow risk by halving the exponent range in exp(). The chunked vectorized structure and masking are preserved. All three passes are performed in vectorized loops, and the output normalization is adjusted to match the halved exponent. This is a valid alternate computation path for softmax, leveraging a well-known exponent-halving trick for stability and hardware efficiency.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:4:\ndef softmax_fused_blocked_vectorized_loop_fixed_v4(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    # First pass: compute row max in vectorized chunks\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')",
+        "worker_seconds": 36.04697666782886,
+        "process_seconds": 38.38497577421367
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 74951,
+        "output_tokens": 8598,
+        "tokens": 83549
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_blocked_vectorized_loop_fixed_v3",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop_fixed_v3(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    # First pass: compute row max in vectorized chunks\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Second pass: compute sum of exp(x - max_val)\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered)\n        exp_x = exp_x * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1, sum_exp)\n    inv_denom = 1.0 / denom\n    # Third pass: normalize and store, using precomputed inv_denom\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered)\n        exp_x = exp_x * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "This repairs all prior constexpr and vectorization issues by using tl.static_range for the loop increments, ensuring the step value is a compile-time constant, and preserves masking and correct reduction identities for ragged shapes. It improves on the incumbent by vectorized memory access and arithmetic, and uses multiplication by the reciprocal of the denominator instead of division for potential instruction throughput improvement. All reductions, loads, and stores remain masked for irregular shapes, and the grid covers all rows exactly."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 83091,
+        "output_tokens": 9306,
+        "tokens": 92397
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_blocked_vectorized_loop_fixed_v5",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "2bade459717c8c57acf5ef6f1a06437b08bd62af755aa9c1f28f6fa75b177ff5",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases memory-level parallelism by processing each row in vectorized chunks of vec_width=4 using tl.static_range(0, RB, 4) to guarantee compile-time loop increments. All loads, reductions, and stores are properly masked with offs_v < N, ensuring correctness for ragged rows. Each pass (max, sum, normalize) is performed in vectorized loops for improved memory and compute efficiency. Division for normalization is replaced by multiplication by the reciprocal for throughput. The launch config matches the problem's shape, with grid=513 and RB covering the padded width.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "timeout",
+        "error": "worker exceeded wall-time limit",
+        "process_seconds": 180.2254265556112
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 103828,
+        "output_tokens": 11440,
+        "tokens": 115268
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_blocked_double_buffered",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_double_buffered(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    # Allocate double buffers for vector chunk\n    buf0 = tl.zeros((vec_width,), dtype=tl.float32)\n    buf1 = tl.zeros((vec_width,), dtype=tl.float32)\n    # First pass: compute row max in vectorized chunks, double-buffered\n    max_val = -float('inf')\n    double_buf = [buf0, buf1]\n    for pass_ix in range(2):\n        # Loop variable for double buffering\n        for start in tl.static_range(pass_ix, RB, 2*vec_width):\n            offs_v = start + tl.arange(0, vec_width)\n            mask_v = offs_v < N\n            idx_v = row * N + offs_v\n            x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n            double_buf[pass_ix][:] = x_v\n            max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Second pass: compute sum of exp(x - max) in double-buffered fashion\n    sum_exp = 0.0\n    for pass_ix in range(2):\n        for start in tl.static_range(pass_ix, RB, 2*vec_width):\n            offs_v = start + tl.arange(0, vec_width)\n            mask_v = offs_v < N\n            idx_v = row * N + offs_v\n            x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n            x_centered = x_v - max_val\n            exp_x = tl.exp(x_centered) * mask_v\n            double_buf[pass_ix][:] = exp_x\n            sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # Third pass: normalize and store, double buffered\n    for pass_ix in range(2):\n        for start in tl.static_range(pass_ix, RB, 2*vec_width):\n            offs_v = start + tl.arange(0, vec_width)\n            mask_v = offs_v < N\n            idx_v = row * N + offs_v\n            x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n            x_centered = x_v - max_val\n            exp_x = tl.exp(x_centered) * mask_v\n            double_buf[pass_ix][:] = exp_x\n            res = exp_x * inv_denom\n            tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "The previous proposal timed out, likely due to excessive loop trip counts with small vector width and scalar accumulation. This proposal implements a double-buffered vector chunking scheme: it splits full-row vectorized iteration into two interleaved passes, allowing each thread to prefetch and process two disjoint sets of chunks in a staggered fashion. This can improve memory-level parallelism by exposing more independent loads, while maintaining vectorized memory access and masking for ragged rows. Each pass (max, sum, normalize) iterates over the row in two offset streams (even/odd chunks), using two vector buffers per thread. Masking and reduction identities remain correct. No additional shared memory or synchronization is introduced, and every output is still written once per invocation."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 112531,
+        "output_tokens": 12333,
+        "tokens": 124864
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_vectorized_double_buffer",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "8590593d9f8859faa760b4af09658371e0b26349288e2eee36678e831f365598",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel improves memory-level parallelism by processing each row in interleaved even/odd vector chunks (vec_width=8), reducing loop iterations and increasing throughput. Double-buffered chunking allows for more independent memory accesses, better hiding memory latency, and exploiting the memory subsystem. All loads, reductions, and stores are masked for ragged rows, ensuring correctness. This addresses the timeout of prior vectorized kernels with small vec_width. The mapping covers all outputs with correct masking and reduction identities.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:4:\ndef softmax_fused_vectorized_double_buffer(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Pass 1: even vector chunks for row max\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 2 * vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')",
+        "worker_seconds": 11.097268515266478,
+        "process_seconds": 13.430426502600312
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 135915,
+        "output_tokens": 15608,
+        "tokens": 151523
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_vectorized_double_buffer_fixed",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_vectorized_double_buffer_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # --- Pass 1: even vector chunks for row max ---\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 16):  # 2*vec_width = 16, constexpr\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # --- Pass 2: odd vector chunks for row max ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # --- Pass 3: sum of exp(x - max) for even vector chunks ---\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    # --- Pass 4: odd vector chunks for sum ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # --- Pass 5: normalize and store for even vector chunks ---\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n    # --- Pass 6: odd vector chunks for normalize/store ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "The previous proposal failed because tl.static_range requires a compile-time constant step, but 2 * vec_width was an int32[] at runtime. This repair replaces 2 * vec_width with the literal 16 in the static_range step argument, which is a valid tl.constexpr. All other logic is preserved: we process even and odd vector-width=8 chunks interleaved in separate passes for each reduction, masking all loads, reductions, and stores for ragged row width N. The index mapping, masking, and reduction identities are correct for arbitrary N <= RB, and all passes use only allowed Triton primitives."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 146363,
+        "output_tokens": 16737,
+        "tokens": 163100
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_vectorized_double_buffer_fixed",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "72a6b02092d893b5368d79874ba71420cd02f6e2f208c014b70be3d8586442e4",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repair directly addresses the previous constexpr error by replacing the tl.static_range step argument with the literal 16, which is a compile-time constant. The kernel processes each row in two interleaved passes (even/odd vector-width=8 chunks) for each phase (max, sum, normalization), increasing memory-level parallelism and reducing loop trip count. Masking ensures only valid elements participate in reductions and stores, preserving correctness for N <= RB. Every output is covered exactly once and all reductions are performed with proper identities.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 7:25:\ndef softmax_fused_vectorized_double_buffer_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Pass 1: even vector chunks for row max\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, vec_width)\n                         ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 11.362113350071013,
+        "process_seconds": 13.691828720271587
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 172725,
+        "output_tokens": 19924,
+        "tokens": 192649
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_vectorized_double_buffer_fixed_v2",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_vectorized_double_buffer_fixed_v2(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # --- Pass 1: even vector chunks for row max ---\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # --- Pass 2: odd vector chunks for row max ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # --- Pass 3: sum of exp(x - max) for even vector chunks ---\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    # --- Pass 4: sum for odd chunks ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # --- Pass 5: normalize and store for even vector chunks ---\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n    # --- Pass 6: normalize/store for odd chunks ---\n    for start in tl.static_range(8, RB, 16):\n        offs_v = start + tl.arange(0, 8, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "This version repairs the previous error by making both arguments to tl.arange (start, stop, step) explicit compile-time constants (0, 8, 1). This guarantees the extent is a tl.constexpr and prevents the triton compilation error. The chunking, masking, interleaved even/odd passes, and reduction logic remain correct for all N <= RB. This maintains the intended vectorized, double-buffered, and masked structure for efficient softmax with full output coverage and correct reduction identities."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 184159,
+        "output_tokens": 21039,
+        "tokens": 205198
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused_vectorized_double_buffer_fixed_v3",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "1b68e1f0c5ea5527d4581f838764467ee63c605af3595a0f3801059a16eae8bc",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version fuses the even/odd chunking into a single vectorized loop (stride 8) per pass, reducing code complexity and improving L1/L2 access regularity. All memory accesses and reductions are vectorized, and every access is masked for ragged N. This eliminates the need for interleaved passes, potentially reducing code size and improving register usage. It retains all correctness invariants: reduction identities, output coverage, masking, and constexpr loop extents for Triton. This approach increases memory-level parallelism compared to the scalar baseline and prior attempts with excessive loop trip counts.",
+      "accepted": false,
+      "previous_failure_attempt": 7,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:4:\ndef softmax_fused_vectorized_double_buffer_fixed_v3(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Compute row max: process all even and odd chunks in one loop (stride 8)\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')",
+        "worker_seconds": 11.797299106605351,
+        "process_seconds": 14.211547289043665
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 212149,
+        "output_tokens": 23624,
+        "tokens": 235773
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "softmax_fused_vectorized_double_buffer_fixed_v4",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_vectorized_double_buffer_fixed_v4(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8  # Compile-time constant\n    # Pass 1: compute row max (chunked, vectorized)\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 8):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Pass 2: sum of exp(x - max) (chunked, vectorized)\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, 8):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # Pass 3: normalize and store (chunked, vectorized)\n    for start in tl.static_range(0, RB, 8):\n        offs_v = start + tl.arange(0, 8)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+        "rationale": "The prior failure was caused by using a runtime value as the tl.static_range step, which must be a compile-time constant in Triton. Here, vec_width is set as 8 (compile-time constant), and all tl.static_range and tl.arange use the literal 8 as step/extent. This maintains vectorization and masking, ensuring correct output for ragged rows. The kernel processes the row in vector-width=8 chunks for all passes (max, sum, normalize), providing improved memory throughput and parallelism, while guaranteeing all reductions and stores are masked for N. This approach combines the simplicity of the single-pass vectorized loop with fully static extents to satisfy Triton's API."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 223584,
+        "output_tokens": 24379,
+        "tokens": 247963
+      }
+    }
+  ],
+  "wall_seconds": 510.65176828950644,
+  "resolved_model": "gpt-4.1-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.6421999999999999,
+  "budget_committed_usd": 0.6422000000000008,
+  "speedup": 1.831521725376262
+}

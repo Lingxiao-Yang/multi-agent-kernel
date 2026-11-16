@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_layernorm_rowwise",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_layernorm_rowwise(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 1024\n    cols = tl.arange(0, BLOCK)\n    mask = cols < N\n    x_ptrs = X + row * N + cols\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    var = tl.sum(centered * centered, 0) / N\n    inv_std = tl.rsqrt(var + 1e-5)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    normed = (centered * inv_std) * w + b\n    tl.store(Y + row * N + cols, normed, mask=mask)\n",
+  "rationale": "This kernel fuses the two-stage layernorm into a single per-row kernel, as outlined in the plan. Each program computes the mean and variance for its row, then applies normalization and affine transformation. The grid covers all 513 rows, with BLOCK=1024 ensuring all 781 columns are processed per row and remaining entries are masked. All reductions and broadcasts use correct masking and numerics. No global scratch, only final output buffer Y is written."
+}

@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.float32(0)\n    sumsq_val = tl.float32(0)\n    for start in range(0, N, BLOCK):\n        idx = start + offs\n        mask = idx < N\n        x = tl.load(X + row * N + idx, mask, other=0.0)\n        x32 = tl.float32(x)\n        sum_val += tl.sum(tl.where(mask, x32, tl.float32(0)), 0)\n        sumsq_val += tl.sum(tl.where(mask, x32 * x32, tl.float32(0)), 0)\n    mean = tl.div_rn(sum_val, N)\n    var = tl.div_rn(sumsq_val, N) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = i // N\n    col = i % N\n    mask = i < TOTAL\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + row * 2, mask, other=0)\n    inv = tl.load(S + row * 2 + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    val = (x - mean) * inv * w + b\n    tl.store(Y + i, val, mask)\n",
+  "rationale": "Repaired layernorm_stats to perform accumulation in float32 using tl.float32 for type conversion (supported primitive), iterating over the irregular dimension N=781 in masked chunks of size BLOCK=256. Sum and sum of squares are accumulated with masking to avoid contributions from padded elements. Computed mean, variance, and inverse sqrt with correct masking and division by logical N. The layernorm_apply kernel is unchanged, as it correctly handles masking and parameter usage. Launch grid sizes and constexpr parameters cover the entire input. This fix addresses previous API errors and ensures numerical correctness for irregular shape layernorm, preserving accuracy and full coverage."
+}

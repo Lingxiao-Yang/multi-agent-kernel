@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_v2",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_v2(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n    mask = offs < N\n    # Load input row with padding masked\n    x = tl.load(X + idx, mask=mask, other=-float('inf'))\n    # Compute row max (ignoring padding)\n    mx = tl.max(x, 0)\n    x_centered = x - mx\n    # Mask again so padding does not contribute to exp/sum\n    exp_x = tl.exp(x_centered)\n    exp_x = exp_x * mask\n    denom = tl.sum(exp_x, 0)\n    # Avoid division by zero (should not occur if N > 0)\n    denom = tl.where(denom == 0, 1, denom)\n    res = exp_x / denom\n    tl.store(Y + idx, res, mask=mask)\n",
+  "rationale": "This version fuses stats and apply, using row-major mapping and masking for ragged shape. Compared to the previous, we explicitly mask the exp_x buffer (multiplying by mask) before the reduction sum, ensuring padded elements contribute zero to the sum and normalization. We also guard against denom==0 for numerical safety, though it should not occur for valid N. All loads and stores are masked by offs < N. Grid covers all 513 rows."
+}

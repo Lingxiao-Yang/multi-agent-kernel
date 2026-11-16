@@ -1,0 +1,1263 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T21:31:58.240277+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "single_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 2.0,
+      "output_usd_per_million": 8.0,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "1bed5d8d58349e1546c29e9ae8e81c84aa1524da04b1df5c6fff162ca2bbdcd7",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "dffa17214485a3508c8e6d8fc66f90154f227e4289e2850258f1364b4570222b",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584057",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 245270,
+    "output_tokens": 21553,
+    "tokens": 266823
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 9.313225746154785e-10
+        }
+      ],
+      "first_launch_seconds": 5.1250468948856,
+      "validation_seconds": 5.781228615902364,
+      "candidate": {
+        "median_ms": 0.019148799777030944,
+        "p25_ms": 0.017561600357294083,
+        "p75_ms": 0.022118400037288665,
+        "min_ms": 0.015667200088500977,
+        "samples_ms": [
+          0.020684799551963805,
+          0.020070399343967437,
+          0.023552000522613525,
+          0.027955201268196107,
+          0.01812479943037033,
+          0.017715199291706084,
+          0.01945600062608719,
+          0.01945600062608719,
+          0.02908160090446472,
+          0.017407999932765962,
+          0.017407999932765962,
+          0.017612800002098083,
+          0.01945600062608719,
+          0.015667200088500977,
+          0.027955201268196107,
+          0.017510400712490083,
+          0.017203199863433837,
+          0.01884160041809082,
+          0.019046400487422944,
+          0.029798400402069092,
+          0.01884160041809082,
+          0.017203199863433837,
+          0.01935359984636307,
+          0.019148799777030944,
+          0.027852800488471986,
+          0.025804799795150758,
+          0.01791999936103821,
+          0.017407999932765962,
+          0.01935359984636307,
+          0.017407999932765962,
+          0.028569599986076354
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.034508800506591795,
+        "p25_ms": 0.03256320059299469,
+        "p75_ms": 0.04213759899139404,
+        "min_ms": 0.031436800956726074,
+        "samples_ms": [
+          0.040755200386047366,
+          0.03256320059299469,
+          0.03256320059299469,
+          0.034508800506591795,
+          0.034508800506591795,
+          0.04341759979724884,
+          0.0447488009929657,
+          0.03287039995193482,
+          0.032358399033546446,
+          0.03430399894714355,
+          0.034508800506591795,
+          0.0419840008020401,
+          0.043110400438308716,
+          0.031641599535942075,
+          0.032153600454330446,
+          0.03522560000419617,
+          0.03358719944953918,
+          0.04526079893112182,
+          0.04485119879245758,
+          0.03676159977912903,
+          0.03563520014286041,
+          0.0421887993812561,
+          0.04259839951992035,
+          0.031744000315666196,
+          0.032051199674606325,
+          0.03389439880847931,
+          0.03399679958820343,
+          0.04249599874019623,
+          0.04208639860153198,
+          0.031436800956726074,
+          0.032153600454330446
+        ]
+      },
+      "paired_speedup": 1.8021390848728405,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.018636800348758698,
+          "p25_ms": 0.017407999932765962,
+          "p75_ms": 0.024166399985551833,
+          "min_ms": 0.01679359972476959,
+          "samples_ms": [
+            0.031641599535942075,
+            0.01955839991569519,
+            0.018636800348758698,
+            0.021401600539684297,
+            0.01884160041809082,
+            0.030105599761009218,
+            0.03880960047245026,
+            0.029183998703956604,
+            0.018636800348758698,
+            0.017817600071430205,
+            0.019251200556755065,
+            0.017407999932765962,
+            0.028774398565292358,
+            0.018534399569034576,
+            0.017407999932765962,
+            0.017203199863433837,
+            0.019046400487422944,
+            0.01812479943037033,
+            0.026931199431419372,
+            0.017100800573825837,
+            0.01679359972476959,
+            0.016998399794101716,
+            0.018943999707698823,
+            0.01730560064315796,
+            0.02754560112953186,
+            0.017510400712490083,
+            0.016998399794101716,
+            0.017407999932765962,
+            0.01945600062608719,
+            0.01730560064315796,
+            0.027136000990867614
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.034201601147651674,
+          "p25_ms": 0.03266559988260269,
+          "p75_ms": 0.04193279892206192,
+          "min_ms": 0.03112959861755371,
+          "samples_ms": [
+            0.033792001008987424,
+            0.043724799156188966,
+            0.03676159977912903,
+            0.0347135990858078,
+            0.034201601147651674,
+            0.03614720106124878,
+            0.046079999208450316,
+            0.05478399991989136,
+            0.036556801199913024,
+            0.046079999208450316,
+            0.04249599874019623,
+            0.031231999397277832,
+            0.032358399033546446,
+            0.03348479866981506,
+            0.03297280073165894,
+            0.04208639860153198,
+            0.04341759979724884,
+            0.031231999397277832,
+            0.032051199674606325,
+            0.033792001008987424,
+            0.033792001008987424,
+            0.04147199988365173,
+            0.0421887993812561,
+            0.03184640109539032,
+            0.031641599535942075,
+            0.03328000009059906,
+            0.03389439880847931,
+            0.04177919924259186,
+            0.04167680144309997,
+            0.031539198756217954,
+            0.03112959861755371
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.01454080045223236,
+        "p25_ms": 0.01443839967250824,
+        "p75_ms": 0.014694400131702423,
+        "min_ms": 0.014336000382900237,
+        "samples_ms": [
+          0.014643199741840363,
+          0.01454080045223236,
+          0.01454080045223236,
+          0.021299199759960176,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.014336000382900237,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.015872000157833098,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.01443839967250824,
+          0.014745600521564484,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.021401600539684297,
+          0.01443839967250824,
+          0.016896000504493712,
+          0.01443839967250824,
+          0.01454080045223236,
+          0.021196800470352172,
+          0.014643199741840363
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 167.38511224315363,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 5.971008880995214,
+      "process_seconds": 17.777421698905528
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "fused_softmax",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "Y",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "41c91af9b4599224803d50807887da585775b9a809f44c7b3f92cac8362a53eb",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "Fuses the rowwise softmax into a single pass to eliminate intermediate memory traffic and reduce launch count. Each row is processed by a single program instance, using a BLOCK-wide vector with masking to handle boundary columns (shape[1] is not a multiple of BLOCK). This preserves the numerically stable softmax by subtracting the row maximum before exponentiation, and covers all outputs with correct mask and reduction identities. All device logic is inlined and all output elements are written on each invocation.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6349549992009997,
+        "validation_seconds": 3.3350157607346773,
+        "candidate": {
+          "median_ms": 0.017510400712490083,
+          "p25_ms": 0.01730560064315796,
+          "p75_ms": 0.019353600591421126,
+          "min_ms": 0.016998399794101716
+        },
+        "incumbent": {
+          "median_ms": 0.03328000009059906,
+          "p25_ms": 0.031999999284744264,
+          "p75_ms": 0.04157440066337585,
+          "min_ms": 0.030924800038337707
+        },
+        "paired_speedup": 1.9005847231617377,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.017817600071430205,
+            "p25_ms": 0.017100800573825837,
+            "p75_ms": 0.01950719952583313,
+            "min_ms": 0.01669120043516159
+          },
+          "incumbent": {
+            "median_ms": 0.035020801424980166,
+            "p25_ms": 0.03240959942340851,
+            "p75_ms": 0.04167679995298386,
+            "min_ms": 0.03031040132045746
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 183.04686755190758,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.5094647482037544,
+        "process_seconds": 15.94597524497658,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 24,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 11262,
+        "output_tokens": 1075,
+        "tokens": 12337
+      },
+      "review": {
+        "diagnosis": "The fused single-pass softmax kernel is correct, efficient, and confirmed faster than the incumbent by nearly 2x. The implementation covers all outputs, correctly masks boundary columns, and preserves numerically stable reduction. No memory or launch inefficiency is observed. Validation and performance are both strong, with no numerical or API errors.",
+        "outcome": "accepted",
+        "next_step": "No further optimization necessary; propose additional changes only if targeting new hardware, precision, or workload scale."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 16762,
+        "output_tokens": 1182,
+        "tokens": 17944
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_blockwise",
+            "grid": [
+              513,
+              8
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "ce56ccbb282e355ad4207dbe3498243d9c936efaf85baf555c55a7672307691c",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel parallelizes the softmax computation along the column dimension by using a two-dimensional launch grid: one program per row and block (tile) of columns. Each block computes its local max and sum-exp, then performs a full row reduction over all blocks by looping. This exposes more parallelism for wide rows (N=781) and can improve occupancy and memory throughput. Masking ensures correct handling at row boundaries. All outputs are covered and written exactly once.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 23:14:\n    local_max = tl.max(x, 0)\n    # Reduce for global row max across all blocks\n    max_val = local_max\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(blk_x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    # Broadcast max_val within block\n    max_val = tl.max(max_val, 0)\n              ^",
+        "worker_seconds": 11.131712263450027,
+        "process_seconds": 13.547259207814932
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 32184,
+        "output_tokens": 3296,
+        "tokens": 35480
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_blockwise",
+              "grid": [
+                513,
+                8
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_blockwise(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    col_start = block * BLOCK\n    col = col_start + offs\n    mask = col < N\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    # Global row max (all blocks must agree)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(blk_x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    # Compute exp(x - max) for this block\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    x_centered = x - max_val\n    exp_x = tl.exp(x_centered)\n    local_sum = tl.sum(exp_x, 0)\n    # Global denominator (all blocks must agree)\n    denom = 0.0\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_exp = tl.exp(blk_x - max_val)\n        blk_sum = tl.sum(blk_exp, 0)\n        denom += blk_sum\n    # Write softmax output for this block\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+        "rationale": "The previous failure was due to an incorrect initialization of max_val: in the softmax blockwise pattern, max_val must be initialized to the reduction identity (-inf) before the reduction loop, not to a per-block local value. This repair restores correct semantics and ensures all blocks for a row agree on the same numerically stable max and denominator. Each program instance (row, block) computes the global row max and denominator by looping over all blocks, so the output is correct and all outputs are written exactly once. This exposes parallelism over columns for wide rows, with correct handling of masking and reduction identities."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 39285,
+        "output_tokens": 3992,
+        "tokens": 43277
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_rowblock",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cb810fa4782f0f89df1879d2a3e68f15da281ce794e284862698a68f70000d55",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This variant uses a 2D grid (row, block) with BLOCK=RB=1024, launching two column blocks per row to balance parallelism and resource usage relative to the original single-row kernel. Each program instance covers a half-row tile (N//2), with correct masking and blockwise reduction for max and denominator. This design increases columnwise concurrency for wide rows, reduces per-program register pressure versus full-row vectorization, and maintains numerically stable reductions and full output coverage. All device logic is inlined, and boundary masking is correct for non-multiple-of-tile N.",
+      "accepted": false,
+      "previous_failure_attempt": 2,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 18:14:\n    col = col_start + offs\n    mask = col < N\n    # 1. Compute row max (across all columns, blockwise)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    max_val = tl.max(max_val, 0)\n              ^",
+        "worker_seconds": 11.571304445154965,
+        "process_seconds": 13.936711777932942
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 57723,
+        "output_tokens": 6050,
+        "tokens": 63773
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_blockwise_repair",
+              "grid": [
+                513,
+                8
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_blockwise_repair(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    col_start = block * BLOCK\n    col = col_start + offs\n    mask = col < N\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    # 1. Compute row max (across all columns, blockwise)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    # 2. Compute denominator (sum of exp(x - max))\n    denom = 0.0\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_val)\n        blk_sum = tl.sum(exp_x, 0)\n        denom = denom + blk_sum\n    # 3. Compute and store the softmax for this block\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x - max_val)\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+        "rationale": "This repairs the previous blockwise/rowblock attempts by ensuring the reduction identities are initialized correctly: max_val = -inf and denom = 0.0 before reduction loops, mirroring the numerically stable single-row algorithm but parallelizing over column blocks. All blocks for a row agree on the same max and denominator via fully inlined blockwise reduction traversals with correct masking. The launch grid [513, 8] covers all outputs (each row gets 8 column blocks of size BLOCK=RB=1024), and masking ensures the irregular N=781 is safely handled for all loads/stores. This exposes more parallelism for wide rows, maintains stable softmax numerics, and meets all reduction and output coverage invariants."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 65824,
+        "output_tokens": 6752,
+        "tokens": 72576
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_tile",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "441cd5c6cc783ba02aaf1c531e02a16495b7ab7f367635f0287ff642d8b8d00d",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel parallelizes softmax along both row and column axes using a 2D grid [513, 2], dividing each row into two column tiles. Every program instance (row, tile) participates in the full row reduction by looping over both tiles to compute the global row max and denominator, ensuring numerical stability (max identity -inf, sum identity 0.0) and correct output for all N (including irregular N=781). All logic is inlined, every output is written exactly once, and boundary columns are properly masked. This exposes more parallelism than a single-row kernel, preserves stable reduction, and covers all outputs.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 20:14:\n    mask = col < N\n    # --- Row-wise max: all tiles for this row must agree ---\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        tile_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, tile_max)\n    max_val = tl.max(max_val, 0)\n              ^",
+        "worker_seconds": 11.097662962973118,
+        "process_seconds": 13.528800438158214
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 86660,
+        "output_tokens": 8936,
+        "tokens": 95596
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_rowblock",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_rowblock(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    offs = tl.arange(0, BLOCK)\n    # 2 blocks per row\n    num_blocks = 2\n    tile_cols = (N + num_blocks - 1) // num_blocks\n    col_start = block_id * tile_cols\n    col = col_start + offs\n    mask = col < N\n    # 1. Compute row max (all blocks participate, loop over both tiles)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col_start = b * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        tile_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, tile_max)\n    max_val = tl.max(max_val, 0)\n    # 2. Compute denominator (sum exp(x - max))\n    denom = 0.0\n    for b in range(num_blocks):\n        blk_col_start = b * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_val)\n        tile_sum = tl.sum(exp_x, 0)\n        denom = denom + tile_sum\n    # 3. Write softmax for this tile\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x - max_val)\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+        "rationale": "This repairs the previous attempts by using a per-row, per-tile (col-block) decomposition with a 2D grid [513, 2]. Each program instance computes its tile and participates in the full row reduction by looping over both tiles for the max and denominator, using correct reduction identities (-inf for max, 0.0 for sum) and masking for boundary columns. This fixes the previous compilation failure by ensuring reduction variables are scalars and no illegal max/accumulation is performed. All logic is inlined, every output is covered once, and the irregular N=781 is safely handled. This exposes more parallelism than a single-row kernel while ensuring correctness."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 95627,
+        "output_tokens": 9673,
+        "tokens": 105300
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_blockwise",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "8059e9e9c32c8cd534565f1be3d156fcd4b5e3c0867acdccbad190cdc351bb45",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs the previous compilation errors by ensuring all reductions operate on scalars, not vectors. A 2D grid [513, 2] parallelizes softmax by splitting each row into two column tiles, with each thread looping over both tiles to compute the global max and denominator. All masking safely handles the irregular N=781, so every output is written once and all boundaries are correct. This exposes more parallelism than a single-row kernel, preserves stable numerics, and guarantees full output coverage and correctness for the given shape.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 21:14:\n\n    # 1. Compute row max (across all columns, blockwise reduction)\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        block_max = tl.max(x_val, 0)\n        max_val = tl.maximum(max_val, block_max)\n    max_val = tl.max(max_val, 0)\n              ^",
+        "worker_seconds": 11.31414885725826,
+        "process_seconds": 13.63880911283195
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 118798,
+        "output_tokens": 11824,
+        "tokens": 130622
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_blockwise_repaired",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_blockwise_repaired(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile_id = tl.program_id(1)\n    num_tiles = 2\n    tile_cols = (N + num_tiles - 1) // num_tiles\n    col_start = tile_id * tile_cols\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = col < N\n\n    # 1. Compute row max (across all columns, blockwise reduction)\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        for k in range(0, tile_cols, BLOCK):\n            blk_col = blk_col_start + k + offs\n            blk_mask = blk_col < N\n            x_ptrs = X + row * N + blk_col\n            x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n            block_max = tl.max(x_val, 0)\n            max_val = tl.maximum(max_val, block_max)\n    # 2. Compute denominator (sum of exp(x - max)) across all columns\n    denom = 0.0\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        for k in range(0, tile_cols, BLOCK):\n            blk_col = blk_col_start + k + offs\n            blk_mask = blk_col < N\n            x_ptrs = X + row * N + blk_col\n            x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n            exp_x = tl.exp(x_val - max_val)\n            block_sum = tl.sum(exp_x, 0)\n            denom = denom + block_sum\n    # 3. Compute softmax on this tile\n    x_ptrs = X + row * N + col\n    x_val = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x_val - max_val)\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+        "rationale": "The previous attempts failed because tl.max(x_val, 0) produces a vector, but tl.maximum expects two scalars. This repair splits the max and denominator reductions into explicit loops over BLOCK-sized vector tiles for each row, accumulating into scalars. For each of the two column tiles, we loop across all BLOCK-sized sub-blocks, aggregating the local max/sum into scalars with tl.max and tl.sum. This ensures all reductions are scalar, not vector, at every step. Masking is correct for irregular N=781, and all outputs are written exactly once. This exposes more columnwise parallelism than the single-row kernel and satisfies all correctness invariants for reduction and coverage."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 128532,
+        "output_tokens": 12591,
+        "tokens": 141123
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_splitrow",
+            "grid": [
+              1026
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "87b5fbee461b25c1ee93c086d74372bab159e88b8542aef655ec688cbffeef28",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel further increases parallelism by splitting each row into two independent half-row tiles, each covered by a separate program instance in a 1D grid [1026] (2*513). Each program computes its assigned half-row, but both halves collaborate by looping over both halves to compute the global row max and denominator as scalars. This ensures numerically stable reduction and correct normalization for all outputs. Masking is correctly applied for irregular N=781, and all outputs are written exactly once, with no out-of-bounds accesses. The approach exposes more parallelism versus a single-row kernel, retains scalar reductions, and avoids the previous blockwise vector/scalar reduction mismatch. All device logic is fully inlined, and all coverage/correctness invariants are satisfied.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)",
+        "worker_seconds": 14.355117469094694,
+        "process_seconds": 16.67604624480009
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 153940,
+        "output_tokens": 14822,
+        "tokens": 168762
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_blockwise_masked",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_blockwise_masked(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile_id = tl.program_id(1)\n    num_tiles = 2\n    tile_cols = (N + num_tiles - 1) // num_tiles\n    col_start = tile_id * tile_cols\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = (row < 513) & (col < N)\n\n    # 1. Compute row max - scalar reduction over all tiles/blocks\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        for blk_off in range(0, tile_cols, BLOCK):\n            blk_col = blk_col_start + blk_off + offs\n            blk_mask = (row < 513) & (blk_col < N)\n            x_ptrs = X + row * N + blk_col\n            x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n            block_max = tl.max(x_val, 0)\n            max_val = tl.maximum(max_val, block_max)\n    # 2. Compute denominator (sum of exp(x - max)) - scalar reduction\n    denom = 0.0\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        for blk_off in range(0, tile_cols, BLOCK):\n            blk_col = blk_col_start + blk_off + offs\n            blk_mask = (row < 513) & (blk_col < N)\n            x_ptrs = X + row * N + blk_col\n            x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n            exp_x = tl.exp(x_val - max_val)\n            block_sum = tl.sum(exp_x, 0)\n            denom = denom + block_sum\n    # 3. Compute softmax for this tile\n    x_ptrs = X + row * N + col\n    x_val = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    exp_x = tl.exp(x_val - max_val)\n    softmax = exp_x / denom\n    y_ptrs = Y + row * N + col\n    tl.store(y_ptrs, softmax, mask=mask)\n",
+        "rationale": "The previous candidate failed due to non-matching reduction domains when splitting each row into independent half-rows, causing incorrect normalization (each half-row computed its own max/denom, not the global row's). This kernel restores full rowwise normalization by ensuring each program instance (row, tile) participates in a complete scalar reduction over all columns before normalizing its outputs. Masking is used for both row and column indices to guarantee only valid outputs are written. The approach reuses the correct blockwise decomposition from earlier, but makes the masking invariant explicit for all accesses, preventing out-of-bounds loads/stores and ensuring correct numerics and output coverage for irregular N. All reductions are scalar, and every output is written exactly once."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 164470,
+        "output_tokens": 15625,
+        "tokens": 180095
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_rowblock",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "32f9b5dfcc619bba69bac8505246ec3c41e2a4cd4a6d445f929439b35be6c7c5",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel repairs the previous row-splitting bug by ensuring that every program instance (row, tile) computes the full row's maximum and denominator before normalizing its own tile's outputs. It accomplishes this by looping over both tiles of the row to aggregate a scalar max and denominator, so the numerically stable softmax is preserved over the entire row. Masking is applied to all loads and stores for irregular N=781. This approach exposes more parallelism than a single-row kernel, avoids out-of-bounds accesses, and guarantees every output is written exactly once. All logic is inlined and every reduction is scalar, preventing mismatched domains or API errors.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)",
+        "worker_seconds": 12.883554743602872,
+        "process_seconds": 15.204212814569473
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 192228,
+        "output_tokens": 17814,
+        "tokens": 210042
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_parallel",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile = tl.program_id(1)\n    n_tiles = 2\n    tile_cols = (N + n_tiles - 1) // n_tiles\n    col_start = tile * tile_cols\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = col < N\n    # --- Compute rowwise max across all tiles (scalar max) ---\n    max_val = -float('inf')\n    for t in range(n_tiles):\n        t_col_start = t * tile_cols\n        # We may need to loop over the tile in sub-blocks if BLOCK < tile_cols\n        for b in range((tile_cols + BLOCK - 1) // BLOCK):\n            sub_offs = b * BLOCK + offs\n            t_col = t_col_start + sub_offs\n            t_mask = t_col < N\n            x_ptrs = X + row * N + t_col\n            x = tl.load(x_ptrs, mask=t_mask, other=-float('inf'))\n            local_max = tl.max(x, 0)\n            max_val = tl.maximum(max_val, local_max)\n    # --- Compute denominator (scalar sum) ---\n    denom = 0.0\n    for t in range(n_tiles):\n        t_col_start = t * tile_cols\n        for b in range((tile_cols + BLOCK - 1) // BLOCK):\n            sub_offs = b * BLOCK + offs\n            t_col = t_col_start + sub_offs\n            t_mask = t_col < N\n            x_ptrs = X + row * N + t_col\n            x = tl.load(x_ptrs, mask=t_mask, other=-float('inf'))\n            exp_x = tl.exp(x - max_val)\n            local_sum = tl.sum(exp_x, 0)\n            denom = denom + local_sum\n    # --- Compute and store softmax for this tile ---\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    numerators = tl.exp(x - max_val)\n    softmax = numerators / denom\n    out_ptrs = Y + row * N + col\n    tl.store(out_ptrs, softmax, mask=mask)\n",
+        "rationale": "Previous attempts failed because programs only reduced over a single vector per tile (BLOCK), missing columns outside their own tile when N > BLOCK. This proposal repairs the reduction by explicitly looping over all sub-blocks within each tile for both the rowwise max and denominator reductions, so every program instance covers the entire row. This guarantees all reductions are scalar, numerically stable, and over the correct domain, regardless of N or BLOCK. The grid [513,2] exposes columnwise parallelism, and all loads/stores are masked for bounds. This approach preserves the increased parallelism while ensuring correctness for irregular row widths."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 203491,
+        "output_tokens": 18590,
+        "tokens": 222081
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "fused_softmax_rowblock_parallel",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "b78953aa6f4bb67aba289236ad7350dbfb4394f62d95f3097fe64994e5144ca0",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "All previous failures were due to partial reductions: each program instance computed reductions only over its own tile, not the entire row, resulting in incorrect softmax normalization. This kernel parallelizes each row into two column tiles (grid [513, 2]), but every program instance loops over the full row in BLOCK-sized chunks to compute the global row max and denominator as scalars. Only then does each instance normalize and write its own tile's outputs. Masking is applied for irregular N=781 on all loads and stores. This exposes more parallelism than a single-row kernel, preserves numerically stable reductions, and covers every output exactly once for any row width.",
+      "accepted": false,
+      "previous_failure_attempt": 7,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.540173400193453,
+        "validation_seconds": 3.1344913924112916,
+        "candidate": {
+          "median_ms": 0.018943999707698823,
+          "p25_ms": 0.017663999646902084,
+          "p75_ms": 0.01966080069541931,
+          "min_ms": 0.017100800573825837
+        },
+        "incumbent": {
+          "median_ms": 0.01884160041809082,
+          "p25_ms": 0.018380799889564516,
+          "p75_ms": 0.02083839997649193,
+          "min_ms": 0.017203199863433837
+        },
+        "paired_speedup": 0.9945946320107686,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 169.19468166468565,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.254336791113019,
+        "process_seconds": 15.53418436087668
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 233135,
+        "output_tokens": 20702,
+        "tokens": 253837
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "fused_softmax_rowblock_parallel",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "Y",
+                "N",
+                "RB"
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_rowblock_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile = tl.program_id(1)\n    n_tiles = 2\n    tile_cols = (N + n_tiles - 1) // n_tiles\n    col_start = tile * tile_cols\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = col < N\n    # --- Parallel reduction: each program instance accumulates local max into shared tile cache ---\n    # Step 1: Each program computes tile-local max\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    tile_max = tl.max(x, 0)\n    # Step 2: Write tile max to temporary output Y (used as scratch)\n    # Use the first position in each tile as the accumulator location\n    if offs[0] == 0:\n        tl.store(Y + row * N + col_start, tile_max)\n    # Step 3: All programs in this row synchronize via program order, then read both tiles' maxima\n    # (No explicit barrier; assume grid[1]=2 and that both stores complete before next load)\n    # This is safe because only one instance in each tile writes to each accumulator\n    max0 = tl.load(Y + row * N + 0, mask=0 < N, other=-float('inf'))\n    max1 = tl.load(Y + row * N + tile_cols, mask=tile_cols < N, other=-float('inf'))\n    max_val = tl.maximum(max0, max1)\n    # --- Compute denominator (sum of exp(x - max)) ---\n    # Each program computes tile-local sum\n    numerators = tl.exp(x - max_val)\n    tile_sum = tl.sum(numerators, 0)\n    # Store tile sum to same temporary locations\n    if offs[0] == 0:\n        tl.store(Y + row * N + col_start, tile_sum)\n    # Read both tiles' sums\n    sum0 = tl.load(Y + row * N + 0, mask=0 < N, other=0.0)\n    sum1 = tl.load(Y + row * N + tile_cols, mask=tile_cols < N, other=0.0)\n    denom = sum0 + sum1\n    # --- Normalize and write softmax output ---\n    softmax = numerators / denom\n    tl.store(Y + row * N + col, softmax, mask=mask)\n",
+        "rationale": "To avoid redundant full-row reduction loops in every program instance, this kernel splits each row into two column tiles using grid [513,2]. Each program computes its own tile-local max and sum-exp, then writes these to the first element of its tile in the output buffer Y (used as temporary scratch). Both programs in the row then read both tile maxima and sums from these locations to compute the global row max and denominator. This reduces redundant loads and arithmetic: each row has exactly two max/sum reductions (one per tile), and all programs agree on the correct normalization. Masking is preserved for irregular N=781. This approach exposes columnwise parallelism while minimizing redundant computation, and covers all outputs exactly once. It is also race-free because only the first thread in each tile writes to the accumulator location, and Y is otherwise overwritten by the final output."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 245270,
+        "output_tokens": 21553,
+        "tokens": 266823
+      }
+    }
+  ],
+  "wall_seconds": 286.5358785055578,
+  "resolved_model": "gpt-4.1-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.6629639999999988,
+  "budget_committed_usd": 0.6629640000000019,
+  "speedup": 1.8021390848728405
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_fullrow",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n    mean_acc = 0.0\n    var_acc = 0.0\n    # First pass: blockwise accumulation for mean\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        mean_acc += tl.sum(x, 0)\n    mean = tl.div_rn(mean_acc, N)\n    # Second pass: blockwise accumulation for variance\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        var_acc += tl.sum(centered * centered, 0)\n    var = tl.div_rn(var_acc, N)\n    inv = tl.rsqrt(var + 1e-5)\n    # Third pass: normalize and affine transform\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+  "rationale": "This kernel repairs the previous stats coverage bug by computing the mean and variance for each row by accumulating across the entire row in BLOCK-sized chunks, with all loads masked. It performs three passes: first to accumulate sum for mean, second for squared centered sum for variance, and third to normalize and apply the affine transform to each chunk. All masking, numerics, and shape invariants are preserved, ensuring correct and fully-covered output for any N."
+}

@@ -1,0 +1,1033 @@
+{
+  "incumbent": {
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_fused",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "Y",
+            "N",
+            1024
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/layernorm_irregular_multi_knowledge_22/candidate_001.py",
+    "rationale": "This fuses the stats (mean/inv-std) and normalization into a single kernel per row, eliminating intermediate S and its memory traffic. Each program computes statistics and applies normalization for its row using BLOCK=1024 and appropriate masking for N=781. Data movement is reduced (no intermediate stats in global memory), and computation is changed to perform two passes over the row (input reload for numerics). Launch grid covers every row, and all boundary masking and normalization numerics are preserved.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 2.384185791015625e-06
+        }
+      ],
+      "first_launch_seconds": 2.4909942485392094,
+      "validation_seconds": 3.1328674480319023,
+      "candidate": {
+        "median_ms": 0.01822720021009445,
+        "p25_ms": 0.01802240014076233,
+        "p75_ms": 0.019968000054359437,
+        "min_ms": 0.01791999936103821,
+        "samples_ms": [
+          0.019763199985027312,
+          0.018534399569034576,
+          0.020070399343967437,
+          0.01822720021009445,
+          0.01822720021009445,
+          0.01822720021009445,
+          0.01802240014076233,
+          0.018329599499702455,
+          0.01791999936103821,
+          0.018329599499702455,
+          0.018329599499702455,
+          0.01822720021009445,
+          0.01802240014076233,
+          0.01802240014076233,
+          0.01802240014076233,
+          0.02682879865169525,
+          0.01802240014076233,
+          0.01802240014076233,
+          0.01812479943037033,
+          0.019968000054359437,
+          0.01791999936103821,
+          0.027750399708747864,
+          0.01802240014076233,
+          0.01812479943037033,
+          0.020172800123691558,
+          0.019968000054359437,
+          0.027852800488471986,
+          0.027750399708747864,
+          0.01822720021009445,
+          0.01802240014076233,
+          0.020070399343967437
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03409920036792755,
+        "p25_ms": 0.03297279924154282,
+        "p75_ms": 0.0420864000916481,
+        "min_ms": 0.031436800956726074,
+        "samples_ms": [
+          0.03317759931087494,
+          0.043007999658584595,
+          0.04423680007457733,
+          0.034815999865531924,
+          0.031539198756217954,
+          0.04116480052471161,
+          0.033792001008987424,
+          0.031948798894882204,
+          0.04229120016098022,
+          0.034406399726867674,
+          0.031948798894882204,
+          0.04188160002231598,
+          0.03348479866981506,
+          0.031641599535942075,
+          0.04095999896526337,
+          0.03399679958820343,
+          0.03328000009059906,
+          0.04259839951992035,
+          0.04136959910392761,
+          0.032767999172210696,
+          0.031436800956726074,
+          0.034508800506591795,
+          0.03389439880847931,
+          0.04259839951992035,
+          0.042393600940704344,
+          0.032051199674606325,
+          0.03184640109539032,
+          0.03409920036792755,
+          0.03409920036792755,
+          0.042393600940704344,
+          0.042393600940704344
+        ]
+      },
+      "paired_speedup": 1.8707865154760845,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.019251200556755065,
+          "p25_ms": 0.01822719946503639,
+          "p75_ms": 0.020735999941825865,
+          "min_ms": 0.017817600071430205,
+          "samples_ms": [
+            0.02170879989862442,
+            0.019968000054359437,
+            0.021401600539684297,
+            0.019865599274635316,
+            0.018329599499702455,
+            0.019763199985027312,
+            0.021913599967956544,
+            0.019865599274635316,
+            0.027750399708747864,
+            0.019763199985027312,
+            0.019251200556755065,
+            0.01791999936103821,
+            0.017817600071430205,
+            0.025190401077270507,
+            0.018329599499702455,
+            0.018329599499702455,
+            0.018329599499702455,
+            0.019148799777030944,
+            0.01812479943037033,
+            0.025497600436210632,
+            0.018432000279426576,
+            0.01812479943037033,
+            0.01791999936103821,
+            0.019763199985027312,
+            0.01791999936103821,
+            0.02682879865169525,
+            0.019046400487422944,
+            0.01812479943037033,
+            0.020070399343967437,
+            0.01812479943037033,
+            0.02805759906768799
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03706879913806915,
+          "p25_ms": 0.03287039995193482,
+          "p75_ms": 0.042905600368976594,
+          "min_ms": 0.031539198756217954,
+          "samples_ms": [
+            0.03840000033378601,
+            0.047513601183891294,
+            0.046387198567390445,
+            0.03706879913806915,
+            0.03614720106124878,
+            0.04669440090656281,
+            0.0447488009929657,
+            0.031744000315666196,
+            0.034815999865531924,
+            0.04433920085430145,
+            0.043315199017524716,
+            0.031539198756217954,
+            0.04126720130443573,
+            0.033792001008987424,
+            0.031948798894882204,
+            0.0419840008020401,
+            0.04126720130443573,
+            0.032051199674606325,
+            0.04147199988365173,
+            0.03389439880847931,
+            0.03348479866981506,
+            0.04249599874019623,
+            0.042803201079368594,
+            0.03184640109539032,
+            0.031948798894882204,
+            0.0336896002292633,
+            0.034508800506591795,
+            0.04997119903564453,
+            0.043007999658584595,
+            0.031744000315666196,
+            0.03225600123405457
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 176.19118476689835,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 3.3331099366769195,
+      "process_seconds": 15.101839769631624,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 32,
+            "spills": 0,
+            "shared_bytes": 2048,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "c4f8eef84ba32892bb64d7e8115374e6280ff7d28e25919b756e055b7603decc",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This fuses the stats (mean/inv-std) and normalization into a single kernel per row, eliminating intermediate S and its memory traffic. Each program computes statistics and applies normalization for its row using BLOCK=1024 and appropriate masking for N=781. Data movement is reduced (no intermediate stats in global memory), and computation is changed to perform two passes over the row (input reload for numerics). Launch grid covers every row, and all boundary masking and normalization numerics are preserved.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.4909942485392094,
+        "validation_seconds": 3.1328674480319023,
+        "candidate": {
+          "median_ms": 0.01822720021009445,
+          "p25_ms": 0.01802240014076233,
+          "p75_ms": 0.019968000054359437,
+          "min_ms": 0.01791999936103821
+        },
+        "incumbent": {
+          "median_ms": 0.03409920036792755,
+          "p25_ms": 0.03297279924154282,
+          "p75_ms": 0.0420864000916481,
+          "min_ms": 0.031436800956726074
+        },
+        "paired_speedup": 1.8707865154760845,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.019251200556755065,
+            "p25_ms": 0.01822719946503639,
+            "p75_ms": 0.020735999941825865,
+            "min_ms": 0.017817600071430205
+          },
+          "incumbent": {
+            "median_ms": 0.03706879913806915,
+            "p25_ms": 0.03287039995193482,
+            "p75_ms": 0.042905600368976594,
+            "min_ms": 0.031539198756217954
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 176.19118476689835,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.3331099366769195,
+        "process_seconds": 15.101839769631624,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 32,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 11475,
+        "output_tokens": 1325,
+        "tokens": 12800
+      },
+      "review": {
+        "diagnosis": "The fused layernorm kernel successfully eliminates the intermediate statistics buffer (S) and its associated global memory traffic, as intended. This results in a substantial reduction in logical memory bandwidth (from ~91 GB/s to ~176 GB/s) and nearly halves the kernel latency (median 0.034ms \u2192 0.018ms). The transformation achieves its main goal: improved performance through fusion, with all outputs validated correct and no numerical or masking errors detected. Resource usage (registers, shared memory) increased as expected, but did not result in spills or occupancy issues for this problem size.",
+        "outcome": "Fusion of statistics and normalization was highly effective, delivering a 1.87x confirmed speedup and removing the dominant bottleneck (intermediate memory traffic). All functional, numerical, and shape invariants passed validation. No further numerical or API issues were observed. The kernel now achieves close to the logical minimum traffic for this operation.",
+        "next_step": "The primary bottleneck is resolved. Further gains may be possible by exploring increased intra-row parallelism (multi-warp reductions for rows with larger N), or by tuning BLOCK size for specific hardware. For very wide rows (N >> 1024), consider splitting reductions or employing more warps per row. For current N=781, the present configuration is near optimal. Focus next on other cases or hardware-specific tuning if required."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 17154,
+        "output_tokens": 1615,
+        "tokens": 18769
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_multiwarp",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              1024
+            ],
+            "num_warps": 8,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "af4ca16f013ae6fd96d87c2719c9d1d4fae842cc3f4fb25f76e86ce23647d940",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version modifies the parallel decomposition by increasing num_warps to 8, distributing reduction and normalization work across more warps per row. This enables multi-warp reductions (as supported by Triton primitives) and tests readiness for wider rows, per card K06. All masking, reloads, and numerics are preserved. The kernel structure changes to use more warps per row, altering the reduction context and intra-row parallelism while maintaining correct output and masking for N < BLOCK.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.650686053559184,
+        "validation_seconds": 3.5126380613073707,
+        "candidate": {
+          "median_ms": 0.018534399569034576,
+          "p25_ms": 0.018329599499702455,
+          "p75_ms": 0.020735999941825865,
+          "min_ms": 0.01812479943037033
+        },
+        "incumbent": {
+          "median_ms": 0.018636800348758698,
+          "p25_ms": 0.018432000279426576,
+          "p75_ms": 0.020582399517297744,
+          "min_ms": 0.01812479943037033
+        },
+        "paired_speedup": 1.0055249040759433,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 173.270894912906,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.7670212304219604,
+        "process_seconds": 15.84181705955416
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 33755,
+        "output_tokens": 3338,
+        "tokens": 37093
+      },
+      "review": {
+        "diagnosis": "Increasing intra-row parallelism by raising num_warps from 4 to 8 for N=781 did not yield measurable improvement: median latency was unchanged (0.0186ms vs 0.0185ms) and logical bandwidth slightly decreased (173 vs 176 GB/s). The kernel remained correct and all masking and shape invariants were preserved. However, for this modest N, a single warp per row already saturates available parallelism without reduction contention or resource pressure. As such, the multi-warp reduction primitive provided no benefit and may have modestly increased overhead (register/shared memory use, minor divergence). This matches the moderate uncertainty assigned to K06 for this row width.",
+        "outcome": "Multi-warp reductions are not beneficial for this problem size (N=781), confirming that the previous fusion kernel is already near optimal for this shape. No numerical, API, or boundary errors occurred. The attempted structural change does not improve performance and slightly reduces efficiency.",
+        "next_step": "Do not pursue increased warp count for similar row sizes (N \u2272 1024); focus instead on other axes such as tuning BLOCK size or addressing much wider rows (N \u226b 1024) where multi-warp reduction becomes necessary. For this case, the single-warp fused kernel should be retained as the optimal configuration. Consider investigating cases with larger N or different shapes where reduction decomposition is a limiting factor."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 41206,
+        "output_tokens": 3634,
+        "tokens": 44840
+      }
+    },
+    {
+      "attempt": 3,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive barrier"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 60981,
+        "output_tokens": 5942,
+        "tokens": 66923
+      },
+      "review": {
+        "diagnosis": "The proposed kernel attempts to split each row across two programs and aggregate partial statistics via shared memory and a synchronization barrier. However, Triton does not support global or per-row shared memory allocations, nor does it implement tl.barrier for inter-program or inter-warp synchronization. The attempted use of tl.zeros for shared memory and tl.barrier for explicit synchronization is not supported by the Triton language or runtime. As a result, the compiler rejected the primitive barrier and the proposal cannot be executed as written. No measurement or validation was possible.",
+        "outcome": "This failure is a Triton API/primitive misuse. Kernel-to-kernel or cross-program synchronization and shared memory are not supported in this way, and the plan cannot be implemented in current Triton. The only supported mechanism for cross-tile reductions is via global memory and multiple launches, or by fully fusing the computation within a single program instance (e.g., using a larger BLOCK and more threads, or through explicit multi-warp reductions where supported).",
+        "next_step": "To safely split a row across multiple programs, use a two-pass launch where the first pass computes and stores partial statistics in a workspace buffer (e.g., S), and the second aggregates and normalizes. Alternatively, restructure the kernel to use only intra-program reductions, possibly with a smaller BLOCK or more warps per row if needed. Avoid any use of shared memory or barriers outside of within-program (single-tile) scope. Revert to a single-program-per-row decomposition for N=781, which is known to be efficient, or author a valid two-pass approach if further decomposition is needed for much larger N."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 69209,
+        "output_tokens": 6285,
+        "tokens": 75494
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise_partial",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_blockwise_final",
+            "grid": [
+              513
+            ],
+            "args": [
+              "Y",
+              "W",
+              "B",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "38a446734d507f8a9cb6672e2bda782f6aab837afc1ad9d1c635e740015f02b0",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This applies a two-pass blockwise decomposition. The first kernel splits each row into two blocks (BLOCK=512), computes partial sums and sum-of-squares for each block, and writes these four float32 partials to the end of each row's region in the output (Y). The second kernel (one per row) aggregates the two partials, computes mean/variance, and normalizes the row, writing the final output to Y. No unsupported shared memory or barrier primitives are used; all cross-block communication is via output buffer padding. All masking and reduction identities are preserved, and every output is overwritten in the second pass as required. This is a direct repair for the previous invalid attempt and preserves all correctness/numerical invariants.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=398605/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",
+        "worker_seconds": 13.903905674815178,
+        "process_seconds": 16.18408653791994
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 91622,
+        "output_tokens": 9062,
+        "tokens": 100684
+      },
+      "review": {
+        "diagnosis": "The proposed two-pass blockwise layernorm failed due to a fundamental dataflow bug: the second kernel ('layernorm_blockwise_final') attempts to reload the original input X from the output buffer Y, but Y is uninitialized (contains only partial statistics in its padding) at that point. As a result, the normalization is performed using uninitialized or invalid data, producing nonfinite (nan) outputs for all elements. The masking and reduction identities in each kernel are correct, and the use of output buffer padding for partial reductions is valid, but the reload of X from Y is not. The cross-pass communication must explicitly transfer X or use a separate workspace. This bug explains why all outputs are nan and validation fails 100%.",
+        "outcome": "This is a functional bug caused by incorrect reload of X in the normalization pass. The kernel does not compute valid outputs and fails all validation. The overall structure for multi-pass decomposition and partial reduction is valid, but the input data must be correctly staged or reloaded in the second pass.",
+        "next_step": "Repair by explicitly passing X to the second pass kernel ('layernorm_blockwise_final') so that X is always loaded from the correct source. Do not attempt to reload X from Y, as Y is not guaranteed to contain valid input data. Update the launch config and kernel signatures accordingly. Recheck all row/column masking and reduction logic after this change."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 101611,
+        "output_tokens": 9357,
+        "tokens": 110968
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise_partial",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "N",
+              512,
+              "Y"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_blockwise_final",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "26939452925d843d82d10482097cdf51eb1d8384199d4b239a276e4f94606690",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs the previous functional bug by ensuring that the normalization pass ('layernorm_blockwise_final') reloads the original input X directly, not from the output buffer Y, which only contains partial statistics at this stage. The first kernel splits each row into two blocks (BLOCK=512), computes partial sums and sum-of-squares, and writes these to the end of the row region in Y. The second kernel aggregates both partials, computes mean and variance, loads the input row from X for normalization, applies affine transformation, and writes the normalized row to Y. All masking, reduction, and shape invariants are preserved. This structure enables blockwise reductions for wider rows and resolves the previous bug where uninitialized values caused nonfinite outputs.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",
+        "worker_seconds": 14.049340359866619,
+        "process_seconds": 16.353596908040345
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 126647,
+        "output_tokens": 11749,
+        "tokens": 138396
+      },
+      "review": {
+        "diagnosis": "The two-pass blockwise layernorm decomposition still fails validation because the partial reductions written in the first pass do not correctly cover the entire row. The first kernel divides each row into two blocks of 512, but for N=781, the second block (offs=512..1023) only covers columns 512..780; columns 781..1023 are masked. However, in both passes, partial sums and sumsq are always written for both blocks, even if the mask is all false (e.g., for split=1, if offs>=N, x is all zeros and so part_sum=0, part_sumsq=0). In the second pass, the mean and variance are computed as the sum of both partials divided by N, but the partials for out-of-range columns contribute zeros, which is correct for the sum but not for the sumsq or the normalization. However, the main problem is that the second pass normalizes the entire row using a BLOCK=512 vectorized load/store, but only the first 781 columns are valid; any loads from columns 781..1023 are masked, but the final output still contains nan for output elements corresponding to those columns in the region of the buffer that is not overwritten. These nans appear in the validation result as nonfinite outputs. Additionally, if the first kernel does not fully initialize all output columns (e.g., because the mask is false), the second kernel may not overwrite all output elements, violating the requirement that every output be written exactly once. This explains why only a portion of the outputs are nonfinite (nan), and all corresponding to the tail/padding of each row.",
+        "outcome": "Partial row reductions must ensure that every output element of Y is always overwritten by the normalization pass, and that masking is applied consistently for all loads and stores. In this attempt, the normalization kernel only writes to Y for masked (i.e., in-bounds) columns, but the output buffer may retain uninitialized values elsewhere, leading to nans in validation. The functional structure is correct for the partial reductions, but the output coverage is incomplete.",
+        "next_step": "Amend the normalization pass so that every output element of Y is always written, using masking to write zero or a neutral value for out-of-bounds elements. Alternatively, use a single launch with a large enough BLOCK to cover the entire row in one go, as in the fused approach. If a two-pass blockwise reduction is required for larger N, ensure that all masking logic is correct in both passes and that the output buffer is never left partially uninitialized. For this case (N=781), the single-pass fused kernel remains the most robust and efficient solution."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 137288,
+        "output_tokens": 12310,
+        "tokens": 149598
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise_final_fullwrite",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_blockwise_partial",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "N",
+              512,
+              "Y"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "93827641bbd8bc82246b9c6adeb260a7cdd45cb37fea83a3ba1f2b3a1673b6e8",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version directly repairs the output coverage bug in the previous blockwise reduction attempts. In the normalization pass (layernorm_blockwise_final_fullwrite), every output element in Y is always overwritten: in-bounds columns receive the normalized value; out-of-bounds columns are explicitly written as zero (or neutral). This guarantees that no output element is left uninitialized, eliminating nonfinite (nan) results in the output buffer. The reduction and normalization logic is unchanged for in-bounds elements, preserving numerics and masking. The launch config and kernel structure remain two-pass and blockwise, as before, but now all output elements are consistently written. This addresses the masking/output coverage issues identified in the previous failure and aligns with the analysis and plan.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=398097/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400145 / 400653 (99.9%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",
+        "worker_seconds": 13.022681663744152,
+        "process_seconds": 15.319141132757068
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 165582,
+        "output_tokens": 14730,
+        "tokens": 180312
+      },
+      "review": {
+        "diagnosis": "The attempted repair did not resolve the underlying bug. The normalization pass now always overwrites every output element in Y, writing zeros for out-of-bounds columns. However, the critical data dependency is still broken: the kernel computes mean and variance from partial sums (which are correct), but the per-row normalization is performed over a BLOCK=512 region, and for N=781, the second block (offs=512..1023) only covers columns 512..780. For offs >= N, all loads from X, W, B are masked and yield zeros, which is numerically safe, but the issue is that for outs-of-bounds columns, the normalization is computing (0-mean)*inv_std*0+0 = 0, which is stored as intended. Nevertheless, the validation shows nearly all outputs are nonfinite (nan), including the in-bounds region. This suggests the partial sums and/or sumsq are not being correctly accumulated or the output buffer region is being corrupted by overlapping writes between the two passes. It is possible that the output buffer Y is used for both storing partial statistics (in the padding) and final output, and there is an off-by-one or overlap in how the partials are written/read, contaminating the statistics and propagating nans. Alternatively, the order of launches may cause the normalization pass to run before the partial reductions complete, but the launch config has the correct order. The bug is likely in the use of the Y buffer for both output and workspace: writing partials to Y + row_id * N + N + [0..3] is valid only if the buffer is sized (N+4), but the shape is [513,781], so the partials may overwrite valid output columns for rows with N < BLOCK*2. This would explain why nearly every output becomes nan: the statistics region overlaps with the output region, so statistics are corrupted by writes in the normalization pass.",
+        "outcome": "The buffer aliasing and/or offset management is incorrect. The statistics region written by the first pass overlaps with the output region for N=781 and BLOCK=512x2, since Y is only sized [513,781]. The normalization pass then overwrites or reads corrupted data, producing nans in nearly every output. This is a critical data movement bug, not a masking or numerics issue.",
+        "next_step": "Allocate a dedicated workspace for the partial statistics (e.g., S of shape [513,4]) so that the output buffer Y is never used to store both output and intermediates. In the first pass, write partial sums/sumsq to S; in the second, read from S for statistics, and write the final output to Y. This will prevent aliasing and guarantee that all output elements are written exactly once with valid data. Review all pointer arithmetic and ensure that no output region is ever overwritten by workspace elements."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 177391,
+        "output_tokens": 15328,
+        "tokens": 192719
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise_partial_ws",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "N",
+              512,
+              "S"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_blockwise_final_ws",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "S",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "68b2c241e9a39d8e5f038085f7d17cbc9e9052b994f542b5026ce4a4ae2898b1",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version allocates a dedicated workspace buffer S for intermediate statistics, eliminating all output/workspace aliasing bugs. The first pass computes partial sums and sum-of-squares for each row split and writes them to S; the second aggregates partials from S, computes mean/variance, reloads X for normalization, and overwrites every output element in Y (writing zero for out-of-bounds columns). This guarantees correct data movement, full output coverage, and correct numerics for irregular shapes, directly repairing the output aliasing and coverage bugs seen in previous blockwise attempts.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",
+        "worker_seconds": 14.06400032248348,
+        "process_seconds": 16.51304817851633
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 209705,
+        "output_tokens": 17911,
+        "tokens": 227616
+      },
+      "review": {
+        "diagnosis": "The dedicated workspace S for partial statistics eliminates all output aliasing, but the implementation still produces nonfinite (nan) outputs in the last 269 columns of every row (columns 512..780, 137997/400653 elements). The root cause is in the blockwise decomposition: for N=781 and BLOCK=512, split=1 covers offs=512..1023, but only offs<781 are valid. The partial sums for split=1 correctly use mask=offs<781, so only columns 512..780 are included. The second pass aggregates both partials, computes the correct mean/var, and reloads X for normalization. However, when normalizing, for offs=512..1023, all loads from W, B, X are masked for offs>=781, so they return zero as intended. The problem is that the normalization pass (BLOCK=512) only covers columns 0..511 in split=0 (first 512 elements), and 512..1023 in split=1, but the second pass is launched only once per row (grid=[513]), so only offs=0..511 are written. The columns 512..780 are never written to Y. This explains why the first 512 columns of each row are correct (covered by offs=0..511), and columns 512..780 remain uninitialized (nan), causing 34.4% nonfinite. The kernel must process the whole row in the normalization pass, not just the first BLOCK elements.",
+        "outcome": "Blockwise partial reduction is correct, but the normalization pass does not sweep the full row. Only columns 0..511 are written, leaving columns 512..780 uninitialized (nan). The remainder of each row is never written, causing a large block of nan outputs and failing validation.",
+        "next_step": "In the normalization pass, either (A) use a grid=[513,2] (with split=0,1) and BLOCK=512 so both halves of each row are processed and written, or (B) use a single program per row with a loop or a larger BLOCK to cover all N columns. For each normalization instance, ensure correct masking and pointer arithmetic so every output column 0..N-1 is written exactly once. Do not write outside [0,N)."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 222825,
+        "output_tokens": 18395,
+        "tokens": 241220
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_blockwise_partial_ws",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "N",
+              512,
+              "S"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_blockwise_final_ws_fullrow",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "S",
+              "N",
+              512
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "5eba9f48d9e9a9678625e6a4482f26736d53421d8dc3c1a6a4453db1a2d05329",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repair launches the normalization pass with grid=[513,2], so both halves of each row are processed by separate programs, each covering a BLOCK=512 segment. Each program loads the correct partial statistics from S, aggregates them, computes mean/variance for the row, then normalizes and writes its segment of output with correct masking. This guarantees that every output element 0..N-1 is written exactly once, regardless of N<BLOCK*2, and there is no aliasing between workspace and output. All shape, masking, and reduction invariants are preserved. This directly addresses the previous bug where the normalization pass only covered columns 0..511, leaving columns 512..780 unwritten.",
+      "accepted": false,
+      "previous_failure_attempt": 7,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 91727 / 400653 (22.9%)\nGreatest absolute difference: 9.820737838745117 at index (194, 30) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (1, 0) (up to 0.0002 allowed)",
+        "worker_seconds": 13.582201659679413,
+        "process_seconds": 15.998043897561729
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 258115,
+        "output_tokens": 21053,
+        "tokens": 279168
+      },
+      "review": {
+        "diagnosis": "The measured result shows that the repaired two-pass blockwise layernorm now covers every output element (no more nonfinite outputs), but 22.9% of elements are still incorrect (mismatched vs. reference). This indicates a numerical or reduction bug. Inspection reveals that in the normalization pass, both splits (split=0, split=1) independently compute normalization and write to non-overlapping segments of Y, but each independently aggregates both partials from S to compute the row mean/variance. This is correct; however, the first pass partials themselves may not be computed accurately for non-contiguous or padded regions. The bug is likely in the partial reduction: for N=781 and BLOCK=512, split=1 covers columns 512..1023 (only 512..780 valid), so the mask is offs<781. Loads from X at columns 781..1023 are masked out (set to zero), but these zeros still contribute to tl.sum(x, 0) and tl.sum(x*x, 0) when the mask is all false (for offs>=781). However, Triton's tl.sum ignores masked-out elements, so the partials should be correct for valid columns. Therefore, the most likely cause is that the partials for split=1 are only for columns 512..780, and for split=0 only for 0..511, and these are summed in the second pass to reconstruct the full row stats, which is correct. However, with grid=[513,2] on the normalization pass, both splits independently aggregate the full row stats (correct) but normalize and write only their own segment, which should be correct with correct masking. The error must then be in either the pointer arithmetic or a subtle off-by-one in how the segments are covered and written, perhaps overlapping or missing some elements, or a bug in how the partials are read/written in S. Given the greatest relative and absolute errors are extreme (1.0 and ~9.8), there may be a mismatch in how the normalization is computed per split or a bug in the workspace addressing.",
+        "outcome": "Output coverage is now correct (every output written, all finite), but 22.9% of elements are numerically incorrect, with some very large errors. This confirms a logic or reduction bug remains in the blockwise decomposition or workspace addressing. The core structure (two passes, coverage) is correct, but there is a bug in how statistics or normalization are computed per segment.",
+        "next_step": "Double-check the workspace addressing and reduction logic: ensure each split's partials in S are written/read without overlap, and each normalization program writes exactly the correct segment of Y with correct masking. Cross-check BLOCK and split arithmetic to avoid off-by-one or overlap. Consider printing (for debugging) or instrumenting the per-row mean/var in both passes. Optionally, simplify to a single normalization pass, or use a single split for N<=BLOCK if needed to bisect the bug."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 272333,
+        "output_tokens": 21675,
+        "tokens": 294008
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 272333,
+    "output_tokens": 21675,
+    "tokens": 294008
+  }
+}

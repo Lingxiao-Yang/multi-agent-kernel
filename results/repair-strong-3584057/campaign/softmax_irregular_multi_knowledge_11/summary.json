@@ -1,0 +1,1016 @@
+{
+  "status": "complete",
+  "manifest": {
+    "started_utc": "2026-11-15T22:19:58.805307+00:00",
+    "case": {
+      "id": "softmax_irregular",
+      "family": "softmax",
+      "shape": [
+        513,
+        781
+      ],
+      "dtype": "float32",
+      "atol": 2e-06,
+      "rtol": 2e-05
+    },
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "provider": "llm",
+    "model": "gpt-4.1-2025-04-14",
+    "protocol": {
+      "schema_version": 1,
+      "status": "development-not-frozen",
+      "proposal": "proposal_final.pdf",
+      "candidate_cap": 8,
+      "call_cap": 32,
+      "token_safety_cap": 500000,
+      "max_output_tokens": 4096,
+      "profile_cap": 21,
+      "temperature": 0.7,
+      "seeds": [
+        11,
+        22,
+        33
+      ],
+      "warmup": 10,
+      "timing_repeats": 31,
+      "inner_repeats": 10,
+      "validation_seeds": [
+        101,
+        202,
+        303
+      ],
+      "final_validation_seeds": [
+        10001,
+        10002,
+        10003,
+        10004,
+        10005
+      ],
+      "improvement_threshold": 1.01,
+      "target_speedup": 1.1,
+      "worker_timeout_s": 180,
+      "feedback_mode": "timing-and-compiler-resources",
+      "model": "gpt-4.1-2025-04-14",
+      "endpoint": "https://api.openai.com/v1",
+      "input_usd_per_million": 2.0,
+      "output_usd_per_million": 8.0,
+      "search_space": "source-v1",
+      "source_gate_version": 2,
+      "shared_api_guidance": "triton-correctness-2026-11-15-v1",
+      "history_context_version": "diagnostics-without-redundant-source-v1"
+    },
+    "protocol_hash": "1bed5d8d58349e1546c29e9ae8e81c84aa1524da04b1df5c6fff162ca2bbdcd7",
+    "case_hash": "b8c7e951eccd1bc530e9203ece042107bb846e31e12af430b5675b2c5be1e6d1",
+    "baseline_hash": "dffa17214485a3508c8e6d8fc66f90154f227e4289e2850258f1364b4570222b",
+    "knowledge_hash": "653c524a5ae7d22f3b27f315a8632987a64483ed0320e9792f2b053197135f19",
+    "environment": {
+      "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+      "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+      "torch": "2.11.0+cu128",
+      "triton": "3.6.0",
+      "cuda": "12.8",
+      "gpu": "NVIDIA A100-PCIE-40GB",
+      "memory_bytes": 42406903808,
+      "capability": [
+        8,
+        0
+      ],
+      "sm_count": 108
+    },
+    "drop_role": null,
+    "drop_category": null,
+    "scheduler_job_id": "3584057",
+    "queue_wait_seconds": null,
+    "code_hashes": {
+      "kernel_study/__init__.py": "7bdb40a3734c78413e9c6bb9da4c721aca54d6e20157de3290196f18a68c861e",
+      "kernel_study/analysis.py": "06e5e8d5c53d3b997643d0190db36aa38a6df15f6eb69fb8b6173087ca3c70e8",
+      "kernel_study/api_guidance.py": "a999509ec1dd18ebfd8135b75e53330980ccf57f4600f696413da71c32b196c8",
+      "kernel_study/bench.py": "24370cb3ae1a1058e24968de4f06d2786011405424b7eda8548bb6f3fd73dd83",
+      "kernel_study/cli.py": "bdb03538b86a8414c97ed9bf8470a5c6c83bf792e7eb0604e60b8deb3d815f5a",
+      "kernel_study/core.py": "4781611e26a70ad077ce39e67d7016c074ccf0cc03c13eaa2f4e99dec09553bc",
+      "kernel_study/kernels.py": "abd6dea42183f0a490c6e973fbc4a72a65dc438840344c62ee704c89fecdba90",
+      "kernel_study/knowledge.py": "7bd6444b331efe3ddbca91c2385eed00168be08d9bc3ab8faa829dcf241f53f1",
+      "kernel_study/metrics.py": "647725754cc4c4985eb27bc20b766ea26e1e207303415d0deb09d2ec1e545e57",
+      "kernel_study/pilot.py": "c4cc3aab8ad3214cae4ba3f4f8f22541324ae54a2ae9949ab22bf5a9e43ff81d",
+      "kernel_study/profile_target.py": "bbe506e8a8bd3a13aca7a6c21a82ec4b42b65fc348378118195a817d8bca2e9b",
+      "kernel_study/providers.py": "3da01c7594573c8a5139dd12261a4222a49a3eb83e2b9faef7f7f1b0def725cf",
+      "kernel_study/repair_analysis.py": "82cb042c37c3969ccaeee867e0c064fa50f853d80f0dbe2c4506fe6a18dbc0a5",
+      "kernel_study/search.py": "74fe64f7682688394b6755af6173150137614c02cdd294ccadc34687cb17849f",
+      "kernel_study/source_policy.py": "e2076294d31c61cbcb113680de9939ce03e4e779c1d95a70f7d7a0a7b356d7d8",
+      "kernel_study/source_space.py": "21d7815943ae65f32a5f3916bcc03522ee5797074fa189983e62cb9878474106",
+      "kernel_study/worker.py": "bf881eefda9faa3f97768db63095a84cbf234cae1bce84b3798cab8c79f21101"
+    }
+  },
+  "stop_reason": "candidate_cap",
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 245609,
+    "output_tokens": 18070,
+    "tokens": 263679
+  },
+  "profile_invocations": 2,
+  "final": {
+    "candidate_id": 1,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 10001,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10002,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10003,
+          "edge": "random",
+          "max_abs_error": 1.4901161193847656e-08
+        },
+        {
+          "seed": 10004,
+          "edge": "random",
+          "max_abs_error": 7.450580596923828e-09
+        },
+        {
+          "seed": 10005,
+          "edge": "random",
+          "max_abs_error": 1.1175870895385742e-08
+        },
+        {
+          "seed": 10001,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 10001,
+          "edge": "large",
+          "max_abs_error": 2.384185791015625e-07
+        },
+        {
+          "seed": 10001,
+          "edge": "negative",
+          "max_abs_error": 9.313225746154785e-10
+        }
+      ],
+      "first_launch_seconds": 1.191169553436339,
+      "validation_seconds": 1.8594997497275472,
+      "candidate": {
+        "median_ms": 0.018329599499702455,
+        "p25_ms": 0.017100800573825837,
+        "p75_ms": 0.02088960036635399,
+        "min_ms": 0.016896000504493712,
+        "samples_ms": [
+          0.020582400262355804,
+          0.021196800470352172,
+          0.02959359884262085,
+          0.026624000072479247,
+          0.017100800573825837,
+          0.017510400712490083,
+          0.019251200556755065,
+          0.017203199863433837,
+          0.026931199431419372,
+          0.01730560064315796,
+          0.016998399794101716,
+          0.017203199863433837,
+          0.01935359984636307,
+          0.016998399794101716,
+          0.027136000990867614,
+          0.017407999932765962,
+          0.017100800573825837,
+          0.017100800573825837,
+          0.019046400487422944,
+          0.01730560064315796,
+          0.02682879865169525,
+          0.018329599499702455,
+          0.016896000504493712,
+          0.017100800573825837,
+          0.019148799777030944,
+          0.018432000279426576,
+          0.027238398790359497,
+          0.02590720057487488,
+          0.017100800573825837,
+          0.016998399794101716,
+          0.019046400487422944
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.0336896002292633,
+        "p25_ms": 0.032614400982856756,
+        "p75_ms": 0.04183039963245392,
+        "min_ms": 0.030924800038337707,
+        "samples_ms": [
+          0.04669440090656281,
+          0.03430399894714355,
+          0.033792001008987424,
+          0.03338240087032318,
+          0.03358719944953918,
+          0.04433920085430145,
+          0.0421887993812561,
+          0.031744000315666196,
+          0.031641599535942075,
+          0.03389439880847931,
+          0.0336896002292633,
+          0.04177919924259186,
+          0.042393600940704344,
+          0.031641599535942075,
+          0.031436800956726074,
+          0.033792001008987424,
+          0.03317759931087494,
+          0.04177919924259186,
+          0.042905598878860474,
+          0.03225600123405457,
+          0.031641599535942075,
+          0.03297280073165894,
+          0.03358719944953918,
+          0.04188160002231598,
+          0.04208639860153198,
+          0.030924800038337707,
+          0.030924800038337707,
+          0.03297280073165894,
+          0.03307519853115082,
+          0.04167680144309997,
+          0.042393600940704344
+        ]
+      },
+      "paired_speedup": 1.8379888894904761,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.01730560064315796,
+          "p25_ms": 0.017203199863433837,
+          "p75_ms": 0.019046400487422944,
+          "min_ms": 0.016896000504493712,
+          "samples_ms": [
+            0.022015999257564544,
+            0.01884160041809082,
+            0.02088959962129593,
+            0.018636800348758698,
+            0.02815999984741211,
+            0.017203199863433837,
+            0.017203199863433837,
+            0.017407999932765962,
+            0.017100800573825837,
+            0.01730560064315796,
+            0.018636800348758698,
+            0.01730560064315796,
+            0.01730560064315796,
+            0.016998399794101716,
+            0.019046400487422944,
+            0.017203199863433837,
+            0.026624000072479247,
+            0.017100800573825837,
+            0.016896000504493712,
+            0.017203199863433837,
+            0.019251200556755065,
+            0.017203199863433837,
+            0.027238398790359497,
+            0.01791999936103821,
+            0.017203199863433837,
+            0.017203199863433837,
+            0.019046400487422944,
+            0.017203199863433837,
+            0.027340799570083618,
+            0.018739199638366698,
+            0.017203199863433837
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03358719944953918,
+          "p25_ms": 0.03281919956207276,
+          "p75_ms": 0.04172800034284592,
+          "min_ms": 0.030924800038337707,
+          "samples_ms": [
+            0.03706879913806915,
+            0.04628480076789856,
+            0.045363199710845944,
+            0.034201601147651674,
+            0.033792001008987424,
+            0.04556800127029419,
+            0.03338240087032318,
+            0.030924800038337707,
+            0.04208639860153198,
+            0.03338240087032318,
+            0.031641599535942075,
+            0.03256320059299469,
+            0.03358719944953918,
+            0.042905598878860474,
+            0.0421887993812561,
+            0.03307519853115082,
+            0.03225600123405457,
+            0.03317759931087494,
+            0.0336896002292633,
+            0.04177919924259186,
+            0.04167680144309997,
+            0.031539198756217954,
+            0.031027200818061828,
+            0.03328000009059906,
+            0.03317759931087494,
+            0.04167680144309997,
+            0.0419840008020401,
+            0.03133440017700195,
+            0.031436800956726074,
+            0.03317759931087494,
+            0.03358719944953918
+          ]
+        }
+      },
+      "library": {
+        "median_ms": 0.014643199741840363,
+        "p25_ms": 0.01454080045223236,
+        "p75_ms": 0.014796800166368484,
+        "min_ms": 0.014336000382900237,
+        "samples_ms": [
+          0.014847999811172486,
+          0.01443839967250824,
+          0.03768320083618164,
+          0.01454080045223236,
+          0.014643199741840363,
+          0.031948798894882204,
+          0.014745600521564484,
+          0.01454080045223236,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014745600521564484,
+          0.01679359972476959,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.02222079932689667,
+          0.01454080045223236,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.01945600062608719,
+          0.015462400019168853,
+          0.01454080045223236,
+          0.014745600521564484,
+          0.014336000382900237,
+          0.014643199741840363,
+          0.015974399447441102,
+          0.014643199741840363,
+          0.01443839967250824,
+          0.01454080045223236
+        ]
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3205224,
+        "logical_gbps": 174.86601385109537,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.0541915334761143,
+      "process_seconds": 14.081043045967817
+    },
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "softmax_fused",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "Y",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_fused",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "d60c733088eab1c5639067b707edc8ce01b04cb27d8ca51416714e7370d86e48",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This fuses the two-stage softmax pattern into a single kernel per row, eliminating the intermediate scratch tensor S and reducing global memory traffic. All reductions and masking are performed within the BLOCK-sized tile, with padding values masked as required. The program computes both the numerically-stable max and sum-exp for each row in a single pass, then writes the normalized output with masking. This directly targets the previously identified fusion/memory bottleneck (K05), and respects all shape, masking, and constexpr restrictions for the given case (N=781, RB=1024, grid=513).",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.536667381413281,
+        "validation_seconds": 3.9753021858632565,
+        "candidate": {
+          "median_ms": 0.018943999707698823,
+          "p25_ms": 0.01797119975090027,
+          "p75_ms": 0.02165760025382042,
+          "min_ms": 0.017510400712490083
+        },
+        "incumbent": {
+          "median_ms": 0.03583999872207642,
+          "p25_ms": 0.034508799016475675,
+          "p75_ms": 0.04341759979724884,
+          "min_ms": 0.03256320059299469
+        },
+        "paired_speedup": 1.8918918536253502,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.01812479943037033,
+            "p25_ms": 0.017407999932765962,
+            "p75_ms": 0.019302400201559065,
+            "min_ms": 0.017203199863433837
+          },
+          "incumbent": {
+            "median_ms": 0.037376001477241516,
+            "p25_ms": 0.03384319990873337,
+            "p75_ms": 0.04249599874019623,
+            "min_ms": 0.031948798894882204
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 169.19468166468565,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.153458908200264,
+        "process_seconds": 16.268194775097072,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 31,
+              "spills": 0,
+              "shared_bytes": 16,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 11879,
+        "output_tokens": 1523,
+        "tokens": 13402
+      },
+      "review": {
+        "diagnosis": "The proposed fused softmax kernel succeeded: it correctly eliminated the intermediate scratch, halved the launch count, and fused all per-row reductions into a single kernel. Validation was passed with the required tolerances. The measured median latency (0.0181 ms) is nearly 2x faster than the previous two-pass implementation (0.0374 ms), confirming that excess memory traffic and kernel launches were the performance bottleneck. Logical bandwidth increased from ~95 GB/s to ~169 GB/s, and compiler resource use remains healthy (31 registers/thread, 16B shared, no spills). There are no indications of numerical, shape, or masking errors, and the implementation matches all API and launch contract requirements.",
+        "outcome": "Fusing both softmax stages into a single per-row kernel delivered the expected improvement, resolving the dominant memory and launch inefficiency. Validation and resource metrics confirm correctness and efficiency for the current shape.",
+        "next_step": "The main bottleneck is resolved for this case. For further improvement, consider parallelizing reductions across multiple warps for much wider rows, or tuning BLOCK and num_warps for other shapes. No immediate repairs or structural changes are required for this case."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 17771,
+        "output_tokens": 1775,
+        "tokens": 19546
+      }
+    },
+    {
+      "attempt": 2,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 33318,
+        "output_tokens": 3335,
+        "tokens": 36653
+      },
+      "review": {
+        "diagnosis": "The proposal was rejected because it did not introduce a structural change to the device computation, data movement, or parallel decomposition. The only difference from the incumbent was an increased num_warps value (from 4 to 8) and a cosmetic kernel renaming. The kernel body and all its primitives, including the reduction mechanism, remained unchanged and fully supported multi-warp reductions via Triton's built-in primitives. According to the launch contract, changes must go beyond kernel configuration and identifiers; actual device logic, loop decomposition, or reduction structure must be altered.",
+        "outcome": "Increasing num_warps alone does not satisfy the requirement for a substantive code transformation. No further measurements were taken; the attempt was correctly rejected as a config-only edit. This does not provide new insight into reduction or memory structure for the case.",
+        "next_step": "To explore multi-warp or tiled reductions, explicitly restructure the kernel: for example, split the row into multiple logical tiles per program (e.g., two launches per row with smaller BLOCKs, each covering part of the row), or perform a hierarchical reduction within the kernel using local accumulation and a final cross-warp reduction. Alternatively, attempt a loop over tiles within each program to handle rows wider than BLOCK, or repartition the grid to assign multiple programs per row. Any such change must alter the work assignment or reduction implementation, not just launch parameters."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 39571,
+        "output_tokens": 3626,
+        "tokens": 43197
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_split_tile",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "cebedc12fde81e01a30e902b9cf5f4e46e6f6a5eff0d2ddb21027866cb2f8bf5",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel splits each row into two logical tiles, each of size BLOCK//2, mapping to grid=[513,2]. Each tile loads and processes its segment, computing a local tile max and tile sum. The reduction across the two tiles is emulated using local arrays (since Triton does not have automatic inter-program communication), but in practice this would be implemented via explicit communication if supported. The structure changes the parallel decomposition, assigning two programs per row, each covering half the columns, and the reductions for max and sum are split and then combined across tiles. Masking applies as before to ensure correctness at the row boundary.",
+      "accepted": false,
+      "previous_failure_attempt": 2,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:24:\ndef softmax_split_tile(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile_id = tl.program_id(1)\n    TILE = BLOCK // 2\n    col_offset = tile_id * TILE\n    cols = col_offset + tl.arange(0, TILE)\n                        ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 11.25536379031837,
+        "process_seconds": 13.721746820025146
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 57259,
+        "output_tokens": 5769,
+        "tokens": 63028
+      },
+      "review": {
+        "diagnosis": "The previous proposal failed due to a Triton API constraint: tl.arange expects its arguments (start, end) to be compile-time constants (tl.constexpr), but the code used TILE = BLOCK // 2, where BLOCK is a tl.constexpr parameter but TILE as a local variable is not guaranteed as such. This led to a compilation error at the line cols = col_offset + tl.arange(0, TILE). As a result, the kernel did not compile and could not be measured. Additionally, the attempted communication between tiles via local arrays (max_tiles, sum_tiles) does not perform actual inter-program reduction in Triton; each program's local copy of those arrays is independent, so the cross-tile reduction would not work as intended.",
+        "outcome": "No performance or correctness measurements were obtained because the kernel failed to compile. The core issue is non-constexpr arguments to tl.arange, and the attempted inter-program reduction via local arrays is not executable in Triton's programming model. The grid decomposition and shape invariants were otherwise respected.",
+        "next_step": "To repair, ensure all tl.arange arguments are tl.constexpr (use TILE as a function parameter, not a local variable). For multi-tile reductions, use one of: (1) a loop within the kernel to cover the whole row in tiles of constexpr size, accumulating reductions for max/sum, or (2) split the row across multiple programs and store local reductions to a workspace buffer, followed by a second launch to combine and finalize normalization. The first is preferred for single-launch softmax. Carefully mask loads/stores at tile boundaries and preserve numerical stability. Avoid using local arrays for cross-program communication; instead, use a workspace buffer if multiple launches are required."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 65031,
+        "output_tokens": 6129,
+        "tokens": 71160
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_multi_tile",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "b0faf49888ee1c3340a03ed65ce704497c23066477787b96c036466f02e6a8cb",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel processes each row in tiles of size BLOCK, looping over them to cover the entire row even when N > BLOCK and N is not a multiple of BLOCK. All tl.arange extents are strictly constexpr, as required. The first loop accumulates the row max, the second accumulates the sum of exponentials, and the third normalizes and writes the output. All loads/stores are masked for correct boundary behavior. This structure supports arbitrary N > BLOCK and repairs the previous failure by keeping all tiling parameters compile-time constants and not relying on inter-program communication or nonlocal arrays.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.7463674983009696,
+        "validation_seconds": 3.350718891248107,
+        "candidate": {
+          "median_ms": 0.01822720021009445,
+          "p25_ms": 0.01791999936103821,
+          "p75_ms": 0.020479999482631683,
+          "min_ms": 0.017612800002098083
+        },
+        "incumbent": {
+          "median_ms": 0.01945600062608719,
+          "p25_ms": 0.01817599982023239,
+          "p75_ms": 0.020326399803161622,
+          "min_ms": 0.017510400712490083
+        },
+        "paired_speedup": 1.0674157523826513,
+        "confirmed": false,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.019046400487422944,
+            "p25_ms": 0.01822720021009445,
+            "p75_ms": 0.020479999482631683,
+            "min_ms": 0.017612800002098083
+          },
+          "incumbent": {
+            "median_ms": 0.018432000279426576,
+            "p25_ms": 0.01822720021009445,
+            "p75_ms": 0.020019199699163437,
+            "min_ms": 0.016998399794101716
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3205224,
+          "logical_gbps": 175.84840036073706,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.4951224410906434,
+        "process_seconds": 15.740728292614222
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 85629,
+        "output_tokens": 8030,
+        "tokens": 93659
+      },
+      "review": {
+        "diagnosis": "The kernel softmax_multi_tile was a correct structural change, implementing per-row softmax with explicit tiling so that all tl.arange arguments are tl.constexpr and all masking is handled correctly. The kernel loops over the row in tiles of BLOCK columns, accumulating reductions for the row maximum and sum of exponentials, then normalizing and writing the output in a third loop. The proposal repaired the previous compilation failure caused by non-constexpr arguments to tl.arange. All loads and stores are masked, ensuring correct results for irregular row lengths.",
+        "outcome": "The measured performance and correctness are essentially identical to the fused single-pass softmax kernel: median latency was 0.0190 ms vs 0.0184 ms for the incumbent, with logical bandwidth ~176 GB/s. The paired speedup is 1.07x in favor of the candidate, but the difference is within timing noise, so the new tiling strategy does not improve over the already efficient single-pass reduction for N=781. Validation passes and there are no numerical or masking errors.",
+        "next_step": "This attempt confirms that explicit tile-looping within a program is functionally correct and does not harm performance for this shape, but also does not improve it. For even wider rows (N >> BLOCK), this structure may enable better scaling or parallelization, but for the current case, the single-pass fused softmax is sufficient. Further improvements could explore multi-warp reductions or hierarchical reduction for extremely wide rows, but are not justified here. No immediate changes are required for this shape."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 94636,
+        "output_tokens": 8353,
+        "tokens": 102989
+      }
+    },
+    {
+      "attempt": 5,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive num_warps"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 118404,
+        "output_tokens": 10452,
+        "tokens": 128856
+      },
+      "review": {
+        "diagnosis": "The previous proposal failed due to the use of the unsupported Triton primitive num_warps at device code level. In Triton, num_warps is a launch configuration parameter and cannot be queried or used as a dynamic value inside the device function. The kernel attempted to emulate inter-warp reduction by using tl.num_warps() and manipulating arrays based on that, but Triton's model does not allow dynamic inter-warp communication, and all reduction within a program must be done using the primitives available for the current tile and warp. The attempted hierarchical reduction and per-warp accumulation approach are not supported through arrays or runtime introspection in Triton's device code.",
+        "outcome": "No timing or correctness measurements were generated due to the unsupported primitive error. The attempt did not provide new data on performance or numerical stability, and the kernel did not execute. The error is strictly due to a Triton API violation, not a conceptual issue with reduction structure or masking.",
+        "next_step": "To repair, avoid any use of num_warps or device-level queries about warp count. Instead, restructure the reduction to operate within the single-warp scope provided by tl.max/tl.sum, or tile the reduction in a way that does not require inter-warp communication. For multi-warp reductions in Triton, work must be divided into separate programs (grid dimensions), or reductions must be staged via an explicit workspace and multiple launches. For this shape (N=781), the single-warp reduction is already efficient, so further attempts should either revert to tiling/looping inside a program or use a 2-stage reduction with a workspace buffer."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 127836,
+        "output_tokens": 10794,
+        "tokens": 138630
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_split_program_row",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              "N",
+              "RB"
+            ],
+            "num_warps": 2,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "0f576e02499d71b6fc46c145d7b9ba15430460a1c0b97589e6ed40b68c1612f7",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel structurally partitions each row into two halves, mapping each half to a separate program (grid=[513,2]). Each program computes the local max and sum for its half, storing them in a workspace region (Y is used for both scratch and output buffers). Both programs then read the two partial results, combine for the global row max and sum, and perform normalization and output write for their segment. This changes the parallel decomposition and reduction structure, using explicit inter-program communication through a workspace buffer. All loads/stores are masked for correct tail handling, and all tl.arange extents are constexpr. The design addresses the previous single-program-per-row reduction by splitting the work and using workspace for partial reductions, while preserving correctness and numerical stability.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 5:10:\ndef softmax_split_program_row(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    HALF = BLOCK // 2\n    col = tl.arange(0, HALF)\n          ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 11.189183872193098,
+        "process_seconds": 13.494559286162257
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 154049,
+        "output_tokens": 12963,
+        "tokens": 167012
+      },
+      "review": {
+        "diagnosis": "The proposed kernel attempted to split each row's softmax across two programs (grid=[513,2]), each handling half of the row, with explicit scratch and communication for local max/sum reductions. However, the kernel failed to compile due to Triton API constraints: tl.arange expects compile-time (tl.constexpr) arguments for its extent, but HALF was computed as a local variable (BLOCK // 2) instead of being passed as a tl.constexpr kernel parameter. As a result, the line col = tl.arange(0, HALF) triggered a compilation error. The launch and reduction structure was otherwise valid and would have correctly performed softmax with workspace-based cross-program reduction, provided all extent/masking rules were met.",
+        "outcome": "No timing or correctness measurements were obtained because the kernel did not compile. The key failure is strictly due to non-constexpr arguments to tl.arange, not output coverage, masking, or numerics. This is a common Triton programming error when attempting to tile or partition reductions at runtime rather than at compile time.",
+        "next_step": "To repair, promote HALF to a kernel parameter by explicitly passing it as a tl.constexpr argument (e.g., add HALF=BLOCK//2 as a parameter, and call the kernel with HALF resolved at launch time). Ensure any use of tl.arange(..., HALF) is with a compile-time constant. Double-check that all offsets (row, part, col) and masking correctly cover every output element, and that workspace indices do not overlap. Once the constexpr error is fixed, remeasure performance and validation to determine if the partitioned reduction strategy is competitive or correct for this shape."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 164741,
+        "output_tokens": 13308,
+        "tokens": 178049
+      }
+    },
+    {
+      "attempt": 7,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "invalid argument symbol or integer"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 193243,
+        "output_tokens": 15488,
+        "tokens": 208731
+      },
+      "review": {
+        "diagnosis": "The previous attempt failed with the error 'invalid argument symbol or integer' when launching the kernel. This occurred because the launch configuration attempted to pass HALF=BLOCK//2 as an argument, but the launch system only supports passing buffer/scalar symbols and integer literals as kernel arguments. Expressions like BLOCK//2 are not supported as launch-time arguments; they must be computed at the Python (host) side and passed as a concrete integer. Additionally, all kernel argument values for tl.constexpr parameters must be resolvable at launch time to actual integers, not dependent on expressions or other arguments.",
+        "outcome": "No kernel was launched and no timing or validation was performed. The explicit constexpr repair plan is otherwise correct, but the launch configuration must resolve HALF to its concrete integer value before passing it as an argument. The kernel and launch contract are otherwise structurally valid for the intended partitioned reduction.",
+        "next_step": "Update the launch configuration to pass HALF as a concrete integer (e.g., 512 if BLOCK=1024). Ensure that all constexpr kernel arguments are passed as integer literals or previously resolved Python integers, not as runtime expressions or symbolic names. After this fix, re-run the experiment to validate correctness and performance of the split-row reduction structure."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 204261,
+        "output_tokens": 15750,
+        "tokens": 220011
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "softmax_split_program_row",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "Y",
+              781,
+              1024,
+              512
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "09cadba03e67cf506e79df7dccba62e99e25b0ecade6fb20965b8c6e3c65c736",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel partitions each row into two programs (grid=[513,2]), each handling HALF=512 columns. Each program computes its local max and sum, writing these to the first four floats of the row in Y (used as workspace). Both programs then read both local maxes/sums to compute the global row max and sum for stable softmax normalization. All loads/stores are masked for correct handling of the irregular tail (N=781). The output is written after the workspace region. This changes both the parallel decomposition (multiple programs per row) and the reduction structure (partial reductions with explicit workspace communication), directly addressing prior API and reduction structure errors.",
+      "accepted": false,
+      "previous_failure_attempt": 7,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=360130/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400568 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 3) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (0, 3) (up to 2e-05 allowed)",
+        "worker_seconds": 12.93708591721952,
+        "process_seconds": 15.394757225178182
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 233853,
+        "output_tokens": 17714,
+        "tokens": 251567
+      },
+      "review": {
+        "diagnosis": "The proposed kernel softmax_split_program_row structurally partitions each row among two programs (grid=[513,2]), each computing local max and sum, using the beginning of Y as a workspace for communication. However, validation failed catastrophically: 100% of outputs are nonfinite (nan/inf), with every element mismatching reference. This is not a partial masking or coverage issue, but a full numerical failure. The likely cause is a race condition or ordering bug in workspace usage: both programs per row attempt to read the other's partial reduction before it has been written, so the loaded workspace values are uninitialized or stale, propagating nonfinite values through the normalization. Triton provides no guarantee of launch order or cross-program synchronization within a grid dimension, so this explicit cross-program reduction is unsafe unless performed in two separate kernel launches (first writing partial results, then reading/combining them in a second pass).",
+        "outcome": "This attempt demonstrates that single-launch cross-program reduction via a shared output buffer is not safe: results are nonfinite and totally incorrect. The structure is not viable for stable parallel softmax on this hardware and Triton API. No performance or partial correctness can be assessed.",
+        "next_step": "To safely perform multi-program reductions, use a true two-stage approach: the first kernel writes partial max/sum results to a workspace, and a second kernel reads and combines them, then computes and writes the normalized output. Alternatively, revert to a single-program-per-row reduction (as in the incumbent), or use explicit tiling and looping within each program to accumulate reductions, ensuring all data dependencies are satisfied before normalization. Avoid any in-place cross-program workspace communication within a single launch for reductions."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 245609,
+        "output_tokens": 18070,
+        "tokens": 263679
+      }
+    }
+  ],
+  "wall_seconds": 247.89436088409275,
+  "resolved_model": "gpt-4.1-2025-04-14",
+  "scientific_evidence": true,
+  "estimated_inference_usd": 0.6357779999999984,
+  "budget_committed_usd": 0.6357780000000055,
+  "speedup": 1.8379888894904761
+}

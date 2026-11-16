@@ -1,0 +1,22 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 1024\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + offs, mask, other=-float('inf'))\n    # Compute max per row\n    mx = tl.max(x, 0)\n    # Compute exp(x - max) with zero masked padding\n    ex = tl.exp(x - mx) * mask\n    # Compute sum per row\n    denom = tl.sum(ex, 0)\n    # Final output with masking\n    y = ex / denom\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "Merged softmax_stats and softmax_apply into one kernel to reduce kernel launches and intermediate memory traffic, improving throughput and correctness. Used a fixed BLOCK size of 1024 (power of two) with masking to handle irregular dimension 781, ensuring no out-of-bounds loads or stores. Used 4 warps for per-row reductions balancing parallelism and communication overhead. This fusion directly addresses bottlenecks K05, K07, K06, and K09 by eliminating intermediate scratch storage, masking all memory accesses, and reducing launch overhead."
+}

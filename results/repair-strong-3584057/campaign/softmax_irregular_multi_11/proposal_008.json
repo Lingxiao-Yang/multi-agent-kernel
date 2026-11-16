@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_blockwise",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_blockwise(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    block_id = tl.program_id(1)\n    # Each block covers 512 columns\n    cols = tl.arange(0, 512) + block_id * 512\n    mask = cols < N\n    offs = row * N + cols\n    neg_inf = -3.4028235e38\n    # Load this block's data\n    x_block = tl.load(X + offs, mask, other=neg_inf)\n    # --- Blockwise max reduction (across both blocks) ---\n    # Each block loads both chunks for the row\n    block0_cols = tl.arange(0, 512)\n    block0_mask = block0_cols < N\n    block1_cols = tl.arange(0, 512) + 512\n    block1_mask = block1_cols < N\n    x0 = tl.load(X + row * N + block0_cols, block0_mask, other=neg_inf)\n    x1 = tl.load(X + row * N + block1_cols, block1_mask, other=neg_inf)\n    mx0 = tl.max(x0, 0)\n    mx1 = tl.max(x1, 0)\n    mx = tl.maximum(mx0, mx1)\n    # --- Center, exp, compute denominator (blockwise sum) ---\n    x_block_centered = x_block - mx\n    exp_x_block = tl.exp(x_block_centered)\n    # Redundant: both blocks compute blockwise sums for full row\n    exp_x0 = tl.exp(x0 - mx)\n    exp_x1 = tl.exp(x1 - mx)\n    sum0 = tl.sum(exp_x0, 0)\n    sum1 = tl.sum(exp_x1, 0)\n    denom = sum0 + sum1\n    # --- Normalize and store ---\n    y = exp_x_block / denom\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "This kernel splits each row into two column blocks (block_id=0,1; 512 columns each), with each program instance processing a row/block pair. To ensure correct normalization, each program instance loads both blocks of the row to compute the global row maximum and the sum of exponentials. Masking is used both for loading and storing to handle the irregular N=781 case. This changes the decomposition and data movement from the incumbent's single-row-per-program fused softmax to a per-row, per-block structure, with redundant loading and reduction for correctness. This decomposition exposes parallelism for wide N, and the kernel is fully contract-compliant for the irregular case."
+}

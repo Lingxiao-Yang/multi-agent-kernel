@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          392
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0)\n    mean = tl.div_rn(tl.sum(tl.where(mask, x, 0), 0), N)\n    centered = tl.where(mask, x - mean, 0)\n    inv = tl.rsqrt(tl.sum(centered * centered, 0) / N + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0)\n    mean = tl.load(S + 2 * row, mask, other=0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0)\n    w = tl.load(W + col, mask, other=0)\n    b = tl.load(B + col, mask, other=0)\n    y = (x - mean) * inv * w + b\n    tl.store(Y + i, y, mask)\n",
+  "rationale": "Unify block size in layernorm_apply to padded RB=1024 to match layernorm_stats, reducing grid size from 1566 to 392 and simplifying masking. Mask loads in layernorm_stats exclude padding from sums ensuring numerical correctness. Masking in layernorm_apply ensures no out-of-bounds memory access while preserving correctness. This aligns memory access patterns and improves coalescing and efficiency."
+}

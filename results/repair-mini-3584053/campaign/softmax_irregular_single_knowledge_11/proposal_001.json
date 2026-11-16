@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n    ptr = row * N + col\n    mask = col < N\n\n    # Load with masking; out-of-bounds elements get -inf\n    x = tl.load(X + ptr, mask, other=-float('inf'))\n\n    # Compute max for the row\n    mx = tl.max(x, 0)\n\n    # Compute exp(x - max) with masking\n    exps = tl.exp(x - mx) * mask\n\n    # Compute sum of exps\n    denom = tl.sum(exps, 0)\n\n    # Normalize\n    y = exps / denom\n\n    # Store output with masking\n    tl.store(Y + ptr, y, mask)\n",
+  "rationale": "Fused two kernels into one to eliminate intermediate memory traffic and kernel launch overhead. Used a single grid dimension over rows with BLOCK=1024 to cover all columns with masking for irregular width. This change reduces global memory accesses and improves latency hiding and occupancy without sacrificing correctness."
+}

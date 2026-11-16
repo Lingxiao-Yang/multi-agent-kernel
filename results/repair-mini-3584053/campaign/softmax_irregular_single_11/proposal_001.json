@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    # Step 1: compute max with iterative tree reduction over RB\n    m = x\n    stride = RB // 2\n    while stride > 0:\n        # For strides that cross boundary, mask with -inf\n        m2 = tl.where(offs + stride < RB, m[stride:], tl.full((RB - stride,), -float('inf'), dtype=tl.float32))\n        m = tl.maximum(m[:stride], m2)\n        # Keep only first stride elements for next iteration\n        m = tl.concatenate([m, tl.full((RB - stride,), -float('inf'), dtype=tl.float32)])[:RB]\n        stride //= 2\n\n    mx = m[0]\n\n    # Load again for sum with exp centered by max\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n    exp_x = tl.exp(x - mx)\n    exp_x = tl.where(offs < N, exp_x, tl.zeros((RB,), dtype=tl.float32))\n\n    # Step 2: compute sum with iterative tree reduction over exp_x\n    s = exp_x\n    stride = RB // 2\n    while stride > 0:\n        s2 = tl.where(offs + stride < RB, s[stride:], tl.zeros((RB - stride,), dtype=tl.float32))\n        s = s[:stride] + s2\n        s = tl.concatenate([s, tl.zeros((RB - stride,), dtype=tl.float32)])[:RB]\n        stride //= 2\n\n    denom = s[0]\n\n    # Step 3: write output softmax values\n    y = tl.where(offs < N, exp_x / denom, tl.zeros((RB,), dtype=tl.float32))\n    tl.store(Y + idx, y, offs < N)\n",
+  "rationale": "Corrected the iterative tree reduction to properly use indexed slices and masking for max and sum reductions over the padded input vector of size RB=1024. This ensures no out-of-bound memory accesses and proper identity padding (-inf for max, 0 for sum). The reductions now keep only the relevant portion after each step, maintaining the correct sequence length and avoiding stale values. The fused kernel combines max, sum, and apply phases with appropriate masking and uses 8 warps and 2 stages for efficient pipelining and throughput on the given hardware and problem size."
+}

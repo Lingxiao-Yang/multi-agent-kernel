@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes, pass 'x' explicitly\n    mx = tl.max_contiguous(x)\n\n    # Broadcast max scalar to all lanes\n    mx_bcast = tl.broadcast_to(mx, (BLOCK,))\n\n    # Compute exp(x - max) with masking\n    shifted = tl.where(mask, tl.exp(x - mx_bcast), 0.0)\n\n    # Warp-level sum reduction across all lanes, pass 'shifted' explicitly\n    s = tl.sum(shifted)\n\n    # Broadcast sum scalar to all lanes\n    s_bcast = tl.broadcast_to(s, (BLOCK,))\n\n    # Compute normalized output\n    out = tl.where(mask, shifted / s_bcast, 0.0)\n\n    # Store output with masking\n    tl.store(Y + row * N + offs, out, mask)\n",
+  "rationale": "Corrected the kernel by explicitly passing the per-lane vectors 'x' and 'shifted' as arguments to tl.max_contiguous and tl.sum respectively, as required by the Triton API. Maintains the 2D launch grid [513,4] with BLOCK=256 and masks lanes beyond the irregular width 781. Broadcasts scalar max and sum reductions to all lanes before exponentiation and normalization for numerical stability and correctness. This fused kernel reduces global memory traffic and kernel launch overhead compared to the incumbent two-kernel baseline, enabling compilation, runtime validation, and expected performance improvements."
+}

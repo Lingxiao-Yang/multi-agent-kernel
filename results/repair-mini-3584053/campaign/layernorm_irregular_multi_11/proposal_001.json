@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    sum_x = tl.sum(tl.where(mask, x, 0.0), 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_sq = tl.sum(centered * centered, 0)\n    inv = tl.rsqrt(tl.div_rn(sum_sq, N) + 1e-5)\n    tl.store(S + 2 * row, mean, True)\n    tl.store(S + 2 * row + 1, inv, True)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + row * 2, mask, other=0.0)\n    inv = tl.load(S + row * 2 + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    val = (x - mean) * inv * w + b\n    tl.store(Y + i, val, mask)\n",
+  "rationale": "Changed layernorm_stats kernel BLOCK to 1024 (next power of two >= N=781) to enable vectorized loads and reductions with masking. Masked loads and stores to exclude padding beyond N=781 and preserve correct sums/means. Mean and variance divided by N=781 as required. The apply kernel remains unchanged with BLOCK=256 and grid covering total elements, masked for bounds; this balances occupancy and vectorization. This respects all invariants, avoids register spills, and improves performance by enabling efficient vectorization."
+}

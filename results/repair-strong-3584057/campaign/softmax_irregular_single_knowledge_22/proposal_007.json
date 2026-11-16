@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_unrolled8",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_unrolled8(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    # Unroll the reduction into 8 segments to increase instruction-level parallelism\n    seg = 8\n    seg_size = BLOCK // seg\n    # Compute max for each segment\n    max_vals = []\n    for i in range(seg):\n        seg_start = i * seg_size\n        seg_end = (i + 1) * seg_size if i < seg - 1 else BLOCK\n        seg_mask = (offs >= seg_start) & (offs < seg_end) & col_mask\n        max_i = tl.max(tl.where(seg_mask, x, -float('inf')), 0)\n        max_vals.append(max_i)\n    mx = max_vals[0]\n    for i in range(1, seg):\n        mx = tl.maximum(mx, max_vals[i])\n    # Compute exponentials\n    exp_x = tl.exp(x - mx) * col_mask\n    # Compute sum for each segment\n    sum_vals = []\n    for i in range(seg):\n        seg_start = i * seg_size\n        seg_end = (i + 1) * seg_size if i < seg - 1 else BLOCK\n        seg_mask = (offs >= seg_start) & (offs < seg_end) & col_mask\n        sum_i = tl.sum(tl.where(seg_mask, exp_x, 0.0), 0)\n        sum_vals.append(sum_i)\n    denom = sum_vals[0]\n    for i in range(1, seg):\n        denom = denom + sum_vals[i]\n    denom = tl.where(denom == 0, 1, denom)\n    y = exp_x / denom\n    tl.store(Y + row * N + offs, y, col_mask)\n",
+  "rationale": "This kernel unrolls the reduction for both the max and sum operations into 8 segments, increasing instruction-level parallelism and potentially improving throughput by reducing dependencies in the reductions. Each segment computes its own masked reduction using only allowed Triton primitives and compile-time constants, so all shapes and masks are legal. The segmented reductions are combined at the end using tl.maximum and scalar addition. All masking logic ensures that out-of-bound columns (due to padding) do not contribute to the reductions or normalization, preserving correctness for irregular row widths. The launch/grid structure, argument contract, and reduction identities are unchanged from the incumbent, and the number of pipeline stages is increased to two to potentially provide further latency hiding."
+}

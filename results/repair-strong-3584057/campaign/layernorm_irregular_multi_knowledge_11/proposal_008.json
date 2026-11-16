@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_parallel",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          8
+        ],
+        "num_warps": 8,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_parallel(X, W, B, Y, N: tl.constexpr, VEC: tl.constexpr):\n    row = tl.program_id(0)\n    num_chunks = (N + VEC - 1) // VEC\n    mean_acc = 0.0\n    meansq_acc = 0.0\n    for i in range(0, num_chunks):\n        chunk_start = i * VEC\n        chunk_end = tl.minimum(chunk_start + VEC, N)\n        chunk_range = tl.arange(0, VEC)\n        chunk_mask = (chunk_range + chunk_start) < N\n        chunk_offs = row * N + chunk_start + chunk_range\n        x_chunk = tl.load(X + chunk_offs, chunk_mask, other=0.0)\n        mean_acc += tl.sum(x_chunk, 0)\n        meansq_acc += tl.sum(x_chunk * x_chunk, 0)\n    mean = mean_acc / N\n    meansq = meansq_acc / N\n    var = meansq - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    # Normalize and write output\n    for i in range(0, num_chunks):\n        chunk_start = i * VEC\n        chunk_end = tl.minimum(chunk_start + VEC, N)\n        chunk_range = tl.arange(0, VEC)\n        chunk_mask = (chunk_range + chunk_start) < N\n        chunk_offs = row * N + chunk_start + chunk_range\n        x_chunk = tl.load(X + chunk_offs, chunk_mask, other=0.0)\n        w_chunk = tl.load(W + chunk_start + chunk_range, chunk_mask, other=0.0)\n        b_chunk = tl.load(B + chunk_start + chunk_range, chunk_mask, other=0.0)\n        norm_chunk = (x_chunk - mean) * inv * w_chunk + b_chunk\n        tl.store(Y + chunk_offs, norm_chunk, chunk_mask)\n",
+  "rationale": "This kernel changes the reduction order for improved numerical stability. Each row is processed by a single program instance, but reduction is performed in VEC-wide chunks using explicit masking to cover all columns (even irregular N). All partial sums (mean and mean of squares) are accumulated into scalars using a reduction-tree pattern across VEC lanes, minimizing floating-point reduction error from tiling. Normalization is performed similarly in parallel chunks. This approach directly addresses the reduction-order errors in previous tiled attempts by matching the full-row reduction pattern of the incumbent with explicit chunking and masking, ensuring both accuracy and correct coverage for any N."
+}

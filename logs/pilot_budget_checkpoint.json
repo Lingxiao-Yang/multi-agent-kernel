@@ -2,12 +2,12 @@
   "approved_total_pilot_usd": 25,
   "authorization": "User explicitly approved $25 total cap on 2026-11-15",
   "prior_completed_usd": 0.8739192,
-  "local_smoke_cap_usd": 0.5,
-  "local_smoke_latest_completed_usd": 0.14747720000000003,
-  "phase_mini_cap_usd": 4,
-  "phase_strong_conditional_cap_usd": 16,
-  "maximum_total_exposure_usd": 21.3739192,
-  "unallocated_usd": 3.6260808,
-  "note": "Caps are maximum exposure, not actual spend. Local and cluster runs are unfinished at this checkpoint.",
-  "updated_utc": "2026-11-15T19:41:35.456668+00:00"
+  "local_smoke_completed_usd": 0.20543760000000005,
+  "phase_mini_completed_usd": 1.9153828000000004,
+  "phase_strong_completed_usd": 10.417500000000006,
+  "total_completed_estimated_usd": 13.4122396,
+  "remaining_usd": 11.5877604,
+  "outstanding_reservations_usd": 0,
+  "updated_utc": "2026-11-16T00:39:39.421626+00:00",
+  "note": "All declared phases completed. Usage-derived estimates at frozen prices; cached discounts ignored. Not an invoice. No new inference or jobs launched during readout. Proposed next-stage ceilings are not reservations."
 }

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_vectorized_loop_fixed_v5",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop_fixed_v5(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    # First pass: compute row max in vectorized chunks\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 4):\n        offs_v = start + tl.arange(0, 4)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Second pass: compute sum of exp(x - max)\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, 4):\n        offs_v = start + tl.arange(0, 4)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # Third pass: normalize and store\n    for start in tl.static_range(0, RB, 4):\n        offs_v = start + tl.arange(0, 4)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+  "rationale": "This kernel increases memory-level parallelism by processing each row in vectorized chunks of vec_width=4 using tl.static_range(0, RB, 4) to guarantee compile-time loop increments. All loads, reductions, and stores are properly masked with offs_v < N, ensuring correctness for ragged rows. Each pass (max, sum, normalize) is performed in vectorized loops for improved memory and compute efficiency. Division for normalization is replaced by multiplication by the reciprocal for throughput. The launch config matches the problem's shape, with grid=513 and RB covering the padded width."
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    # Load input with masking for irregular N\n    x = tl.load(X + offs, col < N, other=0)\n    # Compute mean across the row\n    mean = tl.div_rn(tl.sum(x, 0), N)\n    # Centered x for variance\n    centered = tl.where(col < N, x - mean, 0)\n    var = tl.sum(centered * centered, 0) / N\n    inv = tl.rsqrt(var + 1e-5)\n    # Load weights and bias with masking\n    w = tl.load(W + col, col < N, other=0)\n    b = tl.load(B + col, col < N, other=0)\n    # Apply normalization, scale, shift\n    norm = tl.where(col < N, (x - mean) * inv * w + b, 0)\n    tl.store(Y + offs, norm, col < N)\n",
+  "rationale": "Fuses statistics and apply passes in a single kernel, eliminating intermediate memory traffic. One kernel per row (grid=513), each covering full row with BLOCK=1024 and masking for N=781. All reduction and masking invariants are preserved, including correct handling of padding and epsilon. This changes data movement and kernel structure, not just code style."
+}

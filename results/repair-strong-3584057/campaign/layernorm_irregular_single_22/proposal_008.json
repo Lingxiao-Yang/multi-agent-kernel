@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_fullrow_blockaccum_tail_unroll2",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_blockaccum_tail_unroll2(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N // (2 * BLOCK))\n    tail_start = num_iters * 2 * BLOCK\n    # Accumulators for main unrolled loop\n    sum_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sum_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc0 = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc1 = tl.zeros((BLOCK,), dtype=tl.float32)\n    # Main unrolled accumulation\n    for i in range(num_iters):\n        base = 2 * i * BLOCK\n        col0 = offs + base\n        col1 = offs + base + BLOCK\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        sum_acc0 += tl.where(mask0, x0, 0.0)\n        sum_acc1 += tl.where(mask1, x1, 0.0)\n        sqr_acc0 += tl.where(mask0, x0 * x0, 0.0)\n        sqr_acc1 += tl.where(mask1, x1 * x1, 0.0)\n        count_acc0 += tl.where(mask0, 1.0, 0.0)\n        count_acc1 += tl.where(mask1, 1.0, 0.0)\n    # Tail processing for remaining elements\n    tail_sum = tl.zeros((BLOCK,), dtype=tl.float32)\n    tail_sqr = tl.zeros((BLOCK,), dtype=tl.float32)\n    tail_count = tl.zeros((BLOCK,), dtype=tl.float32)\n    for t in range((N - tail_start + BLOCK - 1) // BLOCK):\n        col = offs + tail_start + t * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        tail_sum += tl.where(mask, x, 0.0)\n        tail_sqr += tl.where(mask, x * x, 0.0)\n        tail_count += tl.where(mask, 1.0, 0.0)\n    # Reduce accumulators\n    row_sum = tl.sum(sum_acc0, 0) + tl.sum(sum_acc1, 0) + tl.sum(tail_sum, 0)\n    row_sqr = tl.sum(sqr_acc0, 0) + tl.sum(sqr_acc1, 0) + tl.sum(tail_sqr, 0)\n    row_count = tl.sum(count_acc0, 0) + tl.sum(count_acc1, 0) + tl.sum(tail_count, 0)\n    mean = tl.div_rn(row_sum, row_count)\n    var = tl.div_rn(row_sqr, row_count) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    # Main unrolled output loop\n    for i in range(num_iters):\n        base = 2 * i * BLOCK\n        col0 = offs + base\n        col1 = offs + base + BLOCK\n        mask0 = col0 < N\n        mask1 = col1 < N\n        x0 = tl.load(X + row * N + col0, mask=mask0, other=0.0)\n        x1 = tl.load(X + row * N + col1, mask=mask1, other=0.0)\n        centered0 = x0 - mean\n        centered1 = x1 - mean\n        w0 = tl.load(W + col0, mask=mask0, other=0.0)\n        w1 = tl.load(W + col1, mask=mask1, other=0.0)\n        b0 = tl.load(B + col0, mask=mask0, other=0.0)\n        b1 = tl.load(B + col1, mask=mask1, other=0.0)\n        y0 = (centered0 * inv) * w0 + b0\n        y1 = (centered1 * inv) * w1 + b1\n        tl.store(Y + row * N + col0, y0, mask=mask0)\n        tl.store(Y + row * N + col1, y1, mask=mask1)\n    # Tail output\n    for t in range((N - tail_start + BLOCK - 1) // BLOCK):\n        col = offs + tail_start + t * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = x - mean\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+  "rationale": "This kernel fuses blockwise unrolling and tail handling for irregular N. The main accumulation and output loops are explicitly unrolled by two BLOCK-wide stripes for higher ILP and memory throughput. For the remaining (tail) elements not fitting in a 2*BLOCK multiple, a separate masked blockwise loop handles the last stripes. All accumulators (sum, sqr, count) and outputs are correctly masked and summed, ensuring numerics and coverage for any N. This approach maximizes vectorization and minimizes loop overhead for large N, while guaranteeing correctness for irregular shapes."
+}

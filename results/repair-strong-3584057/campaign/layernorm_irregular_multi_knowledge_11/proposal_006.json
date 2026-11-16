@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_rowwise_tiled",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_rowwise_tiled(X, W, B, Y, N: tl.constexpr, TILE: tl.constexpr):\n    row = tl.program_id(0)\n    num_tiles = (N + TILE - 1) // TILE\n    mean_acc = 0.0\n    # First pass: mean\n    for tile_idx in range(0, num_tiles):\n        tile_col = tile_idx * TILE + tl.arange(0, TILE)\n        offs = row * N + tile_col\n        mask = tile_col < N\n        x = tl.load(X + offs, mask, other=0.0)\n        mean_acc += tl.sum(x, 0)\n    mean = mean_acc / N\n    # Second pass: variance\n    var_acc = 0.0\n    for tile_idx in range(0, num_tiles):\n        tile_col = tile_idx * TILE + tl.arange(0, TILE)\n        offs = row * N + tile_col\n        mask = tile_col < N\n        x = tl.load(X + offs, mask, other=0.0)\n        diff = x - mean\n        var_acc += tl.sum(diff * diff, 0)\n    var = var_acc / N\n    inv = tl.rsqrt(var + 1e-5)\n    # Third pass: normalization and write output\n    for tile_idx in range(0, num_tiles):\n        tile_col = tile_idx * TILE + tl.arange(0, TILE)\n        offs = row * N + tile_col\n        mask = tile_col < N\n        x = tl.load(X + offs, mask, other=0.0)\n        w = tl.load(W + tile_col, mask, other=0.0)\n        b = tl.load(B + tile_col, mask, other=0.0)\n        norm = (x - mean) * inv * w + b\n        tl.store(Y + offs, norm, mask)\n",
+  "rationale": "This kernel changes the reduction and data movement strategy from a single large vector covering the whole row to a tiled approach. Each row is processed by a single program instance, but the reduction (for mean and variance) is computed in tiles of TILE columns (here, 256). The kernel loops over tiles for all passes, ensuring that partial reductions accumulate over the entire row, and that every column is covered exactly once, even if N is not divisible by TILE. All loads and stores use explicit in-bounds masking (mask = tile_col < N) to guarantee correct output and no out-of-bounds memory access. This decomposition is robust for any row width N, reduces per-thread register pressure, and preserves numerical accuracy for mean/variance. The kernel structure and data movement are thus different from the single-vector incumbent, directly addressing previous coverage and masking pitfalls."
+}

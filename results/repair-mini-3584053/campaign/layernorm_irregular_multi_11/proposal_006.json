@@ -1,0 +1,57 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats_part1",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          512,
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_stats_part2",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          512,
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          784
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          512
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_part1(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    block_id = tl.program_id(axis=1)\n    offs = tl.arange(0, BLOCK)\n    col = block_id * BLOCK + offs\n    mask = col < N\n    ptr = row * N + col\n    x = tl.load(X + ptr, mask, other=0.0)\n    partial_sum = tl.sum(x, 0)\n    idx = row * NUM_BLOCKS + block_id\n    tl.store(S + idx, partial_sum, True)\n\n@triton.jit\ndef layernorm_stats_part2(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    offs = tl.arange(0, NUM_BLOCKS)\n    mask = offs < NUM_BLOCKS\n    ptr = row * NUM_BLOCKS + offs\n    partial_sums = tl.load(S + ptr, mask, other=0.0)\n    total_sum = tl.sum(partial_sums, 0)\n    mean = tl.div_rn(total_sum, N)\n\n    sum_sq = 0.0\n    for i in range(NUM_BLOCKS):\n        base_col = i * BLOCK\n        offs = tl.arange(0, BLOCK)\n        col = base_col + offs\n        mask_x = col < N\n        ptr_x = row * N + col\n        x = tl.load(X + ptr_x, mask_x, other=0.0)\n        centered = tl.where(mask_x, x - mean, 0.0)\n        sum_sq += tl.sum(centered * centered, 0)\n\n    inv = tl.rsqrt(tl.div_rn(sum_sq, N) + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    mask = i < TOTAL\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, mask, other=0.0)\n    mean = tl.load(S + 2 * row, mask, other=0.0)\n    inv = tl.load(S + 2 * row + 1, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n    val = (x - mean) * inv * w + b\n    tl.store(Y + i, val, mask)\n"
+}

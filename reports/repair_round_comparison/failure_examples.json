@@ -1,0 +1,1559 @@
+[
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive next_stage"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 5:35:\ndef layernorm_stats_part1(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    # Compute partial sums of X[row, :] in chunks of BLOCK\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    block_id = tl.program_id(1) if tl.num_programs() > 1 else 0\n                                   ^\nnum_programs() missing 1 required positional argument: 'axis'"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "launch argument count does not match kernel signature"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 10:13:\ndef layernorm_stats_part2(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    offs = tl.arange(0, NUM_BLOCKS)\n    mask = offs < NUM_BLOCKS\n    ptr = row * NUM_BLOCKS + offs\n    partial_sums = tl.load(S + ptr, mask, other=0.0)\n    total_sum = tl.sum(partial_sums, 0)\n    mean = tl.div_rn(total_sum, N)\n\n    sum_sq = tl.float32(0.0)\n             ^\nTypeError(\"'dtype' object is not callable\")"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 11:4:\ndef layernorm_stats_part2(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    offs = tl.arange(0, NUM_BLOCKS)\n    mask = offs < NUM_BLOCKS\n    ptr = row * NUM_BLOCKS + offs\n    partial_sums = tl.load(S + ptr, mask, other=0.0)\n    total_sum = tl.sum(partial_sums, 0)\n    mean = tl.div_rn(total_sum, N)\n\n    sum_sq = 0.0\n    for i in range(NUM_BLOCKS):\n    ^\nAssertionError(\"Loop-carried variable offs has initial type <['2'], int32> but is re-assigned to <['512'], int32> in loop! Please make sure that the type stays consistent.\")"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 11:8:\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean: sum reduction over RB lanes with masking\n    s = tl.sum(x, mask)\n        ^"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive next_stage"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 15:18:\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out invalid lanes before summation (no mask argument for tl.sum)\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Manual unrolled reduction for sum (mean)\n    step = RB // 4\n    sum0 = tl.sum(x_masked[0:step], 0)\n                  ^\nunsupported tensor index: <triton.language.core.slice object at 0x15258c11d160>"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 15:12:\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out invalid lanes before summation\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Manual unrolled sum reduction over 4 segments using indexed offset loads\n    step = RB // 4\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 12:12:\ndef layernorm_fused_unrolled_constexpr_8warps(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Manual unrolled sum reduction over 4 segments using constexpr offset arrays\n    step = tl.constexpr(RB // 4)\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 12:12:\ndef layernorm_fused_unrolled_constexpr_8warps(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Manual unrolled sum reduction over 4 segments with constexpr offsets\n    step = RB // 4  # Must be power-of-two and constexpr as kernel argument\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 28:38:\n    sum0 = tl.sum(tl.where(offs0 < N, tl.load(X + row * N + offs0, offs0 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs1 < N, tl.load(X + row * N + offs1, offs1 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs2 < N, tl.load(X + row * N + offs2, offs2 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs3 < N, tl.load(X + row * N + offs3, offs3 < N, other=0.0), 0.0), 0)\n\n    mean = tl.div_rn(sum0, N)\n\n    # Centered input with masking\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Partial sums for variance\n    sum2 = tl.sum(tl.where(offs0 < N, centered[offs0] * centered[offs0], 0.0), 0)\n                                      ^\nDid you forget to add @triton.jit ? (`_semantic` argument must be provided outside of JIT functions.)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 4:11:\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 256  # power of two <= N\n    offs = tl.arange(0, BLOCK)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=199693/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 199693 / 400653 (49.8%)\nGreatest absolute difference: nan at index (257, 243) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (257, 243) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32\n    num_sub_blocks = BLOCK // sub_block\n    offs = tl.arange(0, sub_block)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32  # constexpr\n    num_sub_blocks = BLOCK // sub_block  # constexpr\n    offs = tl.arange(0, sub_block)  # constexpr extent\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32  # constexpr\n    num_sub_blocks = BLOCK // sub_block  # constexpr\n    offs = tl.arange(0, sub_block)  # constexpr extent\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "launch argument count does not match kernel signature"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 1,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive convert_to_float32"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive cast"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.float32(0)\n              ^\nTypeError(\"'dtype' object is not callable\")"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.zeros((1,), tl.float32)[0]\n              ^\nunsupported tensor index: constexpr[0]"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.float32(0.0)\n              ^\nTypeError(\"'dtype' object is not callable\")"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "launch argument count does not match kernel signature"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 1,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 8,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 13:12:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean using masked sum and accurate division\n    sum_x = tl.sum(x, mask=mask)\n            ^\nTypeError(\"sum() got an unexpected keyword argument 'mask'\")"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 13:12:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean using masked sum (mask as positional argument)\n    sum_x = tl.sum(x, mask)\n            ^"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 3,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile\n    mx = tl.max(x, axis=0)\n    # Warp-level reduction for max across tiles\n    mx = tl.max_contiguous(mx, axis=0)\n         ^\nmax_contiguous() got an unexpected keyword argument 'axis'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile\n    mx_tile = tl.max(x)\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(mx_tile)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile (over BLOCK elements)\n    mx_tile = tl.max(x)\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(mx_tile)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes, pass 'x' explicitly\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes, pass 'x' explicitly\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 1,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 7:9:\ndef softmax_apply(X, S, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, RB)\n    mask = col < N\n\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n         ^\nMask argument cannot be block type if pointer argument is not a block"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 45729 / 400653 (11.4%)\nGreatest absolute difference: 0.003648342564702034 at index (125, 176) (up to 2e-06 allowed)\nGreatest relative difference: 0.1668810099363327 at index (125, 701) (up to 2e-05 allowed)"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Warp-level max reduction over the tile\n    mx = tl.max(x, 0)\n    mx = tl.max_contiguous(mx)  # cross-lane warp max\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 12:9:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Warp-level max reduction over the tile (lane-wise max)\n    mx = tl.max(x, 0)  # lane local max\n    # Hierarchical cross-lane warp max reductions\n    mx = tl.max_contiguous(mx)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 12:15:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction (axis=0)\n    lane_max = tl.max(x, 0)  # lane-local max\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive sum_contiguous"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction (axis=0)\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 4:10:\ndef softmax_fused(X, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 1024\n    col = tl.arange(0, BLOCK)\n          ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 12:18:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Hierarchical max reduction: reduce within warp lanes in two stages\n    # Stage 1: partial max reduction over 512 elements per warp lane (assuming BLOCK=1024)\n    max1 = tl.max(x[:BLOCK//2], 0)\n                  ^\nunsupported tensor index: <triton.language.core.slice object at 0x14578035e630>"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 1,
+    "status": "proposal_error",
+    "error": "forbidden construct: While"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive concatenate"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive concat"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive concat"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "forbidden construct: While"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive concat"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 11:4:\ndef softmax_stats(X, S, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    m = x\n    # unrolled tree max reduction over RB elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n    ^\nAttributeError(\"'List' object has no attribute 'func'\")"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 11:4:\ndef softmax_stats(X, S, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    m = x\n    # unrolled tree max reduction over RB elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n    ^\nAttributeError(\"'List' object has no attribute 'func'\")"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 1,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 7,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 13:9:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n    ptr = row * N + col\n    mask = col < N\n\n    # Load with masking; out-of-bounds elements get -inf\n    x = tl.load(X + ptr, mask, other=-float('inf'))\n\n    # Two-stage max reduction for large BLOCK\n    half = BLOCK // 2\n    x1 = x[:half]\n         ^\nunsupported tensor index: <triton.language.core.slice object at 0x149280403aa0>"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 12:22:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking, pad out-of-bounds with -inf for max reduction\n    x = tl.load(X + idx, col_mask, other=-float('inf'))\n\n    # Two-stage max reduction: split BLOCK into two halves\n    half = BLOCK // 2\n    max_left = tl.max(x[:half], col_mask[:half])\n                      ^\nunsupported tensor index: <triton.language.core.slice object at 0x14c5997692b0>"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "mini",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 1,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 188077 / 400653 (46.9%)\nGreatest absolute difference: 52574.69140625 at index (25, 343) (up to 2e-05 allowed)\nGreatest relative difference: 329982784.0 at index (114, 202) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 7:4:\ndef layernorm_stats_parallel(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    m2_acc = tl.zeros((), dtype=tl.float32)\n    count = 0\n    for offs_base in range(0, N, BLOCK):\n    ^\nAssertionError('Loop-carried variable count has initial type int32 but is re-assigned to uint32 in loop! Please make sure that the type stays consistent.')"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive uint32"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 212009 / 400653 (52.9%)\nGreatest absolute difference: 57484.41015625 at index (119, 343) (up to 2e-05 allowed)\nGreatest relative difference: 192861200.0 at index (11, 395) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 398818 / 400653 (99.5%)\nGreatest absolute difference: 3.7230138778686523 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 63808.65625 at index (11, 395) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 1,
+    "status": "error",
+    "error": "at 4:11:\ndef fused_layernorm_rowwise(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 1024\n    cols = tl.arange(0, BLOCK)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive barrier"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 5:11:\ndef partial_layernorm_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    offs = split * BLOCK\n    cols = tl.arange(0, BLOCK) + offs\n           ^\narange's range must be a power of 2"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 2052 / 400653 (0.5%)\nGreatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 2052 / 400653 (0.5%)\nGreatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 2052 / 400653 (0.5%)\nGreatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 399574 / 400653 (99.7%)\nGreatest absolute difference: 5.5735273361206055 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 102104.9765625 at index (11, 395) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=400653/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 70901 / 400653 (17.7%)\nGreatest absolute difference: 0.014000415802001953 at index (469, 344) (up to 2e-05 allowed)\nGreatest relative difference: 42.78575134277344 at index (114, 202) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive barrier"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=398605/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=398097/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400145 / 400653 (99.9%)\nGreatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 137997 / 400653 (34.4%)\nGreatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 91727 / 400653 (22.9%)\nGreatest absolute difference: 9.820737838745117 at index (194, 30) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (1, 0) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 1,
+    "status": "proposal_error",
+    "error": "invalid argument symbol or integer"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 6:32:\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    CHUNKS = 4\n    chunk_size = BLOCK // CHUNKS\n    offs = chunk * chunk_size + tl.arange(0, chunk_size)\n                                ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 4,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 13851 / 400653 (3.5%)\nGreatest absolute difference: 0.00012198835611343384 at index (0, 733) (up to 2e-05 allowed)\nGreatest relative difference: 18.855627059936523 at index (0, 594) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 4:27:\ndef layernorm_apply_split(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n                           ^\narange's range must be a power of 2"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 7:30:\ndef layernorm_apply_chunked_unrolled(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    base_off = chunk * CHUNK\n    UNROLL = 64  # UNROLL must divide CHUNK and be a power of two\n    for u in range(0, CHUNK, UNROLL):\n        offs = base_off + u + tl.arange(0, UNROLL)\n                              ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 1,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 1539 / 400653 (0.4%)\nGreatest absolute difference: 4.6098779421299696e-05 at index (0, 343) (up to 2e-05 allowed)\nGreatest relative difference: 0.05183902755379677 at index (0, 343) (up to 0.0002 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 9:12:\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        if row >= 513:\n            break\n            ^\nunsupported AST node type: Break"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 9:12:\ndef layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    ROWS_PER_PROG = 4\n    row_start = pid * ROWS_PER_PROG\n    offs = tl.arange(0, BLOCK)\n    for row_offset in range(ROWS_PER_PROG):\n        row = row_start + row_offset\n        if row >= 513:\n            continue\n            ^\nunsupported AST node type: Continue"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 8:4:\ndef layernorm_row_multiwarp(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    lane = tl.arange(0, BLOCK)\n    # Per-lane accumulators for mean and variance\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    var_acc = tl.zeros((), dtype=tl.float32)\n    # Strided reduction for mean\n    for c in range(lane, N, BLOCK):\n    ^\nTypeError(\"For lower bound must be a scalar, got <['256'], int32>\")"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 6:11:\ndef layernorm_row_split4_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n           ^\narange's range must be a power of 2"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 21:17:\n    local_var = 0.0\n    count = 0.0\n    # 1. Partial mean\n    for off in range(col_start, col_end, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = (offs < col_end) & (offs < N)\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        local_mean += tl.sum(x, 0)\n        count += tl.sum(mask, 0)\n    # Global reduction: sum over tiles\n    total_mean = tl.sum(local_mean, axis=0)\n                 ^"
+  },
+  {
+    "model": "strong",
+    "case": "layernorm_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "Python object mutation forbidden; use tl.store for output"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "only tensor .to access allowed"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 5:11:\ndef softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    CHUNK_SIZE = BLOCK // 2\n    cols = tl.arange(0, CHUNK_SIZE) + chunk * CHUNK_SIZE\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "invalid argument symbol or integer"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 8:15:\ndef softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    CHUNK_SIZE = BLOCK // 2  # 1024//2 = 512 for this case\n    cols = tl.arange(0, 512) + chunk * 512\n    mask = cols < N\n    offs = row * N + cols\n    neg_inf = -tl.float32(3.4028235e38)\n               ^\nTypeError(\"'dtype' object is not callable\")"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 6:11:\ndef softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    # Statically set chunk size\n    CHUNK_SIZE = 512\n    cols = tl.arange(0, CHUNK_SIZE) + chunk * CHUNK_SIZE\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 5:11:\ndef softmax_tile_split(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile_width = BLOCK // 2\n    offs = tl.arange(0, tile_width)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "invalid argument symbol or integer"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 5:11:\ndef softmax_split_col(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = BLOCK // 2\n    offs = tl.arange(0, tile)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 5:11:\ndef softmax_split_col_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = RB // 2\n    offs = tl.arange(0, tile)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi",
+    "seed": 22,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 6:12:\ndef softmax_split_col_unrolled(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = RB // 2\n    # Unroll both halves explicitly\n    offs0 = tl.arange(0, tile)\n            ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "proposal_error",
+    "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 6:24:\ndef softmax_split_tile(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile_id = tl.program_id(1)\n    TILE = BLOCK // 2\n    col_offset = tile_id * TILE\n    cols = col_offset + tl.arange(0, TILE)\n                        ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive num_warps"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 5:10:\ndef softmax_split_program_row(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    HALF = BLOCK // 2\n    col = tl.arange(0, HALF)\n          ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 7,
+    "status": "proposal_error",
+    "error": "invalid argument symbol or integer"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 11,
+    "attempt": 8,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=360130/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400568 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 3) (up to 2e-06 allowed)\nGreatest relative difference: nan at index (0, 3) (up to 2e-05 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "Python object mutation forbidden; use tl.store for output"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 24:14:\n    # Step 2: Compute local max for this partition\n    local_max = tl.max(x, 0)\n    # Step 3: All-gather local_max from all partitions into registers\n    # Each program instance computes its local_max and broadcasts it\n    # across SPLIT lanes for reduction (register only, no shared memory)\n    maxs = tl.full((SPLIT,), -float('inf'), dtype=tl.float32)\n    maxs = tl.where(tl.arange(0, SPLIT) == split_id, local_max, maxs)\n    # The following lines gather all local_max values for this row\n    # across SPLIT instances; since there is no inter-program comm,\n    # we simulate it by having each thread only access its own partition's max\n    # and then reduce over the register array (all maxs are -inf except one)\n    row_max = maxs[0]\n              ^\nunsupported tensor index: constexpr[0]"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "multi_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 16:11:\n    chunk = (N + SPLIT - 1) // SPLIT\n    col_start = split_id * chunk\n    col_end = min(col_start + chunk, N)\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = (col < col_end) & (col < N)\n    x_ptrs = X + row_id * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    # Local max for this partition\n    local_max = tl.max(x, 0)\n    # Gather both splits' local_max and compute row_max by arithmetic\n    max0 = tl.max(tl.where(split_id == 0, local_max, -float('inf')), 0)\n           ^"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 10:17:\ndef softmax_fused_blocked_vectorized_loop(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n    mask = offs < N\n    # Load row in vectorized chunks, accumulate max\n    vec_width = 4\n    max_val = -float('inf')\n    for i in range(0, RB, vec_width):\n        offs_v = offs[i:i+vec_width]\n                 ^\nunsupported tensor index: <triton.language.core.slice object at 0x1522fc932c30>"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 7:25:\ndef softmax_fused_blocked_vectorized_loop_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    max_val = -float('inf')\n    # Loop over row in vector chunks to compute row max\n    for start in range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width)\n                         ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 6:4:\ndef softmax_fused_blocked_vectorized_loop_fixed_v4(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 4\n    # First pass: compute row max in vectorized chunks\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 5,
+    "status": "timeout",
+    "error": "worker exceeded wall-time limit"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 6,
+    "status": "error",
+    "error": "at 6:4:\ndef softmax_fused_vectorized_double_buffer(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Pass 1: even vector chunks for row max\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 2 * vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 7,
+    "status": "error",
+    "error": "at 7:25:\ndef softmax_fused_vectorized_double_buffer_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Pass 1: even vector chunks for row max\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, 16):\n        offs_v = start + tl.arange(0, vec_width)\n                         ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 11,
+    "attempt": 8,
+    "status": "error",
+    "error": "at 6:4:\ndef softmax_fused_vectorized_double_buffer_fixed_v3(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Compute row max: process all even and odd chunks in one loop (stride 8)\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n    ^\nAssertionError('int32[] used as tl.static_range step value is not a constexpr')"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 5:11:\ndef softmax_split_reduce(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    chunk = BLOCK // 2\n    offs = tl.arange(0, chunk) + part * chunk\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 3,
+    "status": "proposal_error",
+    "error": "Python object mutation forbidden; use tl.store for output"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 4,
+    "status": "proposal_error",
+    "error": "forbidden construct: While"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 5,
+    "status": "proposal_error",
+    "error": "forbidden construct: While"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive make_block_ptr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400640 / 400653 (100.0%)\nGreatest absolute difference: 0.014774195849895477 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 0.1758943647146225 at index (403, 30) (up to 2e-05 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "unsupported Triton primitive barrier"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 23:14:\n    local_max = tl.max(x, 0)\n    # Reduce for global row max across all blocks\n    max_val = local_max\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        blk_ptrs = X + row * N + blk_col\n        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(blk_x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    # Broadcast max_val within block\n    max_val = tl.max(max_val, 0)\n              ^"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 18:14:\n    col = col_start + offs\n    mask = col < N\n    # 1. Compute row max (across all columns, blockwise)\n    max_val = -float('inf')\n    for b in range(num_blocks):\n        blk_col = b * BLOCK + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        blk_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, blk_max)\n    max_val = tl.max(max_val, 0)\n              ^"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 20:14:\n    mask = col < N\n    # --- Row-wise max: all tiles for this row must agree ---\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        tile_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, tile_max)\n    max_val = tl.max(max_val, 0)\n              ^"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 5,
+    "status": "error",
+    "error": "at 21:14:\n\n    # 1. Compute row max (across all columns, blockwise reduction)\n    max_val = -float('inf')\n    for t in range(num_tiles):\n        blk_col_start = t * tile_cols\n        blk_col = blk_col_start + offs\n        blk_mask = blk_col < N\n        x_ptrs = X + row * N + blk_col\n        x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))\n        block_max = tl.max(x_val, 0)\n        max_val = tl.maximum(max_val, block_max)\n    max_val = tl.max(max_val, 0)\n              ^"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 6,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 11,
+    "attempt": 7,
+    "status": "incorrect",
+    "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400653 / 400653 (100.0%)\nGreatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)\nGreatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 2,
+    "status": "error",
+    "error": "at 9:17:\ndef softmax_fused_blocked_multi_stage(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    # Stage 1: Parallel sub-block reduction for max\n    quarter = BLOCK // 4\n    mx0 = tl.max(x[:quarter], 0)\n                 ^\nunsupported tensor index: <triton.language.core.slice object at 0x1534196b4500>"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 3,
+    "status": "error",
+    "error": "at 9:11:\ndef softmax_fused_blocked_multi_stage(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    # Four sub-blocks: indices for each quarter\n    quarter = BLOCK // 4\n    idx0 = tl.arange(0, quarter)\n           ^\narange's arguments must be of type tl.constexpr"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 4,
+    "status": "error",
+    "error": "at 12:15:\ndef softmax_fused_blocked_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    # Load input with masking\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    # Parallel segmented max reduction (4 segments)\n    seg = 4\n    seg_size = BLOCK // seg\n    offs_full = tl.arange(0, BLOCK)\n    max_vals = tl.full((seg,), -float('inf'), dtype=tl.float32)\n               ^\nShape element 0 must have type `constexpr[int]`, got `constexpr[<class 'triton.language.core.tensor'>]"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 6,
+    "status": "proposal_error",
+    "error": "only tensor .to access allowed"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 7,
+    "status": "proposal_error",
+    "error": "only tensor .to access allowed"
+  },
+  {
+    "model": "strong",
+    "case": "softmax_irregular",
+    "variant": "single_knowledge",
+    "seed": 22,
+    "attempt": 8,
+    "status": "proposal_error",
+    "error": "only tensor .to access allowed"
+  }
+]

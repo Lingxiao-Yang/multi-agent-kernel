@@ -1,0 +1,43 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "partial_layernorm_rowwise_split",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          512,
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "final_layernorm_rowwise_split",
+        "grid": [
+          513
+        ],
+        "args": [
+          "S",
+          "W",
+          "B",
+          "X",
+          "Y",
+          781,
+          512,
+          2
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n# First stage: Each row is split into NSPLIT tiles of BLOCK=512. Only valid logical columns are processed.\n@triton.jit\ndef partial_layernorm_rowwise_split(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NSPLIT: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    start = split * BLOCK\n    # Compute valid cols for this split: covers [start, min(start+BLOCK,N))\n    cols = tl.arange(0, BLOCK) + start\n    mask = cols < N\n    x_ptrs = X + row * N + cols\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    part_sum = tl.sum(tl.where(mask, x, 0.0), 0)\n    part_sumsq = tl.sum(tl.where(mask, x * x, 0.0), 0)\n    # Store [sum, sumsq] for (row, split) at offset (row * NSPLIT + split) * 2\n    s_offset = (row * NSPLIT + split) * 2\n    tl.store(S + s_offset + 0, part_sum)\n    tl.store(S + s_offset + 1, part_sumsq)\n\n# Second stage: reduce splits, compute mean/var, normalize, affine-transform\n@triton.jit\ndef final_layernorm_rowwise_split(S, W, B, X, Y, N: tl.constexpr, BLOCK: tl.constexpr, NSPLIT: tl.constexpr):\n    row = tl.program_id(0)\n    total_sum = 0.0\n    total_sumsq = 0.0\n    for split in range(NSPLIT):\n        s_offset = (row * NSPLIT + split) * 2\n        total_sum += tl.load(S + s_offset + 0)\n        total_sumsq += tl.load(S + s_offset + 1)\n    mean = tl.div_rn(total_sum, N)\n    var = tl.div_rn(total_sumsq, N) - mean * mean\n    inv_std = tl.rsqrt(var + 1e-5)\n    n_tiles = (N + BLOCK - 1) // BLOCK\n    for tile in range(n_tiles):\n        start = tile * BLOCK\n        cols = tl.arange(0, BLOCK) + start\n        mask = cols < N\n        x_ptrs = X + row * N + cols\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        w = tl.load(W + cols, mask=mask, other=0.0)\n        b = tl.load(B + cols, mask=mask, other=0.0)\n        normed = (centered * inv_std) * w + b\n        y_ptrs = Y + row * N + cols\n        tl.store(y_ptrs, normed, mask=mask)\n",
+  "rationale": "This repairs the previous split-row decomposition by ensuring each split only covers its assigned logical columns, avoiding overlap or omission. NSPLIT=ceil(N/BLOCK)=2 for N=781, BLOCK=512. In the first kernel, each split processes cols [split*BLOCK, min((split+1)*BLOCK,N)), masking out-of-bounds columns. Both partial sum and sumsq are accumulated only over valid elements. In the second kernel, the reduction over splits now covers all logical columns exactly once, guaranteeing correct mean and variance for every row. The output normalization and affine transform are unchanged. This corrects the regular numerical error previously observed, which was caused by incorrect split coverage. All other reduction/masking/constexpr invariants and buffer indexing are preserved."
+}

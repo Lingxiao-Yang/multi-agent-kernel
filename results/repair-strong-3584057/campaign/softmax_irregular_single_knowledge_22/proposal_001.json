@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    x_ptrs = X + row * N + offs\n    # First, compute the row max with masking\n    x = tl.load(x_ptrs, col_mask, other=-float('inf'))\n    mx = tl.max(x, 0)\n    # Compute exp(x - mx) with masking\n    exp_x = tl.exp(x - mx) * col_mask\n    # Compute denom with masking\n    denom = tl.sum(exp_x, 0)\n    # Avoid division by zero\n    denom = tl.where(denom == 0, 1, denom)\n    y = exp_x / denom\n    # Store with masking\n    tl.store(Y + row * N + offs, y, col_mask)\n",
+  "rationale": "This proposal refines the fused softmax by explicitly zeroing the exponentials for out-of-bound columns, ensuring that padding does not contribute to the reduction or normalization. The masking logic is applied both to the exponential computation and the store, matching the contract requirement for correct reduction identities and output coverage. The division avoids division-by-zero, which may occur if a row is fully masked (edge case). All computation is kept within a single kernel, with a BLOCK-wide vector covering RB (the next power-of-two of N), and masking ensures correctness for irregular widths. No unnecessary code changes are made; all device logic is updated as required for correct softmax on irregular shapes."
+}

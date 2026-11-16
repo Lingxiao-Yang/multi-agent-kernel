@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_split_col_fixed",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_split_col_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    tile = RB // 2\n    offs = tl.arange(0, tile)\n    start = part * tile\n    cols = start + offs\n    col_mask = cols < N\n    x_ptr = X + row * N + cols\n    x = tl.load(x_ptr, col_mask, other=-float('inf'))\n    mx_local = tl.max(x, 0)\n    # compute global max by also loading other tile\n    other_start = (1 - part) * tile\n    other_cols = other_start + offs\n    other_col_mask = other_cols < N\n    x_ptr_other = X + row * N + other_cols\n    x_other = tl.load(x_ptr_other, other_col_mask, other=-float('inf'))\n    mx_other = tl.max(x_other, 0)\n    mx_total = tl.maximum(mx_local, mx_other)\n    x_shifted = x - mx_total\n    exp_x = tl.exp(x_shifted)\n    local_sum = tl.sum(exp_x, 0)\n    x_other_shifted = x_other - mx_total\n    exp_x_other = tl.exp(x_other_shifted)\n    other_sum = tl.sum(exp_x_other, 0)\n    denom = local_sum + other_sum\n    softmax = exp_x / denom\n    y_ptr = Y + row * N + cols\n    tl.store(y_ptr, softmax, col_mask)\n",
+  "rationale": "This kernel repairs the previous compilation error by making RB (the padded row block size) a tl.constexpr kernel argument and using tile = RB // 2 as a compile-time constant for tl.arange. Each row is split across two programs (grid [513,2]), each covering half the columns (tile). Each half computes its local max and sum, then explicitly loads the other half and recomputes max/sum for correct normalization. All loads and stores are masked with respect to N (irregular shape), ensuring correctness. This transformation increases intra-row parallelism and exercises segmented reduction, and now satisfies the Triton API constraints for tl.arange extent. The launch config only uses accepted scalar arguments (N, RB) and covers the full output domain."
+}

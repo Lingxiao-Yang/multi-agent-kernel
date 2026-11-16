@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "num_warps": 8,
+        "num_stages": 2,
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ]
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Warp-level max reduction over the tile\n    mx = tl.max(x, 0)\n    mx = tl.max_contiguous(mx)  # cross-lane warp max\n\n    # Broadcast max to all lanes\n    # Subtract max and exponentiate, mask padded elements to zero\n    exps = tl.where(mask, tl.exp(x - mx), 0.0)\n\n    # Warp-level sum reduction over exps\n    s = tl.sum(exps, 0)\n    s = tl.sum(s)  # cross-warp sum\n\n    # Normalize\n    y = tl.where(mask, exps / s, 0.0)\n\n    # Store result with mask\n    tl.store(Y + row * N + offs, y, mask)\n",
+  "rationale": "Implemented a single fused kernel softmax_fused that performs max reduction, exponentiation, sum reduction, and normalization in one launch to eliminate intermediate memory traffic and kernel launch overhead. Increased per-row parallelism to 8 warps and tile size RB=1024 to match padded width. Masked loads and stores with -inf for max and 0 for sum to handle irregular column count N=781. Used warp-level reductions and cross-warp communication to efficiently compute max and sum. This fusion and parallel decomposition better utilize GPU parallelism and memory bandwidth while preserving numerical correctness and stability."
+}

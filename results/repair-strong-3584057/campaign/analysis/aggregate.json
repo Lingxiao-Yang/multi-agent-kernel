@@ -1,0 +1,49 @@
+{
+  "n_runs": 16,
+  "evidence_type": "LLM-study",
+  "variant_geomeans": {
+    "single": 1.5855218911518194,
+    "single_knowledge": 1.8614073347712576,
+    "multi": 1.5564222200471332,
+    "multi_knowledge": 1.8796394499376388
+  },
+  "paired": {
+    "complete_pairs": 4,
+    "case_clusters": 2,
+    "bootstrap_seed": 42,
+    "resamples": 5000,
+    "effects": {
+      "roles_without_knowledge": {
+        "ratio": 0.9816466292473915,
+        "ci95": [
+          0.9775654947345382,
+          0.985744801655917
+        ]
+      },
+      "knowledge_single": {
+        "ratio": 1.174002923049532,
+        "ci95": [
+          0.9950661478187455,
+          1.38511682499715
+        ]
+      },
+      "roles_with_knowledge": {
+        "ratio": 1.0097948013988143,
+        "ci95": [
+          0.9971700381525989,
+          1.0225794016246068
+        ]
+      },
+      "interaction_ratio": {
+        "ratio": 1.028674444869233,
+        "ci95": [
+          1.0200544551988144,
+          1.0373672779271195
+        ]
+      }
+    },
+    "note": "Case-cluster bootstrap over paired log ratios; small-suite inference only."
+  },
+  "excluded_runs": [],
+  "excluded_incomplete_runs": 0
+}

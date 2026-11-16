@@ -1,0 +1,8 @@
+{
+  "status": "incorrect",
+  "error_type": "AssertionError",
+  "error": "validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 2052 / 400653 (0.5%)\nGreatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)",
+  "traceback": "Traceback (most recent call last):\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/kernel_study/worker.py\", line 16, in main\n    result = evaluate(read_json(args.request))\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/kernel_study/bench.py\", line 187, in evaluate\n    result[\"validation\"], result[\"first_launch_seconds\"] = validate(case, config, seeds, request.get(\"source\"))\n                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/kernel_study/bench.py\", line 160, in validate\n    raise AssertionError(f'validation seed={seed} edge={edge} nonfinite_outputs={nonfinite}/{actual.numel()}; '\nAssertionError: validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 2052 / 400653 (0.5%)\nGreatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)\nGreatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)\n",
+  "worker_seconds": 14.883685484528542,
+  "process_seconds": 17.076326726935804
+}

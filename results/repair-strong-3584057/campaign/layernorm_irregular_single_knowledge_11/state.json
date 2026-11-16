@@ -1,0 +1,1295 @@
+{
+  "incumbent": {
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_fused_row_parallel",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "Y",
+            "N",
+            1024
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/layernorm_irregular_single_knowledge_11/candidate_001.py",
+    "rationale": "This kernel fuses layernorm into a single pass, assigning each row to a program instance (grid=513). Each thread processes BLOCK=1024 columns and masks padding. Reductions (mean, variance) are correctly masked to avoid padded values contributing. The logic ensures correct output coverage and numerics for irregular row width (N=781), using the required epsilon and division-by-N. Data movement is minimized by loading weights/biases per row in parallel. No helper function calls or nonstandard primitives are used. This is a valid and optimized kernel under the contract.",
+    "id": 1,
+    "parent_id": 0,
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 2.384185791015625e-06
+        }
+      ],
+      "first_launch_seconds": 2.9692846424877644,
+      "validation_seconds": 5.064635308459401,
+      "candidate": {
+        "median_ms": 0.018739199638366698,
+        "p25_ms": 0.018534399569034576,
+        "p75_ms": 0.020428799837827683,
+        "min_ms": 0.01802240014076233,
+        "samples_ms": [
+          0.020787200331687926,
+          0.019148799777030944,
+          0.020582400262355804,
+          0.020275199413299562,
+          0.028774398565292358,
+          0.018636800348758698,
+          0.018636800348758698,
+          0.018636800348758698,
+          0.018739199638366698,
+          0.027136000990867614,
+          0.018534399569034576,
+          0.018739199638366698,
+          0.020684799551963805,
+          0.020275199413299562,
+          0.028672000765800475,
+          0.018739199638366698,
+          0.018432000279426576,
+          0.018534399569034576,
+          0.018636800348758698,
+          0.018432000279426576,
+          0.018636800348758698,
+          0.01966080069541931,
+          0.01935359984636307,
+          0.022015999257564544,
+          0.03061760067939758,
+          0.01802240014076233,
+          0.01812479943037033,
+          0.01802240014076233,
+          0.01955839991569519,
+          0.018534399569034576,
+          0.018329599499702455
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.03532800078392029,
+        "p25_ms": 0.034252800047397614,
+        "p75_ms": 0.04234240055084229,
+        "min_ms": 0.032358399033546446,
+        "samples_ms": [
+          0.034201601147651674,
+          0.045875200629234315,
+          0.045158401131629944,
+          0.03297280073165894,
+          0.03317759931087494,
+          0.03430399894714355,
+          0.03543039858341217,
+          0.04106239974498749,
+          0.04362240135669708,
+          0.03532800078392029,
+          0.03532800078392029,
+          0.045363199710845944,
+          0.04362240135669708,
+          0.03297280073165894,
+          0.032358399033546446,
+          0.03543039858341217,
+          0.034508800506591795,
+          0.04136959910392761,
+          0.04270080029964447,
+          0.034918400645256045,
+          0.03256320059299469,
+          0.04157440066337585,
+          0.04628480076789856,
+          0.03522560000419617,
+          0.035020801424980166,
+          0.03389439880847931,
+          0.034508800506591795,
+          0.0419840008020401,
+          0.043007999658584595,
+          0.0347135990858078,
+          0.03246079981327057
+        ]
+      },
+      "paired_speedup": 1.8852459798544237,
+      "confirmed": true,
+      "confirmation": {
+        "candidate": {
+          "median_ms": 0.019148799777030944,
+          "p25_ms": 0.018636800348758698,
+          "p75_ms": 0.02380800023674965,
+          "min_ms": 0.01822720021009445,
+          "samples_ms": [
+            0.02242559939622879,
+            0.028467199206352232,
+            0.018943999707698823,
+            0.019148799777030944,
+            0.02109439969062805,
+            0.018534399569034576,
+            0.02815999984741211,
+            0.018943999707698823,
+            0.01822720021009445,
+            0.018432000279426576,
+            0.018329599499702455,
+            0.025190401077270507,
+            0.018329599499702455,
+            0.01884160041809082,
+            0.020070399343967437,
+            0.020684799551963805,
+            0.02887679934501648,
+            0.026009601354599,
+            0.018432000279426576,
+            0.018636800348758698,
+            0.020275199413299562,
+            0.018636800348758698,
+            0.018739199638366698,
+            0.018636800348758698,
+            0.020479999482631683,
+            0.028672000765800475,
+            0.018739199638366698,
+            0.020787200331687926,
+            0.02805759906768799,
+            0.028262400627136232,
+            0.018636800348758698
+          ]
+        },
+        "incumbent": {
+          "median_ms": 0.03563520014286041,
+          "p25_ms": 0.034662400186061856,
+          "p75_ms": 0.043571199476718905,
+          "min_ms": 0.03256320059299469,
+          "samples_ms": [
+            0.045158401131629944,
+            0.03563520014286041,
+            0.03573760092258453,
+            0.04485119879245758,
+            0.04382719993591309,
+            0.03317759931087494,
+            0.03287039995193482,
+            0.04188160002231598,
+            0.034918400645256045,
+            0.03297280073165894,
+            0.04249599874019623,
+            0.0347135990858078,
+            0.03461120128631592,
+            0.04485119879245758,
+            0.043724799156188966,
+            0.03266560137271881,
+            0.03256320059299469,
+            0.034815999865531924,
+            0.034918400645256045,
+            0.043110400438308716,
+            0.043110400438308716,
+            0.035020801424980166,
+            0.04966399967670441,
+            0.04321280121803284,
+            0.04341759979724884,
+            0.05478399991989136,
+            0.06440960168838501,
+            0.03266560137271881,
+            0.03266560137271881,
+            0.034815999865531924,
+            0.034815999865531924
+          ]
+        }
+      },
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 171.37722325263144,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 5.368378381244838,
+      "process_seconds": 17.541089716367424,
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 32,
+            "spills": 0,
+            "shared_bytes": 2048,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      }
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_fused_row_parallel",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "ac71cdd20f1cd080a3445e8ba8887343d8ec59803c827b1672d8139fec639141",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel fuses layernorm into a single pass, assigning each row to a program instance (grid=513). Each thread processes BLOCK=1024 columns and masks padding. Reductions (mean, variance) are correctly masked to avoid padded values contributing. The logic ensures correct output coverage and numerics for irregular row width (N=781), using the required epsilon and division-by-N. Data movement is minimized by loading weights/biases per row in parallel. No helper function calls or nonstandard primitives are used. This is a valid and optimized kernel under the contract.",
+      "accepted": true,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.9692846424877644,
+        "validation_seconds": 5.064635308459401,
+        "candidate": {
+          "median_ms": 0.018739199638366698,
+          "p25_ms": 0.018534399569034576,
+          "p75_ms": 0.020428799837827683,
+          "min_ms": 0.01802240014076233
+        },
+        "incumbent": {
+          "median_ms": 0.03532800078392029,
+          "p25_ms": 0.034252800047397614,
+          "p75_ms": 0.04234240055084229,
+          "min_ms": 0.032358399033546446
+        },
+        "paired_speedup": 1.8852459798544237,
+        "confirmed": true,
+        "confirmation": {
+          "candidate": {
+            "median_ms": 0.019148799777030944,
+            "p25_ms": 0.018636800348758698,
+            "p75_ms": 0.02380800023674965,
+            "min_ms": 0.01822720021009445
+          },
+          "incumbent": {
+            "median_ms": 0.03563520014286041,
+            "p25_ms": 0.034662400186061856,
+            "p75_ms": 0.043571199476718905,
+            "min_ms": 0.03256320059299469
+          }
+        },
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 171.37722325263144,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 5.368378381244838,
+        "process_seconds": 17.541089716367424,
+        "profile": {
+          "mode": "compiler-resources",
+          "kernels": [
+            {
+              "registers_per_thread": 32,
+              "spills": 0,
+              "shared_bytes": 2048,
+              "num_warps": 4
+            }
+          ],
+          "hardware_counters": null,
+          "note": "No hardware-counter bottleneck claims."
+        }
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 11370,
+        "output_tokens": 1410,
+        "tokens": 12780
+      },
+      "review": {
+        "diagnosis": "Success. The fused row-parallel layernorm kernel is correct, confirmed much faster than the incumbent, and passes all masking and numerical invariants for this irregular shape (513, 781). Boundary masking, division by logical N, and epsilon usage are all correct. The performance gain is due to fusion, single-pass memory access, and efficient per-row parallel reduction.",
+        "outcome": "accept",
+        "next_step": "No further action required. This kernel is optimal under the current contract. Additional tuning (tile sizes, warps) could be explored in future attempts for even wider rows or very large batches."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 17188,
+        "output_tokens": 1543,
+        "tokens": 18731
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_split_row_vector",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              512
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "3011b713d63bb2d20b0cceb04d4915829e1bac977080c5a9c09640e2be4b6530",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This attempts a two-way split of each row: each row is processed by two separate program instances in parallel, each handling a BLOCK=512 column chunk, for grid=[ROWS,2]. Both splits independently compute the full-row mean/variance by loading both halves in turn, then only normalize and write their own region. This increases residency and may improve latency for wide or irregular rows, at the cost of extra redundant loads (full row loaded by both splits). No out-of-bounds store or reduction error is possible, as all loads/stores are masked and the mean/variance are always divided by the true N. This is a valid parallel decomposition and a meaningful change in data movement and computation structure.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.8624012265354395,
+        "validation_seconds": 3.4792050383985043,
+        "candidate": {
+          "median_ms": 0.020172800123691558,
+          "p25_ms": 0.019814399629831315,
+          "p75_ms": 0.022067199647426605,
+          "min_ms": 0.01966080069541931
+        },
+        "incumbent": {
+          "median_ms": 0.019865599274635316,
+          "p25_ms": 0.01966080069541931,
+          "p75_ms": 0.02227199971675873,
+          "min_ms": 0.01812479943037033
+        },
+        "paired_speedup": 0.984771531608274,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 159.19812719644946,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.616199543699622,
+        "process_seconds": 15.899570193141699
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 34440,
+        "output_tokens": 4337,
+        "tokens": 38777
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_split_row_vector_looped",
+              "grid": [
+                513,
+                2
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                512
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_split_row_vector_looped(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    cols = split * BLOCK + tl.arange(0, BLOCK)\n    offs = row * N + cols\n    mask = cols < N\n\n    # (1) Compute full-row mean and variance by strided loads for all splits, to avoid redundant loads of both halves by both splits\n    # Each split loads a BLOCK at a time, looping over the full row\n    num_splits = (N + BLOCK - 1) // BLOCK\n    sum_x = 0.0\n    sum_x2 = 0.0\n    for i in range(num_splits):\n        sub_cols = i * BLOCK + tl.arange(0, BLOCK)\n        sub_mask = sub_cols < N\n        sub_offs = row * N + sub_cols\n        sub_x = tl.load(X + sub_offs, mask=sub_mask, other=0.0)\n        sum_x += tl.sum(sub_x, axis=0)\n        sum_x2 += tl.sum(sub_x * sub_x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    var = tl.div_rn(sum_x2, N) - mean * mean\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # (2) Load and normalize only this split's BLOCK\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    x_centered = x - mean\n    y = (x_centered * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "The previous attempt redundantly loaded both halves of each row in both splits, which is wasteful for wide rows. This repair generalizes the reduction: each split, for every row, loops over all BLOCK-sized chunks of the row, accumulating the sum and sum of squares (with masking) to compute the true mean and variance. Only after these reductions does each split load and normalize its own region (BLOCK columns per split). This avoids excess memory traffic for rows wider than 2*BLOCK and is fully correct for all N. All loads and stores are masked; reductions divide by logical N, and epsilon is preserved. The mapping covers the full output, and all Triton API invariants are honored."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 42939,
+        "output_tokens": 5030,
+        "tokens": 47969
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_row_chunked_parallel",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "28f5414e7484ff06e8ef82edd42f370a473fb9997e6128743634d93959f9f83b",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel processes each row in smaller BLOCK=256 chunks, iterating over the row for mean and variance accumulation, then normalizes/writes in a third pass. This further reduces register pressure versus the incumbent's BLOCK=1024, increasing occupancy and improving cache locality. All loads and stores are masked at the row boundary, supporting arbitrary N. This chunked multi-sweep design is validated for masking, division by logical N, and epsilon for variance. The structure is a meaningful change in parallel decomposition and data movement, with a smaller working set per thread for improved performance on irregular or very wide rows.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.2116366727277637,
+        "validation_seconds": 3.838623064570129,
+        "candidate": {
+          "median_ms": 0.020684799551963805,
+          "p25_ms": 0.019046400487422944,
+          "p75_ms": 0.02252800017595291,
+          "min_ms": 0.01884160041809082
+        },
+        "incumbent": {
+          "median_ms": 0.01945600062608719,
+          "p25_ms": 0.018943999707698823,
+          "p75_ms": 0.021196800470352172,
+          "min_ms": 0.018739199638366698
+        },
+        "paired_speedup": 0.9405941100473486,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 155.25758380844954,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.964435144327581,
+        "process_seconds": 15.456373361870646
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 63571,
+        "output_tokens": 7091,
+        "tokens": 70662
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_strided_vector",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_strided_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    # Stride vectorization: each thread processes cols = lane + i*BLOCK for i in [0, num_iters)\n    # Covers entire row, using stride BLOCK\n    lane = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    var_acc = tl.zeros((), dtype=tl.float32)\n    # First pass: accumulate mean\n    for i in range(0, num_iters):\n        cols = i * BLOCK + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        mean_acc += tl.sum(x, axis=0)\n    mean = tl.div_rn(mean_acc, N)\n    # Second pass: accumulate variance\n    for i in range(0, num_iters):\n        cols = i * BLOCK + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        xc = x - mean\n        xc = tl.where(mask, xc, 0.0)\n        var_acc += tl.sum(xc * xc, axis=0)\n    var = tl.div_rn(var_acc, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Third pass: normalize and write output\n    for i in range(0, num_iters):\n        cols = i * BLOCK + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        w = tl.load(W + cols, mask=mask, other=0.0)\n        b = tl.load(B + cols, mask=mask, other=0.0)\n        xc = x - mean\n        y = (xc * inv_std) * w + b\n        tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "This kernel changes the row chunking to a strided vector approach: each thread processes a fixed lane and strides through the row in steps of BLOCK. This maximizes coalesced access and register reuse for wide or irregular rows. Vectorization is preserved, but each lane no longer processes contiguous columns, spreading memory accesses and potentially improving L2/L1 utilization for large N. The three-pass mean/variance/normalize structure is kept, with all reductions dividing by logical N and all loads/stores masked for boundary safety. This is a valid and meaningful change to parallel decomposition, data movement, and computation structure."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 72657,
+        "output_tokens": 7833,
+        "tokens": 80490
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_row_multiwarp",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 8,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "4f2cd23ebef34bb12ddfb27590a839a00fd15ca9aeb9ecd177841b3e67aa4793",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases the number of warps to 8 (from 4), and uses a strided-lane reduction: each lane (thread) processes a subset of columns in steps of BLOCK, accumulating mean and variance contributions. All loads and stores are masked for boundary safety. The parallel decomposition (strided lane/chunked) and multiwarp configuration meaningfully change the computation and data movement structure compared to the incumbent (single-block per row, 4 warps). This design reduces register pressure per thread, improves occupancy, and may increase memory throughput for irregular or wide rows. All reductions divide by logical N, epsilon is correctly used, and every output is written exactly once. The kernel covers the full output and reduction domain with valid masking and numerics.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 8:4:\ndef layernorm_row_multiwarp(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    lane = tl.arange(0, BLOCK)\n    # Per-lane accumulators for mean and variance\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    var_acc = tl.zeros((), dtype=tl.float32)\n    # Strided reduction for mean\n    for c in range(lane, N, BLOCK):\n    ^\nTypeError(\"For lower bound must be a scalar, got <['256'], int32>\")",
+        "worker_seconds": 11.150312397629023,
+        "process_seconds": 13.475203131325543
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 94746,
+        "output_tokens": 9957,
+        "tokens": 104703
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_multiwarp",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 8,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_multiwarp(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    lane = tl.arange(0, BLOCK)\n    # Each thread accumulates over a strided lane for mean and var\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    # First pass: mean\n    for start in range(0, N, BLOCK):\n        cols = start + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        mean_acc += tl.where(mask, x, 0.0)\n    # Reduce across lanes for mean\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # Second pass: variance\n    for start in range(0, N, BLOCK):\n        cols = start + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        xc = x - mean\n        xc = tl.where(mask, xc, 0.0)\n        var_acc += xc * xc\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Final pass: normalize and write\n    for start in range(0, N, BLOCK):\n        cols = start + lane\n        mask = cols < N\n        offs = row * N + cols\n        x = tl.load(X + offs, mask=mask, other=0.0)\n        w = tl.load(W + cols, mask=mask, other=0.0)\n        b = tl.load(B + cols, mask=mask, other=0.0)\n        xc = x - mean\n        y = (xc * inv_std) * w + b\n        tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "The previous attempt failed because the for-loop lower bound (lane) was not a compile-time scalar, violating Triton's loop requirements. This repair uses the correct idiom: each program instance (row) accumulates in a per-lane vector register (BLOCK-wide) using for-loops over chunks of BLOCK elements, with tl.arange(0, BLOCK) to construct the per-lane column indices. All accumulators are BLOCK-vectors, and reductions are performed over the axis=0 dimension for mean and variance, ensuring proper parallel reduction. All loads and stores are masked for boundary safety, reductions always divide by logical N, and epsilon is preserved for variance. This approach achieves the intended parallel decomposition and memory access pattern, increasing occupancy and reducing register pressure per thread compared to the incumbent."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 104154,
+        "output_tokens": 10719,
+        "tokens": 114873
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_row_strided_vector",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 8,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "2d8e23bacf100790ef6d2eb1321907b7666a0624e0b1150359a9ff30d95aeb42",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel repairs the previous proposal's compile error by using only compile-time scalars in for-loop bounds and replacing scalar accumulators with BLOCK-wide vectors. Each row is processed by a single program instance that executes three strided vector passes: mean, variance, and normalization, with all loads/stores masked for irregular row width. The approach reduces register pressure per thread, increases occupancy (8 warps), and maintains full output coverage for any N. The decomposition and memory access pattern meaningfully differ from the incumbent.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.800518501549959,
+        "validation_seconds": 3.458386749960482,
+        "candidate": {
+          "median_ms": 0.01935359984636307,
+          "p25_ms": 0.01884160041809082,
+          "p75_ms": 0.02094080001115799,
+          "min_ms": 0.018636800348758698
+        },
+        "incumbent": {
+          "median_ms": 0.019251200556755065,
+          "p25_ms": 0.018739199638366698,
+          "p75_ms": 0.02375679984688759,
+          "min_ms": 0.018636800348758698
+        },
+        "paired_speedup": 0.9947090313729284,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 165.93667459769767,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.592939884401858,
+        "process_seconds": 15.31547165568918
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 128650,
+        "output_tokens": 12820,
+        "tokens": 141470
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_split_blocks",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_split_blocks(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    cols = tl.arange(0, BLOCK) + split * BLOCK\n    mask = cols < N\n    offs = row * N + cols\n    # Compute mean and variance over whole row (all splits loop entire row)\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK):\n        idx = off + tl.arange(0, BLOCK)\n        mask_r = idx < N\n        offs_r = row * N + idx\n        x = tl.load(X + offs_r, mask=mask_r, other=0.0)\n        mean_acc += tl.where(mask_r, x, 0.0)\n    # Reduce to scalar mean\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.sum(mean, axis=0) # collapse to scalar\n    mean = tl.div_rn(mean, N)\n    for off in range(0, N, BLOCK):\n        idx = off + tl.arange(0, BLOCK)\n        mask_r = idx < N\n        offs_r = row * N + idx\n        x = tl.load(X + offs_r, mask=mask_r, other=0.0)\n        xc = x - mean\n        var_acc += tl.where(mask_r, xc * xc, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.sum(var, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Normalize and write only this split's BLOCK\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "This kernel splits each row across 4 program instances (grid=[513,4]), each processing a contiguous BLOCK=256 columns. All splits independently compute the row mean/variance by looping through all BLOCKs in the row, using vector accumulators and masking. This reduces per-thread register pressure and increases overall GPU occupancy versus a single instance per row. Each split only normalizes and writes its own region, so there are no redundant stores. All loads and stores are masked for irregular widths, and mean/variance are divided by logical N, preserving epsilon for variance. This is a meaningful change in decomposition, memory access, and computation structure compared to the incumbent (which processes the whole row in one program instance and larger BLOCKs), and covers all outputs and reductions."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 139010,
+        "output_tokens": 13614,
+        "tokens": 152624
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_row_split4_vector",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              196
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "ba63a70e42e49c6be4d1d004b21418a580ae244ea9d63d1124f1202bf6f18f81",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel splits each row across 4 program instances (grid=[513,4]), each handling a contiguous BLOCK=196 column chunk. Each split computes the full mean and variance by looping in a strided vectorized manner over every BLOCK in the row, accumulating contributions across all splits, and then only normalizes/writes its own region. All loads and stores are masked for out-of-bounds safety, and the reductions always divide by true N. Reducing BLOCK to 196 further increases occupancy and reduces per-thread register pressure versus larger blocks, which may benefit irregular/wide rows. This mapping increases parallelism, changes memory access patterns, and the strided accumulation reduces excess memory traffic for large N. The structure meaningfully changes computation, decomposition, and memory movement compared to the incumbent and prior attempts.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:11:\ndef layernorm_row_split4_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n           ^\narange's range must be a power of 2",
+        "worker_seconds": 12.098086486570537,
+        "process_seconds": 14.552053121849895
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 166073,
+        "output_tokens": 15987,
+        "tokens": 182060
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_split4_vector",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_split4_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk  # BLOCK must be a power of 2, here 256\n    mask = cols < N\n    offs = row * N + cols\n    # 1. Compute mean using vector accumulation (all splits cover full row collaboratively)\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for s in range(SPLITS):\n            bcols = off + s * BLOCK + tl.arange(0, BLOCK)\n            bmask = bcols < N\n            boffs = row * N + bcols\n            x = tl.load(X + boffs, mask=bmask, other=0.0)\n            mean_acc += tl.where(bmask, x, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # 2. Compute variance (masked)\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        for s in range(SPLITS):\n            bcols = off + s * BLOCK + tl.arange(0, BLOCK)\n            bmask = bcols < N\n            boffs = row * N + bcols\n            x = tl.load(X + boffs, mask=bmask, other=0.0)\n            xc = x - mean\n            var_acc += tl.where(bmask, xc * xc, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # 3. Normalize and write only this split's region\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "The previous attempt failed because tl.arange(0, BLOCK) required BLOCK to be a power of 2, but 196 is not. This repair sets BLOCK=256 (a power of 2) for Triton to generate the vector lanes correctly. All other logic is preserved: four splits per row, each handling a contiguous chunk; each split loops over all splits' regions for mean/variance accumulation, then only normalizes/writes its own chunk. All loads/stores are masked for out-of-bounds safety, and reductions are always over the true N. This change corrects the API usage error while maintaining the intended parallelism, data movement, and computation structure."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 177281,
+        "output_tokens": 16806,
+        "tokens": 194087
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_row_split4_vector",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "6633a8b789df15b2a056defde9c5d9a64b212ceb5e6a7546b0e2c0be8808b267",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The BLOCK is set to 256 (a power of two) to satisfy tl.arange API requirements and avoid compilation errors. Each row is split across 4 program instances. All splits collaboratively compute the mean and variance by looping over every BLOCK-sized chunk of the row, ensuring reductions are over the logical N and all accesses are masked for boundary safety. Only the program instance responsible for each chunk normalizes and writes its output region. This mapping increases parallelism, reduces register pressure per thread, and maintains correct memory access/masking and numerics. The structure is a meaningful change in computation, decomposition, and data movement.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.9314865432679653,
+        "validation_seconds": 3.5013162279501557,
+        "candidate": {
+          "median_ms": 0.020582400262355804,
+          "p25_ms": 0.020070399343967437,
+          "p75_ms": 0.025241600722074507,
+          "min_ms": 0.018329599499702455
+        },
+        "incumbent": {
+          "median_ms": 0.020275199413299562,
+          "p25_ms": 0.019763199985027312,
+          "p75_ms": 0.02232320010662079,
+          "min_ms": 0.01802240014076233
+        },
+        "paired_speedup": 0.9850745858043536,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 156.03000423005201,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.638138085603714,
+        "process_seconds": 16.46832208801061
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 207021,
+        "output_tokens": 19132,
+        "tokens": 226153
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_split4_vector_unroll",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_split4_vector_unroll(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n    mask = cols < N\n    offs = row * N + cols\n    # 1. Compute mean collaboratively: all splits cover full row by BLOCK*4 chunks, unrolled s loop\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        # Manual unroll for s in range(4)\n        bcols0 = off + 0 * BLOCK + tl.arange(0, BLOCK)\n        bmask0 = bcols0 < N\n        boffs0 = row * N + bcols0\n        x0 = tl.load(X + boffs0, mask=bmask0, other=0.0)\n        mean_acc += tl.where(bmask0, x0, 0.0)\n\n        bcols1 = off + 1 * BLOCK + tl.arange(0, BLOCK)\n        bmask1 = bcols1 < N\n        boffs1 = row * N + bcols1\n        x1 = tl.load(X + boffs1, mask=bmask1, other=0.0)\n        mean_acc += tl.where(bmask1, x1, 0.0)\n\n        bcols2 = off + 2 * BLOCK + tl.arange(0, BLOCK)\n        bmask2 = bcols2 < N\n        boffs2 = row * N + bcols2\n        x2 = tl.load(X + boffs2, mask=bmask2, other=0.0)\n        mean_acc += tl.where(bmask2, x2, 0.0)\n\n        bcols3 = off + 3 * BLOCK + tl.arange(0, BLOCK)\n        bmask3 = bcols3 < N\n        boffs3 = row * N + bcols3\n        x3 = tl.load(X + boffs3, mask=bmask3, other=0.0)\n        mean_acc += tl.where(bmask3, x3, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # 2. Compute variance collaboratively, manual unroll\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        bcols0 = off + 0 * BLOCK + tl.arange(0, BLOCK)\n        bmask0 = bcols0 < N\n        boffs0 = row * N + bcols0\n        x0 = tl.load(X + boffs0, mask=bmask0, other=0.0)\n        xc0 = x0 - mean\n        var_acc += tl.where(bmask0, xc0 * xc0, 0.0)\n\n        bcols1 = off + 1 * BLOCK + tl.arange(0, BLOCK)\n        bmask1 = bcols1 < N\n        boffs1 = row * N + bcols1\n        x1 = tl.load(X + boffs1, mask=bmask1, other=0.0)\n        xc1 = x1 - mean\n        var_acc += tl.where(bmask1, xc1 * xc1, 0.0)\n\n        bcols2 = off + 2 * BLOCK + tl.arange(0, BLOCK)\n        bmask2 = bcols2 < N\n        boffs2 = row * N + bcols2\n        x2 = tl.load(X + boffs2, mask=bmask2, other=0.0)\n        xc2 = x2 - mean\n        var_acc += tl.where(bmask2, xc2 * xc2, 0.0)\n\n        bcols3 = off + 3 * BLOCK + tl.arange(0, BLOCK)\n        bmask3 = bcols3 < N\n        boffs3 = row * N + bcols3\n        x3 = tl.load(X + boffs3, mask=bmask3, other=0.0)\n        xc3 = x3 - mean\n        var_acc += tl.where(bmask3, xc3 * xc3, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # 3. Normalize and write only this split's region\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "To reduce loop overhead and improve occupancy, this kernel unrolls the inner split loop for mean and variance accumulation, fusing four loads per outer iteration. This increases instruction-level parallelism and can better utilize memory bandwidth. Output coverage, masking, and reduction invariants are preserved. This transformation changes the memory access pattern and compute structure, compared to prior candidate kernels."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 219349,
+        "output_tokens": 20466,
+        "tokens": 239815
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 1,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_split4_interleaved_unroll",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "Y",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "a9364f71f6423a3f0014b5f04991ad02b4205399844efa7f313e2a29dac825ea",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 1,
+        "launches_after": 1,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This kernel increases instruction-level parallelism by interleaving reduction passes across splits: in each outer iteration, every split processes BLOCK elements from a different offset, unrolling the split loop to improve memory throughput. This distributes memory accesses and reduction contributions more evenly than chunked or contiguous approaches, potentially improving cache/bandwidth utilization. All loads and stores are masked for irregular N; reductions always divide by the true N; epsilon is preserved for variance; and each split only normalizes and writes its own region. The mapping covers all outputs and reductions as required.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.6800442514941096,
+        "validation_seconds": 3.323077374137938,
+        "candidate": {
+          "median_ms": 0.02222079932689667,
+          "p25_ms": 0.020479999482631683,
+          "p75_ms": 0.024217600375413893,
+          "min_ms": 0.020070399343967437
+        },
+        "incumbent": {
+          "median_ms": 0.02181120067834854,
+          "p25_ms": 0.020275199413299562,
+          "p75_ms": 0.022988799959421158,
+          "min_ms": 0.019968000054359437
+        },
+        "paired_speedup": 0.9815668805373559,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 144.5254940092432,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.462961073964834,
+        "process_seconds": 15.36057962384075
+      },
+      "cards": [
+        "K01",
+        "K04",
+        "K05",
+        "K06",
+        "K07",
+        "K09",
+        "K10",
+        "K12"
+      ],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 252479,
+        "output_tokens": 23413,
+        "tokens": 275892
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_row_blocked_unrolled",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "Y",
+                "N",
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_row_blocked_unrolled(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    split = tl.program_id(1)\n    SPLITS = 4\n    chunk = split * BLOCK\n    cols = tl.arange(0, BLOCK) + chunk\n    mask = cols < N\n    offs = row * N + cols\n    # 1. Mean computation: unroll the inner loop for ILP\n    mean_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        bcols0 = off + 0 * BLOCK + tl.arange(0, BLOCK)\n        bcols1 = off + 1 * BLOCK + tl.arange(0, BLOCK)\n        bcols2 = off + 2 * BLOCK + tl.arange(0, BLOCK)\n        bcols3 = off + 3 * BLOCK + tl.arange(0, BLOCK)\n        bmask0 = bcols0 < N\n        bmask1 = bcols1 < N\n        bmask2 = bcols2 < N\n        bmask3 = bcols3 < N\n        boffs0 = row * N + bcols0\n        boffs1 = row * N + bcols1\n        boffs2 = row * N + bcols2\n        boffs3 = row * N + bcols3\n        x0 = tl.load(X + boffs0, mask=bmask0, other=0.0)\n        x1 = tl.load(X + boffs1, mask=bmask1, other=0.0)\n        x2 = tl.load(X + boffs2, mask=bmask2, other=0.0)\n        x3 = tl.load(X + boffs3, mask=bmask3, other=0.0)\n        mean_acc += tl.where(bmask0, x0, 0.0)\n        mean_acc += tl.where(bmask1, x1, 0.0)\n        mean_acc += tl.where(bmask2, x2, 0.0)\n        mean_acc += tl.where(bmask3, x3, 0.0)\n    mean = tl.sum(mean_acc, axis=0)\n    mean = tl.div_rn(mean, N)\n    # 2. Variance computation: unroll the inner loop\n    var_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    for off in range(0, N, BLOCK * SPLITS):\n        bcols0 = off + 0 * BLOCK + tl.arange(0, BLOCK)\n        bcols1 = off + 1 * BLOCK + tl.arange(0, BLOCK)\n        bcols2 = off + 2 * BLOCK + tl.arange(0, BLOCK)\n        bcols3 = off + 3 * BLOCK + tl.arange(0, BLOCK)\n        bmask0 = bcols0 < N\n        bmask1 = bcols1 < N\n        bmask2 = bcols2 < N\n        bmask3 = bcols3 < N\n        boffs0 = row * N + bcols0\n        boffs1 = row * N + bcols1\n        boffs2 = row * N + bcols2\n        boffs3 = row * N + bcols3\n        x0 = tl.load(X + boffs0, mask=bmask0, other=0.0)\n        x1 = tl.load(X + boffs1, mask=bmask1, other=0.0)\n        x2 = tl.load(X + boffs2, mask=bmask2, other=0.0)\n        x3 = tl.load(X + boffs3, mask=bmask3, other=0.0)\n        xc0 = x0 - mean\n        xc1 = x1 - mean\n        xc2 = x2 - mean\n        xc3 = x3 - mean\n        var_acc += tl.where(bmask0, xc0 * xc0, 0.0)\n        var_acc += tl.where(bmask1, xc1 * xc1, 0.0)\n        var_acc += tl.where(bmask2, xc2 * xc2, 0.0)\n        var_acc += tl.where(bmask3, xc3 * xc3, 0.0)\n    var = tl.sum(var_acc, axis=0)\n    var = tl.div_rn(var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n    # 3. Normalize and write only this split's region\n    x = tl.load(X + offs, mask=mask, other=0.0)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    xc = x - mean\n    y = (xc * inv_std) * w + b\n    tl.store(Y + offs, y, mask=mask)\n",
+        "rationale": "The previous proposal (interleaved reduction with per-split offset) was slower than the incumbent, likely due to increased memory divergence and address computation overhead. This attempt instead unrolls the split loop for each reduction pass, so each split loads and accumulates four BLOCK-sized chunks per outer iteration, always in contiguous sections. This maximizes ILP and memory throughput by issuing four coalesced loads per loop, retains correct masking and reduction over logical N, and covers all outputs and reductions. This is a meaningful change in memory access and compute structure compared to both the incumbent and previous proposals."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 266131,
+        "output_tokens": 24766,
+        "tokens": 290897
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 266131,
+    "output_tokens": 24766,
+    "tokens": 290897
+  }
+}

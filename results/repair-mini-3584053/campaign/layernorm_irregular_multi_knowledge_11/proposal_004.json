@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_pipelined",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_pipelined(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    mean_acc = 0.0\n    var_acc = 0.0\n    count = 0.0\n\n    offs = tl.arange(0, BLOCK)  # constexpr\n\n    # --- Accumulate mean with software pipelining ---\n    # Initialize pipeline\n    block_start = 0\n    col = block_start + offs\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n\n    for block_start_next in range(BLOCK, N + BLOCK, BLOCK):\n        col_next = block_start_next + offs\n        mask_next = col_next < N\n        if block_start_next < N:\n            x_next = tl.load(X + row * N + col_next, mask_next, other=0.0)\n        else:\n            x_next = tl.zeros((BLOCK,), dtype=tl.float32)\n\n        mean_acc += tl.sum(tl.where(mask, x, 0.0), 0)\n        count += tl.sum(tl.where(mask, 1.0, 0.0), 0)\n\n        x = x_next\n        mask = mask_next\n\n    mean = mean_acc / count\n\n    # --- Accumulate variance with software pipelining ---\n    block_start = 0\n    col = block_start + offs\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n\n    for block_start_next in range(BLOCK, N + BLOCK, BLOCK):\n        col_next = block_start_next + offs\n        mask_next = col_next < N\n        if block_start_next < N:\n            x_next = tl.load(X + row * N + col_next, mask_next, other=0.0)\n        else:\n            x_next = tl.zeros((BLOCK,), dtype=tl.float32)\n\n        centered = tl.where(mask, x - mean, 0.0)\n        var_acc += tl.sum(centered * centered, 0)\n\n        x = x_next\n        mask = mask_next\n\n    var = var_acc / count\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # --- Normalize and store output with software pipelining ---\n    block_start = 0\n    col = block_start + offs\n    mask = col < N\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n\n    for block_start_next in range(BLOCK, N + BLOCK, BLOCK):\n        col_next = block_start_next + offs\n        mask_next = col_next < N\n        if block_start_next < N:\n            x_next = tl.load(X + row * N + col_next, mask_next, other=0.0)\n            w_next = tl.load(W + col_next, mask_next, other=0.0)\n            b_next = tl.load(B + col_next, mask_next, other=0.0)\n        else:\n            x_next = tl.zeros((BLOCK,), dtype=tl.float32)\n            w_next = tl.zeros((BLOCK,), dtype=tl.float32)\n            b_next = tl.zeros((BLOCK,), dtype=tl.float32)\n\n        y = (x - mean) * inv_std * w + b\n        tl.store(Y + row * N + col, y, mask)\n\n        x = x_next\n        w = w_next\n        b = b_next\n        mask = mask_next\n\n    # Store last block\n    y = (x - mean) * inv_std * w + b\n    tl.store(Y + row * N + col, y, mask)\n\n",
+  "rationale": "Reimplemented the fused layernorm kernel with explicit software pipelining over the three main passes: mean accumulation, variance accumulation, and normalization/store. Each pass loads the next BLOCK chunk while computing on the current chunk, overlapping memory loads and computation to improve latency hiding and throughput. This structural change goes beyond simply increasing num_stages; it pipelines data movement and arithmetic in all loops with masking to fully cover irregular row width N=781. The kernel launches with grid=513 (one per row), BLOCK=256 constexpr, num_warps=4, and num_stages=2. This design addresses prior review feedback requiring structural changes for num_stages>1 and should improve performance on NVIDIA A100 by better utilizing memory bandwidth and compute parallelism."
+}

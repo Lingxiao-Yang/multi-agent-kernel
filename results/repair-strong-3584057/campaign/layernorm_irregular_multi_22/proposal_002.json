@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_layernorm_rowwise",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_layernorm_rowwise(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    cols = tl.arange(0, BLOCK)\n    mask = cols < N\n    x_ptrs = X + row * N + cols\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    var = tl.sum(centered * centered, 0) / N\n    inv_std = tl.rsqrt(var + 1e-5)\n    w = tl.load(W + cols, mask=mask, other=0.0)\n    b = tl.load(B + cols, mask=mask, other=0.0)\n    normed = (centered * inv_std) * w + b\n    tl.store(Y + row * N + cols, normed, mask=mask)\n",
+  "rationale": "BLOCK is now passed as a tl.constexpr argument, allowing valid use of tl.arange(0, BLOCK). All memory operations and reductions use correct masking and normalization over N, ensuring correctness for the irregular row width. The single fused kernel covers all rows, performing layernorm and affine transformation in one pass, eliminating the need for intermediate scratch space."
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_blockloop",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_blockloop(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    mean = 0.0\n    var = 0.0\n    for off in range(0, N, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = offs < N\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask, other=0)\n        mean += tl.sum(x, 0)\n    mean = tl.div_rn(mean, N)\n    for off in range(0, N, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = offs < N\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask, other=0)\n        centered = tl.where(mask, x - mean, 0)\n        var += tl.sum(centered * centered, 0)\n    var = var / N\n    inv_std = tl.rsqrt(var + 1e-5)\n    for off in range(0, N, BLOCK):\n        offs = off + tl.arange(0, BLOCK)\n        mask = offs < N\n        x_ptrs = X + row * N + offs\n        x = tl.load(x_ptrs, mask, other=0)\n        centered = tl.where(mask, x - mean, 0)\n        w = tl.load(W + offs, mask, other=0)\n        b = tl.load(B + offs, mask, other=0)\n        y = (centered * inv_std) * w + b\n        y_ptrs = Y + row * N + offs\n        tl.store(y_ptrs, y, mask)\n",
+  "rationale": "This version processes each row in blocks of BLOCK=256 columns, looping over the entire row for mean, variance, and output computation. It reduces register pressure and improves occupancy for wider rows while still masking for boundaries and ensuring correct reduction identities. Each pass (mean, variance, apply) is tile-wise to fit in fast memory and registers, but all logic for a row is handled by a single program in the grid. This addresses concerns of register pressure (K04), correct reduction over irregular row widths (K06, K07), and avoids double launches (K05, K09)."
+}

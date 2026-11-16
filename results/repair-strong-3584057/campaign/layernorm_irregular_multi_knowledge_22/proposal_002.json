@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_multiwarp",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          1024
+        ],
+        "num_warps": 8,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_multiwarp(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row_id = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    x_ptr = X + row_id * N + offs\n    mask = offs < N\n\n    # Load input row, padding with 0 where out-of-bounds\n    x = tl.load(x_ptr, mask, other=0)\n    # Multi-warp: all threads in block participate in reduction\n    sum_x = tl.sum(x, 0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0)\n    sum_x2 = tl.sum(centered * centered, 0)\n    var = tl.div_rn(sum_x2, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Reload input and parameters\n    x = tl.load(x_ptr, mask, other=0)\n    w = tl.load(W + offs, mask, other=0)\n    b = tl.load(B + offs, mask, other=0)\n    norm = (x - mean) * inv_std\n    y = norm * w + b\n    tl.store(Y + row_id * N + offs, y, mask)\n",
+  "rationale": "This version modifies the parallel decomposition by increasing num_warps to 8, distributing reduction and normalization work across more warps per row. This enables multi-warp reductions (as supported by Triton primitives) and tests readiness for wider rows, per card K06. All masking, reloads, and numerics are preserved. The kernel structure changes to use more warps per row, altering the reduction context and intra-row parallelism while maintaining correct output and masking for N < BLOCK."
+}

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking, pad out-of-bounds with -inf for max reduction\n    x = tl.load(X + idx, col_mask, other=-float('inf'))\n\n    # Compute max per row reduction\n    mx = tl.max(x, 0)\n\n    # Compute exp(x - max) with masked values masked to zero\n    exp_x = tl.exp(x - mx) * col_mask\n\n    # Sum exp values for denominator\n    denom = tl.sum(exp_x, 0)\n\n    # Compute softmax output\n    out = exp_x / denom\n\n    # Store output with masking\n    tl.store(Y + idx, out, col_mask)\n",
+  "rationale": "Fuse the two-pass softmax into a single kernel to reduce global memory traffic and kernel launch overhead. Use explicit masking to handle irregular row sizes correctly by padding out-of-bound elements with -inf for max reduction and zero for exp sum, ensuring numerical correctness. Compute max and sum reductions per row in one pass, then write normalized softmax output directly. Use a BLOCK size of 1024 with masking to cover all 781 columns, ensuring full row coverage and correct masking for boundary elements."
+}

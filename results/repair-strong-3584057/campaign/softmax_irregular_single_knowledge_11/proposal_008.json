@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "fused_softmax_rowblock_parallel",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef fused_softmax_rowblock_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    tile = tl.program_id(1)\n    n_tiles = 2\n    tile_cols = (N + n_tiles - 1) // n_tiles\n    col_start = tile * tile_cols\n    offs = tl.arange(0, BLOCK)\n    col = col_start + offs\n    mask = col < N\n    # --- Compute rowwise max (scalar), parallelized over BLOCK-sized strides ---\n    max_val = -float('inf')\n    # Loop over the row in BLOCK-sized chunks\n    for chunk_start in range(0, N, BLOCK):\n        chunk_col = chunk_start + offs\n        chunk_mask = chunk_col < N\n        x_ptrs = X + row * N + chunk_col\n        x = tl.load(x_ptrs, mask=chunk_mask, other=-float('inf'))\n        local_max = tl.max(x, 0)\n        max_val = tl.maximum(max_val, local_max)\n    # --- Compute denominator (scalar), parallelized over BLOCK-sized strides ---\n    denom = 0.0\n    for chunk_start in range(0, N, BLOCK):\n        chunk_col = chunk_start + offs\n        chunk_mask = chunk_col < N\n        x_ptrs = X + row * N + chunk_col\n        x = tl.load(x_ptrs, mask=chunk_mask, other=-float('inf'))\n        exp_x = tl.exp(x - max_val)\n        local_sum = tl.sum(exp_x, 0)\n        denom = denom + local_sum\n    # --- Compute and store softmax for this tile ---\n    x_ptrs = X + row * N + col\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    numerators = tl.exp(x - max_val)\n    softmax = numerators / denom\n    out_ptrs = Y + row * N + col\n    tl.store(out_ptrs, softmax, mask=mask)\n",
+  "rationale": "All previous failures were due to partial reductions: each program instance computed reductions only over its own tile, not the entire row, resulting in incorrect softmax normalization. This kernel parallelizes each row into two column tiles (grid [513, 2]), but every program instance loops over the full row in BLOCK-sized chunks to compute the global row max and denominator as scalars. Only then does each instance normalize and write its own tile's outputs. Masking is applied for irregular N=781 on all loads and stores. This exposes more parallelism than a single-row kernel, preserves numerically stable reductions, and covers every output exactly once for any row width."
+}

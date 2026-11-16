@@ -1,0 +1,55 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats_blockwise",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "S_partial",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_stats_reduce",
+        "grid": [
+          513
+        ],
+        "args": [
+          "S_partial",
+          "S",
+          "N"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply_rowchunk",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_blockwise(X, S_partial, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    part_size = BLOCK // 2\n    offs = part * part_size + tl.arange(0, part_size)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    sum_x2 = tl.sum(x * x, axis=0)\n    tl.store(S_partial + row * 4 + part * 2 + 0, sum_x)\n    tl.store(S_partial + row * 4 + part * 2 + 1, sum_x2)\n\n@triton.jit\ndef layernorm_stats_reduce(S_partial, S, N: tl.constexpr):\n    row = tl.program_id(0)\n    sum0 = tl.load(S_partial + row * 4 + 0)\n    sumsq0 = tl.load(S_partial + row * 4 + 1)\n    sum1 = tl.load(S_partial + row * 4 + 2)\n    sumsq1 = tl.load(S_partial + row * 4 + 3)\n    total_sum = sum0 + sum1\n    total_sumsq = sumsq0 + sumsq1\n    mean = tl.div_rn(total_sum, N)\n    var = tl.div_rn(total_sumsq, N) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    chunk_size = BLOCK // 4\n    offs = chunk * chunk_size + tl.arange(0, chunk_size)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+  "rationale": "This attempts a true blockwise reduction for stats with a two-stage strategy: (1) Each row is split into 2 programs, each computing a partial sum/sum-of-squares for its half of the row and writing to S_partial; (2) A reduction kernel sums the two partials, computes mean/variance/inv, and stores to S. The apply kernel is parallelized as a 2D grid (row, chunk) so each program writes a contiguous chunk of a row, maximizing coalesced access and reuse of row stats. All reductions and loads/stores use correct masks, and all divisions are by logical N. This changes the decomposition and data movement for both stats and apply, not just constants or naming."
+}

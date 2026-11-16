@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_split_program_row",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024,
+          512
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_split_program_row(X, Y, N: tl.constexpr, BLOCK: tl.constexpr, HALF: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    col = tl.arange(0, HALF)\n    base = row * N + part * HALF\n    off = base + col\n    mask = (part * HALF + col) < N\n    # Load half-row\n    x = tl.load(X + off, mask=mask, other=-float('inf'))\n    # Each program computes local max for its half\n    local_max = tl.max(x, 0)\n    # Write local max to output buffer as workspace: first 4 floats per row\n    # layout: [max0, max1, sum0, sum1] for each row\n    max_ptr = Y + row * 4 + part\n    tl.store(max_ptr, local_max)\n    # Both programs read local maxes to compute full row max\n    max0 = tl.load(Y + row * 4 + 0)\n    max1 = tl.load(Y + row * 4 + 1)\n    row_max = tl.maximum(max0, max1)\n    # Center and exponentiate\n    x_centered = x - row_max\n    exp_x = tl.exp(x_centered)\n    local_sum = tl.sum(exp_x, 0)\n    sum_ptr = Y + row * 4 + (part + 2)\n    tl.store(sum_ptr, local_sum)\n    # Both programs read local sums for normalization\n    sum0 = tl.load(Y + row * 4 + 2)\n    sum1 = tl.load(Y + row * 4 + 3)\n    row_sum = sum0 + sum1\n    y = exp_x / row_sum\n    # Write output after workspace region (offset 513*4 floats)\n    out_base = 513 * 4\n    y_off = out_base + row * N + part * HALF + col\n    tl.store(Y + y_off, y, mask=mask)\n",
+  "rationale": "This kernel partitions each row into two programs (grid=[513,2]), each handling HALF=512 columns. Each program computes its local max and sum, writing these to the first four floats of the row in Y (used as workspace). Both programs then read both local maxes/sums to compute the global row max and sum for stable softmax normalization. All loads/stores are masked for correct handling of the irregular tail (N=781). The output is written after the workspace region. This changes both the parallel decomposition (multiple programs per row) and the reduction structure (partial reductions with explicit workspace communication), directly addressing prior API and reduction structure errors."
+}

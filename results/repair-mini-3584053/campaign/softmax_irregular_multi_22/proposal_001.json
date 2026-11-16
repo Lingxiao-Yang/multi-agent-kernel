@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          393
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400653,
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    x = tl.load(X + row * N + col, col < N, other=-float('inf'))\n    mx = tl.max(x, 0)\n    denom = tl.sum(tl.exp(x - mx), 0)\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = i // N\n    mask = i < TOTAL\n    x = tl.load(X + i, mask, other=0)\n    mx = tl.load(S + row * 2, mask, other=0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1)\n    val = tl.exp(x - mx) / denom\n    tl.store(Y + i, val, mask)\n",
+  "rationale": "Changed softmax_apply BLOCK size to 1024 to unify with softmax_stats. Adjusted grid size to 393=(400653+1024-1)//1024. Added masking on loads and stores with i<TOTAL to avoid out-of-bounds. This enables full-row vectorized loads and stores, reduces divergence and control flow overhead, and aligns kernel launch configuration with padded row size RB=1024."
+}

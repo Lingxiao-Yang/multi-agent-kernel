@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n    ptr = row * N + col\n    mask = col < N\n\n    # Load with masking; out-of-bounds elements get -inf\n    x = tl.load(X + ptr, mask, other=-float('inf'))\n\n    # Two-stage max reduction using masking instead of slicing\n    half = BLOCK // 2\n    mask1 = offs < half\n    mask2 = ~mask1\n\n    x1 = tl.where(mask1, x, -float('inf'))\n    x2 = tl.where(mask2, x, -float('inf'))\n\n    mx1 = tl.max(x1, 0)\n    mx2 = tl.max(x2, 0)\n    mx = tl.maximum(mx1, mx2)\n\n    # Compute exp(x - max) with masking\n    exps = tl.exp(x - mx) * mask\n\n    # Two-stage sum reduction using masking\n    exps1 = tl.where(mask1, exps, 0.0)\n    exps2 = tl.where(mask2, exps, 0.0)\n\n    sum1 = tl.sum(exps1, 0)\n    sum2 = tl.sum(exps2, 0)\n    denom = sum1 + sum2\n\n    # Normalize\n    y = exps / denom\n\n    # Store output with masking\n    tl.store(Y + ptr, y, mask)\n",
+  "rationale": "Repaired compilation error by replacing unsupported tensor slicing with masking and tl.where to partition input vectors for two-stage reductions. This ensures compatibility with Triton's indexing rules and preserves numerical stability. Retains increased num_warps=8 and num_stages=2 for improved GPU occupancy and pipeline depth on A100. Masking ensures correctness with irregular width N=781 and stable softmax numerics."
+}

@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_vectorized_double_buffer_fixed_v3",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_vectorized_double_buffer_fixed_v3(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    vec_width = 8\n    # Compute row max: process all even and odd chunks in one loop (stride 8)\n    max_val = -float('inf')\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        mx_v = tl.max(x_v, 0)\n        max_val = tl.maximum(max_val, mx_v)\n    # Sum of exp(x - max)\n    sum_exp = 0.0\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1.0, sum_exp)\n    inv_denom = 1.0 / denom\n    # Normalize and store\n    for start in tl.static_range(0, RB, vec_width):\n        offs_v = start + tl.arange(0, vec_width, 1)\n        mask_v = offs_v < N\n        idx_v = row * N + offs_v\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x * inv_denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+  "rationale": "This version fuses the even/odd chunking into a single vectorized loop (stride 8) per pass, reducing code complexity and improving L1/L2 access regularity. All memory accesses and reductions are vectorized, and every access is masked for ragged N. This eliminates the need for interleaved passes, potentially reducing code size and improving register usage. It retains all correctness invariants: reduction identities, output coverage, masking, and constexpr loop extents for Triton. This approach increases memory-level parallelism compared to the scalar baseline and prior attempts with excessive loop trip counts."
+}

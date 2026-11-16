@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row_id = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    x_ptr = X + row_id * N + offs\n    mask = offs < N\n\n    # Load input row, padding with 0 where out-of-bounds\n    x = tl.load(x_ptr, mask, other=0)\n    # Compute mean\n    mean = tl.div_rn(tl.sum(x, 0), N)\n    # Centered vector, mask out-of-bounds\n    centered = tl.where(mask, x - mean, 0)\n    # Variance: sum of squares divided by N\n    var = tl.sum(centered * centered, 0) / N\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Reload input row for numerics (preserve original x)\n    x = tl.load(x_ptr, mask, other=0)\n    # Load weight and bias for the row's columns\n    w = tl.load(W + offs, mask, other=0)\n    b = tl.load(B + offs, mask, other=0)\n    # Apply normalization only for in-bounds columns\n    norm = (x - mean) * inv_std\n    y = norm * w + b\n    tl.store(Y + row_id * N + offs, y, mask)\n",
+  "rationale": "This fuses the stats (mean/inv-std) and normalization into a single kernel per row, eliminating intermediate S and its memory traffic. Each program computes statistics and applies normalization for its row using BLOCK=1024 and appropriate masking for N=781. Data movement is reduced (no intermediate stats in global memory), and computation is changed to perform two passes over the row (input reload for numerics). Launch grid covers every row, and all boundary masking and normalization numerics are preserved."
+}

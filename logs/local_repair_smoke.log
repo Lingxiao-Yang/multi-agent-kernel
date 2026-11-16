@@ -1,3 +1,4 @@
 softmax_irregular multi 11 complete 1.0 0.051850400000000005
 softmax_irregular single_knowledge 11 complete 1.0 0.09960240000000001
 softmax_irregular multi_knowledge 11 complete 1.90030999789358 0.14747720000000003
+softmax_irregular single 11 complete 1.0 0.20543760000000005

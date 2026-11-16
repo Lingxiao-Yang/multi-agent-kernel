@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking, pad out-of-bounds with -inf for max reduction\n    x = tl.load(X + idx, col_mask, other=-float('inf'))\n\n    half = BLOCK // 2\n    left_mask = offs < half\n    right_mask = ~left_mask\n\n    # Mask values outside half for max reduction\n    x_left = tl.where(left_mask, x, -float('inf'))\n    x_right = tl.where(right_mask, x, -float('inf'))\n    max_left = tl.max(x_left, 0)\n    max_right = tl.max(x_right, 0)\n    mx = tl.maximum(max_left, max_right)\n\n    # Broadcast max to all lanes\n    mx_broadcast = tl.broadcast_to(mx, (BLOCK,))\n\n    # Compute exp(x - max) with masking\n    exp_x = tl.exp(x - mx_broadcast) * col_mask\n\n    # Two-stage sum reduction for denominator with masking\n    exp_left = tl.where(left_mask, exp_x, 0.0)\n    exp_right = tl.where(right_mask, exp_x, 0.0)\n    sum_left = tl.sum(exp_left, 0)\n    sum_right = tl.sum(exp_right, 0)\n    denom = sum_left + sum_right\n\n    # Broadcast denom to all lanes\n    denom_broadcast = tl.broadcast_to(denom, (BLOCK,))\n\n    # Compute output\n    out = exp_x / denom_broadcast\n\n    # Store output with masking\n    tl.store(Y + idx, out, col_mask)\n",
+  "rationale": "Repaired previous compilation error by replacing unsupported slicing of Triton tensors with element-wise masking using tl.where to select halves for the two-stage max and sum reductions. This respects Triton's API and preserves the two-stage reduction strategy to reduce register pressure and improve instruction-level parallelism. Masking is carefully applied to maintain correctness for irregular row sizes. The launch configuration with num_warps=8 and num_stages=2 is retained to improve resource utilization and latency hiding."
+}

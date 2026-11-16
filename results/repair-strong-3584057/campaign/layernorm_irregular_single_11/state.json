@@ -1,0 +1,1245 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/layernorm_irregular_single_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.209466845728457,
+      "validation_seconds": 1.9836739022284746,
+      "candidate": {
+        "median_ms": 0.03522560000419617,
+        "p25_ms": 0.033894398808479304,
+        "p75_ms": 0.04264959990978241,
+        "min_ms": 0.03246079981327057,
+        "samples_ms": [
+          0.046079999208450316,
+          0.03348479866981506,
+          0.034918400645256045,
+          0.04433920085430145,
+          0.03297280073165894,
+          0.035123199224472046,
+          0.043110400438308716,
+          0.03297280073165894,
+          0.040140798687934874,
+          0.043110400438308716,
+          0.034815999865531924,
+          0.04188160002231598,
+          0.03256320059299469,
+          0.06451200246810913,
+          0.03246079981327057,
+          0.035020801424980166,
+          0.04249599874019623,
+          0.03246079981327057,
+          0.040345600247383116,
+          0.042803201079368594,
+          0.03430399894714355,
+          0.034815999865531924,
+          0.03297280073165894,
+          0.03522560000419617,
+          0.04464640021324158,
+          0.03522560000419617,
+          0.037785598635673524,
+          0.043110400438308716,
+          0.03266560137271881,
+          0.034508800506591795,
+          0.04085760116577149
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.0347135990858078,
+        "p25_ms": 0.03292160034179688,
+        "p75_ms": 0.04264959990978241,
+        "min_ms": 0.031744000315666196,
+        "samples_ms": [
+          0.031744000315666196,
+          0.04392960071563721,
+          0.04044800102710724,
+          0.0347135990858078,
+          0.03758080005645752,
+          0.03256320059299469,
+          0.034508800506591795,
+          0.04382719993591309,
+          0.03287039995193482,
+          0.034201601147651674,
+          0.045363199710845944,
+          0.03246079981327057,
+          0.06502400040626526,
+          0.03297280073165894,
+          0.03932160139083862,
+          0.03338240087032318,
+          0.035020801424980166,
+          0.0449535995721817,
+          0.03246079981327057,
+          0.034508800506591795,
+          0.043007999658584595,
+          0.03256320059299469,
+          0.0347135990858078,
+          0.04433920085430145,
+          0.032358399033546446,
+          0.043315199017524716,
+          0.04177919924259186,
+          0.03430399894714355,
+          0.04229120016098022,
+          0.03225600123405457,
+          0.03389439880847931
+        ]
+      },
+      "paired_speedup": 0.9854650902091838,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.030105599761009218,
+        "p25_ms": 0.029900801181793214,
+        "p75_ms": 0.03031040132045746,
+        "min_ms": 0.02969599962234497,
+        "samples_ms": [
+          0.030003198981285097,
+          0.029900801181793214,
+          0.030105599761009218,
+          0.029798400402069092,
+          0.030105599761009218,
+          0.029798400402069092,
+          0.03409920036792755,
+          0.02969599962234497,
+          0.030105599761009218,
+          0.029900801181793214,
+          0.03031040132045746,
+          0.030105599761009218,
+          0.03031040132045746,
+          0.029900801181793214,
+          0.030105599761009218,
+          0.030003198981285097,
+          0.03020800054073334,
+          0.029900801181793214,
+          0.030003198981285097,
+          0.030003198981285097,
+          0.034406399726867674,
+          0.029900801181793214,
+          0.03020800054073334,
+          0.029798400402069092,
+          0.036556801199913024,
+          0.029900801181793214,
+          0.031027200818061828,
+          0.03614720106124878,
+          0.03041279911994934,
+          0.03133440017700195,
+          0.030105599761009218
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 2.3466534912586212e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 91.16869548332579,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.1977865900844336,
+      "process_seconds": 15.540544396266341
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "invalid argument symbol or integer"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10421,
+        "output_tokens": 2798,
+        "tokens": 13219
+      },
+      "review": {
+        "diagnosis": "The previous attempt failed with 'invalid argument symbol or integer'. The error is due to the inclusion of the S_partial buffer and its incorrect argument usage in the config and kernels. The launch contract only defines S, not S_partial, as a valid workspace buffer. The proposal also incorrectly tried to use a two-stage reduction with a workspace buffer that does not exist, violating the input contract.",
+        "outcome": "The proposal is not executable due to invalid buffer arguments and violates the workspace contract. This results in a proposal_error and no performance or correctness measurement.",
+        "next_step": "In the next implement attempt, return to a single-stage stats kernel using only provided buffers (X, S, etc.), performing all reductions within a single program. If apply is split row-wise (grid [513, 4]), ensure that all arguments and buffer usage match the contract and each kernel instance covers a unique chunk of the output. Avoid introducing non-contract workspace buffers."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15967,
+        "output_tokens": 2999,
+        "tokens": 18966
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_rowwise",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_rowchunk",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "c1b61fd5833e7aa8731da47c2740c285ba011219dacf581ec4f3470ffc358569",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implementation repairs the prior workspace buffer violation by removing S_partial and using only legal contract buffers. The stats kernel (layernorm_stats_rowwise) computes per-row mean and variance in a single kernel, masking for irregular N, using BLOCK=1024 for vectorization. The apply kernel (layernorm_apply_rowchunk) splits each row into 4 contiguous chunks (grid [513,4]), so each program instance processes a unique chunk, ensuring full output coverage and coalesced memory access. All computation and data movement are performed in device-side logic, with correct masking and output overwriting in every invocation.",
+      "accepted": false,
+      "previous_failure_attempt": 1,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 6:32:\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    CHUNKS = 4\n    chunk_size = BLOCK // CHUNKS\n    offs = chunk * chunk_size + tl.arange(0, chunk_size)\n                                ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 13.224763759411871,
+        "process_seconds": 15.473779486492276
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30302,
+        "output_tokens": 5259,
+        "tokens": 35561
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats_rowwise",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_rowchunk",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    chunk_start = chunk * CHUNK\n    offs = chunk_start + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "The previous failure was due to using a runtime variable (chunk_size = BLOCK // CHUNKS) in tl.arange, which requires a compile-time constant. To fix this, set CHUNK=256 (BLOCK=1024 split into 4, matching grid [513,4]) as a kernel constexpr argument. Each row is split into four contiguous chunks, each of size 256, and each kernel instance processes one such chunk, using tl.arange(0, CHUNK). All masking and pointer math is correct for irregular N. The stats kernel is unchanged and remains correct; only the apply kernel is repaired to comply with Triton's constexpr rules."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37161,
+        "output_tokens": 5999,
+        "tokens": 43160
+      }
+    },
+    {
+      "attempt": 3,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_rowwise",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_rowchunk",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "64567c6823ccfcebadb00ce32f694e26d035ccc15ffd3693253b5bc9ad74ba64",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This proposal repairs the previous constexpr violation in the apply kernel by introducing CHUNK=256 as a compile-time argument, so each row is split into 4 contiguous chunks (matching grid [513,4]). Each program instance covers a unique chunk of the row, using only compile-time constants in tl.arange. The stats kernel is unchanged and correctly computes the mean and variance per row with proper masking for irregular N (781 < 1024). All loads/stores in both kernels are masked to ensure correctness for irregular row shapes, and every output is written exactly once. This approach increases parallelism, maximizes coalesced memory access, and is fully contract-compliant.",
+      "accepted": false,
+      "previous_failure_attempt": 2,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.4187792018055916,
+        "validation_seconds": 3.3371123978868127,
+        "candidate": {
+          "median_ms": 0.03461120128631592,
+          "p25_ms": 0.03333120048046112,
+          "p75_ms": 0.04264959990978241,
+          "min_ms": 0.032358399033546446
+        },
+        "incumbent": {
+          "median_ms": 0.034918400645256045,
+          "p25_ms": 0.034252800047397614,
+          "p75_ms": 0.042444799840450284,
+          "min_ms": 0.03246079981327057
+        },
+        "paired_speedup": 1.00887572079336,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 92.78707125573553,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 3.6382663156837225,
+        "process_seconds": 15.379336196929216
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 52568,
+        "output_tokens": 8256,
+        "tokens": 60824
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats_rowwise",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_rowchunk",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "This structure keeps the stats kernel as a single-row reduction with correct masking for irregular row width (N=781, BLOCK=1024). The apply kernel splits each row into 4 contiguous column chunks (CHUNK=256, grid [513,4]), using only compile-time constants for tl.arange. All loads, stores, and math are correctly masked for irregular size. This increases parallelism and ensures full output coverage with fully contract-compliant device logic."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 60050,
+        "output_tokens": 8980,
+        "tokens": 69030
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_rowwise",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_rowchunk_fused",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "c5a837ddea671e036e8f509267cf3b4d2a204d688c3796f41e4830e9b8bd5c6f",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This proposal algebraically fuses the scale and shift computation in the apply kernel: (x - mean) * inv * w + b is rewritten as x * (inv * w) + (b - mean * inv * w). This reduces arithmetic instructions and register pressure for each output element. The stats kernel remains unchanged, ensuring correct per-row mean and variance with masking for irregular N. Both kernels use only legal contract buffers and compile-time constants in tl.arange, and all loads and stores are masked for correct output. This fusion should improve throughput by reducing the number of arithmetic operations and improving register reuse, while maintaining correct output for all elements.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 13851 / 400653 (3.5%)\nGreatest absolute difference: 0.00012198835611343384 at index (0, 733) (up to 2e-05 allowed)\nGreatest relative difference: 18.855627059936523 at index (0, 594) (up to 0.0002 allowed)",
+        "worker_seconds": 15.217744430527091,
+        "process_seconds": 17.517955489456654
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 77885,
+        "output_tokens": 11332,
+        "tokens": 89217
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats_rowwise",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_rowchunk",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "The previous attempt failed due to a numerical error introduced by the fused algebraic rewrite in the apply kernel, which led to relative/absolute tolerance violations. This implementation repairs the kernel by reverting to the original, more numerically stable computation: (x - mean) * inv * w + b. The stats kernel remains unchanged and correct. All masking, shape, and constexpr invariants are maintained. Each output element is written once, and no illegal contract usage or shape violation remains. This ensures full numerical correctness while preserving parallel coverage and vectorization."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 85967,
+        "output_tokens": 12073,
+        "tokens": 98040
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_rowwise",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_rowchunk",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "64567c6823ccfcebadb00ce32f694e26d035ccc15ffd3693253b5bc9ad74ba64",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The previous failure was due to a numerically unstable fusion in the apply kernel. This implementation repairs that by reverting to the canonical layernorm: (x - mean) * inv * w + b. The stats kernel remains a single-row masked reduction, fully contract-compliant and correct for irregular N. The apply kernel splits each row into 4 contiguous column chunks (CHUNK=256, grid [513,4]), with all loads and stores masked for correct bounds. All tl.arange extents are compile-time constants, and every output is written exactly once. This structure is numerically robust and covers the full output space efficiently.",
+      "accepted": false,
+      "previous_failure_attempt": 4,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 1.1846491722390056,
+        "validation_seconds": 2.0067894188687205,
+        "candidate": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03368959873914719,
+          "p75_ms": 0.043110400438308716,
+          "min_ms": 0.032358399033546446
+        },
+        "incumbent": {
+          "median_ms": 0.034918400645256045,
+          "p25_ms": 0.03374079912900925,
+          "p75_ms": 0.0434688001871109,
+          "min_ms": 0.032767999172210696
+        },
+        "paired_speedup": 0.9941691365326053,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 91.43449545912694,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 2.30416436586529,
+        "process_seconds": 14.348399372771382
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 105659,
+        "output_tokens": 14304,
+        "tokens": 119963
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats_rowwise",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_rowchunk",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "The incumbent handles stats and application in different parallel layouts, but the apply kernel is memory bound and underutilizes parallelism for irregular N. This proposal preserves the numerically stable computation (x - mean) * inv * w + b, but increases output parallelism by splitting each row into 4 column chunks (CHUNK=256, grid [513,4]). All loads/stores are masked for N=781, with compile-time block sizes. The stats kernel is retained as a single-row reduction with correct masking. This structure ensures full output coverage, correct masking, and maximal parallel throughput. No unnecessary recalc or contract violations are introduced."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 114551,
+        "output_tokens": 15066,
+        "tokens": 129617
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_split",
+            "grid": [
+              513,
+              8
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              98
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "97cc0cee0c729dcc665425401132880cf5109ed84bbdd6b6c04cef5c06ca2a4f",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implementation increases parallelism in the memory-bound apply kernel by splitting each row into 8 column chunks (CHUNK=98), giving a [513,8] grid. Each kernel instance writes only a fraction of a row; masking is used for irregular N=781. This maximizes concurrent output programs and SM occupancy for this irregular shape. All pointer math and masking is updated for chunked coverage. The stats kernel remains a single-row reduction with correct masking. This structure increases parallel throughput, maintains correct coverage, and leverages more of the GPU's available parallelism for this case.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 4:27:\ndef layernorm_apply_split(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n                           ^\narange's range must be a power of 2",
+        "worker_seconds": 12.228596428409219,
+        "process_seconds": 14.487969347275794
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 136552,
+        "output_tokens": 17228,
+        "tokens": 153780
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_rowchunk",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    y = (x - mean) * inv * w + b\n    tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "The previous attempt failed because tl.arange's extent (CHUNK=98) was not a power of two, violating Triton's requirement. This proposal repairs the apply kernel by splitting each row into 4 column chunks of size 256 (CHUNK=256, a power of two), matching grid [513,4] and covering all N=781 columns via masking. All pointer math and masking is correct for N=781. The stats kernel remains unchanged as a per-row masked reduction. This structure ensures maximal parallelism, correct output coverage for irregular N, and only uses legal compile-time constants in tl.arange, fixing the previous compilation error."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 145871,
+        "output_tokens": 17985,
+        "tokens": 163856
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_chunked",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "59f934df56ff98e924202ea0ec24801eb30caeb1f328edeb47f49bfe131b22fb",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implementation repairs the previous failure by ensuring the chunk size for tl.arange is a power of two (CHUNK=256), as required by Triton. The apply kernel splits each row into 4 contiguous chunks (grid [513,4]), with correct pointer math and masking for the irregular N=781. Every output element is written exactly once, all loads and stores are masked, and only allowed primitives are used. The stats kernel remains a single-row masked reduction and is unchanged. This ensures full output coverage, maximal parallelism, and contract compliance.",
+      "accepted": false,
+      "previous_failure_attempt": 6,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 2.8985320888459682,
+        "validation_seconds": 3.7711265152320266,
+        "candidate": {
+          "median_ms": 0.035123199224472046,
+          "p25_ms": 0.03256320059299469,
+          "p75_ms": 0.043008001148700715,
+          "min_ms": 0.031948798894882204
+        },
+        "incumbent": {
+          "median_ms": 0.03522560000419617,
+          "p25_ms": 0.03353599905967712,
+          "p75_ms": 0.042035201191902155,
+          "min_ms": 0.032051199674606325
+        },
+        "paired_speedup": 1.002915474159107,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 91.43449545912694,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.075795685872436,
+        "process_seconds": 15.854237692430615
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 169825,
+        "output_tokens": 20230,
+        "tokens": 190055
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_chunked_unroll",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_chunked_unroll(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    # Unroll vectorized computation for each chunk\n    for i in range(0, CHUNK, 64):\n        idx = offs + i\n        submask = (idx < N) & mask\n        x = tl.load(x_ptrs + i, mask=submask, other=0.0)\n        w = tl.load(w_ptrs + i, mask=submask, other=0.0)\n        b = tl.load(b_ptrs + i, mask=submask, other=0.0)\n        y = (x - mean) * inv * w + b\n        tl.store(y_ptrs + i, y, mask=submask)\n",
+        "rationale": "The previous implementation already provided high parallel coverage, but the memory-bound apply kernel can benefit from explicit loop unrolling within each chunk to increase instruction-level parallelism and improve memory throughput. Here, each kernel instance processes a chunk of 256 elements (CHUNK=256), but the inner computation is unrolled with a stride of 64 (which is a power of two and fits modern GPU vector widths), improving cache and memory access patterns. All loads and stores remain masked for irregular N=781. The stats kernel remains unchanged, as it was already contract-compliant and vectorized. This transformation increases effective memory bandwidth utilization and may yield a modest speedup for this irregular row shape."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 180130,
+        "output_tokens": 21053,
+        "tokens": 201183
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              781,
+              1024
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply_chunked_unrolled",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "021414b118a5c4ef905ab0cfc4bedc46953e04a4187d2080c3bbfab257875499",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The apply kernel is further optimized by unrolling the computation inside each chunk (CHUNK=256) using an inner stride of UNROLL=64, which is a power of two and divides CHUNK evenly. This increases instruction-level parallelism and can improve memory throughput and vector unit utilization. Masking is used for all loads/stores to support the irregular N=781. The stats kernel is unchanged, as it is already correct and efficient for this shape.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 7:30:\ndef layernorm_apply_chunked_unrolled(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    base_off = chunk * CHUNK\n    UNROLL = 64  # UNROLL must divide CHUNK and be a power of two\n    for u in range(0, CHUNK, UNROLL):\n        offs = base_off + u + tl.arange(0, UNROLL)\n                              ^\narange's arguments must be of type tl.constexpr",
+        "worker_seconds": 11.552459651604295,
+        "process_seconds": 13.964299437589943
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 206541,
+        "output_tokens": 23433,
+        "tokens": 229974
+      },
+      "review": {
+        "config": {
+          "mode": "source-v1",
+          "launches": [
+            {
+              "kernel": "layernorm_stats",
+              "grid": [
+                513
+              ],
+              "args": [
+                "X",
+                "S",
+                781,
+                1024
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            },
+            {
+              "kernel": "layernorm_apply_chunked_vectorized",
+              "grid": [
+                513,
+                4
+              ],
+              "args": [
+                "X",
+                "W",
+                "B",
+                "S",
+                "Y",
+                781,
+                256
+              ],
+              "num_warps": 4,
+              "num_stages": 1
+            }
+          ]
+        },
+        "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_chunked_vectorized(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    base_off = chunk * CHUNK\n    vec = 8  # vector width (must divide CHUNK and be power of 2)\n    for u in range(0, CHUNK, vec):\n        offs = base_off + u + tl.arange(0, vec)\n        mask = offs < N\n        x_ptrs = X + row * N + offs\n        y_ptrs = Y + row * N + offs\n        w_ptrs = W + offs\n        b_ptrs = B + offs\n        mean = tl.load(S + 2 * row)\n        inv = tl.load(S + 2 * row + 1)\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        w = tl.load(w_ptrs, mask=mask, other=0.0)\n        b = tl.load(b_ptrs, mask=mask, other=0.0)\n        y = (x - mean) * inv * w + b\n        tl.store(y_ptrs, y, mask=mask)\n",
+        "rationale": "The previous attempt failed because the range argument to tl.arange in the inner unroll loop was not a tl.constexpr (compile-time constant) in Triton's JIT. This implementation repairs that by using a fixed vector width (vec=8), which is a power of two and divides the chunk size (CHUNK=256) evenly. The inner loop now explicitly unrolls by vec=8, so tl.arange(0, vec) is always a compile-time constant, meeting Triton's requirements. This increases instruction-level parallelism within each chunk, improves memory throughput, and better utilizes the GPU's vector units for this memory-bound apply kernel. All masking is preserved for N=781, and every output is written exactly once. The stats kernel remains unchanged, as it is already correct and efficient for this shape."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 217449,
+        "output_tokens": 24274,
+        "tokens": 241723
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 217449,
+    "output_tokens": 24274,
+    "tokens": 241723
+  }
+}

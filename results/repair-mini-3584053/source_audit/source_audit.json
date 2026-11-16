@@ -1,0 +1,4013 @@
+{
+  "runs": [
+    {
+      "run": "layernorm_irregular_multi_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.13166880000000006
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "status": "complete",
+      "speedup": 1.860962595974551,
+      "final_candidate": 2,
+      "cost": 0.12346440000000014
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "status": "complete",
+      "speedup": 1.838709705180552,
+      "final_candidate": 2,
+      "cost": 0.14730320000000008
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.14257680000000028
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11670400000000014
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11698320000000001
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11645720000000015
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11308520000000022
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11554359999999986
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.11868719999999999
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.12820960000000015
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "status": "complete",
+      "speedup": 1.8314607007957038,
+      "final_candidate": 2,
+      "cost": 0.11211599999999988
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.1117463999999998
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "status": "complete",
+      "speedup": 1.0,
+      "final_candidate": 0,
+      "cost": 0.08965560000000003
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "status": "complete",
+      "speedup": 1.948863578110877,
+      "final_candidate": 1,
+      "cost": 0.11840919999999966
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "status": "complete",
+      "speedup": 1.9788359715031918,
+      "final_candidate": 1,
+      "cost": 0.11277239999999994
+    }
+  ],
+  "candidates": [
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 2,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive next_stage",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 3,
+        "tl.load": 9,
+        "tl.sum": 5,
+        "tl.store": 5,
+        "tl.next_stage": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.div_rn": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 3,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 5:35:\ndef layernorm_stats_part1(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    # Compute partial sums of X[row, :] in chunks of BLOCK\n    num_blocks = (N + BLOCK - 1) // BLOCK\n    block_id = tl.program_id(1) if tl.num_programs() > 1 else 0\n                                   ^\nnum_programs() missing 1 required positional argument: 'axis'",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.num_programs": 1,
+        "tl.rsqrt": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 4,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "launch argument count does not match kernel signature",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.div_rn": 2,
+        "tl.float32": 1,
+        "range": 1,
+        "tl.rsqrt": 1,
+        "tl.where": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 10:13:\ndef layernorm_stats_part2(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    offs = tl.arange(0, NUM_BLOCKS)\n    mask = offs < NUM_BLOCKS\n    ptr = row * NUM_BLOCKS + offs\n    partial_sums = tl.load(S + ptr, mask, other=0.0)\n    total_sum = tl.sum(partial_sums, 0)\n    mean = tl.div_rn(total_sum, N)\n\n    sum_sq = tl.float32(0.0)\n             ^\nTypeError(\"'dtype' object is not callable\")",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.div_rn": 2,
+        "tl.float32": 1,
+        "range": 1,
+        "tl.rsqrt": 1,
+        "tl.where": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 6,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:4:\ndef layernorm_stats_part2(X, S, N: tl.constexpr, BLOCK: tl.constexpr, NUM_BLOCKS: tl.constexpr):\n    row = tl.program_id(axis=0)\n    offs = tl.arange(0, NUM_BLOCKS)\n    mask = offs < NUM_BLOCKS\n    ptr = row * NUM_BLOCKS + offs\n    partial_sums = tl.load(S + ptr, mask, other=0.0)\n    total_sum = tl.sum(partial_sums, 0)\n    mean = tl.div_rn(total_sum, N)\n\n    sum_sq = 0.0\n    for i in range(NUM_BLOCKS):\n    ^\nAssertionError(\"Loop-carried variable offs has initial type <['2'], int32> but is re-assigned to <['512'], int32> in loop! Please make sure that the type stays consistent.\")",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.div_rn": 2,
+        "range": 1,
+        "tl.rsqrt": 1,
+        "tl.where": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.div_rn": 2,
+        "range": 1,
+        "tl.rsqrt": 1,
+        "tl.where": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_11",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 3,
+      "kernels": [
+        "layernorm_stats_part1",
+        "layernorm_stats_part2",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 4,
+        "tl.arange": 4,
+        "tl.load": 8,
+        "tl.sum": 3,
+        "tl.store": 4,
+        "tl.div_rn": 2,
+        "range": 1,
+        "tl.rsqrt": 1,
+        "tl.where": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:8:\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean: sum reduction over RB lanes with masking\n    s = tl.sum(x, mask)\n        ^",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 2,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 4,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive next_stage",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 4,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.next_stage": 1,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 15:18:\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out invalid lanes before summation (no mask argument for tl.sum)\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Manual unrolled reduction for sum (mean)\n    step = RB // 4\n    sum0 = tl.sum(x_masked[0:step], 0)\n                  ^\nunsupported tensor index: <triton.language.core.slice object at 0x15258c11d160>",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_unrolled_8warps"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 4,
+        "tl.sum": 8,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 15:12:\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out invalid lanes before summation\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Manual unrolled sum reduction over 4 segments using indexed offset loads\n    step = RB // 4\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_unrolled_indexed_8warps"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 2,
+        "tl.load": 3,
+        "tl.where": 12,
+        "tl.sum": 8,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 6,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:12:\ndef layernorm_fused_unrolled_constexpr_8warps(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Manual unrolled sum reduction over 4 segments using constexpr offset arrays\n    step = tl.constexpr(RB // 4)\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_unrolled_constexpr_8warps"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 2,
+        "tl.load": 7,
+        "tl.constexpr": 1,
+        "tl.sum": 8,
+        "tl.div_rn": 2,
+        "tl.where": 10,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 7,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:12:\ndef layernorm_fused_unrolled_constexpr_8warps(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Manual unrolled sum reduction over 4 segments with constexpr offsets\n    step = RB // 4  # Must be power-of-two and constexpr as kernel argument\n    offs0 = tl.arange(0, step)\n            ^\narange's arguments must be of type tl.constexpr",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_unrolled_constexpr_8warps"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 2,
+        "tl.load": 7,
+        "tl.sum": 8,
+        "tl.div_rn": 2,
+        "tl.where": 10,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_22",
+      "case": "layernorm_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 8,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 28:38:\n    sum0 = tl.sum(tl.where(offs0 < N, tl.load(X + row * N + offs0, offs0 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs1 < N, tl.load(X + row * N + offs1, offs1 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs2 < N, tl.load(X + row * N + offs2, offs2 < N, other=0.0), 0.0), 0)\n    sum0 += tl.sum(tl.where(offs3 < N, tl.load(X + row * N + offs3, offs3 < N, other=0.0), 0.0), 0)\n\n    mean = tl.div_rn(sum0, N)\n\n    # Centered input with masking\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Partial sums for variance\n    sum2 = tl.sum(tl.where(offs0 < N, centered[offs0] * centered[offs0], 0.0), 0)\n                                      ^\nDid you forget to add @triton.jit ? (`_semantic` argument must be provided outside of JIT functions.)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_unrolled_constexpr_8warps"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 2,
+        "tl.load": 7,
+        "tl.sum": 8,
+        "tl.div_rn": 2,
+        "tl.where": 10,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 4:11:\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 256  # power of two <= N\n    offs = tl.arange(0, BLOCK)\n           ^\narange's arguments must be of type tl.constexpr",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 2,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.load": 5,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.load": 5,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 4,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 10,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.store": 2,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.zeros": 5
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 5,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 10,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.store": 2,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.zeros": 5
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 6,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400644 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined_repair"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 10,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.store": 2,
+        "tl.zeros": 5,
+        "tl.sum": 3,
+        "tl.where": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined_meanonly"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 3,
+        "tl.load": 6,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.zeros": 1,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused_pipelined_meanonly_tuned"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 3,
+        "tl.load": 6,
+        "range": 3,
+        "tl.rsqrt": 1,
+        "tl.zeros": 1,
+        "tl.sum": 3,
+        "tl.where": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 2,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 3,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 4,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=199693/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 199693 / 400653 (49.8%)\nGreatest absolute difference: nan at index (257, 243) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (257, 243) (up to 0.0002 allowed)",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused_hierarchical"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32\n    num_sub_blocks = BLOCK // sub_block\n    offs = tl.arange(0, sub_block)\n           ^\narange's arguments must be of type tl.constexpr",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused_hierarchical_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "range": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 6,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32  # constexpr\n    num_sub_blocks = BLOCK // sub_block  # constexpr\n    offs = tl.arange(0, sub_block)  # constexpr extent\n           ^\narange's arguments must be of type tl.constexpr",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused_hierarchical_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "range": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 7,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 5:11:\ndef layernorm_apply_fused_hierarchical_fixed(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    sub_block = 32  # constexpr\n    num_sub_blocks = BLOCK // sub_block  # constexpr\n    offs = tl.arange(0, sub_block)  # constexpr extent\n           ^\narange's arguments must be of type tl.constexpr",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused_hierarchical_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "range": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_multi_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 8,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "launch argument count does not match kernel signature",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply_fused_hierarchical_fixed"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "range": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 1,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive convert_to_float32",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.float32": 2,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.convert_to_float32": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 2,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive cast",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.float32": 3,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.cast": 1,
+        "tl.where": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 3,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.float32(0)\n              ^\nTypeError(\"'dtype' object is not callable\")",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.float32": 5,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.where": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.zeros((1,), tl.float32)[0]\n              ^\nunsupported tensor index: constexpr[0]",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.zeros": 2,
+        "tl.load": 6,
+        "tl.where": 1,
+        "tl.sum": 2,
+        "tl.float32": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 4:14:\ndef layernorm_stats(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    sum_val = tl.float32(0.0)\n              ^\nTypeError(\"'dtype' object is not callable\")",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.float32": 3,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.where": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 6,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.where": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.where": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_11",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "range": 1,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.load": 6,
+        "tl.where": 1,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3,
+        "tl.sum": 2
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 2,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 3,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 4,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "launch argument count does not match kernel signature",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 5,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 6,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_22",
+      "case": "layernorm_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 2,
+      "kernels": [
+        "layernorm_stats",
+        "layernorm_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.sum": 2,
+        "tl.div_rn": 1,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 1,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 2,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1,
+        "tl.arange": 4
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 3,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 4,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 5,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 6,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 7,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_11",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 8,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 3,
+        "tl.rsqrt": 1,
+        "tl.arange": 3,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:12:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean using masked sum and accurate division\n    sum_x = tl.sum(x, mask=mask)\n            ^\nTypeError(\"sum() got an unexpected keyword argument 'mask'\")",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 2,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:12:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean using masked sum (mask as positional argument)\n    sum_x = tl.sum(x, mask)\n            ^",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 3,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.where": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 4,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 5,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 6,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 7,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "layernorm_irregular_single_knowledge_22",
+      "case": "layernorm_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 8,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=269325/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 400478 / 400653 (100.0%)\nGreatest absolute difference: nan at index (0, 256) (up to 2e-05 allowed)\nGreatest relative difference: nan at index (0, 256) (up to 0.0002 allowed)",
+      "launches": 1,
+      "kernels": [
+        "layernorm_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 3,
+        "tl.where": 3,
+        "tl.sum": 2,
+        "tl.div_rn": 2,
+        "tl.rsqrt": 1,
+        "tl.store": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile\n    mx = tl.max(x, axis=0)\n    # Warp-level reduction for max across tiles\n    mx = tl.max_contiguous(mx, axis=0)\n         ^\nmax_contiguous() got an unexpected keyword argument 'axis'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 2,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile\n    mx_tile = tl.max(x)\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(mx_tile)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 3,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:9:\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Compute max per tile (over BLOCK elements)\n    mx_tile = tl.max(x)\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(mx_tile)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 6,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 7,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes, pass 'x' explicitly\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_11",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 11,
+      "attempt": 8,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)  # Each program processes one row\n    col_block = tl.program_id(1)  # Tile block along columns\n    offs = col_block * BLOCK + tl.arange(0, BLOCK)  # Column offsets\n\n    mask = offs < N\n    ptr = X + row * N + offs\n    x = tl.load(ptr, mask, other=-float('inf'))\n\n    # Warp-level max reduction across all lanes, pass 'x' explicitly\n    mx = tl.max_contiguous(x)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.load": 1,
+        "tl.max_contiguous": 1,
+        "tl.broadcast_to": 2,
+        "tl.where": 2,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.arange": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 1,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "tl.exp": 2,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 2,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 7:9:\ndef softmax_apply(X, S, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, RB)\n    mask = col < N\n\n    x = tl.load(X + row * N + col, mask, other=0.0)\n    mx = tl.load(S + row * 2, mask, other=0.0)\n         ^\nMask argument cannot be block type if pointer argument is not a block",
+      "launches": 3,
+      "kernels": [
+        "softmax_exp_sum",
+        "softmax_sum_reduce",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.max": 1,
+        "tl.store": 5,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 5,
+      "status": "incorrect",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 45729 / 400653 (11.4%)\nGreatest absolute difference: 0.003648342564702034 at index (125, 176) (up to 2e-06 allowed)\nGreatest relative difference: 0.1668810099363327 at index (125, 701) (up to 2e-05 allowed)",
+      "launches": 3,
+      "kernels": [
+        "softmax_exp_sum",
+        "softmax_sum_reduce",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.max": 1,
+        "tl.store": 5,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 6,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 3,
+      "kernels": [
+        "softmax_exp_sum",
+        "softmax_sum_reduce",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.max": 1,
+        "tl.store": 5,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 3,
+      "kernels": [
+        "softmax_exp_sum",
+        "softmax_sum_reduce",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 7,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_22",
+      "case": "softmax_irregular",
+      "variant": "multi",
+      "seed": 22,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 3,
+      "kernels": [
+        "softmax_exp_sum",
+        "softmax_sum_reduce",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 3,
+        "tl.arange": 2,
+        "tl.load": 6,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 7,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:9:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Warp-level max reduction over the tile\n    mx = tl.max(x, 0)\n    mx = tl.max_contiguous(mx)  # cross-lane warp max\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 2,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:9:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Warp-level max reduction over the tile (lane-wise max)\n    mx = tl.max(x, 0)  # lane local max\n    # Hierarchical cross-lane warp max reductions\n    mx = tl.max_contiguous(mx)\n         ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.max_contiguous": 2,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 3,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:15:\ndef softmax_fused(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction (axis=0)\n    lane_max = tl.max(x, 0)  # lane-local max\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 5,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 6,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive sum_contiguous",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 2,
+        "tl.sum_contiguous": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 7,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction\n    lane_max = tl.max(x, 0)  # lane max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 11,
+      "attempt": 8,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:15:\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n\n    # Load input with masking, pad with -inf for max reduction\n    x = tl.load(X + row * N + offs, mask, other=-float('inf'))\n\n    # Step 1: lane-wise max reduction (axis=0)\n    lane_max = tl.max(x, 0)  # lane-local max\n\n    # Step 2: warp-level max reduction over lane_max\n    warp_max = tl.max_contiguous(lane_max)\n               ^\nmax_contiguous() missing 1 required positional argument: 'values'",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.max_contiguous": 1,
+        "tl.where": 2,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 1,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 4:10:\ndef softmax_fused(X, Y, N: tl.constexpr):\n    row = tl.program_id(0)\n    BLOCK = 1024\n    col = tl.arange(0, BLOCK)\n          ^\narange's arguments must be of type tl.constexpr",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 2,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 4,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:18:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    mask = col < N\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + offs, mask, other=-float('inf'))\n\n    # Hierarchical max reduction: reduce within warp lanes in two stages\n    # Stage 1: partial max reduction over 512 elements per warp lane (assuming BLOCK=1024)\n    max1 = tl.max(x[:BLOCK//2], 0)\n                  ^\nunsupported tensor index: <triton.language.core.slice object at 0x14578035e630>",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 3,
+        "tl.maximum": 1,
+        "tl.sum": 3,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 5,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 6,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 7,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_multi_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "multi_knowledge",
+      "seed": 22,
+      "attempt": 8,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused_v2"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 1,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "forbidden construct: While",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 2,
+        "tl.exp": 1,
+        "tl.where": 4,
+        "tl.store": 1,
+        "tl.maximum": 1,
+        "tl.zeros": 4,
+        "tl.full": 2,
+        "tl.concatenate": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 2,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive concatenate",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 2,
+        "tl.exp": 1,
+        "tl.where": 4,
+        "tl.store": 1,
+        "tl.maximum": 1,
+        "tl.zeros": 4,
+        "tl.full": 2,
+        "tl.concatenate": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive concat",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 2,
+        "tl.exp": 1,
+        "tl.where": 4,
+        "tl.store": 1,
+        "tl.maximum": 1,
+        "tl.zeros": 4,
+        "tl.full": 2,
+        "tl.concat": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 4,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive concat",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 2,
+        "tl.exp": 1,
+        "tl.where": 4,
+        "tl.store": 1,
+        "tl.maximum": 1,
+        "tl.zeros": 4,
+        "tl.full": 2,
+        "tl.concat": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 5,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "forbidden construct: While",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 5,
+        "tl.exp": 2,
+        "tl.where": 3,
+        "tl.store": 3,
+        "tl.maximum": 1,
+        "tl.zeros": 3,
+        "tl.full": 2,
+        "tl.concat": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 6,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "unsupported Triton primitive concat",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 5,
+        "tl.exp": 2,
+        "tl.where": 3,
+        "tl.store": 3,
+        "tl.maximum": 1,
+        "tl.zeros": 3,
+        "tl.full": 2,
+        "tl.concat": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 7,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:4:\ndef softmax_stats(X, S, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    m = x\n    # unrolled tree max reduction over RB elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n    ^\nAttributeError(\"'List' object has no attribute 'func'\")",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 4,
+        "tl.load": 5,
+        "tl.exp": 2,
+        "tl.where": 5,
+        "tl.store": 3,
+        "tl.maximum": 1,
+        "tl.zeros": 3,
+        "tl.full": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_11",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 11,
+      "attempt": 8,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 11:4:\ndef softmax_stats(X, S, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    m = x\n    # unrolled tree max reduction over RB elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n    ^\nAttributeError(\"'List' object has no attribute 'func'\")",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 4,
+        "tl.load": 5,
+        "tl.exp": 2,
+        "tl.where": 5,
+        "tl.store": 3,
+        "tl.maximum": 1,
+        "tl.zeros": 3,
+        "tl.full": 2,
+        "float": 4
+      },
+      "has_dot": false,
+      "has_reduction": false
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 1,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 2,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 3,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 4,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 5,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 6,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 7,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_22",
+      "case": "softmax_irregular",
+      "variant": "single",
+      "seed": 22,
+      "attempt": 8,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 2,
+      "kernels": [
+        "softmax_stats",
+        "softmax_apply"
+      ],
+      "calls": {
+        "tl.program_id": 2,
+        "tl.arange": 2,
+        "tl.load": 4,
+        "tl.max": 1,
+        "tl.exp": 2,
+        "tl.sum": 1,
+        "tl.store": 3,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 2,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 13:9:\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n    ptr = row * N + col\n    mask = col < N\n\n    # Load with masking; out-of-bounds elements get -inf\n    x = tl.load(X + ptr, mask, other=-float('inf'))\n\n    # Two-stage max reduction for large BLOCK\n    half = BLOCK // 2\n    x1 = x[:half]\n         ^\nunsupported tensor index: <triton.language.core.slice object at 0x149280403aa0>",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 3,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 4,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 5,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 6,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 7,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_11",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 11,
+      "attempt": 8,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 1,
+      "status": "ok",
+      "accepted": true,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 2,
+      "status": "error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "at 12:22:\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col_mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking, pad out-of-bounds with -inf for max reduction\n    x = tl.load(X + idx, col_mask, other=-float('inf'))\n\n    # Two-stage max reduction: split BLOCK into two halves\n    half = BLOCK // 2\n    max_left = tl.max(x[:half], col_mask[:half])\n                      ^\nunsupported tensor index: <triton.language.core.slice object at 0x14c5997692b0>",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.broadcast_to": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 3,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.broadcast_to": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 4,
+      "status": "ok",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": true,
+      "error": "",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.where": 4,
+        "tl.max": 2,
+        "tl.maximum": 1,
+        "tl.broadcast_to": 2,
+        "tl.sum": 2,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 3
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 5,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 6,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 7,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    },
+    {
+      "run": "softmax_irregular_single_knowledge_22",
+      "case": "softmax_irregular",
+      "variant": "single_knowledge",
+      "seed": 22,
+      "attempt": 8,
+      "status": "proposal_error",
+      "accepted": false,
+      "source_supplied": true,
+      "source_differs": true,
+      "structural_screen": false,
+      "error": "source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries",
+      "launches": 1,
+      "kernels": [
+        "softmax_fused"
+      ],
+      "calls": {
+        "tl.program_id": 1,
+        "tl.arange": 1,
+        "tl.load": 1,
+        "tl.max": 1,
+        "tl.sum": 1,
+        "tl.store": 1,
+        "tl.exp": 1,
+        "float": 1
+      },
+      "has_dot": false,
+      "has_reduction": true
+    }
+  ],
+  "counts": {
+    "searches": 16,
+    "attempts": 128,
+    "source_supplied": 128,
+    "structural_screen": 93,
+    "correct": 34,
+    "retained": 5
+  },
+  "caveat": "Static primitive counts and launch changes require manual review; not causal attribution."
+}

@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    mask = offs < N\n    idx = row * N + offs\n\n    # Load input with masking for padding\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Compute mean: sum reduction over RB lanes with masking\n    s = tl.sum(x, mask)\n    mean = tl.div_rn(s, N)\n\n    # Centered input\n    centered = tl.where(mask, x - mean, 0.0)\n\n    # Compute variance\n    s2 = tl.sum(centered * centered, mask)\n    var = tl.div_rn(s2, N)\n\n    # Compute inverse stddev with epsilon\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load affine parameters with masking\n    w = tl.load(W + offs, mask, other=0.0)\n    b = tl.load(B + offs, mask, other=0.0)\n\n    # Normalize and apply affine transform\n    y = tl.where(mask, centered * inv_std * w + b, 0.0)\n\n    # Store result with masking\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Fused mean, variance, normalization, and affine transform in one kernel to reduce memory bandwidth and kernel launch overhead. Used a fixed power-of-two RB=1024 with masking to cover irregular N=781, ensuring correctness and efficient vectorization. Launched one program per row (grid=513) to process each row fully, exploiting warp-level parallelism (4 warps) and 1 pipeline stage. This fusion improves data locality by accessing input and parameters once, avoids intermediate scratch storage, and reduces divergence by masking padded elements. The approach preserves numerical correctness by careful masking and division by logical N."
+}

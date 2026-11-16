@@ -1,0 +1,40 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_blockwise_partial",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "N",
+          512,
+          "Y"
+        ],
+        "num_warps": 2,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_blockwise_final",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          512
+        ],
+        "num_warps": 2,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n# First pass: compute partial row statistics and write them into the output buffer's padding\n@triton.jit\ndef layernorm_blockwise_partial(X, N: tl.constexpr, BLOCK: tl.constexpr, Y):\n    row_id = tl.program_id(0)\n    split = tl.program_id(1)\n    offs = split * BLOCK + tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptr = X + row_id * N + offs\n    x = tl.load(x_ptr, mask, other=0)\n    part_sum = tl.sum(x, 0)\n    part_sumsq = tl.sum(x * x, 0)\n    # Write partials into the end of the output buffer for this row, after N\n    if split == 0:\n        tl.store(Y + row_id * N + N, part_sum)\n        tl.store(Y + row_id * N + N + 1, part_sumsq)\n    else:\n        tl.store(Y + row_id * N + N + 2, part_sum)\n        tl.store(Y + row_id * N + N + 3, part_sumsq)\n\n# Second pass: aggregate partials, compute mean/var, normalize and output\n@triton.jit\ndef layernorm_blockwise_final(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row_id = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    # Read partial sums from the end of the buffer\n    sum0 = tl.load(Y + row_id * N + N)\n    sumsq0 = tl.load(Y + row_id * N + N + 1)\n    sum1 = tl.load(Y + row_id * N + N + 2)\n    sumsq1 = tl.load(Y + row_id * N + N + 3)\n    full_sum = sum0 + sum1\n    full_sumsq = sumsq0 + sumsq1\n    mean = tl.div_rn(full_sum, N)\n    mean_sq = mean * mean\n    var = tl.div_rn(full_sumsq, N) - mean_sq\n    inv_std = tl.rsqrt(var + 1e-5)\n    # Reload input row for normalization (from X, not Y)\n    x_ptr = X + row_id * N + offs\n    x = tl.load(x_ptr, mask, other=0)\n    w = tl.load(W + offs, mask, other=0)\n    b = tl.load(B + offs, mask, other=0)\n    norm = (x - mean) * inv_std\n    y = norm * w + b\n    tl.store(Y + row_id * N + offs, y, mask)\n",
+  "rationale": "This repairs the previous functional bug by ensuring that the normalization pass ('layernorm_blockwise_final') reloads the original input X directly, not from the output buffer Y, which only contains partial statistics at this stage. The first kernel splits each row into two blocks (BLOCK=512), computes partial sums and sum-of-squares, and writes these to the end of the row region in Y. The second kernel aggregates both partials, computes mean and variance, loads the input row from X for normalization, applies affine transformation, and writes the normalized row to Y. All masking, reduction, and shape invariants are preserved. This structure enables blockwise reductions for wider rows and resolves the previous bug where uninitialized values caused nonfinite outputs."
+}

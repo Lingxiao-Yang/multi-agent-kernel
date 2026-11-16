@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    col = tl.arange(0, BLOCK)\n    offs = row * N + col\n    # Load input row with masking\n    x = tl.load(X + offs, col < N, other=-float('inf'))\n    # Compute maximum value in the row for numerical stability\n    mx = tl.max(x, 0)\n    x_centered = x - mx\n    # Exponentiate and compute denominator\n    exp_x = tl.exp(x_centered)\n    denom = tl.sum(exp_x, 0)\n    # Normalize\n    y = exp_x / denom\n    # Store softmax output, mask tail\n    tl.store(Y + offs, y, col < N)\n",
+  "rationale": "This fuses the two-stage softmax pattern into a single kernel per row, eliminating the intermediate scratch tensor S and reducing global memory traffic. All reductions and masking are performed within the BLOCK-sized tile, with padding values masked as required. The program computes both the numerically-stable max and sum-exp for each row in a single pass, then writes the normalized output with masking. This directly targets the previously identified fusion/memory bottleneck (K05), and respects all shape, masking, and constexpr restrictions for the given case (N=781, RB=1024, grid=513)."
+}

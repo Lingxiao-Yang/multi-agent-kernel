@@ -1,0 +1,1027 @@
+{
+  "incumbent": {
+    "id": 0,
+    "config": {
+      "mode": "source-v1",
+      "launches": [
+        {
+          "kernel": "layernorm_stats",
+          "grid": [
+            513
+          ],
+          "args": [
+            "X",
+            "S",
+            "N",
+            "RB"
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        },
+        {
+          "kernel": "layernorm_apply",
+          "grid": [
+            1566
+          ],
+          "args": [
+            "X",
+            "W",
+            "B",
+            "S",
+            "Y",
+            "TOTAL",
+            "N",
+            256
+          ],
+          "num_warps": 4,
+          "num_stages": 1
+        }
+      ]
+    },
+    "source": "/scratch/11957/sheep_in_clouds/kernel-study-repair-20261115/results/repair-strong-3584057/campaign/layernorm_irregular_multi_11/baseline.py",
+    "result": {
+      "status": "ok",
+      "environment": {
+        "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+        "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+        "torch": "2.11.0+cu128",
+        "triton": "3.6.0",
+        "cuda": "12.8",
+        "gpu": "NVIDIA A100-PCIE-40GB",
+        "memory_bytes": 42406903808,
+        "capability": [
+          8,
+          0
+        ],
+        "sm_count": 108
+      },
+      "validation": [
+        {
+          "seed": 101,
+          "edge": "random",
+          "max_abs_error": 1.430511474609375e-06
+        },
+        {
+          "seed": 202,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 303,
+          "edge": "random",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "zeros",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "constant",
+          "max_abs_error": 0.0
+        },
+        {
+          "seed": 101,
+          "edge": "large",
+          "max_abs_error": 1.9073486328125e-06
+        },
+        {
+          "seed": 101,
+          "edge": "negative",
+          "max_abs_error": 1.9073486328125e-06
+        }
+      ],
+      "first_launch_seconds": 1.3049993757158518,
+      "validation_seconds": 2.1853615418076515,
+      "candidate": {
+        "median_ms": 0.034815999865531924,
+        "p25_ms": 0.03328000009059906,
+        "p75_ms": 0.04229120016098022,
+        "min_ms": 0.032051199674606325,
+        "samples_ms": [
+          0.037171199917793274,
+          0.04116480052471161,
+          0.03266560137271881,
+          0.034815999865531924,
+          0.04126720130443573,
+          0.034815999865531924,
+          0.04423680007457733,
+          0.03266560137271881,
+          0.034815999865531924,
+          0.04352000057697296,
+          0.03389439880847931,
+          0.034406399726867674,
+          0.03246079981327057,
+          0.03246079981327057,
+          0.037785598635673524,
+          0.04352000057697296,
+          0.037376001477241516,
+          0.04485119879245758,
+          0.03225600123405457,
+          0.03461120128631592,
+          0.04352000057697296,
+          0.032358399033546446,
+          0.034508800506591795,
+          0.0506879985332489,
+          0.034815999865531924,
+          0.043315199017524716,
+          0.032051199674606325,
+          0.034406399726867674,
+          0.043315199017524716,
+          0.032358399033546446,
+          0.034201601147651674
+        ]
+      },
+      "incumbent": {
+        "median_ms": 0.0347135990858078,
+        "p25_ms": 0.0336896002292633,
+        "p75_ms": 0.042547200620174405,
+        "min_ms": 0.032051199674606325,
+        "samples_ms": [
+          0.04188160002231598,
+          0.03348479866981506,
+          0.034201601147651674,
+          0.06277120113372803,
+          0.05375999808311462,
+          0.03246079981327057,
+          0.034201601147651674,
+          0.04352000057697296,
+          0.03256320059299469,
+          0.034815999865531924,
+          0.04433920085430145,
+          0.03225600123405457,
+          0.034508800506591795,
+          0.04423680007457733,
+          0.035123199224472046,
+          0.03686400055885315,
+          0.04321280121803284,
+          0.03399679958820343,
+          0.03430399894714355,
+          0.032358399033546446,
+          0.0347135990858078,
+          0.04321280121803284,
+          0.03338240087032318,
+          0.034815999865531924,
+          0.043110400438308716,
+          0.0336896002292633,
+          0.03399679958820343,
+          0.0336896002292633,
+          0.032051199674606325,
+          0.0419840008020401,
+          0.04167680144309997
+        ]
+      },
+      "paired_speedup": 0.9970588011224834,
+      "confirmed": false,
+      "library": {
+        "median_ms": 0.030003198981285097,
+        "p25_ms": 0.02969599962234497,
+        "p75_ms": 0.030054399371147157,
+        "min_ms": 0.029491201043128967,
+        "samples_ms": [
+          0.030105599761009218,
+          0.02959359884262085,
+          0.030003198981285097,
+          0.02959359884262085,
+          0.030003198981285097,
+          0.029798400402069092,
+          0.03553279936313629,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.032153600454330446,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.029900801181793214,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.02969599962234497,
+          0.03133440017700195,
+          0.02969599962234497,
+          0.029900801181793214,
+          0.03031040132045746,
+          0.03696640133857727,
+          0.02969599962234497,
+          0.030003198981285097,
+          0.0364544004201889,
+          0.02969599962234497,
+          0.02959359884262085,
+          0.030003198981285097,
+          0.029491201043128967,
+          0.030003198981285097,
+          0.029900801181793214,
+          0.03563520014286041
+        ]
+      },
+      "profile": {
+        "mode": "compiler-resources",
+        "kernels": [
+          {
+            "registers_per_thread": 21,
+            "spills": 0,
+            "shared_bytes": 16,
+            "num_warps": 4
+          },
+          {
+            "registers_per_thread": 24,
+            "spills": 0,
+            "shared_bytes": 0,
+            "num_warps": 4
+          }
+        ],
+        "hardware_counters": null,
+        "note": "No hardware-counter bottleneck claims."
+      },
+      "profile_seconds": 1.8716789782047272e-05,
+      "throughput": {
+        "flops": null,
+        "minimum_bytes": 3211472,
+        "logical_gbps": 92.24126873861174,
+        "achieved_tflops": null,
+        "fraction_peak_bandwidth": null,
+        "fraction_peak_compute": null,
+        "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+      },
+      "worker_seconds": 2.40677906665951,
+      "process_seconds": 14.114558378234506
+    }
+  },
+  "history": [
+    {
+      "attempt": 1,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_split",
+            "grid": [
+              513,
+              4
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256,
+              4
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "7f34c676915a17b5a67f7e43c77be9b71462e57ca88465a25111db6b9351b008",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "The incumbent stats kernel performed a single program per row, each reducing over all columns, which underutilized the GPU for moderate row count. This version splits each row into 4 programs, each processing a chunk of columns and producing partial sums of x and x^2. The split==0 instance then reduces these partials to compute mean/variance, writing to the legacy S layout for compatibility with the unchanged apply kernel. All loads and stores are masked for bounds, and all reduction identities are correct. The apply kernel is unchanged. This increases per-row parallelism and better utilizes available GPU resources.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 188077 / 400653 (46.9%)\nGreatest absolute difference: 52574.69140625 at index (25, 343) (up to 2e-05 allowed)\nGreatest relative difference: 329982784.0 at index (114, 202) (up to 0.0002 allowed)",
+        "worker_seconds": 13.946724478155375,
+        "process_seconds": 16.256711076013744
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 3,
+        "input_tokens": 10273,
+        "output_tokens": 2550,
+        "tokens": 12823
+      },
+      "review": {
+        "diagnosis": "The modified 'layernorm_stats_split' kernel attempts to parallelize per-row statistics by splitting each row across 4 programs, with each program writing partial sums and the split==0 instance reducing them. However, the kernel uses the S buffer (which is only sized [ROWS,2]) as if it were [ROWS,2*SPLIT], i.e. it overwrites S out-of-bounds, leading to race conditions and/or corruption of the final mean/inv values. This is a memory safety and logic bug. The validation error shows massive output mismatches, with many elements off by large values, confirming invalid stats (mean/inv) propagate into the final output.",
+        "outcome": "The attempt failed due to incorrect usage of the scratch buffer S: writing partials into locations outside the allocated [ROWS,2] shape, causing memory corruption and wrong results. The apply kernel is unchanged and expects S in the original format, but receives incorrect values.",
+        "next_step": "Redesign the stats kernel so all intermediate partials are accumulated in registers, not written to S, or allocate a true [ROWS,2*SPLIT] workspace if partial writes are needed. For correctness, either: (1) have each program process a non-overlapping chunk and reduce within the program (with a loop if needed), or (2) use one program per row, but use multi-threaded (warp-level) reduction for higher parallelism. Ensure S is only used for the [ROWS,2] output, and all loads/stores are masked for bounds. Re-verify all memory accesses and kernel index logic before further optimization."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 1,
+        "calls": 4,
+        "input_tokens": 15995,
+        "output_tokens": 2891,
+        "tokens": 18886
+      }
+    },
+    {
+      "attempt": 2,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_parallel",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "3f1ae24ac16559ad66e0f25eaecf4fb9ab3a519c03f0af32d9b20481dabe7ccb",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repair reverts the stats kernel to the safe output usage of one program per row, but increases parallelism by processing the row in BLOCK-sized register chunks and reducing within the kernel using a for-loop. All accumulation of x and x^2 is done in registers (mean_acc, m2_acc), and only the final mean and inv are written to S. No intermediate writes to S occur, eliminating the out-of-bounds and race bugs from the previous attempt. The kernel masks all loads for bounds, correctly divides by N, and matches the apply kernel's expected S layout. The apply kernel is unchanged and compatible.",
+      "accepted": false,
+      "previous_failure_attempt": 1,
+      "result": {
+        "status": "error",
+        "error_type": "CompilationError",
+        "error": "at 7:4:\ndef layernorm_stats_parallel(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    m2_acc = tl.zeros((), dtype=tl.float32)\n    count = 0\n    for offs_base in range(0, N, BLOCK):\n    ^\nAssertionError('Loop-carried variable count has initial type int32 but is re-assigned to uint32 in loop! Please make sure that the type stays consistent.')",
+        "worker_seconds": 11.458676702342927,
+        "process_seconds": 13.871262094005942
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 7,
+        "input_tokens": 30383,
+        "output_tokens": 4769,
+        "tokens": 35152
+      },
+      "review": {
+        "diagnosis": "The attempt failed at compilation due to an inconsistent type for the loop-carried variable 'count' in the stats kernel. It is initialized as a Python int (int32), but inside the loop it is incremented by tl.sum(mask, 0), which returns a uint32. Triton requires loop-carried variables to have a consistent type throughout the loop, hence the compilation assertion error.",
+        "outcome": "Compilation failed, so no runtime or correctness validation occurred. The stats kernel cannot execute in its current form and does not produce any output.",
+        "next_step": "Repair the stats kernel by initializing 'count' with tl.zeros((), dtype=tl.uint32) or by removing it entirely if it is unused, ensuring all loop-carried variables maintain a consistent Triton type. Review all other loop-carried variables for type consistency. After fixing, re-measure for correctness and performance."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 2,
+        "calls": 8,
+        "input_tokens": 37154,
+        "output_tokens": 4960,
+        "tokens": 42114
+      }
+    },
+    {
+      "attempt": 3,
+      "accepted": false,
+      "result": {
+        "status": "proposal_error",
+        "error": "unsupported Triton primitive uint32"
+      },
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 11,
+        "input_tokens": 53589,
+        "output_tokens": 6949,
+        "tokens": 60538
+      },
+      "review": {
+        "diagnosis": "The attempt failed at proposal due to the usage of an unsupported Triton primitive: tl.uint32. The Triton version in use does not support tl.uint32 as a scalar/accumulator type. The intent was to ensure type consistency for the loop-carried variable 'count', but the solution is not portable to this Triton release.",
+        "outcome": "No execution or validation occurred. The proposal was rejected at the source parsing stage for using a non-portable/unsupported dtype.",
+        "next_step": "Eliminate the 'count' variable entirely from the stats kernel, as it is unused for the final result (mean and variance are always divided by N, not a computed count). Use only float32 accumulators for mean_acc and m2_acc. Ensure all reductions, accumulations, and masking are performed in float32. Re-run with this correction to validate correctness and performance."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 3,
+        "calls": 12,
+        "input_tokens": 60591,
+        "output_tokens": 7138,
+        "tokens": 67729
+      }
+    },
+    {
+      "attempt": 4,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_parallel",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              400653,
+              781,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "ff32e92d94889b8e93ebcdbf2a3eff67e18529c6157e4ada3f3392bc70e26a37",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implementation repairs the previous proposal by eliminating the unsupported uint32 accumulator and removing any unnecessary count variable. The stats kernel now accumulates the sum and sum-of-squares for each row in float32 registers using a loop over BLOCK-sized chunks, with masking to handle irregular row length. All reductions are performed in float32, and the final mean and inverse standard deviation are stored in the output buffer S, matching the expected layout for the apply kernel. The apply kernel remains unchanged and compatible. This approach preserves increased intra-row parallelism without risking out-of-bounds buffer access or unsupported primitive use.",
+      "accepted": false,
+      "previous_failure_attempt": 3,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.854865343309939,
+        "validation_seconds": 4.6282499469816685,
+        "candidate": {
+          "median_ms": 0.034815999865531924,
+          "p25_ms": 0.03420159965753555,
+          "p75_ms": 0.04326400011777878,
+          "min_ms": 0.032358399033546446
+        },
+        "incumbent": {
+          "median_ms": 0.03461120128631592,
+          "p25_ms": 0.03343359977006912,
+          "p75_ms": 0.043059200048446655,
+          "min_ms": 0.03225600123405457
+        },
+        "paired_speedup": 0.9941176878444683,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 92.24126873861174,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.807986197993159,
+        "process_seconds": 16.52783072926104
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 15,
+        "input_tokens": 78270,
+        "output_tokens": 9047,
+        "tokens": 87317
+      },
+      "review": {
+        "diagnosis": "The revised stats kernel correctly avoids previous type errors and memory safety issues: all accumulation is done in float32 registers, and only the mean and inverse variance are written out, matching the apply kernel's expectation. All masking and division logic is sound. The measured outcome shows correct results and nearly identical performance to the incumbent (median_ms within 1%). No accuracy or performance regression is observed, but no measurable speedup is achieved either.",
+        "outcome": "The attempt is correct, producing numerically accurate results and maintaining performance parity with the original. The per-row reduction now loops over BLOCK-sized chunks with masking, but on this problem size (513 rows, 781 columns), this change does not yield a throughput improvement. No bottleneck is resolved versus the incumbent.",
+        "next_step": "To further increase parallelism and potentially improve performance, consider decomposing the stats reduction across multiple programs per row (e.g., split each row into multiple workgroups, each accumulating partial sums in registers, then reducing across splits), being careful to collect and combine all partials in-register or by a final reduction step. This may require an explicit workspace for partial reductions or additional kernel launches. Alternatively, explore warp-level reductions or increasing num_warps if register pressure allows. Continue to check all buffer accesses and reduction identities for correctness at each step."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 4,
+        "calls": 16,
+        "input_tokens": 86368,
+        "output_tokens": 9324,
+        "tokens": 95692
+      }
+    },
+    {
+      "attempt": 5,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_split2",
+            "grid": [
+              513,
+              2
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              2,
+              512
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "e7dafa7a8375a0fe492618aab2b1b3745dc90bcd59aeb1b2dcf41c15e0446eaa",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This version splits each row across 2 programs (SPLIT=2), each program reducing a chunk of columns and writing its partial sum and sum-of-squares into S as a workspace (interpreted as [ROWS,2*SPLIT] for the reduction, but only [ROWS,2] used for final output). The split==0 program for each row then reads all partials, reduces to the correct mean and variance, and writes the final two stats to the head of the S row as required by the apply kernel. This increases occupancy versus a single program per row, but uses only a modest SPLIT=2 to reduce workspace pressure and risk. All loads/stores are masked for bounds; intermediate writes are only to S as intended scratch. This changes the intra-row reduction and overall parallel decomposition structure versus the incumbent.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 212009 / 400653 (52.9%)\nGreatest absolute difference: 57484.41015625 at index (119, 343) (up to 2e-05 allowed)\nGreatest relative difference: 192861200.0 at index (11, 395) (up to 0.0002 allowed)",
+        "worker_seconds": 14.533370265737176,
+        "process_seconds": 16.741321549750865
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 19,
+        "input_tokens": 107019,
+        "output_tokens": 11807,
+        "tokens": 118826
+      },
+      "review": {
+        "diagnosis": "The proposed stats kernel attempts to split each row across two programs (SPLIT=2), where each program processes a chunk of columns, accumulating partial sums and sum-of-squares into S at offsets as a workspace. The split==0 program then reduces these partials to get the final mean and variance, writing to the expected output positions for the apply kernel. However, this design corrupts the S buffer: the workspace S is only allocated as [ROWS,2] (for mean/inv per row), but the kernel writes intermediates at [ROWS,2*SPLIT] offsets (i.e., outside the legal allocation), leading to memory corruption and race hazards. As a result, the validation fails catastrophically, with >50% of outputs wrong and huge absolute/relative errors, confirming the stats are nonsensical for many rows.",
+        "outcome": "The attempt is incorrect due to using S as a workspace larger than its allocation. This results in out-of-bounds writes and undefined values for the real stats consumed by the apply kernel. The parallel decomposition structure is otherwise plausible, but the hardware-legal workspace must be respected.",
+        "next_step": "Redesign the inter-program reduction so that either: (1) all accumulation remains in registers and only the two final values are written to S, or (2) an explicit, properly sized workspace is allocated for partials (not permitted for S in this contract). Alternatively, use a single program per row but exploit intra-program parallelism via BLOCK-sized register tiles and for-loops for reduction, as in the last correct proposal. Do not use S for temporary storage outside of [ROWS,2]."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 5,
+        "calls": 20,
+        "input_tokens": 116321,
+        "output_tokens": 12154,
+        "tokens": 128475
+      }
+    },
+    {
+      "attempt": 6,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_parallel_wide",
+            "grid": [
+              513
+            ],
+            "args": [
+              "X",
+              "S",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "a12b7c1c3175e146a5eae902245e4c2ed8a6f4a5258e39ca17f6d1171acb48bf",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 2,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs previous workspace misuse by accumulating all row statistics in registers using a BLOCK-wide reduction loop, never writing intermediates to S. Only the final mean and inv are written to S, matching the apply kernel's contract. The stats kernel is parallel at the register/thread level within each row, using BLOCK=256 for wider per-row reduction and better memory throughput. All loads/stores are correctly masked for bounds, and division is always by the logical N. This preserves correctness while offering improved intra-row parallelism without risking out-of-bounds memory access or workspace overrun.",
+      "accepted": false,
+      "previous_failure_attempt": 5,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 3.121087168343365,
+        "validation_seconds": 3.827607967890799,
+        "candidate": {
+          "median_ms": 0.03543039858341217,
+          "p25_ms": 0.03404799997806549,
+          "p75_ms": 0.04270080029964447,
+          "min_ms": 0.03266560137271881
+        },
+        "incumbent": {
+          "median_ms": 0.03522560000419617,
+          "p25_ms": 0.03281919956207276,
+          "p75_ms": 0.04264959990978241,
+          "min_ms": 0.03225600123405457
+        },
+        "paired_speedup": 0.9942196930487854,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 90.64171243909036,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 4.016148970462382,
+        "process_seconds": 24.896174450404942
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 23,
+        "input_tokens": 140320,
+        "output_tokens": 14168,
+        "tokens": 154488
+      },
+      "review": {
+        "diagnosis": "The measured outcome for attempt 6 is correct: all outputs are within tolerance, no nonfinite values, and the kernel matches the numerical reference. The stats kernel now does all partial-sum accumulation in registers via a BLOCK-wide loop, only writing the final two statistics for each row to S. This resolves the catastrophic validation failures seen in previous attempts that misused S as a workspace. The grid, masking, and division logic are sound, and the parallel decomposition is legal and safe. However, as in attempt 4, there is no measurable speedup: the kernel's performance (median_ms) is within 1% of the incumbent, indicating that increasing intra-row parallelism alone does not move the bottleneck for this problem size and hardware.",
+        "outcome": "The kernel is correct and safe, with no accuracy or stability regressions. However, the change does not yield a measurable performance gain versus the incumbent. The stats kernel remains limited by the per-row reduction structure, but for this row/column shape, register-level parallelism and a single grid program per row is not a bottleneck.",
+        "next_step": "To further pursue speedup, explore a decomposition that increases occupancy or uses a two-stage reduction: split each row across multiple programs, each accumulating partials in registers, then reduce across splits into the output buffer. This requires either a separate workspace (not allowed for S) or a two-stage launch, e.g., first stage for partials, second stage for final reduction, being careful to use only the contract S shape for final stats. Alternatively, consider whether the apply kernel could be fused with stats or otherwise restructured for greater throughput. If no improvement is found, this problem may already be compute/memory balanced at this batch size, and significant further speedup may require a different optimization axis (e.g., kernel fusion, larger batch, or hardware-occupancy tuning)."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 6,
+        "calls": 24,
+        "input_tokens": 150539,
+        "output_tokens": 14562,
+        "tokens": 165101
+      }
+    },
+    {
+      "attempt": 7,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_split2_stage1",
+            "grid": [
+              1026
+            ],
+            "args": [
+              "X",
+              "T",
+              "N",
+              2,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_stats_split2_stage2",
+            "grid": [
+              513
+            ],
+            "args": [
+              "T",
+              "S",
+              "N",
+              2
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "0355cfe3d76d2f709d3b78e52f43a08c27271f40765415599238769b158aae26",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 3,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This implements a two-stage reduction for layernorm statistics to increase parallelism and occupancy. The first kernel splits each row across two programs (SPLIT=2), each accumulating partial sums (x, x^2) for half a row into a workspace T as [513 * 2, 2]. The second kernel reduces the two partials for each row, computes final mean and variance, and writes the result to S ([513,2]) for the apply kernel. All loads and stores are masked, and reduction identities are preserved. This structure is a true computational/data movement transformation versus the incumbent, and addresses the bottleneck of low stats kernel occupancy for moderate row counts by enabling more programs to run in parallel.",
+      "accepted": false,
+      "previous_failure_attempt": null,
+      "result": {
+        "status": "incorrect",
+        "error_type": "AssertionError",
+        "error": "validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]\nTensor-likes are not close!\n\nMismatched elements: 398818 / 400653 (99.5%)\nGreatest absolute difference: 3.7230138778686523 at index (154, 343) (up to 2e-05 allowed)\nGreatest relative difference: 63808.65625 at index (11, 395) (up to 0.0002 allowed)",
+        "worker_seconds": 16.8093192987144,
+        "process_seconds": 19.086922730319202
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 27,
+        "input_tokens": 177089,
+        "output_tokens": 17193,
+        "tokens": 194282
+      },
+      "review": {
+        "diagnosis": "The proposed two-stage stats reduction is incorrect: the majority of output elements are outside the allowed tolerance, with 99.5% mismatch and large absolute and relative errors. The root cause is an incorrect split of the row into halves in stage 1: each program computes partial sums over an offset range, but the offset calculation (offs = split * (N // SPLIT) + tl.arange(0, BLOCK)) only covers the first BLOCK elements of each half, rather than looping or vectorizing across the full half-row. As a result, only a subset of elements are reduced, and the computed mean/variance is based on incomplete data. This error propagates to the apply kernel, so nearly all outputs are wrong. The grid/shape/constexpr usage is otherwise legal, but the reduction logic is incomplete.",
+        "outcome": "The attempt fails with almost all outputs incorrect due to incomplete reduction of each row in the two-stage stats kernel. The logic only sums over a small range within each split, not the full half-row, resulting in invalid statistics and layernorm output.",
+        "next_step": "Repair the first-stage stats kernel so that each split covers its entire chunk of the row: use a for-loop over the split's column range in BLOCK-sized chunks, accumulating all values in registers before writing to T. Each program must process all columns assigned to its split, not just a single BLOCK window. In stage 2, sum all partials as before. Ensure all loads and stores are masked for bounds, and that the workspace T is fully written before being read. Re-validate for correctness before further optimization."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 7,
+        "calls": 28,
+        "input_tokens": 188487,
+        "output_tokens": 17530,
+        "tokens": 206017
+      }
+    },
+    {
+      "attempt": 8,
+      "parent_id": 0,
+      "config": {
+        "mode": "source-v1",
+        "launches": [
+          {
+            "kernel": "layernorm_stats_split2_stage1_fullrow",
+            "grid": [
+              1026
+            ],
+            "args": [
+              "X",
+              "T",
+              "N",
+              2,
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_stats_split2_stage2",
+            "grid": [
+              513
+            ],
+            "args": [
+              "T",
+              "S",
+              "N",
+              2
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          },
+          {
+            "kernel": "layernorm_apply",
+            "grid": [
+              1566
+            ],
+            "args": [
+              "X",
+              "W",
+              "B",
+              "S",
+              "Y",
+              "TOTAL",
+              "N",
+              256
+            ],
+            "num_warps": 4,
+            "num_stages": 1
+          }
+        ]
+      },
+      "source_hash": "abf839bd3bc719f3302b92d9bee8c72bf2e5a44f45cd43341ad6e8ddf0cb764f",
+      "source_edit": {
+        "structural_edit": true,
+        "launches_before": 2,
+        "launches_after": 3,
+        "note": "Structural screen passed; transformation mechanism requires source review."
+      },
+      "rationale": "This repairs the two-stage stats reduction by ensuring each split in the first stage covers its entire assigned chunk of the row. Instead of processing only a single BLOCK window per split, the kernel loops over the full chunk in BLOCK-sized tiles, accumulating all values in registers before writing the two partials to T. All loads are carefully masked for bounds, and every column in the split is reduced. The second stage sums all partials as before to produce the final stats for each row. This guarantees correctness, covering all columns exactly once, and enables measurement of the impact of this two-stage parallel decomposition on performance. The apply kernel remains unchanged. The workspace T is sized [513*2,2] as required by the decomposition.",
+      "accepted": false,
+      "previous_failure_attempt": 7,
+      "result": {
+        "status": "ok",
+        "environment": {
+          "python": "3.12.11 (main, Jan 15 2026, 17:04:57) [GCC 8.5.0 20210514 (Red Hat 8.5.0-22)]",
+          "platform": "Linux-4.18.0-553.150.1.el8_10.x86_64-x86_64-with-glibc2.28",
+          "torch": "2.11.0+cu128",
+          "triton": "3.6.0",
+          "cuda": "12.8",
+          "gpu": "NVIDIA A100-PCIE-40GB",
+          "memory_bytes": 42406903808,
+          "capability": [
+            8,
+            0
+          ],
+          "sm_count": 108
+        },
+        "first_launch_seconds": 4.950890393927693,
+        "validation_seconds": 5.9790800074115396,
+        "candidate": {
+          "median_ms": 0.04966399967670441,
+          "p25_ms": 0.048844799399375916,
+          "p75_ms": 0.054323199391365054,
+          "min_ms": 0.04689919948577881
+        },
+        "incumbent": {
+          "median_ms": 0.035020801424980166,
+          "p25_ms": 0.03461120128631592,
+          "p75_ms": 0.040345600247383116,
+          "min_ms": 0.032767999172210696
+        },
+        "paired_speedup": 0.7051546724579889,
+        "confirmed": false,
+        "throughput": {
+          "flops": null,
+          "minimum_bytes": 3211472,
+          "logical_gbps": 64.66398237970321,
+          "achieved_tflops": null,
+          "fraction_peak_bandwidth": null,
+          "fraction_peak_compute": null,
+          "note": "Logical minimum traffic is not measured DRAM traffic. Peak fractions require verified device/dtype peaks."
+        },
+        "worker_seconds": 6.202328213490546,
+        "process_seconds": 19.077782741747797
+      },
+      "cards": [],
+      "budget": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 31,
+        "input_tokens": 218636,
+        "output_tokens": 20247,
+        "tokens": 238883
+      },
+      "review": {
+        "diagnosis": "The two-stage stats reduction kernel is now correct: each split in the first stage accumulates over its assigned chunk of the row in a BLOCK-tiled loop, with full masking and correct range, then writes exactly one pair of partials per split to the workspace T. The second stage sums the partials for each row and computes the final mean/inverse std as expected. The apply kernel is unchanged and reads the results from S as before. Validation passes: all outputs are within tolerance, and the numerical result is correct.",
+        "outcome": "Functionality is fully correct. However, the measured performance is significantly worse than the incumbent: median_ms is about 50% slower. The extra kernel launch and global memory workspace for partials T introduce additional overhead that offsets any benefit from increased parallelism in the stats reduction. For this problem size and hardware, per-row occupancy is not the dominant bottleneck, and the two-stage approach is inefficient.",
+        "next_step": "Try increasing SPLIT (number of parallel splits per row) in the two-stage reduction to see if further parallelism amortizes the overhead, but beware of register and workspace pressure. Alternatively, revert to a single-program-per-row stats kernel with a BLOCK-wide reduction loop, as this maximizes performance for moderate row counts and avoids extra memory traffic. Consider fusing stats and apply into a single kernel for larger speedup if allowed, or tuning BLOCK size and num_warps for the single-stage kernel. For this case, further two-stage reduction tuning is unlikely to outperform the simple one-stage kernel."
+      },
+      "budget_after_review": {
+        "candidate_cap": 8,
+        "call_cap": 32,
+        "token_safety_cap": 500000,
+        "attempts": 8,
+        "calls": 32,
+        "input_tokens": 231647,
+        "output_tokens": 20572,
+        "tokens": 252219
+      }
+    }
+  ],
+  "budget": {
+    "candidate_cap": 8,
+    "call_cap": 32,
+    "token_safety_cap": 500000,
+    "attempts": 8,
+    "calls": 32,
+    "input_tokens": 231647,
+    "output_tokens": 20572,
+    "tokens": 252219
+  }
+}

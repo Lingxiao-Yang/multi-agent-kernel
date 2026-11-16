@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_blockloop_unroll2_reduced_regs",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_blockloop_unroll2_reduced_regs(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    # Compute max in block-looped, register-sparse fashion\n    max_val = -float('inf')\n    for base in range(0, ((N + BLOCK - 1) // BLOCK) * BLOCK, BLOCK):\n        idx = base + offs\n        mask = idx < N\n        x_ptrs = X + row * N + idx\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        # Reduce across only valid elements\n        max_val = tl.maximum(max_val, tl.max(x, 0))\n    # Compute sum(exp(x - max)) block-looped\n    denom = 0.0\n    for base in range(0, ((N + BLOCK - 1) // BLOCK) * BLOCK, BLOCK):\n        idx = base + offs\n        mask = idx < N\n        x_ptrs = X + row * N + idx\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        e = tl.exp(x - max_val)\n        denom = denom + tl.sum(e, 0)\n    # Write output in block-looped steps\n    for base in range(0, ((N + BLOCK - 1) // BLOCK) * BLOCK, BLOCK):\n        idx = base + offs\n        mask = idx < N\n        x_ptrs = X + row * N + idx\n        x = tl.load(x_ptrs, mask=mask, other=0.0)\n        e = tl.exp(x - max_val) / denom\n        y_ptrs = Y + row * N + idx\n        tl.store(y_ptrs, e, mask=mask)\n",
+  "rationale": "This kernel restructures the previous block-looped/unrolled approach to minimize register pressure by only allocating a single BLOCK-sized register buffer per phase. Instead of unrolling multiple BLOCKs at once, it loops in BLOCK-sized chunks and accumulates the reduction at each step, so only one vector is resident at a time. Each reduction (max, sum-exp) is performed across the local BLOCK, masking to ensure only valid columns participate. This reduces register requirements compared to wider unrolling, which can be beneficial for very wide or irregular rows. All loads and stores are masked for idx < N, and each output is written exactly once. This approach maintains vector throughput, covers all output elements, and is compliant with the allowed Triton primitives."
+}

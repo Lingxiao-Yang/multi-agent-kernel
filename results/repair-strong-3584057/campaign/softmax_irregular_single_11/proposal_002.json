@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blocked_vectorized_loop",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blocked_vectorized_loop(X, Y, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n    mask = offs < N\n    # Load row in vectorized chunks, accumulate max\n    vec_width = 4\n    max_val = -float('inf')\n    for i in range(0, RB, vec_width):\n        offs_v = offs[i:i+vec_width]\n        idx_v = row * N + offs_v\n        mask_v = offs_v < N\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        max_val = tl.maximum(max_val, tl.max(x_v, 0))\n    # Compute exp and sum in a second vectorized loop\n    sum_exp = 0.0\n    for i in range(0, RB, vec_width):\n        offs_v = offs[i:i+vec_width]\n        idx_v = row * N + offs_v\n        mask_v = offs_v < N\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        sum_exp = sum_exp + tl.sum(exp_x, 0)\n    denom = tl.where(sum_exp == 0, 1, sum_exp)\n    # Final normalization and store in vectorized chunks\n    for i in range(0, RB, vec_width):\n        offs_v = offs[i:i+vec_width]\n        idx_v = row * N + offs_v\n        mask_v = offs_v < N\n        x_v = tl.load(X + idx_v, mask=mask_v, other=-float('inf'))\n        x_centered = x_v - max_val\n        exp_x = tl.exp(x_centered) * mask_v\n        res = exp_x / denom\n        tl.store(Y + idx_v, res, mask=mask_v)\n",
+  "rationale": "This kernel increases memory-level parallelism and arithmetic intensity by processing the row in small vectorized chunks (vec_width=4) within each kernel instance. It uses three explicit for-loops over the padded row extent: one to compute the row max, one for the sum of exponentials, and one for normalization and storage. This can improve L1/L2 cacheline utilization and hide memory latency by issuing multiple independent loads per iteration, while the scalar reductions aggregate into max_val and sum_exp. All accesses and reductions are masked for ragged row width. This approach is a strict generalization of the incumbent, but with explicit vectorized memory access and arithmetic in tight loops, which may yield better hardware utilization for large RB cases."
+}

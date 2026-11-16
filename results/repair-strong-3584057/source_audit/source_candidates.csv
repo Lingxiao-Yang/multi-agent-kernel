@@ -1,0 +1,582 @@
+accepted,attempt,calls,case,error,has_dot,has_reduction,kernels,launches,run,seed,source_differs,source_supplied,status,structural_screen,variant
+False,1,"{'tl.program_id': 3, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 5, 'tl.arange': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 188077 / 400653 (46.9%)
+Greatest absolute difference: 52574.69140625 at index (25, 343) (up to 2e-05 allowed)
+Greatest relative difference: 329982784.0 at index (114, 202) (up to 0.0002 allowed)",False,True,"['layernorm_stats_split', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,incorrect,True,multi
+False,2,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6, 'tl.sum': 3}",layernorm_irregular,"at 7:4:
+def layernorm_stats_parallel(X, S, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, BLOCK)
+    mean_acc = tl.zeros((), dtype=tl.float32)
+    m2_acc = tl.zeros((), dtype=tl.float32)
+    count = 0
+    for offs_base in range(0, N, BLOCK):
+    ^
+AssertionError('Loop-carried variable count has initial type int32 but is re-assigned to uint32 in loop! Please make sure that the type stays consistent.')",False,True,"['layernorm_stats_parallel', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,error,True,multi
+False,3,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.zeros': 3, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6, 'tl.sum': 3}",layernorm_irregular,unsupported Triton primitive uint32,False,True,"['layernorm_stats_parallel', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,proposal_error,False,multi
+False,4,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6, 'tl.sum': 2}",layernorm_irregular,,False,True,"['layernorm_stats_parallel', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,ok,True,multi
+False,5,"{'tl.program_id': 3, 'tl.minimum': 1, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 5, 'tl.arange': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 212009 / 400653 (52.9%)
+Greatest absolute difference: 57484.41015625 at index (119, 343) (up to 2e-05 allowed)
+Greatest relative difference: 192861200.0 at index (11, 395) (up to 0.0002 allowed)",False,True,"['layernorm_stats_split2', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,incorrect,True,multi
+False,6,"{'tl.program_id': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.store': 3, 'tl.load': 6, 'tl.sum': 2, 'tl.arange': 2}",layernorm_irregular,,False,True,"['layernorm_stats_parallel_wide', 'layernorm_apply']",2,layernorm_irregular_multi_11,11,True,True,ok,True,multi
+False,7,"{'tl.program_id': 3, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 5, 'tl.arange': 2, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 398818 / 400653 (99.5%)
+Greatest absolute difference: 3.7230138778686523 at index (154, 343) (up to 2e-05 allowed)
+Greatest relative difference: 63808.65625 at index (11, 395) (up to 0.0002 allowed)",False,True,"['layernorm_stats_split2_stage1', 'layernorm_stats_split2_stage2', 'layernorm_apply']",3,layernorm_irregular_multi_11,11,True,True,incorrect,True,multi
+False,8,"{'tl.program_id': 3, 'min': 1, 'tl.zeros': 4, 'range': 2, 'tl.store': 5, 'tl.load': 8, 'tl.sum': 2, 'tl.arange': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,,False,True,"['layernorm_stats_split2_stage1_fullrow', 'layernorm_stats_split2_stage2', 'layernorm_apply']",3,layernorm_irregular_multi_11,11,True,True,ok,True,multi
+False,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.sum': 2, 'tl.div_rn': 1, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1}",layernorm_irregular,"at 4:11:
+def fused_layernorm_rowwise(X, W, B, Y, N: tl.constexpr):
+    row = tl.program_id(0)
+    BLOCK = 1024
+    cols = tl.arange(0, BLOCK)
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['fused_layernorm_rowwise'],1,layernorm_irregular_multi_22,22,True,True,error,True,multi
+True,2,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.sum': 2, 'tl.div_rn': 1, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1}",layernorm_irregular,,False,True,['fused_layernorm_rowwise'],1,layernorm_irregular_multi_22,22,True,True,ok,True,multi
+False,3,"{'tl.program_id': 2, 'tl.load': 9, 'tl.sum': 2, 'tl.zeros': 2, 'tl.store': 5, 'tl.barrier': 2, 'tl.where': 1, 'tl.arange': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,unsupported Triton primitive barrier,False,True,['fused_layernorm_rowwise_2d'],1,layernorm_irregular_multi_22,22,True,True,proposal_error,False,multi
+False,4,"{'tl.program_id': 3, 'tl.load': 6, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'range': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1}",layernorm_irregular,"at 5:11:
+def partial_layernorm_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    split = tl.program_id(1)
+    offs = split * BLOCK
+    cols = tl.arange(0, BLOCK) + offs
+           ^
+arange's range must be a power of 2",False,True,"['partial_layernorm_rowwise', 'final_layernorm_rowwise']",2,layernorm_irregular_multi_22,22,True,True,error,True,multi
+False,5,"{'tl.program_id': 3, 'tl.load': 6, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'range': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1}",layernorm_irregular,"validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 2052 / 400653 (0.5%)
+Greatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)
+Greatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)",False,True,"['partial_layernorm_rowwise', 'final_layernorm_rowwise']",2,layernorm_irregular_multi_22,22,True,True,incorrect,True,multi
+False,6,"{'tl.program_id': 3, 'tl.load': 6, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'range': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1}",layernorm_irregular,"validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 2052 / 400653 (0.5%)
+Greatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)
+Greatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)",False,True,"['partial_layernorm_rowwise', 'final_layernorm_rowwise']",2,layernorm_irregular_multi_22,22,True,True,incorrect,True,multi
+False,7,"{'tl.program_id': 3, 'tl.load': 6, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'tl.where': 3, 'range': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=zeros nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 2052 / 400653 (0.5%)
+Greatest absolute difference: 1.1793080568313599 at index (0, 2) (up to 2e-05 allowed)
+Greatest relative difference: 1.0 at index (0, 0) (up to 0.0002 allowed)",False,True,"['partial_layernorm_rowwise_split', 'final_layernorm_rowwise_split']",2,layernorm_irregular_multi_22,22,True,True,incorrect,True,multi
+False,8,"{'tl.program_id': 2, 'tl.arange': 2, 'range': 3, 'tl.div_rn': 2, 'tl.store': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.rsqrt': 1, 'tl.where': 2}",layernorm_irregular,,False,True,"['mean_rowwise_pass', 'varnorm_rowwise_pass']",2,layernorm_irregular_multi_22,22,True,True,ok,True,multi
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.div_rn': 1, 'tl.where': 2, 'tl.rsqrt': 1, 'tl.store': 1, 'tl.sum': 2}",layernorm_irregular,,False,True,['layernorm_fused'],1,layernorm_irregular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+False,2,"{'tl.program_id': 2, 'tl.minimum': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.sum': 2, 'tl.full': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 3, 'tl.store': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 399574 / 400653 (99.7%)
+Greatest absolute difference: 5.5735273361206055 at index (154, 343) (up to 2e-05 allowed)
+Greatest relative difference: 102104.9765625 at index (11, 395) (up to 0.0002 allowed)",False,True,['layernorm_split_row'],1,layernorm_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,3,"{'tl.program_id': 3, 'tl.minimum': 1, 'tl.arange': 2, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 3, 'tl.where': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=400653/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",False,True,"['layernorm_partial_reduction', 'layernorm_finalize']",2,layernorm_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,4,"{'tl.program_id': 3, 'tl.minimum': 1, 'tl.arange': 2, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 3, 'tl.where': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 137997 / 400653 (34.4%)
+Greatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",False,True,"['layernorm_partial_reduction', 'layernorm_finalize']",2,layernorm_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,5,"{'tl.program_id': 3, 'tl.minimum': 1, 'tl.arange': 2, 'tl.load': 10, 'tl.sum': 3, 'tl.store': 4, 'tl.where': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 137997 / 400653 (34.4%)
+Greatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",False,True,"['layernorm_partial_reduction_v2', 'layernorm_finalize_v2']",2,layernorm_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,6,"{'tl.program_id': 1, 'range': 3, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.store': 1, 'tl.arange': 3}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 70901 / 400653 (17.7%)
+Greatest absolute difference: 0.014000415802001953 at index (469, 344) (up to 2e-05 allowed)
+Greatest relative difference: 42.78575134277344 at index (114, 202) (up to 0.0002 allowed)",False,True,['layernorm_rowwise_tiled'],1,layernorm_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+False,7,"{'tl.program_id': 1, 'range': 2, 'tl.rsqrt': 1, 'tl.load': 4, 'tl.sum': 2, 'tl.store': 1, 'tl.arange': 2}",layernorm_irregular,,False,True,['layernorm_rowwise_splitmean'],1,layernorm_irregular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+False,8,"{'tl.program_id': 1, 'range': 2, 'tl.rsqrt': 1, 'tl.minimum': 2, 'tl.arange': 2, 'tl.load': 4, 'tl.sum': 2, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_parallel'],1,layernorm_irregular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 4, 'tl.div_rn': 1, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1, 'tl.sum': 2}",layernorm_irregular,,False,True,['layernorm_fused'],1,layernorm_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,2,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 4, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_multiwarp'],1,layernorm_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,3,"{'tl.program_id': 2, 'tl.load': 8, 'tl.sum': 2, 'tl.zeros': 1, 'tl.store': 3, 'tl.barrier': 1, 'tl.broadcast_to': 2, 'tl.arange': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,unsupported Triton primitive barrier,False,True,['layernorm_row_split'],1,layernorm_irregular_multi_knowledge_22,22,True,True,proposal_error,False,multi_knowledge
+False,4,"{'tl.program_id': 3, 'tl.load': 8, 'tl.sum': 2, 'tl.arange': 2, 'tl.store': 5, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=398605/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",False,True,"['layernorm_blockwise_partial', 'layernorm_blockwise_final']",2,layernorm_irregular_multi_knowledge_22,22,True,True,incorrect,True,multi_knowledge
+False,5,"{'tl.program_id': 3, 'tl.load': 8, 'tl.sum': 2, 'tl.arange': 2, 'tl.store': 5, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 137997 / 400653 (34.4%)
+Greatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",False,True,"['layernorm_blockwise_partial', 'layernorm_blockwise_final']",2,layernorm_irregular_multi_knowledge_22,22,True,True,incorrect,True,multi_knowledge
+False,6,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 8, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1, 'tl.store': 5, 'tl.sum': 2}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=398097/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400145 / 400653 (99.9%)
+Greatest absolute difference: nan at index (0, 0) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 0) (up to 0.0002 allowed)",False,True,"['layernorm_blockwise_final_fullwrite', 'layernorm_blockwise_partial']",2,layernorm_irregular_multi_knowledge_22,22,True,True,incorrect,True,multi_knowledge
+False,7,"{'tl.program_id': 3, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=137997/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 137997 / 400653 (34.4%)
+Greatest absolute difference: nan at index (0, 512) (up to 2e-05 allowed)
+Greatest relative difference: nan at index (0, 512) (up to 0.0002 allowed)",False,True,"['layernorm_blockwise_partial_ws', 'layernorm_blockwise_final_ws']",2,layernorm_irregular_multi_knowledge_22,22,True,True,incorrect,True,multi_knowledge
+False,8,"{'tl.program_id': 4, 'tl.load': 8, 'tl.sum': 2, 'tl.store': 3, 'tl.arange': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.where': 1}",layernorm_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 91727 / 400653 (22.9%)
+Greatest absolute difference: 9.820737838745117 at index (194, 30) (up to 2e-05 allowed)
+Greatest relative difference: 1.0 at index (1, 0) (up to 0.0002 allowed)",False,True,"['layernorm_blockwise_partial_ws', 'layernorm_blockwise_final_ws_fullrow']",2,layernorm_irregular_multi_knowledge_22,22,True,True,incorrect,True,multi_knowledge
+False,1,"{'tl.program_id': 5, 'tl.load': 10, 'tl.sum': 2, 'tl.store': 5, 'tl.arange': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1}",layernorm_irregular,invalid argument symbol or integer,False,True,"['layernorm_stats_blockwise', 'layernorm_stats_reduce', 'layernorm_apply_rowchunk']",3,layernorm_irregular_single_11,11,True,True,proposal_error,False,single
+False,2,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,"at 6:32:
+def layernorm_apply_rowchunk(X, W, B, S, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    CHUNKS = 4
+    chunk_size = BLOCK // CHUNKS
+    offs = chunk * chunk_size + tl.arange(0, chunk_size)
+                                ^
+arange's arguments must be of type tl.constexpr",False,True,"['layernorm_stats_rowwise', 'layernorm_apply_rowchunk']",2,layernorm_irregular_single_11,11,True,True,error,True,single
+False,3,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,,False,True,"['layernorm_stats_rowwise', 'layernorm_apply_rowchunk']",2,layernorm_irregular_single_11,11,True,True,ok,True,single
+False,4,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,"validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 13851 / 400653 (3.5%)
+Greatest absolute difference: 0.00012198835611343384 at index (0, 733) (up to 2e-05 allowed)
+Greatest relative difference: 18.855627059936523 at index (0, 594) (up to 0.0002 allowed)",False,True,"['layernorm_stats_rowwise', 'layernorm_apply_rowchunk_fused']",2,layernorm_irregular_single_11,11,True,True,incorrect,True,single
+False,5,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,,False,True,"['layernorm_stats_rowwise', 'layernorm_apply_rowchunk']",2,layernorm_irregular_single_11,11,True,True,ok,True,single
+False,6,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,"at 4:27:
+def layernorm_apply_split(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    offs = chunk * CHUNK + tl.arange(0, CHUNK)
+                           ^
+arange's range must be a power of 2",False,True,"['layernorm_stats', 'layernorm_apply_split']",2,layernorm_irregular_single_11,11,True,True,error,True,single
+False,7,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3}",layernorm_irregular,,False,True,"['layernorm_stats', 'layernorm_apply_chunked']",2,layernorm_irregular_single_11,11,True,True,ok,True,single
+False,8,"{'tl.program_id': 3, 'tl.arange': 2, 'tl.load': 6, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 3, 'range': 1}",layernorm_irregular,"at 7:30:
+def layernorm_apply_chunked_unrolled(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    base_off = chunk * CHUNK
+    UNROLL = 64  # UNROLL must divide CHUNK and be a power of two
+    for u in range(0, CHUNK, UNROLL):
+        offs = base_off + u + tl.arange(0, UNROLL)
+                              ^
+arange's arguments must be of type tl.constexpr",False,True,"['layernorm_stats', 'layernorm_apply_chunked_unrolled']",2,layernorm_irregular_single_11,11,True,True,error,True,single
+False,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 6, 'tl.where': 2, 'tl.rsqrt': 1, 'tl.store': 2, 'range': 1, 'tl.sum': 2}",layernorm_irregular,"validation seed=101 edge=constant nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 1539 / 400653 (0.4%)
+Greatest absolute difference: 4.6098779421299696e-05 at index (0, 343) (up to 2e-05 allowed)
+Greatest relative difference: 0.05183902755379677 at index (0, 343) (up to 0.0002 allowed)",False,True,['layernorm_blockwise'],1,layernorm_irregular_single_22,22,True,True,incorrect,True,single
+True,2,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_fullrow'],1,layernorm_irregular_single_22,22,True,True,ok,True,single
+False,3,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.zeros': 3, 'range': 2, 'tl.sum': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 4, 'tl.where': 2, 'mask.to': 1, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_vectorized'],1,layernorm_irregular_single_22,22,True,True,ok,True,single
+False,4,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1}",layernorm_irregular,"at 9:12:
+def layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    pid = tl.program_id(0)
+    ROWS_PER_PROG = 4
+    row_start = pid * ROWS_PER_PROG
+    offs = tl.arange(0, BLOCK)
+    for row_offset in range(ROWS_PER_PROG):
+        row = row_start + row_offset
+        if row >= 513:
+            break
+            ^
+unsupported AST node type: Break",False,True,['layernorm_fused_multirow_fullrow'],1,layernorm_irregular_single_22,22,True,True,error,True,single
+False,5,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1}",layernorm_irregular,"at 9:12:
+def layernorm_fused_multirow_fullrow(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    pid = tl.program_id(0)
+    ROWS_PER_PROG = 4
+    row_start = pid * ROWS_PER_PROG
+    offs = tl.arange(0, BLOCK)
+    for row_offset in range(ROWS_PER_PROG):
+        row = row_start + row_offset
+        if row >= 513:
+            continue
+            ^
+unsupported AST node type: Continue",False,True,['layernorm_fused_multirow_fullrow'],1,layernorm_irregular_single_22,22,True,True,error,True,single
+False,6,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 4, 'tl.where': 4, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_multirow_masked'],1,layernorm_irregular_single_22,22,True,True,ok,True,single
+False,7,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.zeros': 3, 'range': 2, 'tl.sum': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 4, 'tl.where': 3, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_fullrow_blockaccum'],1,layernorm_irregular_single_22,22,True,True,ok,True,single
+True,8,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.zeros': 9, 'range': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 12, 'tl.where': 9, 'tl.sum': 9, 'tl.store': 3}",layernorm_irregular,,False,True,['layernorm_fused_fullrow_blockaccum_tail_unroll2'],1,layernorm_irregular_single_22,22,True,True,ok,True,single
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 3, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.where': 1, 'tl.rsqrt': 1, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_fused_row_parallel'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.load': 4, 'tl.sum': 8, 'tl.full': 1, 'tl.zeros': 2, 'range': 1, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.store': 1, 'tl.arange': 2}",layernorm_irregular,,False,True,['layernorm_split_row_vector'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,3,"{'tl.program_id': 1, 'tl.zeros': 2, 'range': 3, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 1, 'tl.store': 1, 'tl.arange': 3}",layernorm_irregular,,False,True,['layernorm_row_chunked_parallel'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,4,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.zeros': 2, 'range': 3, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.where': 1, 'tl.store': 1}",layernorm_irregular,"at 8:4:
+def layernorm_row_multiwarp(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    lane = tl.arange(0, BLOCK)
+    # Per-lane accumulators for mean and variance
+    mean_acc = tl.zeros((), dtype=tl.float32)
+    var_acc = tl.zeros((), dtype=tl.float32)
+    # Strided reduction for mean
+    for c in range(lane, N, BLOCK):
+    ^
+TypeError(""For lower bound must be a scalar, got <['256'], int32>"")",False,True,['layernorm_row_multiwarp'],1,layernorm_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,5,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.zeros': 2, 'range': 3, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.where': 2, 'tl.store': 1}",layernorm_irregular,,False,True,['layernorm_row_strided_vector'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,6,"{'tl.program_id': 2, 'tl.zeros': 2, 'range': 4, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.store': 1, 'tl.arange': 3, 'tl.where': 2}",layernorm_irregular,"at 6:11:
+def layernorm_row_split4_vector(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    split = tl.program_id(1)
+    SPLITS = 4
+    chunk = split * BLOCK
+    cols = tl.arange(0, BLOCK) + chunk
+           ^
+arange's range must be a power of 2",False,True,['layernorm_row_split4_vector'],1,layernorm_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,7,"{'tl.program_id': 2, 'tl.zeros': 2, 'range': 4, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.store': 1, 'tl.arange': 3, 'tl.where': 2}",layernorm_irregular,,False,True,['layernorm_row_split4_vector'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,8,"{'tl.program_id': 2, 'tl.zeros': 2, 'range': 4, 'tl.sum': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.store': 1, 'tl.arange': 3, 'tl.where': 2}",layernorm_irregular,,False,True,['layernorm_split4_interleaved_unroll'],1,layernorm_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+True,1,"{'tl.program_id': 1, 'range': 3, 'tl.div_rn': 1, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1, 'tl.arange': 3}",layernorm_irregular,,False,True,['layernorm_fused_blockloop'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.num_programs': 1, 'tl.minimum': 1, 'range': 3, 'tl.sum': 6, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.where': 2, 'tl.store': 1, 'tl.arange': 3}",layernorm_irregular,"at 21:17:
+    local_var = 0.0
+    count = 0.0
+    # 1. Partial mean
+    for off in range(col_start, col_end, BLOCK):
+        offs = off + tl.arange(0, BLOCK)
+        mask = (offs < col_end) & (offs < N)
+        x_ptrs = X + row * N + offs
+        x = tl.load(x_ptrs, mask=mask, other=0.0)
+        local_mean += tl.sum(x, 0)
+        count += tl.sum(mask, 0)
+    # Global reduction: sum over tiles
+    total_mean = tl.sum(local_mean, axis=0)
+                 ^",False,True,['layernorm_parallel_tile'],1,layernorm_irregular_single_knowledge_22,22,True,True,error,True,single_knowledge
+False,3,"{'tl.program_id': 1, 'range': 3, 'tl.div_rn': 1, 'tl.rsqrt': 1, 'tl.load': 5, 'tl.sum': 2, 'tl.where': 2, 'tl.store': 1, 'tl.arange': 3}",layernorm_irregular,,False,True,['layernorm_fused_blockloop_vec'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,4,"{'tl.program_id': 2, 'tl.minimum': 1, 'range': 2, 'tl.zeros': 3, 'tl.rsqrt': 1, 'tl.load': 4, 'tl.sum': 7, 'tl.where': 1, 'tl.store': 1, 'tl.arange': 2}",layernorm_irregular,Python object mutation forbidden; use tl.store for output,False,True,['layernorm_fused_blockloop_parallel'],1,layernorm_irregular_single_knowledge_22,22,True,True,proposal_error,False,single_knowledge
+False,5,"{'tl.program_id': 1, 'range': 2, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 4, 'tl.sum': 2, 'tl.where': 1, 'tl.store': 1, 'tl.arange': 2}",layernorm_irregular,,False,True,['layernorm_fused_blockloop_fusedstats'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,6,"{'tl.program_id': 1, 'range': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 12, 'tl.sum': 6, 'tl.where': 3, 'tl.store': 3, 'tl.arange': 6}",layernorm_irregular,,False,True,['layernorm_fused_blockloop_unrolled'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,7,"{'tl.program_id': 1, 'range': 4, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 20, 'tl.sum': 10, 'tl.where': 5, 'tl.store': 5, 'tl.arange': 10}",layernorm_irregular,,False,True,['layernorm_fused_blockloop_unrolled4'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,8,"{'tl.program_id': 1, 'range': 6, 'tl.div_rn': 2, 'tl.rsqrt': 1, 'tl.load': 8, 'tl.sum': 4, 'tl.where': 2, 'tl.store': 2, 'tl.arange': 4}",layernorm_irregular,,False,True,['layernorm_fused_vec8'],1,layernorm_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused'],1,softmax_irregular_multi_11,11,True,True,ok,True,multi
+False,2,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 1, 'tl.max_contiguous': 1, 'tl.broadcast_to': 2, 'tl.exp': 1, 'tl.sum': 2, 'tl.store': 1, 'tl.arange': 1, 'float': 1}",softmax_irregular,only tensor .to access allowed,False,True,['softmax_parallel_chunks'],1,softmax_irregular_multi_11,11,True,True,proposal_error,False,multi
+False,3,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 2, 'tl.zeros': 2, 'tl.where': 4, 'tl.exp': 1, 'tl.sum': 2, 'tl.store': 1, 'tl.arange': 1, 'tl.float32': 1, 'tl.broadcast_to': 4}",softmax_irregular,"at 5:11:
+def softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    CHUNK_SIZE = BLOCK // 2
+    cols = tl.arange(0, CHUNK_SIZE) + chunk * CHUNK_SIZE
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_parallel_chunks'],1,softmax_irregular_multi_11,11,True,True,error,True,multi
+False,4,"{'tl.program_id': 2, 'tl.load': 3, 'tl.max': 3, 'tl.arange': 3, 'tl.maximum': 1, 'tl.exp': 3, 'tl.sum': 3, 'tl.store': 1, 'tl.float32': 1}",softmax_irregular,invalid argument symbol or integer,False,True,['softmax_parallel_chunks'],1,softmax_irregular_multi_11,11,True,True,proposal_error,False,multi
+False,5,"{'tl.program_id': 2, 'tl.load': 3, 'tl.arange': 3, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 3, 'tl.sum': 2, 'tl.store': 1, 'tl.float32': 1}",softmax_irregular,"at 8:15:
+def softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    CHUNK_SIZE = BLOCK // 2  # 1024//2 = 512 for this case
+    cols = tl.arange(0, 512) + chunk * 512
+    mask = cols < N
+    offs = row * N + cols
+    neg_inf = -tl.float32(3.4028235e38)
+               ^
+TypeError(""'dtype' object is not callable"")",False,True,['softmax_parallel_chunks'],1,softmax_irregular_multi_11,11,True,True,error,True,multi
+False,6,"{'tl.program_id': 2, 'tl.load': 3, 'tl.arange': 3, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 3, 'tl.sum': 2, 'tl.store': 1}",softmax_irregular,"at 6:11:
+def softmax_parallel_chunks(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    chunk = tl.program_id(1)
+    # Statically set chunk size
+    CHUNK_SIZE = 512
+    cols = tl.arange(0, CHUNK_SIZE) + chunk * CHUNK_SIZE
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_parallel_chunks'],1,softmax_irregular_multi_11,11,True,True,error,True,multi
+False,7,"{'tl.program_id': 2, 'tl.load': 3, 'tl.arange': 3, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 3, 'tl.sum': 2, 'tl.store': 1}",softmax_irregular,,False,True,['softmax_row_chunked'],1,softmax_irregular_multi_11,11,True,True,ok,True,multi
+False,8,"{'tl.program_id': 2, 'tl.load': 3, 'tl.arange': 3, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 3, 'tl.sum': 2, 'tl.store': 1}",softmax_irregular,,False,True,['softmax_blockwise'],1,softmax_irregular_multi_11,11,True,True,ok,True,multi
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused'],1,softmax_irregular_multi_22,22,True,True,ok,True,multi
+False,2,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,"at 5:11:
+def softmax_tile_split(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    tile_width = BLOCK // 2
+    offs = tl.arange(0, tile_width)
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_tile_split'],1,softmax_irregular_multi_22,22,True,True,error,True,multi
+False,3,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,invalid argument symbol or integer,False,True,['softmax_tile_split_fixed'],1,softmax_irregular_multi_22,22,True,True,proposal_error,False,multi
+False,4,"{'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'tl.program_id': 2, 'float': 1}",softmax_irregular,,False,True,['softmax_multirow'],1,softmax_irregular_multi_22,22,True,True,ok,True,multi
+False,5,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 2, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 2, 'tl.store': 1, 'float': 2}",softmax_irregular,"at 5:11:
+def softmax_split_col(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    tile = BLOCK // 2
+    offs = tl.arange(0, tile)
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_col'],1,softmax_irregular_multi_22,22,True,True,error,True,multi
+False,6,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 2, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 2, 'tl.store': 1, 'float': 2}",softmax_irregular,"at 5:11:
+def softmax_split_col_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    tile = RB // 2
+    offs = tl.arange(0, tile)
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_col_fixed'],1,softmax_irregular_multi_22,22,True,True,error,True,multi
+False,7,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 2, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 2, 'tl.store': 2, 'float': 2}",softmax_irregular,"at 6:12:
+def softmax_split_col_unrolled(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    tile = RB // 2
+    # Unroll both halves explicitly
+    offs0 = tl.arange(0, tile)
+            ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_col_unrolled'],1,softmax_irregular_multi_22,22,True,True,error,True,multi
+False,8,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 2, 'tl.max': 2, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 2, 'tl.store': 2, 'float': 2}",softmax_irregular,,False,True,['softmax_split_col_literal'],1,softmax_irregular_multi_22,22,True,True,ok,True,multi
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused'],1,softmax_irregular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+False,2,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries,False,True,['softmax_multiwarp'],1,softmax_irregular_multi_knowledge_11,11,True,True,proposal_error,False,multi_knowledge
+False,3,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 1, 'tl.zeros': 2, 'tl.where': 2, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'tl.arange': 3, 'float': 1}",softmax_irregular,"at 6:24:
+def softmax_split_tile(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    tile_id = tl.program_id(1)
+    TILE = BLOCK // 2
+    col_offset = tile_id * TILE
+    cols = col_offset + tl.arange(0, TILE)
+                        ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_tile'],1,softmax_irregular_multi_knowledge_11,11,True,True,error,True,multi_knowledge
+False,4,"{'tl.program_id': 1, 'range': 3, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.exp': 2, 'tl.store': 1, 'tl.arange': 3, 'tl.max': 1, 'tl.sum': 1}",softmax_irregular,,False,True,['softmax_multi_tile'],1,softmax_irregular_multi_knowledge_11,11,True,True,ok,True,multi_knowledge
+False,5,"{'tl.program_id': 2, 'tl.arange': 2, 'tl.load': 1, 'tl.max': 1, 'tl.full': 1, 'tl.where': 4, 'range': 4, 'tl.exp': 1, 'tl.sum': 1, 'tl.zeros': 1, 'tl.store': 1, 'tl.num_warps': 7, 'tl.maximum': 1, 'float': 2}",softmax_irregular,unsupported Triton primitive num_warps,False,True,['softmax_multiwarp_hier'],1,softmax_irregular_multi_knowledge_11,11,True,True,proposal_error,False,multi_knowledge
+False,6,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 5, 'tl.max': 1, 'tl.store': 3, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'float': 1}",softmax_irregular,"at 5:10:
+def softmax_split_program_row(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    HALF = BLOCK // 2
+    col = tl.arange(0, HALF)
+          ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_program_row'],1,softmax_irregular_multi_knowledge_11,11,True,True,error,True,multi_knowledge
+False,7,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 5, 'tl.max': 1, 'tl.store': 3, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'float': 1}",softmax_irregular,invalid argument symbol or integer,False,True,['softmax_split_program_row'],1,softmax_irregular_multi_knowledge_11,11,True,True,proposal_error,False,multi_knowledge
+False,8,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 5, 'tl.max': 1, 'tl.store': 3, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'float': 1}",softmax_irregular,"validation seed=101 edge=random nonfinite_outputs=360130/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400568 / 400653 (100.0%)
+Greatest absolute difference: nan at index (0, 3) (up to 2e-06 allowed)
+Greatest relative difference: nan at index (0, 3) (up to 2e-05 allowed)",False,True,['softmax_split_program_row'],1,softmax_irregular_multi_knowledge_11,11,True,True,incorrect,True,multi_knowledge
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused'],1,softmax_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,2,"{'tl.arange': 1, 'range': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_persistent'],1,softmax_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,3,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 3, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.exp': 2, 'tl.where': 1, 'tl.store': 1, 'tl.max': 1, 'tl.sum': 1}",softmax_irregular,,False,True,['softmax_fused_blockwise'],1,softmax_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,4,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.where': 1, 'tl.sum': 1, 'tl.store': 1, 'tl.exp': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused_blockwise_shared'],1,softmax_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,5,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.zeros': 2, 'tl.store': 3, 'tl.barrier': 4, 'tl.where': 1, 'tl.sum': 1, 'range': 2, 'tl.exp': 1, 'tl.maximum': 1, 'float': 1}",softmax_irregular,Python object mutation forbidden; use tl.store for output,False,True,['softmax_row_col_parallel'],1,softmax_irregular_multi_knowledge_22,22,True,True,proposal_error,False,multi_knowledge
+False,6,"{'tl.program_id': 2, 'tl.arange': 3, 'tl.load': 1, 'tl.max': 1, 'tl.full': 1, 'tl.where': 3, 'range': 2, 'tl.sum': 1, 'tl.zeros': 1, 'tl.store': 1, 'tl.maximum': 1, 'tl.exp': 1, 'float': 2}",softmax_irregular,"at 24:14:
+    # Step 2: Compute local max for this partition
+    local_max = tl.max(x, 0)
+    # Step 3: All-gather local_max from all partitions into registers
+    # Each program instance computes its local_max and broadcasts it
+    # across SPLIT lanes for reduction (register only, no shared memory)
+    maxs = tl.full((SPLIT,), -float('inf'), dtype=tl.float32)
+    maxs = tl.where(tl.arange(0, SPLIT) == split_id, local_max, maxs)
+    # The following lines gather all local_max values for this row
+    # across SPLIT instances; since there is no inter-program comm,
+    # we simulate it by having each thread only access its own partition's max
+    # and then reduce over the register array (all maxs are -inf except one)
+    row_max = maxs[0]
+              ^
+unsupported tensor index: constexpr[0]",False,True,['softmax_colwise_parallel'],1,softmax_irregular_multi_knowledge_22,22,True,True,error,True,multi_knowledge
+False,7,"{'tl.program_id': 1, 'min': 1, 'range': 1, 'tl.num_programs': 2, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_persistent_blockwise'],1,softmax_irregular_multi_knowledge_22,22,True,True,ok,True,multi_knowledge
+False,8,"{'tl.program_id': 2, 'min': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 3, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 3, 'tl.store': 1, 'tl.where': 4, 'float': 3}",softmax_irregular,"at 16:11:
+    chunk = (N + SPLIT - 1) // SPLIT
+    col_start = split_id * chunk
+    col_end = min(col_start + chunk, N)
+    offs = tl.arange(0, BLOCK)
+    col = col_start + offs
+    mask = (col < col_end) & (col < N)
+    x_ptrs = X + row_id * N + col
+    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))
+    # Local max for this partition
+    local_max = tl.max(x, 0)
+    # Gather both splits' local_max and compute row_max by arithmetic
+    max0 = tl.max(tl.where(split_id == 0, local_max, -float('inf')), 0)
+           ^",False,True,['softmax_row_split'],1,softmax_irregular_multi_knowledge_22,22,True,True,error,True,multi_knowledge
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.where': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused_blocked_v2'],1,softmax_irregular_single_11,11,True,True,ok,True,single
+False,2,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 3, 'tl.where': 1, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.store': 1, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1}",softmax_irregular,"at 10:17:
+def softmax_fused_blocked_vectorized_loop(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, RB)
+    idx = row * N + offs
+    mask = offs < N
+    # Load row in vectorized chunks, accumulate max
+    vec_width = 4
+    max_val = -float('inf')
+    for i in range(0, RB, vec_width):
+        offs_v = offs[i:i+vec_width]
+                 ^
+unsupported tensor index: <triton.language.core.slice object at 0x1522fc932c30>",False,True,['softmax_fused_blocked_vectorized_loop'],1,softmax_irregular_single_11,11,True,True,error,True,single
+False,3,"{'tl.program_id': 1, 'range': 3, 'tl.where': 1, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1}",softmax_irregular,"at 7:25:
+def softmax_fused_blocked_vectorized_loop_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    vec_width = 4
+    max_val = -float('inf')
+    # Loop over row in vector chunks to compute row max
+    for start in range(0, RB, vec_width):
+        offs_v = start + tl.arange(0, vec_width)
+                         ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_fused_blocked_vectorized_loop_fixed'],1,softmax_irregular_single_11,11,True,True,error,True,single
+False,4,"{'tl.program_id': 1, 'tl.static_range': 3, 'tl.where': 1, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1}",softmax_irregular,"at 6:4:
+def softmax_fused_blocked_vectorized_loop_fixed_v4(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    vec_width = 4
+    # First pass: compute row max in vectorized chunks
+    max_val = -float('inf')
+    for start in tl.static_range(0, RB, vec_width):
+    ^
+AssertionError('int32[] used as tl.static_range step value is not a constexpr')",False,True,['softmax_fused_blocked_vectorized_loop_fixed_v4'],1,softmax_irregular_single_11,11,True,True,error,True,single
+False,5,"{'tl.program_id': 1, 'tl.static_range': 3, 'tl.where': 1, 'float': 4, 'tl.load': 3, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.max': 1, 'tl.exp': 2, 'tl.sum': 1}",softmax_irregular,worker exceeded wall-time limit,False,True,['softmax_fused_blocked_vectorized_loop_fixed_v5'],1,softmax_irregular_single_11,11,True,True,timeout,True,single
+False,6,"{'tl.program_id': 1, 'tl.static_range': 6, 'tl.where': 1, 'float': 7, 'tl.load': 6, 'tl.maximum': 2, 'tl.store': 2, 'tl.arange': 6, 'tl.max': 2, 'tl.exp': 4, 'tl.sum': 2}",softmax_irregular,"at 6:4:
+def softmax_fused_vectorized_double_buffer(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    vec_width = 8
+    # Pass 1: even vector chunks for row max
+    max_val = -float('inf')
+    for start in tl.static_range(0, RB, 2 * vec_width):
+    ^
+AssertionError('int32[] used as tl.static_range step value is not a constexpr')",False,True,['softmax_fused_vectorized_double_buffer'],1,softmax_irregular_single_11,11,True,True,error,True,single
+False,7,"{'tl.program_id': 1, 'tl.static_range': 6, 'tl.where': 1, 'float': 7, 'tl.load': 6, 'tl.maximum': 2, 'tl.store': 2, 'tl.arange': 6, 'tl.max': 2, 'tl.exp': 4, 'tl.sum': 2}",softmax_irregular,"at 7:25:
+def softmax_fused_vectorized_double_buffer_fixed(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    vec_width = 8
+    # Pass 1: even vector chunks for row max
+    max_val = -float('inf')
+    for start in tl.static_range(0, RB, 16):
+        offs_v = start + tl.arange(0, vec_width)
+                         ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_fused_vectorized_double_buffer_fixed'],1,softmax_irregular_single_11,11,True,True,error,True,single
+False,8,"{'tl.program_id': 1, 'tl.static_range': 3, 'tl.where': 1, 'float': 4, 'tl.load': 3, 'tl.max': 1, 'tl.maximum': 1, 'tl.store': 1, 'tl.arange': 3, 'tl.exp': 2, 'tl.sum': 1}",softmax_irregular,"at 6:4:
+def softmax_fused_vectorized_double_buffer_fixed_v3(X, Y, N: tl.constexpr, RB: tl.constexpr):
+    row = tl.program_id(0)
+    vec_width = 8
+    # Compute row max: process all even and odd chunks in one loop (stride 8)
+    max_val = -float('inf')
+    for start in tl.static_range(0, RB, vec_width):
+    ^
+AssertionError('int32[] used as tl.static_range step value is not a constexpr')",False,True,['softmax_fused_vectorized_double_buffer_fixed_v3'],1,softmax_irregular_single_11,11,True,True,error,True,single
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused'],1,softmax_irregular_single_22,22,True,True,ok,True,single
+False,2,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 1, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 2, 'tl.store': 1, 'tl.arange': 1, 'tl.max_contiguous': 2, 'tl.broadcast_to': 1, 'float': 1}",softmax_irregular,"at 5:11:
+def softmax_split_reduce(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    part = tl.program_id(1)
+    chunk = BLOCK // 2
+    offs = tl.arange(0, chunk) + part * chunk
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_split_reduce'],1,softmax_irregular_single_22,22,True,True,error,True,single
+False,3,"{'tl.program_id': 2, 'tl.load': 1, 'tl.max': 1, 'tl.barrier': 2, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'tl.arange': 1, 'float': 1}",softmax_irregular,Python object mutation forbidden; use tl.store for output,False,True,['softmax_split_reduce_scratch'],1,softmax_irregular_single_22,22,True,True,proposal_error,False,single
+False,4,"{'tl.program_id': 1, 'tl.arange': 1, 'float': 2, 'tl.load': 3, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 1, 'tl.max': 1}",softmax_irregular,forbidden construct: While,False,True,['softmax_fused_blockloop'],1,softmax_irregular_single_22,22,True,True,proposal_error,False,single
+False,5,"{'tl.program_id': 1, 'tl.arange': 1, 'float': 2, 'range': 3, 'tl.load': 3, 'tl.maximum': 1, 'tl.exp': 2, 'tl.sum': 1, 'tl.store': 1, 'tl.max': 1}",softmax_irregular,forbidden construct: While,False,True,['softmax_fused_blockloop_unrolled'],1,softmax_irregular_single_22,22,True,True,proposal_error,False,single
+False,6,"{'tl.program_id': 2, 'tl.load': 8, 'tl.max': 1, 'tl.make_block_ptr': 1, 'tl.store': 5, 'tl.barrier': 4, 'tl.exp': 1, 'tl.sum': 1, 'tl.arange': 1, 'tl.maximum': 1, 'float': 1}",softmax_irregular,unsupported Triton primitive make_block_ptr,False,True,['softmax_fused_blockloop_split2'],1,softmax_irregular_single_22,22,True,True,proposal_error,False,single
+False,7,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 3, 'float': 2, 'tl.load': 3, 'tl.maximum': 1, 'tl.exp': 2, 'tl.store': 1, 'tl.max': 1, 'tl.sum': 1}",softmax_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400640 / 400653 (100.0%)
+Greatest absolute difference: 0.014774195849895477 at index (178, 146) (up to 2e-06 allowed)
+Greatest relative difference: 0.1758943647146225 at index (403, 30) (up to 2e-05 allowed)",False,True,['softmax_blockloop_unroll2_reduced_regs'],1,softmax_irregular_single_22,22,True,True,incorrect,True,single
+False,8,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 8, 'tl.max': 1, 'tl.store': 7, 'tl.barrier': 4, 'tl.exp': 1, 'tl.sum': 1, 'tl.maximum': 1, 'float': 2}",softmax_irregular,unsupported Triton primitive barrier,False,True,['softmax_split_chunks'],1,softmax_irregular_single_22,22,True,True,proposal_error,False,single
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'tl.store': 1, 'float': 1}",softmax_irregular,,False,True,['fused_softmax'],1,softmax_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+False,2,"{'tl.program_id': 2, 'tl.arange': 1, 'tl.load': 3, 'tl.max': 3, 'range': 2, 'tl.exp': 2, 'tl.sum': 2, 'tl.store': 1, 'tl.maximum': 1, 'float': 3}",softmax_irregular,"at 23:14:
+    local_max = tl.max(x, 0)
+    # Reduce for global row max across all blocks
+    max_val = local_max
+    for b in range(num_blocks):
+        blk_col = b * BLOCK + offs
+        blk_mask = blk_col < N
+        blk_ptrs = X + row * N + blk_col
+        blk_x = tl.load(blk_ptrs, mask=blk_mask, other=-float('inf'))
+        blk_max = tl.max(blk_x, 0)
+        max_val = tl.maximum(max_val, blk_max)
+    # Broadcast max_val within block
+    max_val = tl.max(max_val, 0)
+              ^",False,True,['fused_softmax_blockwise'],1,softmax_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,3,"{'tl.program_id': 2, 'tl.arange': 1, 'range': 2, 'tl.max': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,"at 18:14:
+    col = col_start + offs
+    mask = col < N
+    # 1. Compute row max (across all columns, blockwise)
+    max_val = -float('inf')
+    for b in range(num_blocks):
+        blk_col = b * BLOCK + offs
+        blk_mask = blk_col < N
+        x_ptrs = X + row * N + blk_col
+        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))
+        blk_max = tl.max(x, 0)
+        max_val = tl.maximum(max_val, blk_max)
+    max_val = tl.max(max_val, 0)
+              ^",False,True,['fused_softmax_rowblock'],1,softmax_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,4,"{'tl.program_id': 2, 'tl.arange': 1, 'range': 2, 'tl.max': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,"at 20:14:
+    mask = col < N
+    # --- Row-wise max: all tiles for this row must agree ---
+    max_val = -float('inf')
+    for t in range(num_tiles):
+        blk_col_start = t * tile_cols
+        blk_col = blk_col_start + offs
+        blk_mask = blk_col < N
+        x_ptrs = X + row * N + blk_col
+        x = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))
+        tile_max = tl.max(x, 0)
+        max_val = tl.maximum(max_val, tile_max)
+    max_val = tl.max(max_val, 0)
+              ^",False,True,['fused_softmax_tile'],1,softmax_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,5,"{'tl.program_id': 2, 'tl.arange': 1, 'range': 2, 'tl.max': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,"at 21:14:
+
+    # 1. Compute row max (across all columns, blockwise reduction)
+    max_val = -float('inf')
+    for t in range(num_tiles):
+        blk_col_start = t * tile_cols
+        blk_col = blk_col_start + offs
+        blk_mask = blk_col < N
+        x_ptrs = X + row * N + blk_col
+        x_val = tl.load(x_ptrs, mask=blk_mask, other=-float('inf'))
+        block_max = tl.max(x_val, 0)
+        max_val = tl.maximum(max_val, block_max)
+    max_val = tl.max(max_val, 0)
+              ^",False,True,['fused_softmax_blockwise'],1,softmax_irregular_single_knowledge_11,11,True,True,error,True,single_knowledge
+False,6,"{'tl.program_id': 1, 'tl.arange': 1, 'range': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.max': 1, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)
+Greatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)",False,True,['fused_softmax_splitrow'],1,softmax_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+False,7,"{'tl.program_id': 2, 'tl.arange': 1, 'range': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.max': 1, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,"validation seed=101 edge=random nonfinite_outputs=0/400653; logical_shape=[513, 781]
+Tensor-likes are not close!
+
+Mismatched elements: 400653 / 400653 (100.0%)
+Greatest absolute difference: 0.030499428510665894 at index (178, 146) (up to 2e-06 allowed)
+Greatest relative difference: 0.3584405481815338 at index (487, 524) (up to 2e-05 allowed)",False,True,['fused_softmax_rowblock'],1,softmax_irregular_single_knowledge_11,11,True,True,incorrect,True,single_knowledge
+False,8,"{'tl.program_id': 2, 'tl.arange': 1, 'range': 2, 'tl.load': 3, 'tl.exp': 2, 'tl.store': 1, 'float': 4, 'tl.max': 1, 'tl.maximum': 1, 'tl.sum': 1}",softmax_irregular,,False,True,['fused_softmax_rowblock_parallel'],1,softmax_irregular_single_knowledge_11,11,True,True,ok,True,single_knowledge
+True,1,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 1, 'tl.sum': 1, 'tl.where': 1, 'tl.store': 1, 'tl.exp': 1, 'float': 1}",softmax_irregular,,False,True,['softmax_fused_blocked'],1,softmax_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,2,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 4, 'tl.maximum': 3, 'tl.sum': 4, 'tl.where': 1, 'tl.store': 1, 'tl.exp': 1, 'float': 1}",softmax_irregular,"at 9:17:
+def softmax_fused_blocked_multi_stage(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, BLOCK)
+    col_mask = offs < N
+    x_ptrs = X + row * N + offs
+    x = tl.load(x_ptrs, col_mask, other=-float('inf'))
+    # Stage 1: Parallel sub-block reduction for max
+    quarter = BLOCK // 4
+    mx0 = tl.max(x[:quarter], 0)
+                 ^
+unsupported tensor index: <triton.language.core.slice object at 0x1534196b4500>",False,True,['softmax_fused_blocked_multi_stage'],1,softmax_irregular_single_knowledge_22,22,True,True,error,True,single_knowledge
+False,3,"{'tl.program_id': 1, 'tl.arange': 5, 'tl.load': 1, 'tl.max': 4, 'tl.maximum': 3, 'tl.sum': 4, 'tl.where': 1, 'tl.store': 1, 'tl.exp': 1, 'float': 1}",softmax_irregular,"at 9:11:
+def softmax_fused_blocked_multi_stage(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, BLOCK)
+    col_mask = offs < N
+    x_ptrs = X + row * N + offs
+    x = tl.load(x_ptrs, col_mask, other=-float('inf'))
+    # Four sub-blocks: indices for each quarter
+    quarter = BLOCK // 4
+    idx0 = tl.arange(0, quarter)
+           ^
+arange's arguments must be of type tl.constexpr",False,True,['softmax_fused_blocked_multi_stage'],1,softmax_irregular_single_knowledge_22,22,True,True,error,True,single_knowledge
+False,4,"{'tl.program_id': 1, 'tl.arange': 4, 'tl.load': 1, 'tl.full': 1, 'range': 2, 'tl.maximum': 3, 'tl.zeros': 1, 'tl.where': 5, 'tl.store': 1, 'tl.max': 1, 'tl.exp': 1, 'tl.sum': 1, 'float': 3}",softmax_irregular,"at 12:15:
+def softmax_fused_blocked_parallel(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):
+    row = tl.program_id(0)
+    offs = tl.arange(0, BLOCK)
+    col_mask = offs < N
+    x_ptrs = X + row * N + offs
+    # Load input with masking
+    x = tl.load(x_ptrs, col_mask, other=-float('inf'))
+    # Parallel segmented max reduction (4 segments)
+    seg = 4
+    seg_size = BLOCK // seg
+    offs_full = tl.arange(0, BLOCK)
+    max_vals = tl.full((seg,), -float('inf'), dtype=tl.float32)
+               ^
+Shape element 0 must have type `constexpr[int]`, got `constexpr[<class 'triton.language.core.tensor'>]",False,True,['softmax_fused_blocked_parallel'],1,softmax_irregular_single_knowledge_22,22,True,True,error,True,single_knowledge
+False,5,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'tl.max': 4, 'tl.maximum': 3, 'tl.sum': 4, 'tl.where': 9, 'tl.store': 1, 'tl.exp': 1, 'float': 5}",softmax_irregular,,False,True,['softmax_fused_blocked_parallel'],1,softmax_irregular_single_knowledge_22,22,True,True,ok,True,single_knowledge
+False,6,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'range': 4, 'tl.where': 3, 'tl.store': 1, 'tl.max': 1, 'max_vals.append': 1, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'sum_vals.append': 1, 'float': 2}",softmax_irregular,only tensor .to access allowed,False,True,['softmax_fused_blocked_unrolled8'],1,softmax_irregular_single_knowledge_22,22,True,True,proposal_error,False,single_knowledge
+False,7,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'range': 4, 'tl.where': 3, 'tl.store': 1, 'tl.max': 1, 'max_vals.append': 1, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'sum_vals.append': 1, 'float': 2}",softmax_irregular,only tensor .to access allowed,False,True,['softmax_fused_blocked_unrolled8'],1,softmax_irregular_single_knowledge_22,22,True,True,proposal_error,False,single_knowledge
+False,8,"{'tl.program_id': 1, 'tl.arange': 1, 'tl.load': 1, 'range': 4, 'tl.where': 3, 'tl.store': 1, 'tl.max': 1, 'max_vals.append': 1, 'tl.maximum': 1, 'tl.exp': 1, 'tl.sum': 1, 'sum_vals.append': 1, 'float': 2}",softmax_irregular,only tensor .to access allowed,False,True,['softmax_fused_blocked_unrolled16'],1,softmax_irregular_single_knowledge_22,22,True,True,proposal_error,False,single_knowledge

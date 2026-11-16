@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused_blockloop_split2",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused_blockloop_split2(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    half = BLOCK // 2\n    offs = tl.arange(0, half) + part * half\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    part_max = tl.max(x, 0)\n    # Write partial max to scratch\n    S_ptr = tl.make_block_ptr(\n        base=tl.scratch, shape=(513, 2), strides=(2, 1), offsets=(row, part), block_shape=(1, 1), order=(0, 1), dtype=tl.float32\n    )\n    tl.store(S_ptr, part_max)\n    tl.barrier()\n    # Reduce to get full row max\n    mx = tl.load(S_ptr, mask=True) if part == 0 else 0.0\n    if part == 0:\n        other_max = tl.load(S_ptr + 1, mask=True)\n        mx = tl.maximum(mx, other_max)\n        tl.store(S_ptr, mx)\n    tl.barrier()\n    mx = tl.load(S_ptr, mask=True)\n    # Compute exp(x - mx) and partial denom\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    x_exp = tl.exp(x - mx)\n    part_sum = tl.sum(x_exp, 0)\n    tl.store(S_ptr, part_sum)\n    tl.barrier()\n    denom = tl.load(S_ptr, mask=True) if part == 0 else 0.0\n    if part == 0:\n        other_sum = tl.load(S_ptr + 1, mask=True)\n        denom = denom + other_sum\n        tl.store(S_ptr, denom)\n    tl.barrier()\n    denom = tl.load(S_ptr, mask=True)\n    # Write output\n    y = x_exp / denom\n    y_ptrs = Y + row * N + offs\n    tl.store(y_ptrs, y, mask=mask)\n",
+  "rationale": "This kernel splits each row into two halves, with each program instance (grid [513,2]) responsible for half the row. Each computes its local max, writes to scratch, synchronizes, and part 0 reduces to get the row max. Both halves then compute exp(x - max), write partial sums, synchronize, and part 0 reduces for the row sum. Both halves then write their normalized outputs. All loads/stores are masked for logical bounds (offs < N), and all extents are constexpr or concrete. This approach reduces per-thread register pressure and increases reduction parallelism for wide/irregular rows, while using only allowed Triton primitives and ensuring every output is written exactly once."
+}

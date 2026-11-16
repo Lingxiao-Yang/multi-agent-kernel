@@ -1,0 +1,24 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_persistent_blockwise",
+        "grid": [
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          513,
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_persistent_blockwise(X, Y, M: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    pid = tl.program_id(0)\n    rows_per_program = (M + tl.num_programs(0) - 1) // tl.num_programs(0)\n    row_start = pid * rows_per_program\n    row_end = min(row_start + rows_per_program, M)\n    for row_id in range(row_start, row_end):\n        offs = tl.arange(0, BLOCK)\n        col = offs\n        mask = col < N\n        x_ptrs = X + row_id * N + col\n        x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n        mx = tl.max(x, 0)\n        x_centered = x - mx\n        exp_x = tl.exp(x_centered)\n        denom = tl.sum(exp_x, 0)\n        norm = exp_x / denom\n        y_ptrs = Y + row_id * N + col\n        tl.store(y_ptrs, norm, mask=mask)\n",
+  "rationale": "This kernel uses a persistent blockwise decomposition. The grid consists of 2 program instances, each responsible for a contiguous chunk of the 513 rows. Each instance loops over its assigned range of rows, performing the entire softmax (masked load, reduction for max, centering, exp, reduction for denominator, normalization, and masked store) in-register for each row. Masking ensures correctness for irregular row width N=781 < BLOCK=1024. This reduces kernel launch overhead and may improve efficiency for small M, while still providing some occupancy. There is no cross-program communication or illegal workspace usage, and all reductions and masking invariants are preserved. The structure and data movement are distinct from the incumbent grid=[M] approach."
+}

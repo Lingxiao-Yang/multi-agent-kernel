@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_split_reduce_scratch",
+        "grid": [
+          513,
+          2
+        ],
+        "args": [
+          "X",
+          "Y",
+          "S",
+          "N",
+          "RB"
+        ],
+        "num_warps": 2,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_split_reduce_scratch(X, Y, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    part = tl.program_id(1)\n    half = BLOCK // 2\n    offs = tl.arange(0, half) + part * half\n    mask = offs < N\n    # Load input chunk\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=-float('inf'))\n    # Compute local max\n    mx_local = tl.max(x, 0)\n    # Store local max to scratch\n    S[row, part] = mx_local\n    tl.barrier()\n    # Compute row max by reducing across both parts\n    mx_row = tl.maximum(S[row, 0], S[row, 1])\n    # Exponentiate centered\n    x_exp = tl.exp(x - mx_row)\n    # Compute local exp sum\n    exp_sum_local = tl.sum(x_exp, 0)\n    # Store local exp sum to scratch\n    S[row, part] = exp_sum_local\n    tl.barrier()\n    # Compute row exp sum by reducing across both parts\n    exp_sum_row = S[row, 0] + S[row, 1]\n    # Normalize\n    y = x_exp / exp_sum_row\n    # Store output\n    y_ptrs = Y + row * N + offs\n    tl.store(y_ptrs, y, mask=mask)\n",
+  "rationale": "This kernel splits each row into two chunks (grid [513,2]), with each program instance processing half the row, reducing register pressure and increasing parallelism for wide/irregular rows. Local partial reductions (max, exp-sum) are written to the provided float32 scratchpad S[ROWS,2] and synchronized via tl.barrier(). Both parts read the true row max/sum for normalization, ensuring every output is normalized by the correct row sum. All loads and stores are masked for logical bounds and tl.constexpr is used for all static extents. This structure repairs prior constexpr/masking errors and guarantees all output is covered exactly once."
+}

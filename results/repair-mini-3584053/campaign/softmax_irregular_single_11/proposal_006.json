@@ -1,0 +1,39 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_stats",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      },
+      {
+        "kernel": "softmax_apply",
+        "grid": [
+          1571
+        ],
+        "args": [
+          "X",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 8,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_stats(X, S, N: tl.constexpr, RB: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, RB)\n    idx = row * N + offs\n\n    # Load input with masking; pad with -inf for max reduction\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n\n    m = x\n    # unrolled tree max reduction over RB=1024 elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n        valid = offs + stride < RB\n        m2 = tl.where(valid, m[stride:], tl.full((RB - stride,), -float('inf'), dtype=tl.float32))\n        m = tl.maximum(m[:stride], m2)\n        # pad remainder with -inf to maintain length\n        m = tl.concat((m[:stride], tl.full((RB - stride,), -float('inf'), dtype=tl.float32)))[:RB]\n\n    mx = m[0]\n\n    # Reload input for sum reduction, center by max\n    x = tl.load(X + idx, offs < N, other=-float('inf'))\n    exp_x = tl.exp(x - mx)\n    exp_x = tl.where(offs < N, exp_x, tl.zeros((RB,), dtype=tl.float32))\n\n    s = exp_x\n    # unrolled tree sum reduction over RB=1024 elements\n    for stride in [512,256,128,64,32,16,8,4,2,1]:\n        valid = offs + stride < RB\n        s2 = tl.where(valid, s[stride:], tl.zeros((RB - stride,), dtype=tl.float32))\n        s = s[:stride] + s2\n        s = tl.concat((s[:stride], tl.zeros((RB - stride,), dtype=tl.float32)))[:RB]\n\n    denom = s[0]\n\n    tl.store(S + row * 2, mx)\n    tl.store(S + row * 2 + 1, denom)\n\n@triton.jit\ndef softmax_apply(X, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = i // N\n    mask = i < TOTAL\n\n    x = tl.load(X + i, mask, other=0)\n    mx = tl.load(S + row * 2, mask, other=0)\n    denom = tl.load(S + row * 2 + 1, mask, other=1)\n\n    y = tl.exp(x - mx) / denom\n    tl.store(Y + i, y, mask)\n",
+  "rationale": "Repaired forbidden while loops by fully unrolling max and sum tree reductions with explicit stride steps, preserving masking and padding invariants for padded extent RB=1024. Increased num_warps and num_stages to 8 and 2 for both kernels to improve GPU utilization and pipelining. Maintained separate kernel launches for softmax_stats and softmax_apply for correctness and simplicity. Masked loads and stores respect logical row length N=781 within padded RB=1024, ensuring no out-of-range accesses. This resolves previous forbidden construct errors and preserves numerical correctness and coverage."
+}

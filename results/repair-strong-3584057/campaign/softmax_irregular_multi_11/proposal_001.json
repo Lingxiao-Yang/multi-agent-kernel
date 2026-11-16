@@ -1,0 +1,23 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "softmax_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef softmax_fused(X, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    cols = tl.arange(0, BLOCK)\n    offs = row * N + cols\n    mask = cols < N\n    # Load input row with padding masked\n    x = tl.load(X + offs, mask, other=-float('inf'))\n    # Compute row maximum for numerical stability\n    mx = tl.max(x, 0)\n    # Center and exponentiate\n    x_centered = x - mx\n    exp_x = tl.exp(x_centered)\n    # Compute denominator (partition function)\n    denom = tl.sum(exp_x, 0)\n    # Normalize\n    y = exp_x / denom\n    # Store results to output, mask padding\n    tl.store(Y + offs, y, mask)\n",
+  "rationale": "This implementation fuses the stats and apply phases of softmax into a single row-parallel kernel. Each row is processed by a single program instance using a BLOCK-wide vector, masking out-of-bounds columns to handle the irregular N=781. Input values are loaded with -inf fill for masked elements, ensuring that padding does not affect the row max or exponentiation. The program computes the maximum, centers, exponentiates, reduces to the normalization denominator, and writes the normalized output in a single global memory pass, eliminating the intermediate S buffer and reducing global memory traffic. The decomposition and reduction pattern is changed from the incumbent's two-pass (row-parallel then element-parallel) structure to a single-pass row-parallel structure, with correct masking and reduction identities."
+}

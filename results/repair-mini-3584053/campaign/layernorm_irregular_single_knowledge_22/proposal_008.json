@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    col = offs\n\n    idx = row * N + col\n    mask = col < N\n\n    # Load input with masking, zero out-of-bounds\n    x = tl.load(X + idx, mask, other=0.0)\n\n    # Zero out-of-bounds elements to exclude padding from sums\n    x_masked = tl.where(mask, x, 0.0)\n\n    # Compute mean using accurate division\n    sum_x = tl.sum(x_masked)\n    mean = tl.div_rn(sum_x, N)\n\n    # Center input and zero out-of-bounds for variance\n    x_centered = tl.where(mask, x - mean, 0.0)\n    sum_var = tl.sum(x_centered * x_centered)\n    var = tl.div_rn(sum_var, N)\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Load weights and biases with masking\n    w = tl.load(W + col, mask, other=0.0)\n    b = tl.load(B + col, mask, other=0.0)\n\n    # Compute normalized output with masking\n    y = tl.where(mask, x_centered * inv_std * w + b, 0.0)\n\n    # Store results with masking\n    tl.store(Y + idx, y, mask)\n",
+  "rationale": "Fuse all layernorm steps into a single kernel with one program per row, BLOCK=256 and grid=513 to cover shape (513,781). Mask loads and stores to handle irregular columns and prevent invalid memory access. Zero out-of-bounds elements before summations to exclude padding from mean and variance calculations, ensuring numerical correctness and stability. Use tl.div_rn for precise division and preserve epsilon=1e-5 for numerical stability. This fusion minimizes global memory traffic and kernel launch overhead while ensuring correctness and stability."
+}

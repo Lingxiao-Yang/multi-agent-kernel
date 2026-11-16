@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats_parallel",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          "N",
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply",
+        "grid": [
+          1566
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          400653,
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_parallel(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mean_acc = tl.zeros((), dtype=tl.float32)\n    m2_acc = tl.zeros((), dtype=tl.float32)\n    for offs_base in range(0, N, BLOCK):\n        col = offs_base + offs\n        mask = col < N\n        x = tl.load(X + row * N + col, mask, other=0)\n        chunk_sum = tl.sum(x, 0)\n        chunk_sum2 = tl.sum(x * x, 0)\n        mean_acc += chunk_sum\n        m2_acc += chunk_sum2\n    mean = tl.div_rn(mean_acc, N)\n    var = tl.div_rn(m2_acc, N) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply(X, W, B, S, Y, TOTAL: tl.constexpr, N: tl.constexpr, BLOCK: tl.constexpr):\n    i = tl.program_id(0) * BLOCK + tl.arange(0, BLOCK)\n    row = i // N\n    col = i % N\n    x = tl.load(X + i, i < TOTAL, other=0)\n    mean = tl.load(S + row * 2, i < TOTAL, other=0)\n    inv = tl.load(S + row * 2 + 1, i < TOTAL, other=0)\n    w = tl.load(W + col, i < TOTAL, other=0)\n    b = tl.load(B + col, i < TOTAL, other=0)\n    tl.store(Y + i, (x - mean) * inv * w + b, i < TOTAL)\n",
+  "rationale": "This implementation repairs the previous proposal by eliminating the unsupported uint32 accumulator and removing any unnecessary count variable. The stats kernel now accumulates the sum and sum-of-squares for each row in float32 registers using a loop over BLOCK-sized chunks, with masking to handle irregular row length. All reductions are performed in float32, and the final mean and inverse standard deviation are stored in the output buffer S, matching the expected layout for the apply kernel. The apply kernel remains unchanged and compatible. This approach preserves increased intra-row parallelism without risking out-of-bounds buffer access or unsupported primitive use."
+}

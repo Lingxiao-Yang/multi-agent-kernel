@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused_fullrow_blockaccum",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          "N",
+          "RB"
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused_fullrow_blockaccum(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    num_iters = (N + BLOCK - 1) // BLOCK\n\n    # Allocate local accumulators (BLOCK-wide) for sum, sqr_sum, count\n    sum_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    sqr_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n    count_acc = tl.zeros((BLOCK,), dtype=tl.float32)\n\n    # First pass: accumulate sum, sqr_sum, count (masked)\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        sum_acc += tl.where(mask, x, 0.0)\n        sqr_acc += tl.where(mask, x * x, 0.0)\n        count_acc += tl.where(mask, 1.0, 0.0)\n\n    # Reduce to scalars for the row\n    row_sum = tl.sum(sum_acc, 0)\n    row_sqr = tl.sum(sqr_acc, 0)\n    row_count = tl.sum(count_acc, 0)\n    mean = tl.div_rn(row_sum, row_count)\n    var = tl.div_rn(row_sqr, row_count) - mean * mean\n    inv = tl.rsqrt(var + 1e-5)\n\n    # Second pass: normalize/affine\n    for i in range(num_iters):\n        col = offs + i * BLOCK\n        mask = col < N\n        x = tl.load(X + row * N + col, mask=mask, other=0.0)\n        centered = x - mean\n        w = tl.load(W + col, mask=mask, other=0.0)\n        b = tl.load(B + col, mask=mask, other=0.0)\n        y = (centered * inv) * w + b\n        tl.store(Y + row * N + col, y, mask=mask)\n",
+  "rationale": "This kernel accumulates sum, squared sum, and count for each row using BLOCK-wide arrays, processing the row in BLOCK-sized stripes. All loads are masked for N, and each accumulator uses tl.where(mask, ...) to ensure only valid elements contribute. After the accumulation, a reduction (tl.sum) yields row_sum, row_sqr, row_count. These are used to compute mean and variance for the row, with correct division by the number of valid elements. The normalization and affine transform are performed in a second loop, again in BLOCK-sized stripes and with all loads and stores masked. This approach increases register/ALU utilization and ILP, reduces the number of cross-thread reductions, and fully covers all output elements for irregular N. The implementation preserves all numerics and shape invariants."
+}

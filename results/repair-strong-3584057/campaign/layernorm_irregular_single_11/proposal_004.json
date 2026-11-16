@@ -1,0 +1,41 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_stats_rowwise",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "S",
+          781,
+          1024
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      },
+      {
+        "kernel": "layernorm_apply_rowchunk_fused",
+        "grid": [
+          513,
+          4
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "S",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 1
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_stats_rowwise(X, S, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    offs = tl.arange(0, BLOCK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    sum_x = tl.sum(x, axis=0)\n    mean = tl.div_rn(sum_x, N)\n    centered = tl.where(mask, x - mean, 0.0)\n    sum_centered2 = tl.sum(centered * centered, axis=0)\n    var = tl.div_rn(sum_centered2, N)\n    inv = tl.rsqrt(var + 1e-5)\n    tl.store(S + 2 * row, mean)\n    tl.store(S + 2 * row + 1, inv)\n\n@triton.jit\ndef layernorm_apply_rowchunk_fused(X, W, B, S, Y, N: tl.constexpr, CHUNK: tl.constexpr):\n    row = tl.program_id(0)\n    chunk = tl.program_id(1)\n    offs = chunk * CHUNK + tl.arange(0, CHUNK)\n    mask = offs < N\n    x_ptrs = X + row * N + offs\n    y_ptrs = Y + row * N + offs\n    w_ptrs = W + offs\n    b_ptrs = B + offs\n    mean = tl.load(S + 2 * row)\n    inv = tl.load(S + 2 * row + 1)\n    x = tl.load(x_ptrs, mask=mask, other=0.0)\n    w = tl.load(w_ptrs, mask=mask, other=0.0)\n    b = tl.load(b_ptrs, mask=mask, other=0.0)\n    # Fused computation: precompute scale and shift\n    scale = inv * w\n    shift = b - mean * scale\n    y = x * scale + shift\n    tl.store(y_ptrs, y, mask=mask)\n",
+  "rationale": "This proposal algebraically fuses the scale and shift computation in the apply kernel: (x - mean) * inv * w + b is rewritten as x * (inv * w) + (b - mean * inv * w). This reduces arithmetic instructions and register pressure for each output element. The stats kernel remains unchanged, ensuring correct per-row mean and variance with masking for irregular N. Both kernels use only legal contract buffers and compile-time constants in tl.arange, and all loads and stores are masked for correct output. This fusion should improve throughput by reducing the number of arithmetic operations and improving register reuse, while maintaining correct output for all elements."
+}

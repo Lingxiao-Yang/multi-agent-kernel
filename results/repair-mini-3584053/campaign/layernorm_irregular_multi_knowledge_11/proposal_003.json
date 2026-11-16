@@ -1,0 +1,25 @@
+{
+  "config": {
+    "mode": "source-v1",
+    "launches": [
+      {
+        "kernel": "layernorm_fused",
+        "grid": [
+          513
+        ],
+        "args": [
+          "X",
+          "W",
+          "B",
+          "Y",
+          781,
+          256
+        ],
+        "num_warps": 4,
+        "num_stages": 2
+      }
+    ]
+  },
+  "source": "import triton\nimport triton.language as tl\n\n@triton.jit\ndef layernorm_fused(X, W, B, Y, N: tl.constexpr, BLOCK: tl.constexpr):\n    row = tl.program_id(0)\n    mean_acc = 0.0\n    var_acc = 0.0\n    count = 0.0\n\n    # First loop: accumulate mean over chunks\n    for block_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = block_start + offs\n        mask = col < N\n        x = tl.load(X + row * N + col, mask, other=0.0)\n        mean_acc += tl.sum(tl.where(mask, x, 0.0), 0)\n        count += tl.sum(tl.where(mask, 1.0, 0.0), 0)\n\n    mean = mean_acc / count\n\n    # Second loop: accumulate variance over chunks\n    for block_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = block_start + offs\n        mask = col < N\n        x = tl.load(X + row * N + col, mask, other=0.0)\n        centered = tl.where(mask, x - mean, 0.0)\n        var_acc += tl.sum(centered * centered, 0)\n\n    var = var_acc / count\n    inv_std = tl.rsqrt(var + 1e-5)\n\n    # Third loop: normalize and store outputs\n    for block_start in range(0, N, BLOCK):\n        offs = tl.arange(0, BLOCK)\n        col = block_start + offs\n        mask = col < N\n        x = tl.load(X + row * N + col, mask, other=0.0)\n        w = tl.load(W + col, mask, other=0.0)\n        b = tl.load(B + col, mask, other=0.0)\n        y = (x - mean) * inv_std * w + b\n        tl.store(Y + row * N + col, y, mask)\n",
+  "rationale": "Increased num_stages from 1 to 2 to enable software pipelining that overlaps memory loads and arithmetic operations, improving latency hiding and throughput. The kernel maintains the three-pass approach: accumulate mean, accumulate variance, then normalize and store output. Each pass loops over the row in BLOCK-sized segments with masking to cover the irregular width N=781 completely. This transformation preserves correctness and numerical stability while leveraging hardware capabilities (A100, compute 8.0) and prior profiling insights. It is a direct incremental improvement over the previously confirmed fused kernel that used num_stages=1, expected to reduce stalls and improve overall kernel performance without changing algorithmic behavior or memory access patterns."
+}
