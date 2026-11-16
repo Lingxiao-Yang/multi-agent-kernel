@@ -76,3 +76,15 @@ distinguishes real repairs from new proposals and superficial rewrites.
 
 The 12-case, 144-search primary study and role/category ablations remain a
 separate next stage after the reliability/model decision.
+
+
+## Completed readout (2026-11-15)
+
+Both phases completed at commit `0d0fd71`. Mini: 5/16 retained authored
+improvements; GPT-4.1: 14/16, meeting both case thresholds. Cumulative
+estimated usage is $13.4122396; $11.5877604 remains. The design and
+reservation figures above are the historical pre-run plan. Completed raw
+outputs and [analysis](https://github.com/Lingxiao-Yang/multi-agent-kernel/blob/results/reports/REPAIR_ROUND_REPORT.md)
+are on results. See [NEXT_EXPERIMENT_PLAN.md](NEXT_EXPERIMENT_PLAN.md)
+for numerical auditing and the proposed next validation stages; none has
+been submitted during this readout.

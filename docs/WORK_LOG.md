@@ -195,3 +195,29 @@ downloads results as a tar.gz.
 
 **Cluster API key.** The OpenAI key lives in `~/.openai_env` (mode 600) on
 Lonestar6. Source it before submitting LLM jobs.
+
+
+## 2026-11-15 — Completed guided repair analysis
+
+Fetched and SHA256-verified both completed A100 jobs (3584053 and 3584057,
+exit 0:0). Reproduced both cluster repair reports locally and checked all 32
+searches, response token accounting, protocol hashes and final validation.
+Mini retained improvements in 5/16 searches; full GPT-4.1 in 14/16. All first
+retentions occurred by attempt 2; one later upgrade was retained at attempt 8.
+Source inspection found actual reduction fusion and correctness repairs,
+plus a variance-formula robustness concern requiring separate stress tests.
+The two full-model baseline fallbacks did produce correct but unretained code.
+
+Finalized the local smoke (4/4). Estimated cumulative inference usage is
+$13.4122396, leaving $11.5877604 under the $25 cap; all old reservations are
+released. Planned numerical auditing, third-seed reduction replication and
+family transfer. No new GPU job or inference request was launched.
+
+See [REPAIR_ROUND_REPORT.md](https://github.com/Lingxiao-Yang/multi-agent-kernel/blob/results/reports/REPAIR_ROUND_REPORT.md), the comparison CSV/JSON
+and figure, and the step/job/budget ledgers. The full primary study and
+ablations remain outstanding. Code stays on main; artifacts stay on results.
+
+
+Added `scripts/compare_repair_rounds.py`: exact matched-matrix, hash, token
+accounting and final-validation checks; prefix/cost analysis and plots.
+Detailed next steps: [NEXT_EXPERIMENT_PLAN.md](NEXT_EXPERIMENT_PLAN.md).
