@@ -7,6 +7,9 @@ import numpy as np
 from .core import VARIANTS, read_json, write_json
 
 
+from .metrics import library_timings
+
+
 def geometric_mean(values):
     values = np.asarray(values, dtype=float)
     if not len(values) or np.any(values <= 0) or not np.all(np.isfinite(values)):
@@ -103,8 +106,7 @@ def analyze(input_dir, output_dir, allow_controls=False):
                      'valid_attempts':sum(x['result']['status']=='ok' for x in s['history']),
                      'retained_attempts':sum(x['accepted'] for x in s['history']), 'wall_seconds':s['wall_seconds'],
                      'estimated_usd':s.get('estimated_inference_usd'),
-                     'library_ms':s['final']['result']['library']['median_ms'],
-                     'candidate_ms':s['final']['result']['candidate']['median_ms'],
+                     **library_timings(s['final']['result'],m['protocol']['schema_version']),
                      'stop_reason':s['stop_reason']})
     if not rows:
         raise ValueError('No eligible complete runs. Scripted controls require --allow-controls.')

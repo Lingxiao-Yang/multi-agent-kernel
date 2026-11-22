@@ -167,16 +167,14 @@ def check_edit(source, config, parent_source, parent_config):
             'note':'Structural screen passed; transformation mechanism requires source review.'}
 
 
-def prepare(case, config, inputs, source):
+def prepare(case, config, inputs, source, *, fresh_output=False):
     import torch
     from .source_policy import load_source
     validate_plan(config)
     _body_shapes(open(source, encoding='utf-8').read(), config)
     mod = load_source(source)
     m,n = case['shape'][:2]
-    output = torch.empty((m,n), dtype=inputs[0].dtype, device='cuda')
-    buffers = {'Y':output, 'S':torch.empty((m,2),device='cuda'), 'T':torch.empty_like(output),
-               'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
+    buffers = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
     if case['family'] == 'matmul':
         buffers.update(A=inputs[0],B=inputs[1],K=case['shape'][2])
     else:
@@ -184,14 +182,27 @@ def prepare(case, config, inputs, source):
         if case['family'] == 'layernorm': buffers.update(W=inputs[1],B=inputs[2])
         elif case['family'] == 'elementwise': buffers['B'] = inputs[1]
     launches = []
+    work_names = {'Y','S','T'}
+    used = {a for item in config['launches'] for a in item['args'] if a in work_names}
+    def workspace():
+        output = inputs[0].new_empty((m,n))
+        work = {'Y':output}
+        if 'S' in used: work['S'] = output.new_empty((m,2), dtype=torch.float32)
+        if 'T' in used: work['T'] = torch.empty_like(output)
+        return work
+    cached = None if fresh_output else workspace()
     for item in config['launches']:
-        args = [buffers[a] if isinstance(a,str) else a for a in item['args']]
-        launches.append((getattr(mod,item['kernel']),tuple(item['grid']),args,
+        args = [buffers.get(a, a) for a in item['args']]
+        slots = [(i, a) for i,a in enumerate(item['args']) if a in work_names]
+        launches.append((getattr(mod,item['kernel'])[tuple(item['grid'])],args,slots,
                          dict(num_warps=item['num_warps'],num_stages=item['num_stages'])))
     compiled = []
     def launch():
-        for kernel,grid,args,opts in launches:
-            built = kernel[grid](*args,**opts)
+        work = workspace() if fresh_output else cached
+        for kernel,template,slots,opts in launches:
+            args = template.copy()
+            for i, name in slots: args[i] = work[name]
+            built = kernel(*args,**opts)
             if all(built is not old for old in compiled): compiled.append(built)
-        return output
+        return work['Y']
     return launch, compiled
