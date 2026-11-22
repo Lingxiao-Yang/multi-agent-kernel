@@ -1,5 +1,6 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
 import argparse
+import ast
 import json
 import math
 from pathlib import Path
@@ -7,6 +8,16 @@ from pathlib import Path
 from .core import read_json, write_json
 from .public_cases import experiment
 from .search import run_worker
+
+
+def changed_program(source, start):
+    def statements(text):
+        tree = ast.parse(text)
+        for node in ast.walk(tree):
+            if isinstance(node,(ast.Module,ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)) and ast.get_docstring(node) is not None:
+                node.body.pop(0)
+        return ast.dump(tree)
+    return statements(source)!=statements(start)
 
 
 def audit(output, agent):
@@ -28,7 +39,7 @@ def audit(output, agent):
         point = dict(attempt=i,usd=budget['committed_usd'],status=h.get('result',{}).get('status','no_submission'))
         if point['status']=='ok':
             source = output/(f'candidate_{i:03}.py' if agent=='single' else f'proposal_{i:03}.py')
-            if source.read_text()!=start.read_text():
+            if changed_program(source.read_text(),start.read_text()) or (agent=='single' and h.get('config')!=start_config):
                 req = dict(case=case,protocol=protocol,source=str(source),config=h.get('config'),
                            incumbent_source=str(start),incumbent_config=start_config,final=True,
                            interface='declarative' if agent=='single' else 'native')

@@ -26,3 +26,11 @@ def test_one_extra_fallback_across_threshold_requires_remeasurement():
                  fallback=(a=='single' and s==11),latency_ms=2. if a=='single' and s==11 else 1.)
             for s in [11,22,33] for a in ['single','greedy']]
     assert compare(rows,[2],[11,22,33])['decision']=='pending-fallback-remeasurement'
+
+
+def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
+    from kernel_study.reference_report import changed_program
+    start = 'def run(x):\n    """baseline"""\n    return x + 1\n'
+    copied = '# same launch\ndef run(x):\n    """new explanation"""\n    return x+1\n'
+    assert not changed_program(copied,start)
+    assert changed_program(copied.replace('x+1','x+2'),start)

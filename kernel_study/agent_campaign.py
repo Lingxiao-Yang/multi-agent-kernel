@@ -151,7 +151,8 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
         req = dict(case=case,source=str(source),interface='native',incumbent_source=str(starter),protocol=protocol)
         result = run_worker(req,output,f'candidate_{i:03}')
         history.append(dict(attempt=i,source_hash=digest(source.read_text()),result=result))
-    proposed = next((p for p in candidates if p.read_text()==selected and selected!=starter.read_text()),None)
+    from .reference_report import changed_program
+    proposed = next((p for p in candidates if p.read_text()==selected and changed_program(selected,starter.read_text())),None)
     final = None
     for source in ([proposed,starter] if proposed else [starter]):
         i = 0 if source==starter else int(source.stem.split('_')[1])
