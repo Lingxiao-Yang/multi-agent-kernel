@@ -94,28 +94,3 @@ class ChatProvider:
                      data.get('model', self.model), {'request_id':data.get('id'),
                      'system_fingerprint':data.get('system_fingerprint'), 'usage':usage,
                      'elapsed_s':time.perf_counter()-start, 'estimated_usd':actual_cost})
-
-
-class ScriptedProvider:
-    """Infrastructure control. It is never evidence about LLM specialization."""
-    name = 'scripted-control'
-    model = 'none'
-
-    def complete(self, system, context, stage, seed):
-        if stage == 'implement':
-            config = dict(context['incumbent']['config'])
-            attempt = context['attempt']
-            family = context['case']['family']
-            if family == 'matmul':
-                config['tensor_core'] = True
-                config['block_m'] = [16,32,64,32][(attempt-1)%4]
-                config['block_n'] = [16,32,64,64][(attempt-1)%4]
-                config['num_stages'] = [1,2,3,2][(attempt-1)%4]
-            else:
-                config['fused'] = True
-                config['num_warps'] = [4, 8, 2, 4][(attempt-1)%4]
-                config['block'] = [256,512,128,1024][(attempt-1)%4]
-            text = json.dumps({'config':config,'source':None,'rationale':'Predefined engineering control; no LLM inference.'})
-        else:
-            text = json.dumps({'note':'Scripted plumbing check; no scientific role/knowledge comparison.'})
-        return Reply(text, 0, 0, 'none', {'synthetic':True, 'estimated_usd':0})

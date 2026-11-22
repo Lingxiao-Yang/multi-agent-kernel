@@ -1,18 +1,25 @@
-"""Minimal profiler range excluding compilation and input generation."""
-from .core import baseline_config, cases
-from .bench import make_inputs, prepare
+"""Profile one public GELU launch after warming up the kernel."""
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from .public_cases import experiment, local_forward, start, task_inputs
 
 
 def main():
     import torch
-    case=next(c for c in cases() if c['id']=='softmax_small')
-    inputs=make_inputs(case,101)
-    config=baseline_config(case['family']); config['fused']=True
-    fn,_=prepare(case,config,inputs)
-    fn(); torch.cuda.synchronize()
-    torch.cuda.cudart().cudaProfilerStart()
-    fn(); torch.cuda.synchronize()
-    torch.cuda.cudart().cudaProfilerStop()
+    case = experiment()['cases']['26']
+    _, _, inputs = task_inputs(case, 101)
+    source, config = start(case)
+    with TemporaryDirectory() as directory:
+        path = Path(directory)/'device.py'
+        path.write_text(source)
+        forward = local_forward(case, path, config, inputs)
+        forward()
+        torch.cuda.synchronize()
+        torch.cuda.cudart().cudaProfilerStart()
+        forward()
+        torch.cuda.synchronize()
+        torch.cuda.cudart().cudaProfilerStop()
 
 
 if __name__=='__main__':

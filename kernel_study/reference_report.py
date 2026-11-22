@@ -1,5 +1,4 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
-import argparse
 import math
 from pathlib import Path
 
@@ -86,13 +85,7 @@ def phase_rows(root, phase, cases, seeds):
     return rows,attempts,measurements
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['development','holdout'])
-    parser.add_argument('output',type=Path)
-    parser.add_argument('--freeze',action='store_true',help='Register the measured single implementation before holdout')
-    parser.add_argument('--measure-pairs',action='store_true',help='Measure missing finalist pairs on the registered GPU')
-    args = parser.parse_args()
+def run_report(args, parser):
     args.output = args.output.resolve()
     plan = experiment()
     if args.measure_pairs:
@@ -132,6 +125,3 @@ def main():
         write_json(args.output/'strategy_freeze.json',{'code_hashes':measured['code_hashes'],
                    'revision':measured['revision'],'development_decision':report['decision']})
     print(report['decision'],report['paired_searches'])
-
-
-if __name__=='__main__': main()

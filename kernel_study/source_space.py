@@ -7,7 +7,6 @@ import ast
 import copy
 import math
 
-from .core import ROOT
 from .source_policy import check_source
 
 MODE = 'source-v1'
@@ -42,46 +41,13 @@ def validate_plan(config):
     return config
 
 
-def baseline(case):
-    if 'public_id' in case:
-        from .public_cases import start
-        return start(case)
-    f = case['family']
-    rows, n = case['shape'][:2]
-    def launch(name, grid, args):
-        return dict(kernel=name, grid=grid, args=args, num_warps=4, num_stages=1)
-    flat = [(rows*n + 255)//256]
-    if f == 'matmul':
-        launches = [launch('matmul_simt', [(rows+15)//16, (n+15)//16], ['A','B','Y','M','N','K',16,16,32])]
-    elif f in ['softmax', 'layernorm']:
-        inputs = ['X'] if f == 'softmax' else ['X','W','B']
-        launches = [launch(f+'_stats', [rows], ['X','S','N','RB']),
-                    launch(f+'_apply', flat, inputs+['S','Y','TOTAL','N',256])]
-    else:
-        launches = [launch('bias_add', flat, ['X','B','T','TOTAL','N',256]),
-                    launch('relu', flat, ['T','Y','TOTAL',256])]
-    names = {x['kernel'] for x in launches}
-    tree = ast.parse((ROOT/'kernel_study/kernels.py').read_text(encoding='utf-8'))
-    functions = [ast.unparse(x) for x in tree.body if isinstance(x, ast.FunctionDef) and x.name in names]
-    source = 'import triton\nimport triton.language as tl\n\n' + '\n\n'.join(functions) + '\n'
-    return source, {'mode':MODE, 'launches':launches}
-
-
 def contract(case):
     from .source_policy import ALLOWED_TL
-    if 'public_id' in case:
-        from .public_cases import layout
-        names, scalars, scratch = layout(case)
-        return {'format':MODE,'inputs':names, 'scalars':scalars, 'output_shape':case['output_shape'],
-                'workspace':{'Y':'output', 'S':[scratch], 'T':case['output_shape']},
-                'allowed_tl':sorted(ALLOWED_TL), 'limits':'1-4 declarative launches'}
-    f = case['family']
-    return {'format':MODE, 'buffers':({'A':'[M,K] input', 'B':'[K,N] input'} if f == 'matmul' else
-            {'X':'[ROWS,N] input', **({'W':'[N] input weight', 'B':'[N] input bias'} if f == 'layernorm' else {'B':'[N] input bias'} if f == 'elementwise' else {})}),
-            'workspace':{'Y':'output, same dtype as inputs', 'S':'[ROWS,2] float32 scratch', 'T':'output-shaped scratch, same dtype as output'},
-            'scalars':'M/ROWS=shape[0], N=shape[1], K=shape[2] for matmul, TOTAL=M*N, RB=next_power_of_2(N)',
-            'grid':'Concrete integer grid dimensions for this case, no expressions or Python. args are positional, symbols resolve to trusted buffers/scalars; integer literals become constexpr parameters.',
-            'allowed_tl':sorted(ALLOWED_TL), 'limits':'1-4 launches; num_warps 1/2/4/8; num_stages 1-4; layernorm epsilon is 1e-5'}
+    from .public_cases import layout
+    names, scalars, scratch = layout(case)
+    return {'format':MODE,'inputs':names, 'scalars':scalars, 'output_shape':case['output_shape'],
+            'workspace':{'Y':'output', 'S':[scratch], 'T':case['output_shape']},
+            'allowed_tl':sorted(ALLOWED_TL), 'limits':'1-4 declarative launches'}
 
 
 def _inline_straight_line_temporaries(body):
@@ -182,21 +148,10 @@ def prepare(case, config, inputs, source, *, fresh_output=False, poison_output=F
     validate_plan(config)
     _body_shapes(open(source, encoding='utf-8').read(), config)
     mod = load_source(source)
-    if 'public_id' in case:
-        from .public_cases import layout
-        names, scalars, scratch = layout(case)
-        buffers = {**scalars, **dict(zip(names, inputs, strict=True))}
-        out_shape, scratch_shape = case['output_shape'], (scratch,)
-    else:
-        m,n = case['shape'][:2]
-        out_shape, scratch_shape = (m,n), (m,2)
-        buffers = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
-        if case['family'] == 'matmul':
-            buffers.update(A=inputs[0],B=inputs[1],K=case['shape'][2])
-        else:
-            buffers['X'] = inputs[0]
-            if case['family'] == 'layernorm': buffers.update(W=inputs[1],B=inputs[2])
-            elif case['family'] == 'elementwise': buffers['B'] = inputs[1]
+    from .public_cases import layout
+    names, scalars, scratch = layout(case)
+    buffers = {**scalars, **dict(zip(names, inputs, strict=True))}
+    out_shape, scratch_shape = case['output_shape'], (scratch,)
     launches = []
     work_names = {'Y','S','T'}
     used = {a for item in config['launches'] for a in item['args'] if a in work_names}

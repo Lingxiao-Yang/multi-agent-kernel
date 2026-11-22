@@ -12,7 +12,7 @@ def main():
     args = p.parse_args()
     start = time.perf_counter()
     try:
-        from .bench import evaluate
+        from .public_cases import evaluate
         result = evaluate(read_json(args.request))
     except Exception as exc:
         result = {"status": "incorrect" if isinstance(exc, AssertionError) else "error",

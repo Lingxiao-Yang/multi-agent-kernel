@@ -7,10 +7,12 @@ import sys
 import time
 from pathlib import Path
 
-from .core import (ROOT, Budget, baseline_config, digest, environment, event, launch_contract, read_json,
-                   utcnow, validate_config, write_json)
+from .core import ROOT, Budget, digest, environment, event, read_json, utcnow, write_json
+from . import source_space
+from .api_guidance import VERSION, guidance, history_context
+from .public_cases import start as public_start
+from .reference_search import interruption
 from .knowledge import select_cards
-from .source_policy import check_source
 
 GENERAL = ('You are a general GPU kernel optimizer. Use the supplied evidence to optimize the current incumbent. '
            'Do not invent measurements. All decisions about retention are made by the harness. Return JSON only.')
@@ -20,9 +22,6 @@ ROLES = {
     'implement': 'You are the kernel implementer. Apply the shared plan to the incumbent. Return JSON only.',
     'review': 'You are the result reviewer. Explain measured outcomes and failures and suggest next directions. You cannot decide retention. Return JSON only.'
 }
-CONTRACT = '''For stage implement, return {"config": <complete config>, "source": null or complete Triton module string, "rationale": "..."}.
-Config keys/domains: num_warps [1,2,4,8], num_stages [1,2,3,4], block [64,128,256,512,1024], block_m/block_n [16,32,64], block_k [16,32,64], fused bool, tensor_core bool.
-source=null preserves the incumbent source. Source edits may only change @triton.jit device functions; preserve names and argument signatures. Only imports triton and triton.language as tl are allowed. No host functions, file/network access, autotune, reference/timer modification or input mutation. Each config tested costs one candidate. Other stages return a concise JSON object.'''
 
 
 def run_worker(request, directory, label):
@@ -61,20 +60,13 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     start = time.perf_counter()
     starting_cost = getattr(provider, 'spent', 0.)
     starting_completed_cost = getattr(provider, 'completed_cost', 0.)
-    source_mode = protocol.get('search_space') == 'source-v1'
     shared_guidance = None
     if protocol.get('shared_api_guidance'):
-        from .api_guidance import VERSION, guidance, history_context
         if protocol['shared_api_guidance'] != VERSION:
             raise ValueError('unknown shared API guidance version')
         shared_guidance = guidance(case)
-    if source_mode:
-        from . import source_space
-        protocol = {**protocol, 'source_gate_version':source_space.GATE_VERSION}
-        source_text, base_config = source_space.baseline(case)
-    else:
-        source_text = (ROOT / 'kernel_study/kernels.py').read_text(encoding='utf-8')
-        base_config = baseline_config(case['family'])
+    protocol = {**protocol, 'source_gate_version':source_space.GATE_VERSION}
+    source_text, base_config = public_start(case)
     # Candidate source stores only the device module; trusted wrapper is never editable.
     base_source = output / 'baseline.py'
     base_source.write_text(source_text, encoding='utf-8')
@@ -97,7 +89,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'summary.json', {'status':'baseline_failed','manifest':manifest,'budget':budget.snapshot()})
         return read_json(output/'summary.json')
     incumbent = {'id':0, 'config':base_config, 'source':str(base_source), 'result':base_result}
-    retained = [incumbent]
+    baseline = incumbent
     history = []
     last_proposal = None
     profile_count = 1
@@ -111,7 +103,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             # Same call slot reassigned to implementer/general reasoning.
             replacement = 'advise' if stage == 'implement' else 'implement'
             system = ROLES[replacement] if variant.startswith('multi') else GENERAL
-        prompt = system + '\n' + (source_space.CONTRACT if source_mode else CONTRACT)
+        prompt = system + '\n' + source_space.CONTRACT
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)
         budget.charge_tokens(reply.input_tokens, reply.output_tokens)
@@ -128,7 +120,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history_context(history) if shared_guidance else history,
                    'knowledge_cards':cards, 'hardware':manifest['environment'],
-                   'launch_contract':source_space.contract(case) if source_mode else launch_contract(case['family']),
+                   'launch_contract':source_space.contract(case),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
         if shared_guidance:
@@ -138,7 +130,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                 'advise':'Give a concise implementable plan. If the previous proposal failed, identify the exact repair and verify shape/constexpr/masking invariants before proposing more optimization.',
                 'implement':'Return complete source and launch config. Re-check all resolved dimensions and reduction invariants. Repairs consume this attempt; no unmeasured speedup claims.',
                 'review':'Return concise diagnosis, outcome, and next_step fields. Explain the measured result. Do not return source/config; only implement supplies executable proposals.'}
-        if source_mode and last_proposal is not None:
+        if last_proposal is not None:
             context['previous_proposal'] = last_proposal
         try:
             for stage in ['analyze','advise']:
@@ -146,17 +138,12 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             candidate = call('implement', context)
             last_proposal = dict(candidate)
             write_json(output / f'proposal_{attempt:03d}.json', candidate)
-            validate_config(candidate['config'])
-            edit = None
-            if source_mode:
-                if not isinstance(candidate.get('source'), str) or not candidate['source'].strip():
-                    raise ValueError('source_edit_required: complete source string is mandatory')
-                # Preserve rejected source as well as successful source for audit.
-                (output / f'proposed_{attempt:03d}.py').write_text(candidate['source'], encoding='utf-8')
-                edit = source_space.check_edit(candidate['source'], candidate['config'],
-                        context['incumbent']['source'], incumbent['config'])
-            text = candidate.get('source') or context['incumbent']['source']
-            check_source(text)
+            source_space.validate_plan(candidate['config'])
+            text = candidate.get('source')
+            if not isinstance(text, str) or not text.strip():
+                raise ValueError('source_edit_required: complete source string is mandatory')
+            (output / f'proposed_{attempt:03d}.py').write_text(text, encoding='utf-8')
+            edit = source_space.check_edit(text, candidate['config'], context['incumbent']['source'], incumbent['config'])
             candidate_source = output / f'candidate_{attempt:03d}.py'
             candidate_source.write_text(text, encoding='utf-8')
             candidate['source'] = str(candidate_source)
@@ -168,7 +155,6 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             if accepted:
                 candidate['result'] = result
                 incumbent = candidate
-                retained.append(candidate)
                 if profile_count < protocol['profile_cap']:
                     prof = run_worker({'case':case,'config':candidate['config'],'source':candidate['source'],
                                       'protocol':protocol,'profile':True}, output, f'profile_{attempt:03d}')
@@ -198,22 +184,10 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'state.json', {'incumbent':incumbent,'history':history,'budget':budget.snapshot()})
         if stop:
             break
-    selection = []
-    if 'public_id' in case:
-        from .public_referee import select_final
-        candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"), config=h['config'])
-                      for h in history if h['result']['status']=='ok']
-        final, selection = select_final(output, case, protocol, 'declarative', retained[0], candidates)
-    else:
-        final = None
-        for item in reversed(retained):
-            checked = run_worker({'case':case,'config':item['config'],'source':item['source'],
-                        'incumbent_config':base_config,'incumbent_source':str(base_source),'protocol':protocol,
-                        'final':True,'library':True}, output, f'final_{item["id"]:03d}')
-            event(log, 'final_validation', candidate_id=item['id'], result=checked)
-            if checked['status'] == 'ok':
-                final = {'candidate_id':item['id'], 'result':checked, 'config':item['config']}
-                break
+    from .public_referee import select_final
+    candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"), config=h['config'])
+                  for h in history if h['result']['status']=='ok']
+    final, selection = select_final(output, case, protocol, 'declarative', baseline, candidates)
     final_stop = stop or budget.stop_reason()
     completed_search = final_stop in ['candidate_cap','call_cap','token_safety_cap']
     summary = {'status':('complete' if completed_search else 'interrupted') if final else 'final_failed', 'manifest':manifest,
@@ -222,17 +196,15 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                'scientific_evidence':provider.name == 'llm' and completed_search and resolved_model is not None,
                'estimated_inference_usd':getattr(provider,'completed_cost',0)-starting_completed_cost,
                'budget_committed_usd':getattr(provider,'spent',0)-starting_cost}
-    if 'public_id' in case:
-        from .reference_search import interruption
-        reason = interruption(output)
-        summary['selection'] = selection
-        if hasattr(provider,'ledger'):
-            usage = provider.ledger.summary()
-            summary['budget'].update(usage)
-            summary['estimated_inference_usd'] = usage['completed_usd']
-            summary['budget_committed_usd'] = usage['committed_usd']
-        if reason:
-            summary.update(status='interrupted', stop_reason=reason)
+    reason = interruption(output)
+    summary['selection'] = selection
+    if hasattr(provider,'ledger'):
+        usage = provider.ledger.summary()
+        summary['budget'].update(usage)
+        summary['estimated_inference_usd'] = usage['completed_usd']
+        summary['budget_committed_usd'] = usage['committed_usd']
+    if reason:
+        summary.update(status='interrupted', stop_reason=reason)
     if final:
         summary['speedup'] = final['result']['paired_speedup']
         # Initial incumbent retained => measured fluctuations don't imply a selected regression.

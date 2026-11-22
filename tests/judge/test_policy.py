@@ -4,7 +4,7 @@ import pytest
 
 
 def test_baseline_source_passes_policy():
-    check_source((ROOT/'kernel_study/kernels.py').read_text())
+    check_source((ROOT/'kernel_study/public_kernels.py').read_text())
 
 
 @pytest.mark.parametrize('source',[

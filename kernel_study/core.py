@@ -82,56 +82,6 @@ class Budget:
         return {**asdict(self), "tokens": self.tokens}
 
 
-def cases():
-    return read_json(ROOT / "configs/cases.json")
-
-
-def baseline_config(family):
-    return {"num_warps": 4, "num_stages": 1, "block": 256,
-            "block_m": 16, "block_n": 16, "block_k": 32,
-            "fused": False, "tensor_core": False}
-
-
-def validate_config(config):
-    if config.get('mode') == 'source-v1':
-        from .source_space import validate_plan
-        return validate_plan(config)
-    expected = baseline_config("matmul")
-    if set(config) != set(expected):
-        raise ValueError("config must contain exactly " + str(sorted(expected)))
-    domains = {"num_warps": [1, 2, 4, 8], "num_stages": [1, 2, 3, 4],
-               "block": [64, 128, 256, 512, 1024],
-               "block_m": [16, 32, 64], "block_n": [16, 32, 64],
-               "block_k": [16, 32, 64]}
-    for name, values in domains.items():
-        if type(config[name]) is not int or config[name] not in values:
-            raise ValueError(f"unsupported {name}: {config[name]}")
-    for name in ("fused", "tensor_core"):
-        if type(config[name]) is not bool:
-            raise ValueError(f"{name} must be boolean")
-    return config
-
-
-def launch_contract(family):
-    """Common API semantics, not optimization recommendations or knowledge cards."""
-    common = ['num_warps', 'num_stages']
-    if family == 'matmul':
-        active = common + ['block_m', 'block_n', 'block_k', 'tensor_core']
-        entry = {'tensor_core=false':'matmul_simt', 'tensor_core=true':'matmul_tensor'}
-        semantics = 'shape is [M,N,K], inputs A[M,K], B[K,N], output Y[M,N]. BM/BN/BK are tile parameters; BK is used only by matmul_tensor.'
-    elif family in ['softmax','layernorm']:
-        active = common + ['block','fused']
-        entry = {'fused=false':[family+'_stats',family+'_apply'], 'fused=true':family+'_fused'}
-        semantics = 'shape is [rows,columns]. Row reductions use next_power_of_2(columns). block controls the apply launch only when fused=false.'
-    else:
-        active = common + ['block','fused']
-        entry = {'fused=false':['bias_add','relu'], 'fused=true':'bias_relu'}
-        semantics = 'shape is [rows,columns]; bias has [columns]. block is the number of flat output elements per program.'
-    return {'active_config_fields':active,'ignored_config_fields':sorted(set(baseline_config(family))-set(active)),
-            'entry_points':entry,'semantics':semantics,
-            'note':'Ignore unrelated family functions in the shared device module. Changing an ignored field does not change this operation.'}
-
-
 def environment():
     import sys
     result = {"python": sys.version, "platform": platform.platform()}

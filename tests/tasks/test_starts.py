@@ -1,6 +1,7 @@
 import pytest
-from kernel_study.core import cases, validate_config
-from kernel_study.source_space import baseline, _body_shapes
+import ast
+from kernel_study.public_cases import experiment, start
+from kernel_study.source_space import validate_plan, _body_shapes
 
 
 @pytest.mark.gpu
@@ -42,9 +43,9 @@ def test_public_starts_read_their_own_device_modules(monkeypatch):
 
 
 def test_only_baseline_functions_are_exposed_and_all_launches_match():
-    for case in cases():
-        source, config = baseline(case)
-        validate_config(config)
+    for number in ('2', '23', '40', '26', '36'):
+        source, config = start(experiment()['cases'][number])
+        validate_plan(config)
         _body_shapes(source, config)
-        for forbidden in ['matmul_tensor', 'softmax_fused', 'layernorm_fused', 'bias_relu']:
-            assert forbidden not in source
+        names = {node.name for node in ast.parse(source).body if isinstance(node, ast.FunctionDef)}
+        assert names == {item['kernel'] for item in config['launches']}

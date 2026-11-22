@@ -1,5 +1,4 @@
 """Run one public case and phase per GPU process before model search."""
-import argparse
 import subprocess
 from pathlib import Path
 
@@ -96,13 +95,8 @@ def run(case, phase, directory, plan):
     return result
 
 
-def main():
+def run_preflight(args, parser):
     import torch
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['preflight','calibrate','hold','hand','stress'])
-    parser.add_argument('--case',required=True)
-    parser.add_argument('--output',type=Path,required=True)
-    args = parser.parse_args()
     plan = public.experiment()
     directory = args.output/args.case
     directory.mkdir(parents=True,exist_ok=True)
@@ -115,7 +109,3 @@ def main():
         raise
     write_json(directory/(args.phase+'.json'),report)
     print(args.phase,args.case,report['peak_allocated_bytes'],flush=True)
-
-
-if __name__ == '__main__':
-    main()

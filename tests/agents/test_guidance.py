@@ -1,11 +1,13 @@
 from kernel_study.api_guidance import VERSION, guidance
-from kernel_study.core import cases
+from kernel_study.public_cases import experiment, layout
 import copy
 from kernel_study.api_guidance import history_context
 
 
 def test_guidance_resolves_irregular_shapes_without_optimized_code():
-    for case in cases():
+    for case in experiment()['cases'].values():
+        _, dims, _ = layout(case)
+        case = dict(case, shape=[dims[k] for k in ('M', 'N', 'K') if k in dims])
         result=guidance(case);s=result['resolved_scalars']
         assert s['N']==case['shape'][1]
         assert s['TOTAL']==case['shape'][0]*case['shape'][1]

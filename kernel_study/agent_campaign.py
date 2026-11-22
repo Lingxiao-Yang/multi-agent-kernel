@@ -1,5 +1,4 @@
 """Run the frozen public comparison one search at a time."""
-import argparse
 import fcntl
 import functools
 import json
@@ -278,19 +277,7 @@ def run_job(args, plan, case_id, agent, seed):
     return result
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['smoke','calibration','development','holdout'])
-    parser.add_argument('--preflight',type=Path,required=True)
-    parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--counters',type=Path,required=True)
-    parser.add_argument('--retry-transport',action='store_true',help='Run one new search after a recorded transport interruption')
-    parser.add_argument('--job',type=int,required=True,help='Zero-based index in the phase')
-    parser.add_argument('--model',default=os.environ.get('KERNEL_BASELINE_MODEL'))
-    parser.add_argument('--endpoint',default=os.environ.get('OPENAI_BASE_URL','https://api.openai.com/v1'))
-    parser.add_argument('--input-price',type=float,default=os.environ.get('KERNEL_BASELINE_INPUT_PRICE'))
-    parser.add_argument('--output-price',type=float,default=os.environ.get('KERNEL_BASELINE_OUTPUT_PRICE'))
-    args = parser.parse_args()
+def run_campaign(args, parser):
     plan = public.experiment()
     schedule = jobs(plan,args.phase)
     if not 0<=args.job<len(schedule): parser.error('job index outside phase')
@@ -343,7 +330,3 @@ def code_hashes():
     for path in ('configs/agent_baseline.json','configs/protocol.json','knowledge/cards.json'):
         hashes[path] = digest((ROOT/path).read_text())
     return hashes
-
-
-if __name__ == '__main__':
-    main()
