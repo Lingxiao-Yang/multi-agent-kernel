@@ -5,8 +5,6 @@ import json
 from pathlib import Path
 import numpy as np
 from .core import VARIANTS, read_json, write_json
-
-
 from .metrics import library_timings
 
 

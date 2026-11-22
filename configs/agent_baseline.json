@@ -1,0 +1,35 @@
+{
+  "upstream": {
+    "KernelAgent": "e0647170da36ef9b059ac0bd3d60103aa4ed378b",
+    "KernelBench": "423217d9fda91e0c2d67e4a43bf62f96f6d104f1",
+    "tritonbench": "32bc178ce503b0fbcf9a1ed3cc033e6d6fe6edc0"
+  },
+  "gpu": "NVIDIA A800-SXM4-80GB",
+  "device_uuid_sha256": "15c7925505a1cd260e1a62294c696c67fab6d1e296b8d603bd791dc641af9b98",
+  "driver": "580.126.09",
+  "torch": "2.12.1+cu130",
+  "triton": "3.7.1",
+  "cuda": "13.0",
+  "agents": ["single", "greedy"],
+  "development": [4, 23, 40],
+  "holdout": [2, 26, 36],
+  "development_seeds": [11, 22],
+  "holdout_seeds": [11, 22, 33],
+  "preflight_seeds": [7713, 8823],
+  "validation_seeds": [101, 202, 303],
+  "final_validation_seeds": [10001, 10002, 10003, 10004, 10005],
+  "timing": {"warmup": 3, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
+  "compile_mode": "max-autotune-no-cudagraphs",
+  "candidate_cap": 4,
+  "call_cap": 16,
+  "historical_cost_usd": 13.4122396,
+  "total_budget_usd": 25,
+  "cases": {
+    "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},
+    "23": {"public_id":23, "family":"softmax", "output_shape":[4096,393216], "dtype":"float32", "atol":1e-11, "rtol":0.0001},
+    "40": {"public_id":40, "family":"layernorm", "output_shape":[16,64,256,256], "dtype":"float32", "atol":0.0001, "rtol":0.0001},
+    "2": {"public_id":2, "family":"matmul", "output_shape":[2048,4096], "k":8192, "dtype":"float32", "atol":0.0001, "rtol":0.0001},
+    "26": {"public_id":26, "family":"gelu", "output_shape":[4096,393216], "dtype":"float32", "atol":0.0001, "rtol":0.0001},
+    "36": {"public_id":36, "family":"rmsnorm", "output_shape":[112,64,512,512], "dtype":"float32", "atol":0.0001, "rtol":0.0001}
+  }
+}

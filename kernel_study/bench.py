@@ -185,6 +185,9 @@ def resource_summary(compiled):
 
 
 def evaluate(request):
+    if 'public_id' in request['case']:
+        from .public_cases import evaluate as evaluate_public
+        return evaluate_public(request)
     import torch
     torch.cuda.set_device(0)
     torch.backends.cuda.matmul.allow_tf32 = False

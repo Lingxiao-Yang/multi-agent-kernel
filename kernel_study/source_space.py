@@ -11,7 +11,7 @@ from .core import ROOT
 from .source_policy import check_source
 
 MODE = 'source-v1'
-GATE_VERSION = 2
+GATE_VERSION = 3
 SYMBOLS = {'X', 'A', 'B', 'W', 'Y', 'S', 'T', 'M', 'N', 'K', 'ROWS', 'TOTAL', 'RB'}
 CONTRACT = '''For implement return {"config":{"mode":"source-v1","launches":[{"kernel":"name","grid":[positive integers],"args":[buffer/scalar symbol names or integer constants],"num_warps":4,"num_stages":1}]},"source":"complete Triton module", "rationale":"code transformation and hypothesis"}.
 Write new device code: config-only, null source, cosmetic renaming, and constant-only source edits are rejected and consume an attempt. Change computation, data movement, parallel decomposition, or kernel structure. No optimized alternative is supplied. You may replace function names/signatures and use 1-4 launches, choosing arbitrary bounded positive grids and integer constexpr arguments. Supply the complete source on every attempt, preserving any kernels still launched.
@@ -27,7 +27,7 @@ def validate_plan(config):
     for item in launches:
         if set(item) != {'kernel', 'grid', 'args', 'num_warps', 'num_stages'}:
             raise ValueError('launch requires kernel/grid/args/num_warps/num_stages')
-        if not isinstance(item['kernel'], str) or not item['kernel'].isidentifier() or item['kernel'].startswith('_'):
+        if not isinstance(item['kernel'], str) or not item['kernel'].isidentifier() or item['kernel'].startswith('__'):
             raise ValueError('invalid kernel identifier')
         grid = item['grid']
         if not isinstance(grid, list) or not 1 <= len(grid) <= 3 or any(type(x) is not int or not 1 <= x <= 2**20 for x in grid) or math.prod(grid) > 2**22:
@@ -43,6 +43,9 @@ def validate_plan(config):
 
 
 def baseline(case):
+    if 'public_id' in case:
+        from .public_cases import start
+        return start(case)
     f = case['family']
     rows, n = case['shape'][:2]
     def launch(name, grid, args):
@@ -66,6 +69,12 @@ def baseline(case):
 
 def contract(case):
     from .source_policy import ALLOWED_TL
+    if 'public_id' in case:
+        from .public_cases import layout
+        names, scalars, scratch = layout(case)
+        return {'format':MODE,'inputs':names, 'scalars':scalars, 'output_shape':case['output_shape'],
+                'workspace':{'Y':'output', 'S':[scratch], 'T':case['output_shape']},
+                'allowed_tl':sorted(ALLOWED_TL), 'limits':'1-4 declarative launches'}
     f = case['family']
     return {'format':MODE, 'buffers':({'A':'[M,K] input', 'B':'[K,N] input'} if f == 'matmul' else
             {'X':'[ROWS,N] input', **({'W':'[N] input weight', 'B':'[N] input bias'} if f == 'layernorm' else {'B':'[N] input bias'} if f == 'elementwise' else {})}),
@@ -173,21 +182,28 @@ def prepare(case, config, inputs, source, *, fresh_output=False):
     validate_plan(config)
     _body_shapes(open(source, encoding='utf-8').read(), config)
     mod = load_source(source)
-    m,n = case['shape'][:2]
-    buffers = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
-    if case['family'] == 'matmul':
-        buffers.update(A=inputs[0],B=inputs[1],K=case['shape'][2])
+    if 'public_id' in case:
+        from .public_cases import layout
+        names, scalars, scratch = layout(case)
+        buffers = {**scalars, **dict(zip(names, inputs, strict=True))}
+        out_shape, scratch_shape = case['output_shape'], (scratch,)
     else:
-        buffers['X'] = inputs[0]
-        if case['family'] == 'layernorm': buffers.update(W=inputs[1],B=inputs[2])
-        elif case['family'] == 'elementwise': buffers['B'] = inputs[1]
+        m,n = case['shape'][:2]
+        out_shape, scratch_shape = (m,n), (m,2)
+        buffers = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
+        if case['family'] == 'matmul':
+            buffers.update(A=inputs[0],B=inputs[1],K=case['shape'][2])
+        else:
+            buffers['X'] = inputs[0]
+            if case['family'] == 'layernorm': buffers.update(W=inputs[1],B=inputs[2])
+            elif case['family'] == 'elementwise': buffers['B'] = inputs[1]
     launches = []
     work_names = {'Y','S','T'}
     used = {a for item in config['launches'] for a in item['args'] if a in work_names}
     def workspace():
-        output = inputs[0].new_empty((m,n))
+        output = inputs[0].new_empty(out_shape)
         work = {'Y':output}
-        if 'S' in used: work['S'] = output.new_empty((m,2), dtype=torch.float32)
+        if 'S' in used: work['S'] = output.new_empty(scratch_shape, dtype=torch.float32)
         if 'T' in used: work['T'] = torch.empty_like(output)
         return work
     cached = None if fresh_output else workspace()
