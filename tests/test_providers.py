@@ -35,3 +35,42 @@ def test_reported_usage_replaces_conservative_cost_reservation(monkeypatch):
     assert r.input_tokens==100 and r.output_tokens==50
     assert p.spent==pytest.approx(.0002)
     assert p.completed_cost==pytest.approx(.0002)
+
+
+def test_transport_failure_is_logged_and_upstream_cannot_silently_call_again(tmp_path,monkeypatch):
+    import urllib.request
+    import urllib.error
+    from kernel_study.reference_search import Ledger,MeteredChat
+    def offline(*args,**kwargs): raise urllib.error.URLError('unreachable')
+    monkeypatch.setattr(urllib.request,'urlopen',offline)
+    ledger = Ledger(tmp_path, 'sample', 4, 16, 1., 1., 1.)
+    chat = MeteredChat(ledger,tmp_path,model='pinned',endpoint='http://localhost:1')
+    with pytest.raises(Exception): chat.send_messages([], 'proposal', 1)
+    with pytest.raises(Exception): chat.send_messages([], 'repair', 2)
+    assert ledger.summary()['calls']==1 and ledger.summary()['committed_usd']>0
+    failures = [e for e in map(json.loads,(tmp_path/'model_events.jsonl').read_text().splitlines()) if e['event']=='request_error']
+    assert [e['reason'] for e in failures]==['transport']
+
+
+def test_both_model_interfaces_meter_the_wire_payload(tmp_path, monkeypatch):
+    import io
+    import json
+    import urllib.request
+    from kernel_study.reference_search import Ledger, MeteredChat
+    sent = []
+    def response(request, timeout):
+        sent.append(json.loads(request.data))
+        return io.BytesIO(json.dumps({'model':'pinned','choices':[{'message':{'content':'{}'}}],
+            'usage':{'prompt_tokens':20,'completion_tokens':7}}).encode())
+    monkeypatch.setattr(urllib.request,'urlopen',response)
+    ledger = Ledger(tmp_path,'pair',2,2,1.,1.,1.)
+    provider = MeteredChat(ledger,tmp_path,model='pinned',endpoint='http://localhost:1',
+                          max_output_tokens=100,input_price=1.,output_price=1.)
+    provider.complete('single',{},'analyze',11)
+    messages = [{'role':'user','content':'native bottleneck diagnosis'}]
+    provider.send_messages(messages,'proposal',12,max_tokens=25)
+    assert sent[0]['response_format']=={'type':'json_object'}
+    assert 'response_format' not in sent[1] and sent[1]['messages']==messages
+    assert sent[1]['max_completion_tokens']==25
+    with pytest.raises(RuntimeError): provider.send_messages(messages,'repair',13)
+    assert len(sent)==2 and ledger.summary()['input_tokens']==40

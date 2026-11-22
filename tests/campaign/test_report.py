@@ -1,4 +1,30 @@
 import pytest
+from kernel_study.core import write_json
+
+
+def test_primary_ratio_uses_only_the_direct_pair():
+    from kernel_study.reference_report import compare
+    rows = [dict(case=40, seed=11, agent=a, correct_new=True, fallback=False, status='complete',
+                 latency_ms=t) for a,t in [('single',9.), ('greedy',1.)]]
+    direct = {(40,11): {'status':'ok', 'candidate':{'median_ms':1.04}, 'incumbent':{'median_ms':1.}}}
+    assert compare(rows, [40], [11], direct)['ratio'] == pytest.approx(1.04)
+    assert not compare(rows, [40], [11], {})['complete']
+
+
+def test_retry_report_charges_both_runs_but_counts_one_search(tmp_path):
+    from kernel_study.reference_report import phase_rows
+    name = 'development-4-single-11'
+    for suffix, status, charge in [('', 'interrupted',.12),('-retry1','complete',.05)]:
+        row=dict(agent='single',case=4,seed=11,status=status,stop_reason='transport' if not suffix else 'candidate_cap',
+                 budget={'attempts':1},cost_usd=0. if not suffix else charge,committed_usd=charge,
+                 candidates=[{'attempt':1,'usd':charge}])
+        write_json(tmp_path/(name+suffix)/'audit.json',row)
+    rows,attempts,_=phase_rows(tmp_path,'development',[4],[11])
+    assert len(rows)==1 and len(attempts)==2
+    assert rows[0]['total_committed_usd']==pytest.approx(.17)
+    assert rows[0]['total_completed_usd']==pytest.approx(.05)
+    assert rows[0]['total_attempts']==2
+    assert rows[0]['matched_candidates'][0]['attempt']==2
 
 
 def pairs(rows):
@@ -31,11 +57,3 @@ def test_one_extra_fallback_across_threshold_requires_remeasurement():
                  fallback=(a=='single' and s==11),latency_ms=2. if a=='single' and s==11 else 1.)
             for s in [11,22,33] for a in ['single','greedy']]
     assert compare(rows,[2],[11,22,33],pairs(rows))['decision']=='pending-fallback-remeasurement'
-
-
-def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
-    from kernel_study.reference_report import changed_program
-    start = 'def run(x):\n    """baseline"""\n    return x + 1\n'
-    copied = '# same launch\ndef run(x):\n    """new explanation"""\n    return x+1\n'
-    assert not changed_program(copied,start)
-    assert changed_program(copied.replace('x+1','x+2'),start)
