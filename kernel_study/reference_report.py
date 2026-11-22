@@ -1,73 +1,18 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
 import argparse
-import ast
-import json
 import math
 from pathlib import Path
 
 from .core import read_json, write_json
 from .public_cases import experiment
-from .search import run_worker
-
-
-def changed_program(source, start):
-    def statements(text):
-        tree = ast.parse(text)
-        for node in ast.walk(tree):
-            if isinstance(node,(ast.Module,ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)) and ast.get_docstring(node) is not None:
-                node.body.pop(0)
-        return ast.dump(tree)
-    return statements(source)!=statements(start)
-
-
-def audit(output, agent):
-    summary = read_json(output/'summary.json')
-    manifest, final = summary['manifest'],summary['final']
-    case,protocol = manifest['case'],manifest['protocol']
-    log = output/'model_events.jsonl'
-    events = [json.loads(s) for s in log.read_text().splitlines()] if log.exists() else []
-    replies = {e['id']:e['budget'] for e in events if e['event']=='response'}
-    proposals = [e for e in events if e['event']=='request' and e['stage'] in ('implement','proposal','repair')]
-    history = {h['attempt']:h for h in summary['history']}
-    start = output/'baseline.py'
-    start_config = read_json(output/'baseline.request.json')['config'] if agent=='single' else None
-    candidates = []
-    for call in proposals:
-        budget = replies.get(call['id'],call['budget'])
-        i = budget['attempts']
-        h = history.get(i,{})
-        point = dict(attempt=i,usd=budget['committed_usd'],status=h.get('result',{}).get('status','no_submission'))
-        if point['status']=='ok':
-            source = output/(f'candidate_{i:03}.py' if agent=='single' else f'proposal_{i:03}.py')
-            if changed_program(source.read_text(),start.read_text()) or (agent=='single' and h.get('config')!=start_config):
-                req = dict(case=case,protocol=protocol,source=str(source),config=h.get('config'),
-                           incumbent_source=str(start),incumbent_config=start_config,final=True,
-                           interface='declarative' if agent=='single' else 'native')
-                checked = run_worker(req,output,f'audit_{i:03}')
-                point['status'] = checked['status']
-                if checked['status']=='ok': point['latency_ms'] = checked['candidate']['median_ms']
-        candidates.append(point)
-    row = dict(agent=agent,case=case['public_id'],seed=manifest['seed'],status=summary['status'],
-               correct_new=any('latency_ms' in h for h in candidates),candidates=candidates,
-               budget=summary['budget'],cost_usd=summary['estimated_inference_usd'],wall_seconds=summary['wall_seconds'])
-    workers = [read_json(p) for p in output.glob('*.result.json')]
-    row['evaluator_process_seconds'] = sum(w.get('process_seconds',0.) for w in workers)
-    row['gpu_slot_seconds'] = summary['wall_seconds'] + sum(
-        read_json(p).get('process_seconds',0.) for p in output.glob('audit_*.result.json'))
-    if final:
-        r = final['result']
-        row.update(latency_ms=r['candidate']['median_ms'],fallback=final['candidate_id']==0,
-                   initial_ms=r['incumbent']['median_ms'],speedup=r['paired_speedup'],
-                   compile_speedup=r['compile']['median_ms']/r['compile_candidate']['median_ms'])
-    write_json(output/'audit.json',row)
-    return row
+from .public_referee import changed_program
 
 
 def geometric(values):
     return math.exp(sum(math.log(v) for v in values)/len(values))
 
 
-def compare(rows, cases, seeds):
+def compare(rows, cases, seeds, measurements):
     keyed = {(r['case'],r['seed'],r['agent']):r for r in rows}
     if len(keyed)!=len(rows): raise ValueError('duplicate search')
     tasks, ratios, valid = {},[],{'single':0,'greedy':0}
@@ -78,8 +23,9 @@ def compare(rows, cases, seeds):
         for seed in seeds:
             pair = [keyed.get((case,seed,a)) for a in valid]
             if any(not r or r['status']!='complete' or 'latency_ms' not in r for r in pair): continue
-            local,greedy = pair
-            values.append(local['latency_ms']/greedy['latency_ms'])
+            measured = measurements.get((case,seed), {})
+            if measured.get('status')!='ok': continue
+            values.append(measured['candidate']['median_ms']/measured['incumbent']['median_ms'])
             for r in pair:
                 valid[r['agent']] += r['correct_new']
                 fallbacks[r['agent']] += r['fallback']
@@ -99,10 +45,45 @@ def compare(rows, cases, seeds):
 
 def prefix(row, axis, limit):
     best = row['initial_ms']
-    for c in row['candidates']:
-        if c[axis]<=limit and 'latency_ms' in c:
-            best = min(best,c['latency_ms'])
+    for c in row['matched_candidates']:
+        if c[axis]<=limit and c.get('selected'):
+            best = c['latency_ms']
     return best
+
+
+def phase_rows(root, phase, cases, seeds):
+    from .agent_campaign import job_name, latest_attempt
+    rows, attempts, measurements = [], [], {}
+    for case in cases:
+        for seed in seeds:
+            result = root/'pairs'/f'{phase}-{case}-{seed}'/'direct.result.json'
+            if result.exists():
+                measurements[case,seed] = read_json(result)
+            for agent in ('single','greedy'):
+                name = job_name(phase,case,agent,seed)
+                latest = latest_attempt(root,name)
+                prior = root/name
+                records = []
+                for directory in ([prior,latest] if prior!=latest else [prior]):
+                    path = directory/'audit.json'
+                    if not path.exists():
+                        continue
+                    row = read_json(path)
+                    records.append(row)
+                    attempts.append(dict(directory=directory.name, status=row['status'], reason=row.get('stop_reason'),
+                                         completed_usd=row['cost_usd'], committed_usd=row.get('committed_usd',0.),
+                                         budget=row['budget']))
+                    if directory==latest:
+                        row = dict(row, run=directory.name)
+                        previous_cost = sum(item.get('committed_usd',0.) for item in records[:-1])
+                        row['total_committed_usd'] = previous_cost + row.get('committed_usd',0.)
+                        row['total_completed_usd'] = sum(item['cost_usd'] for item in records)
+                        previous_attempts = sum(item['budget']['attempts'] for item in records[:-1])
+                        row['total_attempts'] = previous_attempts + row['budget']['attempts']
+                        row['matched_candidates'] = [dict(c, usd=previous_cost+c['usd'],attempt=previous_attempts+c['attempt'])
+                                                     for c in row['candidates']]
+                        rows.append(row)
+    return rows,attempts,measurements
 
 
 def main():
@@ -110,18 +91,33 @@ def main():
     parser.add_argument('phase',choices=['development','holdout'])
     parser.add_argument('output',type=Path)
     parser.add_argument('--freeze',action='store_true',help='Register the measured single implementation before holdout')
+    parser.add_argument('--measure-pairs',action='store_true',help='Measure missing finalist pairs on the registered GPU')
     args = parser.parse_args()
+    args.output = args.output.resolve()
     plan = experiment()
-    rows = [read_json(p) for p in sorted(args.output.glob(args.phase+'-*/audit.json'))]
-    report = compare(rows,plan[args.phase],plan[args.phase+'_seeds'])
+    if args.measure_pairs:
+        from .agent_campaign import code_hashes, job_name, latest_attempt
+        from .public_preflight import check_device
+        from .public_referee import measure_pair
+        check_device(plan)
+        if read_json(args.output/(args.phase+'-protocol.json'))['code_hashes'] != code_hashes():
+            parser.error('pair measurements require the registered evaluation code')
+        for case in plan[args.phase]:
+            for seed in plan[args.phase+'_seeds']:
+                sides = [latest_attempt(args.output,job_name(args.phase,case,agent,seed)) for agent in ('single','greedy')]
+                measure_pair(args.output/'pairs'/f'{args.phase}-{case}-{seed}',*sides)
+    rows,attempts,measurements = phase_rows(args.output,args.phase,plan[args.phase],plan[args.phase+'_seeds'])
+    report = compare(rows,plan[args.phase],plan[args.phase+'_seeds'],measurements)
+    report['attempts'] = attempts
+    report['direct_pairs'] = {f'{case}-{seed}':data for (case,seed),data in measurements.items()}
     report['searches'] = rows
     budgets = []
     for case in plan[args.phase]:
         for seed in plan[args.phase+'_seeds']:
             pair = [r for r in rows if r['case']==case and r['seed']==seed and 'initial_ms' in r]
             if len(pair)!=2: continue
-            for axis,limit in [('attempt',min(r['budget']['attempts'] for r in pair)),('usd',min(r['cost_usd'] for r in pair))]:
-                points = sorted({c[axis] for r in pair for c in r['candidates'] if c[axis]<=limit}|{limit})
+            for axis,limit in [('attempt',min(r['total_attempts'] for r in pair)),('usd',min(r['total_committed_usd'] for r in pair))]:
+                points = sorted({c[axis] for r in pair for c in r['matched_candidates'] if c[axis]<=limit}|{limit})
                 budgets.extend(dict(case=case,seed=seed,axis=axis,limit=p,
                                     **{r['agent']:prefix(r,axis,p) for r in pair}) for p in points)
     report['matched_budget_ms'] = budgets

@@ -176,7 +176,7 @@ def check_edit(source, config, parent_source, parent_config):
             'note':'Structural screen passed; transformation mechanism requires source review.'}
 
 
-def prepare(case, config, inputs, source, *, fresh_output=False):
+def prepare(case, config, inputs, source, *, fresh_output=False, poison_output=False):
     import torch
     from .source_policy import load_source
     validate_plan(config)
@@ -215,6 +215,8 @@ def prepare(case, config, inputs, source, *, fresh_output=False):
     compiled = []
     def launch():
         work = workspace() if fresh_output else cached
+        if poison_output:
+            work['Y'].fill_(float('nan'))
         for kernel,template,slots,opts in launches:
             args = template.copy()
             for i, name in slots: args[i] = work[name]

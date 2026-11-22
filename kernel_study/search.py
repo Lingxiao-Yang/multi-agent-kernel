@@ -198,16 +198,22 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'state.json', {'incumbent':incumbent,'history':history,'budget':budget.snapshot()})
         if stop:
             break
-    # Every retained candidate is eligible for fallback; baseline remains included.
-    final = None
-    for item in reversed(retained):
-        checked = run_worker({'case':case,'config':item['config'],'source':item['source'],
-                    'incumbent_config':base_config,'incumbent_source':str(base_source),'protocol':protocol,
-                    'final':True,'library':True}, output, f'final_{item["id"]:03d}')
-        event(log, 'final_validation', candidate_id=item['id'], result=checked)
-        if checked['status'] == 'ok':
-            final = {'candidate_id':item['id'], 'result':checked, 'config':item['config']}
-            break
+    selection = []
+    if 'public_id' in case:
+        from .public_referee import select_final
+        candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"), config=h['config'])
+                      for h in history if h['result']['status']=='ok']
+        final, selection = select_final(output, case, protocol, 'declarative', retained[0], candidates)
+    else:
+        final = None
+        for item in reversed(retained):
+            checked = run_worker({'case':case,'config':item['config'],'source':item['source'],
+                        'incumbent_config':base_config,'incumbent_source':str(base_source),'protocol':protocol,
+                        'final':True,'library':True}, output, f'final_{item["id"]:03d}')
+            event(log, 'final_validation', candidate_id=item['id'], result=checked)
+            if checked['status'] == 'ok':
+                final = {'candidate_id':item['id'], 'result':checked, 'config':item['config']}
+                break
     final_stop = stop or budget.stop_reason()
     completed_search = final_stop in ['candidate_cap','call_cap','token_safety_cap']
     summary = {'status':('complete' if completed_search else 'interrupted') if final else 'final_failed', 'manifest':manifest,
@@ -216,6 +222,17 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                'scientific_evidence':provider.name == 'llm' and completed_search and resolved_model is not None,
                'estimated_inference_usd':getattr(provider,'completed_cost',0)-starting_completed_cost,
                'budget_committed_usd':getattr(provider,'spent',0)-starting_cost}
+    if 'public_id' in case:
+        from .reference_search import interruption
+        reason = interruption(output)
+        summary['selection'] = selection
+        if hasattr(provider,'ledger'):
+            usage = provider.ledger.summary()
+            summary['budget'].update(usage)
+            summary['estimated_inference_usd'] = usage['completed_usd']
+            summary['budget_committed_usd'] = usage['committed_usd']
+        if reason:
+            summary.update(status='interrupted', stop_reason=reason)
     if final:
         summary['speedup'] = final['result']['paired_speedup']
         # Initial incumbent retained => measured fluctuations don't imply a selected regression.

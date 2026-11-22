@@ -37,20 +37,26 @@ def run(case, phase, directory, plan):
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.cuda.reset_peak_memory_stats()
     seed = plan['preflight_seeds'][int(phase=='hold')]
-    model, inputs, buffers = public.task_inputs(case,seed)
     source, config = public.start(case)
     path = directory/'device.py'
     path.write_text(source)
     native_path = directory/'input.py'
     native_path.write_text(public.matvec_path().read_text() if case['public_id']==4 else
                            public.render_native(case,source,config))
+    protocol = plan['timing']
+    result = dict(case=case,seed=seed,protocol=protocol,launch=config,device_source_hash=digest(source),
+                  native_source_hash=digest(native_path.read_text()),problem_hash=digest(public.task_path(case).read_text()))
+    if phase == 'stress':
+        result['checks'] = {}
+        for interface, source_path in [('native',native_path),('declarative',path)]:
+            result['checks'][interface],_ = public.validate(case,source_path,config,interface,[seed],True)
+        result['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
+        return result
+    model, inputs, buffers = public.task_inputs(case,seed)
     native = public.load_native(native_path)
     forward = lambda: native(*buffers)
     local = public.local_forward(case,path,config,buffers)
     eager = lambda: model(*inputs)
-    protocol = plan['timing']
-    result = dict(case=case,seed=seed,protocol=protocol,launch=config,device_source_hash=digest(source),
-                  native_source_hash=digest(native_path.read_text()),problem_hash=digest(public.task_path(case).read_text()))
     if phase == 'hand':
         public.upstream('tritonbench')
         hand = hand_forward(case['public_id'],buffers)
@@ -93,7 +99,7 @@ def run(case, phase, directory, plan):
 def main():
     import torch
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('phase',choices=['preflight','calibrate','hold','hand'])
+    parser.add_argument('phase',choices=['preflight','calibrate','hold','hand','stress'])
     parser.add_argument('--case',required=True)
     parser.add_argument('--output',type=Path,required=True)
     args = parser.parse_args()

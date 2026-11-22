@@ -6,7 +6,7 @@ def test_public_tasks_and_limits_are_stated_before_search():
     plan = experiment()
     assert plan['development'] == [4, 23, 40]
     assert plan['holdout'] == [2, 26, 36]
-    assert (plan['candidate_cap'], plan['call_cap']) == (4, 16)
+    assert (plan['phases']['development']['candidate_cap'], plan['phases']['development']['call_cap']) == (4, 16)
     assert plan['cases']['40']['output_shape'] == [16, 64, 256, 256]
     assert plan['cases']['36']['output_shape'] == [112, 64, 512, 512]
     assert plan['cases']['23']['atol'] < 1/393216
@@ -59,3 +59,22 @@ def test_hand_layernorm_preserves_the_three_normalized_dimensions():
     w,b = (torch.randn_like(x[0]) for _ in range(2))
     result = hand_forward(40,[x,w,b])()
     torch.testing.assert_close(result,torch.nn.functional.layer_norm(x,x.shape[1:],w,b))
+
+
+def test_layernorm_start_preserves_small_differences_on_large_offsets(tmp_path):
+    from kernel_study import public_cases as public
+    torch=pytest.importorskip('torch')
+    if not torch.cuda.is_available(): pytest.skip('CUDA required')
+    case={**public.experiment()['cases']['40'],'output_shape':[3,4,16,79]}
+    torch.manual_seed(10001)
+    x=torch.rand(case['output_shape'],device='cuda')/32+1024
+    model=torch.nn.LayerNorm(x.shape[1:],device='cuda').eval()
+    with torch.no_grad():
+        w,b=model.weight,model.bias
+        source,config=public.start(case)
+        path=tmp_path/'device.py'
+        path.write_text(source)
+        fn=public.local_forward(case,path,config,[x,w,b])
+        actual=public.check_forward(lambda *_:fn(),[x,w,b],model(x),case,
+                                    reference_chunks=public.fp64_chunks(model,[x]))
+        assert actual['elements']==x.numel()

@@ -1,5 +1,6 @@
 """Frozen KernelBench inputs and shared Triton starts for both agent interfaces."""
 import ast
+import copy
 import importlib.util
 import math
 import os
@@ -80,27 +81,27 @@ def start(case):
     shape = case['output_shape']
     _, sizes, _ = layout(case)
     m,n,total = (sizes[k] for k in ('M','N','TOTAL'))
-    legacy = ROOT/'kernel_study/kernels.py'
     public = ROOT/'kernel_study/public_kernels.py'
     kernels, launches = [], []
     def add(path, name, grid, args, stages=1):
         source = device_function(path,name)
-        if name == 'matmul_tensor':
-            source = source.replace('tl.dot(a, b, acc)', "tl.dot(a, b, acc, input_precision='ieee')")
         kernels.append(source)
         launches.append(dict(kernel=name,grid=grid,args=args,num_warps=4,num_stages=stages))
     if family == 'matvec':
         add(matvec_path(),'_matvec_kernel',[(m+127)//128],
             ['A','B','Y','M','K','K',1,1,1,1,1,128,256],2)
     elif family == 'matmul':
-        add(legacy,'matmul_tensor',[(m+31)//32,(n+31)//32],['A','B','Y','M','N','K',32,32,32])
+        add(public,'matmul_tensor',[(m+31)//32,(n+31)//32],['A','B','Y','M','N','K',32,32,32])
     elif family in ('softmax','layernorm'):
         groups = (n+1023)//1024
         flag = int(family=='softmax')
-        add(public,'row_partials',[groups,m],['X','S','ROWS','N',groups,1024,flag])
+        if flag:
+            add(public,'row_partials',[groups,m],['X','S','ROWS','N',groups,1024,flag])
+        else:
+            add(public,'layernorm_partials',[groups,m],['X','S','ROWS','N',groups,1024])
         add(public,'row_combine',[m],['S','ROWS','N',groups,1024,1 << (groups-1).bit_length(),flag])
         operands = ['X'] if flag else ['X','W','B']
-        add(legacy,family+'_apply',[(total+2047)//2048],operands+['S','Y','TOTAL','N',2048])
+        add(public,family+'_apply',[(total+2047)//2048],operands+['S','Y','TOTAL','N',2048])
     elif family == 'gelu':
         add(public,'gelu',[(total+2047)//2048],['X','Y','TOTAL',2048])
     elif family == 'rmsnorm':
@@ -136,7 +137,32 @@ def local_forward(case, path, config, inputs):
     return source_space.prepare(case,config,inputs,path,fresh_output=True)[0]
 
 
-def check_forward(forward, inputs, expected, case):
+def stress_input(x, edge):
+    if edge == 'zeros':
+        x.zero_()
+    elif edge == 'constant':
+        x.fill_(3.)
+    elif edge == 'large':
+        x.mul_(20.)
+    elif edge == 'negative':
+        x.neg_().sub_(1.)
+    elif edge == 'large_offset':
+        x.mul_(1/32).add_(1024.)
+    else:
+        raise ValueError(edge)
+
+
+def fp64_chunks(model, inputs):
+    model64 = copy.deepcopy(model).double()
+    first, *rest = inputs
+    other = [v.double() for v in rest]
+    rows = max(1, 2**20 // first[0].numel())
+    for i in range(0, first.shape[0], rows):
+        part = slice(i, i+rows)
+        yield part, model64(first[part].double(), *other)
+
+
+def check_forward(forward, inputs, expected, case, *, reference_chunks=None):
     import torch
     snapshots = [x.clone() for x in inputs]
     actual = forward(*inputs)
@@ -146,15 +172,61 @@ def check_forward(forward, inputs, expected, case):
         raise AssertionError('output metadata differs from reference')
     delta = torch.zeros((),device=actual.device)
     bad = torch.zeros((),dtype=torch.int64,device=actual.device)
-    for a,b in zip(actual.flatten().split(2**23),expected.flatten().split(2**23)):
-        a,b = a.float(),b.float()
-        diff = (a-b).abs()
-        delta = torch.maximum(delta,diff.max())
-        bad += (~torch.isclose(a,b,atol=case['atol'],rtol=case['rtol'],equal_nan=False)).sum()
+    reference_info = {'reference':'eager'}
+    if reference_chunks is None:
+        for a,b in zip(actual.flatten().split(2**23), expected.flatten().split(2**23)):
+            a,b = a.float(),b.float()
+            delta = torch.maximum(delta,(a-b).abs().max())
+            bad += (~torch.isclose(a,b,atol=case['atol'],rtol=case['rtol'],equal_nan=False)).sum()
+    else:
+        eager_error = torch.zeros((),dtype=torch.float64,device=actual.device)
+        for part,reference in reference_chunks:
+            a,b = actual[part].double(), expected[part].double()
+            error = (a-reference).abs()
+            eager_delta = (b-reference).abs()
+            allowed = eager_delta + case['atol'] + case['rtol']*reference.abs()
+            delta = torch.maximum(delta,error.max())
+            eager_error = torch.maximum(eager_error,eager_delta.max())
+            bad += (~(torch.isfinite(a) & torch.isfinite(b) & torch.isfinite(reference) & (error <= allowed))).sum()
+        reference_info = {'reference':'fp64','eager_max_abs_error':float(eager_error)}
     count = int(bad)
     if count:
         raise AssertionError(f'{count}/{actual.numel()} elements outside tolerance, max_abs_error={float(delta)}')
-    return {'elements':actual.numel(),'max_abs_error':float(delta),'inputs_unchanged':True}
+    return {'elements':actual.numel(),'max_abs_error':float(delta),'inputs_unchanged':True,**reference_info}
+
+
+def bind(case, source, config, interface, buffers, *, validating=False):
+    if interface == 'native':
+        native = load_native(source)
+        return lambda: native(*buffers), []
+    return source_space.prepare(case,config,buffers,source,fresh_output=True,poison_output=validating)
+
+
+def validate(case, source, config, interface, seeds, stress):
+    import time
+    records = []
+    samples = [(seed, 'random') for seed in seeds]
+    if stress:
+        edges = ['zeros','constant','large','negative']
+        if case['family']=='layernorm':
+            edges.append('large_offset')
+        samples.extend((seeds[0], edge) for edge in edges)
+    for seed, edge in samples:
+        model,inputs,buffers = task_inputs(case,seed)
+        if edge!='random':
+            stress_input(inputs[0], edge)
+        expected = model(*inputs)
+        forward,_ = bind(case,source,config,interface,buffers,validating=True)
+        first = time.perf_counter()
+        reference = fp64_chunks(model,inputs) if edge!='random' else None
+        try:
+            record = check_forward(lambda *args: forward(),buffers,expected,case,reference_chunks=reference)
+        except AssertionError as exc:
+            raise AssertionError(f'{edge} seed {seed}: {exc}') from exc
+        if not records: first_check_seconds = time.perf_counter()-first
+        records.append(dict(seed=seed,edge=edge,**record))
+        del model,inputs,buffers,expected,forward
+    return records, first_check_seconds
 
 
 def evaluate(request):
@@ -165,30 +237,16 @@ def evaluate(request):
     case, protocol = request['case'], request['protocol']
     torch.backends.cuda.matmul.allow_tf32 = False
     started = time.perf_counter()
-    def bind(source, config, interface, buffers):
-        if interface == 'native':
-            native = load_native(source)
-            return lambda: native(*buffers), []
-        return source_space.prepare(case,config,buffers,source,fresh_output=True)
     source = request['source']
     config = request.get('config')
     interface = request.get('interface','declarative')
     seeds = protocol['final_validation_seeds' if request.get('final') else 'validation_seeds']
     with torch.no_grad():
-        records = []
-        for seed in seeds:
-            model,inputs,buffers = task_inputs(case,seed)
-            expected = model(*inputs)
-            forward,_ = bind(source,config,interface,buffers)
-            first = time.perf_counter()
-            record = check_forward(lambda *args: forward(),buffers,expected,case)
-            if not records: first_check_seconds = time.perf_counter()-first
-            records.append(dict(seed=seed,edge='random',**record))
-            del model,inputs,buffers,expected,forward
+        records, first_check_seconds = validate(case, source, config, interface, seeds, request.get('final',False))
         validation_seconds = time.perf_counter()-started
         model,inputs,buffers = task_inputs(case,seeds[0]+77)
-        forward,compiled = bind(source,config,interface,buffers)
-        parent,_ = bind(request.get('incumbent_source',source),request.get('incumbent_config',config),
+        forward,compiled = bind(case,source,config,interface,buffers)
+        parent,_ = bind(case,request.get('incumbent_source',source),request.get('incumbent_config',config),
                         request.get('incumbent_interface',interface),buffers)
         candidate,incumbent = bench.time_pair(forward,parent,protocol)
         speedup = incumbent['median_ms']/candidate['median_ms']
@@ -201,7 +259,7 @@ def evaluate(request):
             result['confirmed'] = i['median_ms']/c['median_ms'] > protocol['improvement_threshold']
         if request.get('library'):
             result['library_candidate'],result['library'] = bench.time_pair(forward,lambda: model(*inputs),protocol)
-        if request.get('final'):
+        if request.get('final') and request.get('compare_compile',True):
             compiled_model = torch.compile(model,mode=experiment()['compile_mode'],fullgraph=True)
             result['compile_candidate'],result['compile'] = bench.time_pair(forward,lambda: compiled_model(*inputs),protocol)
         if request.get('profile'):
