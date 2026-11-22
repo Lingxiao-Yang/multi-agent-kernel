@@ -9,6 +9,35 @@ from kernel_study.providers import MeteredChat
 from kernel_study.records import event
 
 
+def test_matvec_timeout_only_changes_the_initial_worker():
+    from kernel_study.agents.kernelagent import matvec_test_timeout
+
+    class Worker:
+        test_timeout_s = 30
+
+        def __init__(self, worker_id):
+            self.worker_id = worker_id
+
+        @matvec_test_timeout
+        def run_test(self):
+            return self.test_timeout_s
+
+    initial, candidate = Worker(-1), Worker(0)
+    assert initial.run_test() == 180
+    assert candidate.run_test() == initial.test_timeout_s == 30
+
+
+@pytest.mark.parametrize('visible,expected', [(None, 0), ('1,0', 1), ('GPU-abc', 'GPU-abc')])
+def test_native_worker_uses_the_assigned_device(monkeypatch, visible, expected):
+    from kernel_study.agents.kernelagent import worker_gpu
+
+    if visible is None:
+        monkeypatch.delenv('CUDA_VISIBLE_DEVICES', raising=False)
+    else:
+        monkeypatch.setenv('CUDA_VISIBLE_DEVICES', visible)
+    assert worker_gpu() == expected
+
+
 def test_greedy_exhausted_without_a_winner_counts_as_fallback(tmp_path):
     for i in (1, 2):
         (tmp_path / f'proposal_{i:03d}.py').write_text('')

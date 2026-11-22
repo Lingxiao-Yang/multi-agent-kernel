@@ -4,18 +4,17 @@
     "KernelBench": "423217d9fda91e0c2d67e4a43bf62f96f6d104f1",
     "tritonbench": "32bc178ce503b0fbcf9a1ed3cc033e6d6fe6edc0"
   },
-  "gpu": "NVIDIA A800-SXM4-80GB",
+  "gpu": "NVIDIA A100 PCIe 40GB",
   "gpu_specs": {
-    "architecture": "Ampere", "peak_memory_bw_gbps": 2039,
+    "architecture": "Ampere", "peak_memory_bw_gbps": 1555,
     "peak_fp32_tflops": 19.5, "peak_fp16_tflops": 312, "peak_bf16_tflops": 312,
     "sm_count": 108, "max_threads_per_sm": 2048, "l1_cache_kb": 192, "l2_cache_mb": 40,
-    "memory_gb": 80, "memory_type": "HBM2e"
+    "memory_gb": 40, "memory_type": "HBM2"
   },
-  "device_uuid_sha256": "15c7925505a1cd260e1a62294c696c67fab6d1e296b8d603bd791dc641af9b98",
-  "driver": "580.126.09",
-  "torch": "2.12.1+cu130",
+  "driver": "570.195.03",
+  "torch": "2.12.1+cu126",
   "triton": "3.7.1",
-  "cuda": "13.0",
+  "cuda": "12.6",
   "agents": ["single", "greedy"],
   "development": [4, 23, 40],
   "holdout": [2, 26, 36],
@@ -27,7 +26,7 @@
   "timing": {"warmup": 3, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
   "compile_mode": "max-autotune-no-cudagraphs",
   "phases": {
-    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 16},
+    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 16, "single_call_cap": 4},
     "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128},
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}

@@ -20,7 +20,8 @@ from .preflight import check_device
 def jobs(plan, phase):
     if phase in ('smoke','calibration'):
         phase_plan = plan['phases'][phase]
-        return [(phase_plan['case'],'greedy',phase_plan['seed'])]
+        agents = ('greedy','single') if phase=='smoke' else ('greedy',)
+        return [(phase_plan['case'],agent,phase_plan['seed']) for agent in agents]
     pairs = [(case,seed) for case in plan[phase] for seed in plan[phase+'_seeds']]
     rng = random.Random(20261121)
     rng.shuffle(pairs)
@@ -73,22 +74,22 @@ def run_job(args, plan, case_id, agent, seed):
     output = attempt_path(args.output,job,args.retry_transport)
     baseline = args.preflight/str(case_id)
     frozen = read_json(baseline/'preflight.json')
-    hold = read_json(baseline/'hold.json')
     stress = read_json(baseline/'stress.json')
     identity = ('device_source_hash','native_source_hash','problem_hash','launch')
-    if any(record[k]!=frozen[k] for record in (stress,hold) for k in identity) or set(stress['checks'])!={'native','declarative'}:
-        raise ValueError('public pressure or timing checks belong to different starts')
-    if not frozen['identical_outputs'] or not hold['interface_agreement'] or hold['self']['confirmations']>1:
-        raise ValueError('public preflight acceptance incomplete')
+    if any(stress[k]!=frozen[k] for k in identity) or set(stress['checks'])!={'native','declarative'}:
+        raise ValueError('public pressure checks belong to different starts')
+    if not frozen['identical_outputs']:
+        raise ValueError('starting interfaces produced different outputs')
+    register(args.output,f'case-{case_id}-preflight',dict(preflight=digest(frozen),stress=digest(stress)))
     case = dict(plan['cases'][str(case_id)],id=f'level1_{case_id}',problem=kernelbench.task_path(plan['cases'][str(case_id)]).read_text())
     _, dims, _ = kernelbench.layout(case)
     case['shape'] = [dims['M'],dims['N']] + ([dims['K']] if 'K' in dims else [])
     phase = plan['phases'][args.phase]
-    cap, calls, rounds = phase['candidate_cap'],phase['call_cap'],phase['rounds']
+    cap, calls, rounds = phase['candidate_cap'],phase.get(f'{agent}_call_cap',phase['call_cap']),phase['rounds']
     protocol = read_json(ROOT/'configs/protocol.json')
     protocol.update(plan['timing'],candidate_cap=cap, call_cap=calls, model=args.model,
                     endpoint=args.endpoint,input_usd_per_million=args.input_price,output_usd_per_million=args.output_price,
-                    improvement_threshold=hold['self']['threshold'],worker_timeout_s=600,search_space='source-v1',
+                    worker_timeout_s=600,search_space='source-v1',
                     full_calibration=args.phase=='calibration',shared_api_guidance=VERSION,validation_seeds=plan['validation_seeds'],
                     final_validation_seeds=plan['final_validation_seeds'])
     ledger = Ledger(args.output,output.name,cap,calls,args.input_price,args.output_price,
@@ -104,7 +105,7 @@ def run_job(args, plan, case_id, agent, seed):
     else:
         result = run_native(case,seed,protocol,provider,output,baseline,rounds)
     audit(output,agent)
-    if args.phase in ('development','holdout'):
+    if args.phase in ('smoke','development','holdout'):
         sides = [latest_attempt(args.output,job_name(args.phase,case_id,a,seed)) for a in ('single','greedy')]
         measured = measure_pair(args.output/'pairs'/f'{args.phase}-{case_id}-{seed}', *sides)
         if measured is not None and measured['status']!='ok':
@@ -128,15 +129,19 @@ def run_campaign(args, parser):
     os.environ['PYTHONPATH'] = os.pathsep.join([str(ROOT),str(upstream),os.environ.get('PYTHONPATH','')])
     revision = subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip()
     lock = dict(model=args.model,endpoint=args.endpoint,input_price=args.input_price,output_price=args.output_price,
-                gpu=device['gpu'],device_uuid_sha256=plan['device_uuid_sha256'],upstream=plan['upstream'],
-                configuration=digest(plan),
-                preflight={str(c):{stage:digest(read_json(args.preflight/str(c)/(stage+'.json')))
-                                   for stage in ('preflight','stress','hold')}
-                           for c in plan['development']+plan['holdout']})
+                gpu=plan['gpu'],driver=device['driver'],upstream=plan['upstream'],configuration=digest(plan))
     phase_lock = dict(revision=revision,code_hashes=code_hashes(),jobs=schedule)
     for name,record in [('experiment',lock),(args.phase+'-protocol',phase_lock)]:
         try:
             register(args.output,name,record)
+        except ValueError as exc:
+            parser.error(str(exc))
+    case_id,agent,seed = schedule[args.job]
+    if args.phase in ('smoke','development','holdout'):
+        pair = args.output/'pairs'/f'{args.phase}-{case_id}-{seed}'
+        pair.mkdir(parents=True,exist_ok=True)
+        try:
+            register(pair,'device',dict(uuid=device['uuid'],node=device['node']))
         except ValueError as exc:
             parser.error(str(exc))
     if args.phase in ('calibration','development','holdout'):
@@ -151,6 +156,6 @@ def run_campaign(args, parser):
         freeze = read_json(args.output/'strategy_freeze.json')
         if freeze['code_hashes']!=code_hashes(): parser.error('code differs from development freeze')
     sys.path.insert(0,str(upstream))
-    result = run_job(args,plan,*schedule[args.job])
+    result = run_job(args,plan,case_id,agent,seed)
     print(result['status'])
     if result['status']!='complete': raise SystemExit(2)

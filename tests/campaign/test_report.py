@@ -1,7 +1,23 @@
+from argparse import ArgumentParser, Namespace
+
 import pytest
 
+from kernel_study.campaign import report
 from kernel_study.campaign.report import compare, phase_rows
 from kernel_study.records import write_json
+
+
+def test_report_remeasures_only_pairs_assigned_to_its_card(tmp_path,monkeypatch):
+    monkeypatch.setattr(report,'experiment',lambda: {'development':[4],'development_seeds':[11,22]})
+    monkeypatch.setattr(report,'check_device',lambda plan: {'uuid':'GPU-a'})
+    write_json(tmp_path/'development-protocol.json', {'code_hashes':report.code_hashes()})
+    for seed,uuid in [(11,'GPU-a'),(22,'GPU-b')]:
+        write_json(tmp_path/'pairs'/f'development-4-{seed}'/'device.json',{'uuid':uuid})
+    measured = []
+    monkeypatch.setattr(report,'measure_pair',lambda dest,*sides: measured.append(dest.name))
+    args = Namespace(output=tmp_path,phase='development',measure_pairs=True,freeze=False)
+    report.run_report(args,ArgumentParser())
+    assert measured == ['development-4-11']
 
 
 def test_primary_ratio_uses_only_the_direct_pair():

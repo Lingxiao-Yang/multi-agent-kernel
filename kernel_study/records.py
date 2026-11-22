@@ -44,7 +44,7 @@ def environment():
         result.update(torch=torch.__version__, triton=triton.__version__, cuda=torch.version.cuda)
         if torch.cuda.is_available():
             p = torch.cuda.get_device_properties(0)
-            result.update(gpu=p.name, memory_bytes=p.total_memory,
+            result.update(gpu=p.name, uuid=str(p.uuid), node=platform.node(), memory_bytes=p.total_memory,
                           capability=list(torch.cuda.get_device_capability(0)), sm_count=p.multi_processor_count)
     except ImportError:
         pass

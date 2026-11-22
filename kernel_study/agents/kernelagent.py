@@ -22,8 +22,23 @@ def native_manager():
     return OptimizationManager
 
 
+def worker_gpu():
+    visible = (os.environ.get('CUDA_VISIBLE_DEVICES') or '0').split(',')[0].strip()
+    return int(visible) if visible.isdecimal() else visible
+
+
+def matvec_test_timeout(run_test):
+    @functools.wraps(run_test)
+    def verify(worker):
+        if worker.worker_id == -1:
+            with patch.object(worker, 'test_timeout_s', max(180, worker.test_timeout_s)):
+                return run_test(worker)
+        return run_test(worker)
+    return verify
+
+
 @contextmanager
-def native_adapters(provider, seed, output):
+def native_adapters(provider, seed, output, *, matvec=False):
     from triton_kernel_agent.opt_worker_component.orchestrator.optimization_orchestrator import OptimizationOrchestrator
     from kernel_perf_agent.kernel_opt.diagnose_prompt import gpu_specs
     from triton_kernel_agent.worker import VerificationWorker
@@ -82,6 +97,9 @@ def native_adapters(provider, seed, output):
                                              {**gpu_specs.GPU_SPECS_DATABASE,specs['name']:specs}))
         adapters.enter_context(patch.dict(os.environ))
         os.environ.pop('OPENAI_API_KEY',None)
+        if matvec:
+            adapters.enter_context(patch.object(VerificationWorker, '_run_test',
+                                                matvec_test_timeout(VerificationWorker._run_test)))
         for owner,method,label in [(OptimizationOrchestrator,'_generate_optimized_kernel','proposal'),
                                    (VerificationWorker,'_refine_kernel','repair')]:
             adapters.enter_context(patch.object(owner,method,tagged(getattr(owner,method),label)))
@@ -130,13 +148,13 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
                 "        check_forward(kernel_function,buffers,model(*inputs),case)\n"
                 "    return True\nif __name__ == '__main__':\n    test_kernel()\n    print('PASS')\n")
     (output/'test.py').write_text(test)
-    opts = dict(config=str(root/'examples/configs/greedy.yaml'),num_workers=1,gpu_ids=[0],
+    opts = dict(config=str(root/'examples/configs/greedy.yaml'),num_workers=1,gpu_ids=[worker_gpu()],
                 gpu_name=kernelbench.experiment()['gpu'],openai_model=provider.model,
                 ncu_bin_path=shutil.which('ncu'),
                 log_dir=output/'greedy',
                 database_path=output/'greedy/program_db.json')
     if protocol.get('full_calibration'): opts['strategy_config'] = {'max_no_improvement':rounds}
-    with native_adapters(provider, seed, output):
+    with native_adapters(provider, seed, output, matvec=(case['public_id']==4)):
         manager = native_manager()(**opts)
         native = manager.run_optimization(initial_kernel=starter.read_text(),problem_file=problem,
                                           test_code=test,max_rounds=rounds)

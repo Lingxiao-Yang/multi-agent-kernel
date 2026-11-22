@@ -85,13 +85,17 @@ def run_report(args, parser):
     args.output = args.output.resolve()
     plan = experiment()
     if args.measure_pairs:
-        check_device(plan)
+        device = check_device(plan)
         if read_json(args.output/(args.phase+'-protocol.json'))['code_hashes'] != code_hashes():
             parser.error('pair measurements require the registered evaluation code')
         for case in plan[args.phase]:
             for seed in plan[args.phase+'_seeds']:
+                pair = args.output/'pairs'/f'{args.phase}-{case}-{seed}'
+                assigned = pair/'device.json'
+                if assigned.exists() and read_json(assigned)['uuid'] != device['uuid']:
+                    continue
                 sides = [latest_attempt(args.output,job_name(args.phase,case,agent,seed)) for agent in ('single','greedy')]
-                measure_pair(args.output/'pairs'/f'{args.phase}-{case}-{seed}',*sides)
+                measure_pair(pair,*sides)
     rows,attempts,measurements = phase_rows(args.output,args.phase,plan[args.phase],plan[args.phase+'_seeds'])
     report = compare(rows,plan[args.phase],plan[args.phase+'_seeds'],measurements)
     report['attempts'] = attempts

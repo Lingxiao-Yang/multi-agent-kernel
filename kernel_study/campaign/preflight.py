@@ -25,12 +25,19 @@ def hand_forward(problem, inputs):
 
 def check_device(plan):
     info = environment()
-    gpu = subprocess.check_output(['nvidia-smi','--query-gpu=uuid,driver_version',
-                                   '--format=csv,noheader'],text=True).strip().split(', ')
-    if (len(gpu)!=2 or digest(gpu[0])!=plan['device_uuid_sha256'] or gpu[1]!=plan['driver']
-            or any(info[k]!=plan[k] for k in ('gpu','torch','triton','cuda'))):
-        raise ValueError(f'GPU or software differs from registered environment: {gpu}, {info}')
-    return dict(info, uuid=gpu[0], driver=gpu[1])
+    inventory = subprocess.check_output(['nvidia-smi','--query-gpu=uuid,driver_version',
+                                         '--format=csv,noheader'],text=True)
+    visible = info.get('uuid','').lower().removeprefix('gpu-')
+    devices = [line.split(', ') for line in inventory.strip().splitlines()]
+    selected = [(uuid,driver) for uuid,driver in devices if uuid.lower().removeprefix('gpu-')==visible]
+    if len(selected)!=1:
+        raise ValueError(f'CUDA device {visible} not found in nvidia-smi inventory')
+    uuid,driver = selected[0]
+    if (info['gpu'].lower().replace('-',' ')!=plan['gpu'].lower().replace('-',' ')
+            or driver!=plan['driver'] or any(info[k]!=plan[k] for k in ('torch','triton','cuda'))
+            or ('device_uuid_sha256' in plan and digest(uuid)!=plan['device_uuid_sha256'])):
+        raise ValueError(f'GPU or software differs from registered environment: {driver}, {info}')
+    return dict(info, uuid=uuid, driver=driver)
 
 
 def run(case, phase, directory, plan):
