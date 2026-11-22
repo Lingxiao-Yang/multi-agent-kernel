@@ -1,13 +1,16 @@
-import pytest
 import ast
-from kernel_study.public_cases import experiment, start
-from kernel_study.interface import validate_plan, launched_functions
+from pathlib import Path
+
+import pytest
+
+from kernel_study.judge.interface import launched_functions, local_forward, render_native, validate_plan
+from kernel_study.tasks import starts
+from kernel_study.tasks.kernelbench import experiment
+from kernel_study.tasks.starts import load_native, start
 
 
 @pytest.mark.gpu
 def test_native_and_declarative_gelu_forward_share_device_code(tmp_path):
-    from kernel_study.public_cases import experiment, start, load_native
-    from kernel_study.interface import render_native, local_forward
     import torch
     case = {**experiment()['cases']['26'], 'output_shape': [13, 781]}
     source, config = start(case)
@@ -25,23 +28,19 @@ def test_native_and_declarative_gelu_forward_share_device_code(tmp_path):
 
 
 def test_native_layernorm_exposes_affine_parameter_names():
-    import ast
-    from kernel_study.public_cases import experiment, start
-    from kernel_study.interface import render_native
     case = experiment()['cases']['40']
     module = ast.parse(render_native(case,*start(case)))
     assert [arg.arg for arg in module.body[-1].args.args] == ['X','weight','bias']
 
 
 def test_public_starts_read_their_own_device_modules(monkeypatch):
-    from kernel_study import public_cases as p
-    original=p.device_function
+    original=starts.device_function
     def read(path,name):
-        assert path.name != 'kernels.py'
+        assert path == Path(starts.__file__).with_name('kernels.py')
         return original(path,name)
-    monkeypatch.setattr(p,'device_function',read)
+    monkeypatch.setattr(starts,'device_function',read)
     for case in ('2','23','40'):
-        assert p.start(p.experiment()['cases'][case])[1]['launches']
+        assert start(experiment()['cases'][case])[1]['launches']
 
 
 def test_only_baseline_functions_are_exposed_and_all_launches_match():

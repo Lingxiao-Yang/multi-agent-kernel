@@ -1,15 +1,18 @@
-import pytest
 import os
-from pathlib import Path
-from kernel_study.core import read_json
+
+import pytest
+
+from kernel_study.agents.kernelagent import run_native
+from kernel_study.budget import Ledger
+from kernel_study.judge.evaluate import run_worker
+from kernel_study.providers import MeteredChat
+from kernel_study.records import ROOT, read_json
+from kernel_study.tasks.kernelbench import experiment
 
 
 @pytest.mark.gpu
 @pytest.mark.upstream
 def test_common_worker_with_official_matvec_and_hidden_seed(tmp_path,preflight_dir):
-    from kernel_study.core import ROOT
-    from kernel_study.public_cases import experiment
-    from kernel_study.worker import run_worker
     plan = experiment()
     case = plan['cases']['4']
     base = preflight_dir/'4'
@@ -28,10 +31,6 @@ def test_common_worker_with_official_matvec_and_hidden_seed(tmp_path,preflight_d
 @pytest.mark.upstream
 @pytest.mark.skipif(not os.getenv('KERNEL_BASELINE_DENIED_CONTROL'), reason='requires the counter-denied GPU')
 def test_native_greedy_on_counter_denied_device(tmp_path,preflight_dir):
-    from kernel_study.agent_campaign import run_native
-    from kernel_study.core import ROOT
-    from kernel_study.public_cases import experiment
-    from kernel_study.reference_search import Ledger, MeteredChat
     plan = experiment()
     base = preflight_dir/'4'
     usage = Ledger(tmp_path,'counter-control',1,16,2.,8.,0.)

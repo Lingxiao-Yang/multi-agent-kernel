@@ -2,8 +2,9 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from .interface import local_forward
-from .public_cases import experiment, start, task_inputs
+from kernel_study.judge.interface import local_forward
+from kernel_study.tasks.kernelbench import experiment, task_inputs
+from kernel_study.tasks.starts import start
 
 
 def main():

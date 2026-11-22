@@ -1,10 +1,15 @@
 import json
+
 import pytest
+
+from kernel_study.agents.kernelagent import native_adapters, native_manager, native_outcome
+from kernel_study.budget import Ledger
+from kernel_study.campaign.report import compare
+from kernel_study.providers import MeteredChat
+from kernel_study.records import event
 
 
 def test_greedy_exhausted_without_a_winner_counts_as_fallback(tmp_path):
-    from kernel_study.agent_campaign import native_outcome
-    from kernel_study.reference_report import compare
     for i in (1, 2):
         (tmp_path / f'proposal_{i:03d}.py').write_text('')
     final = {'candidate_id': 0}
@@ -25,8 +30,7 @@ def test_pinned_upstream_proposal_and_repair_use_distinct_attempt_files(tmp_path
     import logging
     import urllib.request
     from types import SimpleNamespace
-    from kernel_study.agent_campaign import native_adapters, native_outcome
-    from kernel_study.reference_search import Ledger, MeteredChat
+
     from triton_kernel_agent.worker import VerificationWorker
     from triton_kernel_agent.opt_worker_component.orchestrator.optimization_orchestrator import OptimizationOrchestrator
 
@@ -56,14 +60,11 @@ def test_pinned_upstream_proposal_and_repair_use_distinct_attempt_files(tmp_path
 
 
 def test_exhausted_diagnostic_call_budget_keeps_a_zero_proposal_search(tmp_path):
-    from kernel_study.agent_campaign import native_outcome
-    from kernel_study.core import event
     event(tmp_path/'model_events.jsonl','budget_stop',reason='model_budget_exhausted')
     assert native_outcome(tmp_path,{'attempts':0,'calls':16},{'total_rounds':4},{'candidate_id':0})[0]=='complete'
 
 
 @pytest.mark.upstream
 def test_native_adapter_uses_upstream_parser_and_greedy_manager():
-    from kernel_study.agent_campaign import native_manager
     from triton_kernel_agent.opt_manager import OptimizationManager
     assert native_manager() is OptimizationManager

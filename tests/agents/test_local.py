@@ -4,9 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from kernel_study import public_referee, search as local
-from kernel_study.core import ROOT, read_json
+from kernel_study.agents import local
+from kernel_study.judge import select
 from kernel_study.providers import Reply
+from kernel_study.records import ROOT, code_hashes, read_json
 
 
 class SourceProvider:
@@ -34,7 +35,7 @@ def protocol():
 
 def mock_worker(monkeypatch, worker):
     monkeypatch.setattr(local, 'run_worker', worker)
-    monkeypatch.setattr(public_referee, 'run_worker', worker)
+    monkeypatch.setattr(select, 'run_worker', worker)
 
 
 def measurement(confirmed=False):
@@ -66,6 +67,7 @@ def test_incorrect_candidates_keep_baseline_and_count_calls(tmp_path, monkeypatc
 
     mock_worker(monkeypatch, worker)
     result = local.search(public_case,'multi_knowledge',11,protocol,SourceProvider(),tmp_path/'run')
+    assert result['manifest']['code_hashes'] == code_hashes()
     assert result['budget']['attempts']==2 and result['budget']['calls']==8
     assert result['final']['candidate_id']==0 and result['speedup']==1
     assert not result['scientific_evidence']

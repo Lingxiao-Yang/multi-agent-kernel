@@ -1,14 +1,11 @@
-from __future__ import annotations
-
+"""Experiment records, environment and registered code hashes."""
 import hashlib
 import json
 import platform
-from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VARIANTS = ("single", "single_knowledge", "multi", "multi_knowledge")
 
 
 def read_json(path):
@@ -38,50 +35,6 @@ def event(path, kind, **data):
         handle.flush()
 
 
-@dataclass
-class Budget:
-    candidate_cap: int = 20
-    call_cap: int = 100
-    token_safety_cap: int = 500000
-    attempts: int = 0
-    calls: int = 0
-    input_tokens: int = 0
-    output_tokens: int = 0
-
-    @property
-    def tokens(self):
-        return self.input_tokens + self.output_tokens
-
-    def stop_reason(self):
-        if self.tokens >= self.token_safety_cap:
-            return "token_safety_cap"
-        if self.attempts >= self.candidate_cap:
-            return "candidate_cap"
-        if self.calls >= self.call_cap:
-            return "call_cap"
-        return None
-
-    def reserve_attempt(self):
-        if self.stop_reason():
-            raise RuntimeError(self.stop_reason())
-        self.attempts += 1
-
-    def reserve_call(self):
-        # Candidate count is already reserved before its model calls.
-        if self.calls >= self.call_cap or self.tokens >= self.token_safety_cap:
-            raise RuntimeError("model_budget_exhausted")
-        self.calls += 1
-
-    def charge_tokens(self, input_tokens, output_tokens):
-        if min(input_tokens, output_tokens) < 0:
-            raise ValueError("negative token count")
-        self.input_tokens += input_tokens
-        self.output_tokens += output_tokens
-
-    def snapshot(self):
-        return {**asdict(self), "tokens": self.tokens}
-
-
 def environment():
     import sys
     result = {"python": sys.version, "platform": platform.platform()}
@@ -96,3 +49,13 @@ def environment():
     except ImportError:
         pass
     return result
+
+
+def code_hashes():
+    package = ROOT/'kernel_study'
+    files = [path for path in package.glob('*.py') if path.name != 'cli.py']
+    files.extend(package/'campaign'/name for name in ('__init__.py', 'jobs.py', 'preflight.py'))
+    for directory in ('tasks', 'judge', 'agents'):
+        files.extend((package/directory).rglob('*.py'))
+    files.extend(ROOT/p for p in ('configs/agent_baseline.json', 'configs/protocol.json', 'knowledge/cards.json'))
+    return {path.relative_to(ROOT).as_posix():digest(path.read_text(encoding='utf-8')) for path in sorted(files)}

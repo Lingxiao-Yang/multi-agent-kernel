@@ -3,8 +3,9 @@ import ast
 import math
 from pathlib import Path
 
-from .public_cases import MODE, layout
-from .source_policy import ALLOWED_TL, check_source, load_source
+from ..tasks.kernelbench import layout
+from ..tasks.starts import MODE
+from .policy import ALLOWED_TL, check_source, load_source
 
 SYMBOLS = {'X', 'A', 'B', 'W', 'Y', 'S', 'T', 'M', 'N', 'K', 'ROWS', 'TOTAL', 'RB'}
 

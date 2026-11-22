@@ -5,14 +5,14 @@ import os
 import time
 from pathlib import Path
 
-from .core import ROOT, Budget, digest, environment, event, read_json, utcnow, write_json
-from . import source_space
-from .interface import contract, validate_plan
-from .public_referee import select_final
-from .worker import run_worker
-from .api_guidance import VERSION, guidance, history_context
-from .public_cases import start as public_start
-from .reference_search import interruption
+from ..budget import Budget, interruption
+from ..judge.evaluate import run_worker
+from ..judge.interface import contract, validate_plan
+from ..judge.select import select_final
+from ..records import ROOT, code_hashes, digest, environment, event, read_json, utcnow, write_json
+from ..tasks.starts import start
+from .edit_gate import CONTRACT, GATE_VERSION, check_edit
+from .guidance import VERSION, guidance, history_context
 from .knowledge import select_cards
 
 GENERAL = ('You are a general GPU kernel optimizer. Use the supplied evidence to optimize the current incumbent. '
@@ -39,7 +39,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     output = Path(output).resolve()
     output.mkdir(parents=True, exist_ok=False)
     log = output / 'events.jsonl'
-    start = time.perf_counter()
+    started = time.perf_counter()
     starting_cost = getattr(provider, 'spent', 0.)
     starting_completed_cost = getattr(provider, 'completed_cost', 0.)
     shared_guidance = None
@@ -47,8 +47,8 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         if protocol['shared_api_guidance'] != VERSION:
             raise ValueError('unknown shared API guidance version')
         shared_guidance = guidance(case)
-    protocol = {**protocol, 'source_gate_version':source_space.GATE_VERSION}
-    source_text, base_config = public_start(case)
+    protocol = {**protocol, 'source_gate_version':GATE_VERSION}
+    source_text, base_config = start(case)
     # Candidate source stores only the device module; trusted wrapper is never editable.
     base_source = output / 'baseline.py'
     base_source.write_text(source_text, encoding='utf-8')
@@ -59,7 +59,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                 'knowledge_hash':digest(read_json(ROOT/'knowledge/cards.json')), 'environment':environment(),
                 'drop_role':drop_role, 'drop_category':drop_category,
                 'scheduler_job_id':os.environ.get('SLURM_JOB_ID'), 'queue_wait_seconds':None,
-                'code_hashes':{str(p.relative_to(ROOT)):digest(p.read_text(encoding='utf-8')) for p in sorted((ROOT/'kernel_study').glob('*.py'))}}
+                'code_hashes':code_hashes()}
     write_json(output/'manifest.json', manifest)
     if shared_guidance:
         write_json(output/'shared_api_guidance.json', shared_guidance)
@@ -85,7 +85,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             # Same call slot reassigned to implementer/general reasoning.
             replacement = 'advise' if stage == 'implement' else 'implement'
             system = ROLES[replacement] if variant.startswith('multi') else GENERAL
-        prompt = system + '\n' + source_space.CONTRACT
+        prompt = system + '\n' + CONTRACT
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)
         budget.charge_tokens(reply.input_tokens, reply.output_tokens)
@@ -125,7 +125,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             if not isinstance(text, str) or not text.strip():
                 raise ValueError('source_edit_required: complete source string is mandatory')
             (output / f'proposed_{attempt:03d}.py').write_text(text, encoding='utf-8')
-            edit = source_space.check_edit(text, candidate['config'], context['incumbent']['source'], incumbent['config'])
+            edit = check_edit(text, candidate['config'], context['incumbent']['source'], incumbent['config'])
             candidate_source = output / f'candidate_{attempt:03d}.py'
             candidate_source.write_text(text, encoding='utf-8')
             candidate['source'] = str(candidate_source)
@@ -173,7 +173,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     completed_search = final_stop in ['candidate_cap','call_cap','token_safety_cap']
     summary = {'status':('complete' if completed_search else 'interrupted') if final else 'final_failed', 'manifest':manifest,
                'stop_reason':stop or budget.stop_reason(), 'budget':budget.snapshot(), 'profile_invocations':profile_count,
-               'final':final,'history':history,'wall_seconds':time.perf_counter()-start,'resolved_model':resolved_model,
+               'final':final,'history':history,'wall_seconds':time.perf_counter()-started,'resolved_model':resolved_model,
                'scientific_evidence':provider.name == 'llm' and completed_search and resolved_model is not None,
                'estimated_inference_usd':getattr(provider,'completed_cost',0)-starting_completed_cost,
                'budget_committed_usd':getattr(provider,'spent',0)-starting_cost}

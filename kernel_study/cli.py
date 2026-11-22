@@ -3,9 +3,9 @@ import argparse
 import os
 from pathlib import Path
 
-from .public_preflight import run_preflight
-from .agent_campaign import run_campaign
-from .reference_report import run_report
+from .campaign.preflight import run_preflight
+from .campaign.jobs import run_campaign
+from .campaign.report import run_report
 
 
 def main(argv=None):

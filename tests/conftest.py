@@ -34,7 +34,7 @@ def public_case():
 
 @pytest.fixture
 def mock_environment(monkeypatch):
-    monkeypatch.setattr('kernel_study.search.environment', lambda: {'gpu': 'test'})
+    monkeypatch.setattr('kernel_study.agents.local.environment', lambda: {'gpu': 'test'})
 
 
 @pytest.fixture

@@ -1,7 +1,7 @@
 import pytest
 
-from kernel_study.public_cases import start
-from kernel_study.interface import launched_functions, prepare, validate_plan
+from kernel_study.judge.interface import launched_functions, prepare, validate_plan
+from kernel_study.tasks.starts import start
 
 
 @pytest.mark.gpu

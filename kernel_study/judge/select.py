@@ -4,8 +4,8 @@ import fcntl
 import json
 from pathlib import Path
 
-from .core import read_json, write_json
-from .worker import run_worker
+from ..records import read_json, write_json
+from .evaluate import run_worker
 
 
 def changed_program(source, start):

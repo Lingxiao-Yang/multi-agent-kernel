@@ -40,3 +40,14 @@ def test_package_imports_are_acyclic(imports):
 
 def test_internal_imports_are_at_module_scope(imports):
     assert not [(source, target) for source, target, at_top in imports if not at_top]
+
+
+def test_imports_follow_the_study_layers(imports):
+    layers = {'records':0, 'budget':0, 'providers':0, 'tasks':1, 'judge':2,
+              'agents':3, 'campaign':4, 'cli':5}
+    def layer(name):
+        parts = name.split('.')
+        return 0 if len(parts)==1 else layers[parts[1]]
+
+    for source, target, _ in imports:
+        assert layer(target) <= layer(source), f'{source} imports {target}'

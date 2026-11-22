@@ -1,4 +1,4 @@
-from kernel_study.knowledge import select_cards
+from kernel_study.agents.knowledge import select_cards
 
 
 def test_knowledge_selection_is_shared_deterministic_and_ablatable():

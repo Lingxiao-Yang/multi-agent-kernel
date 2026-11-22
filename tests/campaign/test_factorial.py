@@ -1,6 +1,6 @@
 import pytest
-from kernel_study.analysis import geometric_mean, paired_effects
-from kernel_study.analysis import paired_effects
+
+from kernel_study.campaign.factorial import geometric_mean, paired_effects
 
 
 def test_known_factorial_interaction_and_no_improvement_runs():

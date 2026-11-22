@@ -1,7 +1,7 @@
-from kernel_study.api_guidance import VERSION, guidance
-from kernel_study.public_cases import experiment, layout
 import copy
-from kernel_study.api_guidance import history_context
+
+from kernel_study.agents.guidance import VERSION, guidance, history_context
+from kernel_study.tasks.kernelbench import experiment, layout
 
 
 def test_guidance_resolves_irregular_shapes_without_optimized_code():

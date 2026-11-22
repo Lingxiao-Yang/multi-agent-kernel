@@ -8,6 +8,11 @@ import urllib.request
 import urllib.error
 import re
 from dataclasses import dataclass
+from http.client import IncompleteRead
+from pathlib import Path
+
+from .budget import interruption
+from .records import event
 
 
 @dataclass
@@ -94,3 +99,38 @@ class ChatProvider:
                      data.get('model', self.model), {'request_id':data.get('id'),
                      'system_fingerprint':data.get('system_fingerprint'), 'usage':usage,
                      'elapsed_s':time.perf_counter()-start, 'estimated_usd':actual_cost})
+
+
+class MeteredChat(ChatProvider):
+    def __init__(self, ledger, directory, **kwargs):
+        super().__init__(**kwargs)
+        self.ledger, self.directory = ledger, Path(directory)
+
+    def send_messages(self, messages, stage, seed, json_output=False, max_tokens=None):
+        stopped = interruption(self.directory)
+        if stopped:
+            raise RuntimeError(stopped)
+        reserved = len(json.dumps(messages).encode())+256
+        output_cap = self.max_output_tokens if max_tokens is None else min(max_tokens,self.max_output_tokens)
+        log = self.directory/'model_events.jsonl'
+        try:
+            number = self.ledger.reserve(stage,reserved,output_cap)
+        except RuntimeError as exc:
+            event(log,'budget_stop',stage=stage,reason=str(exc),budget=self.ledger.summary())
+            raise
+        event(log,'request',id=number,stage=stage,seed=seed,messages=messages,budget=self.ledger.summary())
+        try:
+            reply = super().send_messages(messages,stage,seed,json_output,output_cap)
+        except Exception as exc:
+            if str(exc).startswith(('HTTP 400:', 'HTTP 401:', 'HTTP 403:', 'HTTP 404:', 'HTTP 429:')):
+                self.ledger.settle(number,0,0)
+            reason = 'transport' if isinstance(exc, (OSError, IncompleteRead)) else 'provider_error'
+            event(log,'request_error',id=number,reason=reason,error=str(exc))
+            raise
+        self.ledger.settle(number,reply.input_tokens,reply.output_tokens)
+        event(log,'response',id=number,stage=stage,model=reply.model,content=reply.text,
+              metadata=reply.metadata,budget=self.ledger.summary())
+        if reply.model != self.model:
+            event(log,'request_error',id=number,reason='model_changed',error='unexpected model snapshot')
+            raise RuntimeError(f'resolved model {reply.model} differs from snapshot {self.model}')
+        return reply

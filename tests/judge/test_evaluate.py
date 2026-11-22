@@ -1,7 +1,7 @@
 import sys
 
-from kernel_study import worker
-from kernel_study.core import read_json, write_json
+from kernel_study.judge import evaluate as worker
+from kernel_study.records import read_json, write_json
 
 
 def test_public_requests_reach_same_referee(tmp_path, monkeypatch):

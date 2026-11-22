@@ -1,10 +1,11 @@
-from kernel_study.core import ROOT
-from kernel_study.source_policy import check_source
 import pytest
+
+from kernel_study.judge.policy import check_source
+from kernel_study.records import ROOT
 
 
 def test_baseline_source_passes_policy():
-    check_source((ROOT/'kernel_study/public_kernels.py').read_text())
+    check_source((ROOT/'kernel_study/tasks/kernels.py').read_text())
 
 
 @pytest.mark.parametrize('source',[

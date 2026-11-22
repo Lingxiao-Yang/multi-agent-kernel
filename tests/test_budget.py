@@ -1,5 +1,6 @@
 import pytest
-from kernel_study.core import Budget
+
+from kernel_study.budget import Budget, Ledger
 
 
 def test_candidate_failure_and_repair_consume_budget():
@@ -27,7 +28,6 @@ def test_call_cap_blocks_further_network_requests():
 
 
 def test_local_search_cap_takes_precedence_over_an_unsent_charge(tmp_path):
-    from kernel_study.reference_search import Ledger
     ledger=Ledger(tmp_path,'capped',1,1,1.,1.,.002)
     call=ledger.reserve('proposal',1000,1000)
     ledger.settle(call,1000,1000)
@@ -37,7 +37,6 @@ def test_local_search_cap_takes_precedence_over_an_unsent_charge(tmp_path):
 
 
 def test_model_budget_spans_analysis_proposal_and_failed_repair(tmp_path):
-    from kernel_study.reference_search import Ledger
     ledger = Ledger(tmp_path, 'matvec-11', 2, 3, 2.0, 8.0, 0.08)
     analysis = ledger.reserve('analysis', 400, 1000)
     ledger.settle(analysis,300,300)
@@ -58,7 +57,6 @@ def test_model_budget_spans_analysis_proposal_and_failed_repair(tmp_path):
 
 
 def test_ambiguous_call_stays_reserved_across_process_restarts(tmp_path):
-    from kernel_study.reference_search import Ledger
     ledger = Ledger(tmp_path, 'sample', 4, 16, 2., 8., 0.011)
     ledger.reserve('proposal', 1000, 1000)
     reopened = Ledger(tmp_path, 'sample', 4, 16, 2., 8., 0.011)

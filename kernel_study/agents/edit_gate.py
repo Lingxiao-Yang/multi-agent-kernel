@@ -2,7 +2,7 @@
 import ast
 import copy
 
-from .interface import launched_functions, validate_plan
+from ..judge.interface import launched_functions, validate_plan
 
 GATE_VERSION = 3
 CONTRACT = '''For implement return {"config":{"mode":"source-v1","launches":[{"kernel":"name","grid":[positive integers],"args":[buffer/scalar symbol names or integer constants],"num_warps":4,"num_stages":1}]},"source":"complete Triton module", "rationale":"code transformation and hypothesis"}.

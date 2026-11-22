@@ -1,10 +1,11 @@
 import pytest
 
+from kernel_study.campaign.preflight import hand_forward
+
 
 @pytest.mark.gpu
 @pytest.mark.upstream
 def test_hand_layernorm_preserves_the_three_normalized_dimensions():
-    from kernel_study.public_preflight import hand_forward
     import torch
     x = torch.randn(3,2,4,8,device='cuda')
     w,b = (torch.randn_like(x[0]) for _ in range(2))

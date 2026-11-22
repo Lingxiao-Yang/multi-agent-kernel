@@ -1,9 +1,10 @@
 import pytest
-from kernel_study.core import write_json
+
+from kernel_study.campaign.report import compare, phase_rows
+from kernel_study.records import write_json
 
 
 def test_primary_ratio_uses_only_the_direct_pair():
-    from kernel_study.reference_report import compare
     rows = [dict(case=40, seed=11, agent=a, correct_new=True, fallback=False, status='complete',
                  latency_ms=t) for a,t in [('single',9.), ('greedy',1.)]]
     direct = {(40,11): {'status':'ok', 'candidate':{'median_ms':1.04}, 'incumbent':{'median_ms':1.}}}
@@ -12,7 +13,6 @@ def test_primary_ratio_uses_only_the_direct_pair():
 
 
 def test_retry_report_charges_both_runs_but_counts_one_search(tmp_path):
-    from kernel_study.reference_report import phase_rows
     name = 'development-4-single-11'
     for suffix, status, charge in [('', 'interrupted',.12),('-retry1','complete',.05)]:
         row=dict(agent='single',case=4,seed=11,status=status,stop_reason='transport' if not suffix else 'candidate_cap',
@@ -33,7 +33,6 @@ def pairs(rows):
 
 
 def test_fallback_stays_in_ratio_and_valid_new_is_counted_independently():
-    from kernel_study.reference_report import compare
     rows = []
     for case in [2,26,36]:
         for seed in [11,22,33]:
@@ -52,7 +51,6 @@ def test_fallback_stays_in_ratio_and_valid_new_is_counted_independently():
 
 
 def test_one_extra_fallback_across_threshold_requires_remeasurement():
-    from kernel_study.reference_report import compare
     rows = [dict(case=2,seed=s,agent=a,status='complete',correct_new=True,
                  fallback=(a=='single' and s==11),latency_ms=2. if a=='single' and s==11 else 1.)
             for s in [11,22,33] for a in ['single','greedy']]

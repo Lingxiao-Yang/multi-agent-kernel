@@ -1,10 +1,12 @@
 import pytest
-from kernel_study.core import write_json
+
+from kernel_study.judge import select as referee
+from kernel_study.judge.select import changed_program
+from kernel_study.records import write_json
 
 
 @pytest.mark.parametrize('interface', ['native','declarative'])
 def test_final_selection_checks_every_candidate_against_the_current_winner(tmp_path, monkeypatch, interface):
-    from kernel_study import public_referee as referee
     start = {'id':0, 'source':str(tmp_path/'baseline.py'), 'config':None}
     candidates = []
     for i in range(5):
@@ -28,7 +30,6 @@ def test_final_selection_checks_every_candidate_against_the_current_winner(tmp_p
 
 
 def test_pair_worker_receives_both_recorded_finalists_and_reuses_raw_samples(tmp_path, monkeypatch):
-    from kernel_study import public_referee as referee
     directories = {}
     for agent, interface in [('single','declarative'),('greedy','native')]:
         directory = tmp_path/agent
@@ -55,7 +56,6 @@ def test_pair_worker_receives_both_recorded_finalists_and_reuses_raw_samples(tmp
 
 
 def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
-    from kernel_study.public_referee import changed_program
     start = 'def run(x):\n    """baseline"""\n    return x + 1\n'
     copied = '# same launch\ndef run(x):\n    """new explanation"""\n    return x+1\n'
     assert not changed_program(copied,start)

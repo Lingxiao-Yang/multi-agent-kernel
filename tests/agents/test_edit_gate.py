@@ -2,8 +2,9 @@ import copy
 
 import pytest
 
-from kernel_study.public_cases import experiment, start
-from kernel_study.source_space import check_edit
+from kernel_study.agents.edit_gate import check_edit
+from kernel_study.tasks.kernelbench import experiment
+from kernel_study.tasks.starts import start
 
 
 def test_parameter_only_cosmetic_and_constant_only_edits_rejected():

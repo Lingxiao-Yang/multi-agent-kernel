@@ -1,8 +1,11 @@
 import io
 import json
 import urllib.error
+
 import pytest
-from kernel_study.providers import ChatProvider
+
+from kernel_study.budget import Ledger
+from kernel_study.providers import ChatProvider, MeteredChat
 
 
 def test_rejected_quota_request_releases_financial_reservation(monkeypatch):
@@ -40,7 +43,7 @@ def test_reported_usage_replaces_conservative_cost_reservation(monkeypatch):
 def test_transport_failure_is_logged_and_upstream_cannot_silently_call_again(tmp_path,monkeypatch):
     import urllib.request
     import urllib.error
-    from kernel_study.reference_search import Ledger,MeteredChat
+
     def offline(*args,**kwargs): raise urllib.error.URLError('unreachable')
     monkeypatch.setattr(urllib.request,'urlopen',offline)
     ledger = Ledger(tmp_path, 'sample', 4, 16, 1., 1., 1.)
@@ -56,7 +59,7 @@ def test_both_model_interfaces_meter_the_wire_payload(tmp_path, monkeypatch):
     import io
     import json
     import urllib.request
-    from kernel_study.reference_search import Ledger, MeteredChat
+
     sent = []
     def response(request, timeout):
         sent.append(json.loads(request.data))

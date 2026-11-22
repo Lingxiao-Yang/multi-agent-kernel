@@ -1,8 +1,7 @@
-
+from kernel_study.tasks.kernelbench import experiment
 
 
 def test_public_tasks_and_limits_are_stated_before_search():
-    from kernel_study.public_cases import experiment
     plan = experiment()
     assert plan['development'] == [4, 23, 40]
     assert plan['holdout'] == [2, 26, 36]

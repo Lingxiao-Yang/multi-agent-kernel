@@ -1,4 +1,4 @@
-from .core import ROOT, read_json
+from ..records import ROOT, read_json
 
 
 def select_cards(family, measurements=None, excluded_category=None):

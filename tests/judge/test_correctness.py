@@ -1,8 +1,12 @@
 import pytest
 
+from kernel_study.judge.correctness import check_forward, fp64_chunks
+from kernel_study.judge.interface import local_forward, prepare
+from kernel_study.tasks.kernelbench import experiment
+from kernel_study.tasks.starts import start
+
 
 def test_common_referee_rejects_mutation_wrong_shape_and_wrong_dtype():
-    from kernel_study.correctness import check_forward
     torch = pytest.importorskip('torch')
     x = torch.tensor([2.])
     case = dict(atol=0.,rtol=0.)
@@ -13,17 +17,14 @@ def test_common_referee_rejects_mutation_wrong_shape_and_wrong_dtype():
 
 @pytest.mark.gpu
 def test_layernorm_start_preserves_small_differences_on_large_offsets(tmp_path):
-    from kernel_study import public_cases as public
-    from kernel_study.correctness import check_forward, fp64_chunks
-    from kernel_study.interface import local_forward
     import torch
-    case={**public.experiment()['cases']['40'],'output_shape':[3,4,16,79]}
+    case={**experiment()['cases']['40'],'output_shape':[3,4,16,79]}
     torch.manual_seed(10001)
     x=torch.rand(case['output_shape'],device='cuda')/32+1024
     model=torch.nn.LayerNorm(x.shape[1:],device='cuda').eval()
     with torch.no_grad():
         w,b=model.weight,model.bias
-        source,config=public.start(case)
+        source,config=start(case)
         path=tmp_path/'device.py'
         path.write_text(source)
         fn=local_forward(case,path,config,[x,w,b])
@@ -34,7 +35,7 @@ def test_layernorm_start_preserves_small_differences_on_large_offsets(tmp_path):
 
 def test_stress_uses_the_fp64_error_of_eager_and_rejects_nonfinite():
     torch=pytest.importorskip('torch')
-    from kernel_study.correctness import check_forward
+
     x = torch.tensor([[1., 1.]])
     expected = torch.tensor([[.9, 1.1]])
     reference = torch.ones_like(expected, dtype=torch.float64)
@@ -50,13 +51,13 @@ def test_stress_uses_the_fp64_error_of_eager_and_rejects_nonfinite():
 @pytest.mark.gpu
 def test_declarative_validation_poisons_each_fresh_output(tmp_path):
     import torch
-    from kernel_study import public_cases, interface
-    case={**public_cases.experiment()['cases']['26'],'output_shape':[2,17]}
-    source,config=public_cases.start(case)
+
+    case={**experiment()['cases']['26'],'output_shape':[2,17]}
+    source,config=start(case)
     source=source.replace('i<TOTAL)', 'i<TOTAL-1)')
     path=tmp_path/'partial.py'
     path.write_text(source)
     x=torch.ones((2,17),device='cuda')
-    forward,_=interface.prepare(case,config,[x],path,fresh_output=True,poison_output=True)
+    forward,_=prepare(case,config,[x],path,fresh_output=True,poison_output=True)
     for _ in range(2):
         assert torch.isnan(forward().flatten()[-1])

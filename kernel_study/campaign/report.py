@@ -1,16 +1,11 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
-import math
-from pathlib import Path
 
-from .core import read_json, write_json
-from .public_cases import experiment
-from .agent_campaign import code_hashes, job_name, latest_attempt
-from .public_preflight import check_device
-from .public_referee import measure_pair
-
-
-def geometric(values):
-    return math.exp(sum(math.log(v) for v in values)/len(values))
+from ..judge.select import measure_pair
+from ..records import code_hashes, read_json, write_json
+from ..tasks.kernelbench import experiment
+from .factorial import geometric_mean
+from .jobs import job_name, latest_attempt
+from .preflight import check_device
 
 
 def compare(rows, cases, seeds, measurements):
@@ -31,10 +26,10 @@ def compare(rows, cases, seeds, measurements):
                 valid[r['agent']] += r['correct_new']
                 fallbacks[r['agent']] += r['fallback']
         paired += len(values)
-        tasks[str(case)] = {'paired_repeats':len(values),'ratios':values,'ratio':geometric(values) if values else None}
-        if values: ratios.append(geometric(values))
+        tasks[str(case)] = {'paired_repeats':len(values),'ratios':values,'ratio':geometric_mean(values) if values else None}
+        if values: ratios.append(geometric_mean(values))
     complete = paired==len(cases)*len(seeds)
-    ratio = geometric(ratios) if ratios else None
+    ratio = geometric_mean(ratios) if ratios else None
     if not complete: decision = 'incomplete'
     elif min(fallbacks.values()) == paired: decision = 'pending-all-fallbacks'
     elif ratio>1.10 and abs(fallbacks['single']-fallbacks['greedy'])==1: decision = 'pending-fallback-remeasurement'

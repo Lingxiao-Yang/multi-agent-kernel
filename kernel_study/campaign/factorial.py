@@ -1,14 +1,17 @@
 """Paired per-case effects and clustered bootstrap."""
 from __future__ import annotations
+import math
+
 import numpy as np
-from .core import VARIANTS
+
+VARIANTS = ("single", "single_knowledge", "multi", "multi_knowledge")
 
 
 def geometric_mean(values):
     values = np.asarray(values, dtype=float)
     if not len(values) or np.any(values <= 0) or not np.all(np.isfinite(values)):
         raise ValueError('geometric mean needs positive finite observations')
-    return float(np.exp(np.mean(np.log(values))))
+    return math.exp(sum(math.log(value) for value in values.flat) / values.size)
 
 
 def paired_effects(rows, resamples=5000, seed=42):

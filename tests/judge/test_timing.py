@@ -1,12 +1,13 @@
 import sys
-from types import SimpleNamespace
 from contextlib import nullcontext
-from kernel_study import bench, worker
-from kernel_study.core import ROOT, read_json
+from types import SimpleNamespace
+
+from kernel_study.judge import evaluate as worker, timing
+from kernel_study.judge.timing import confirmed, threshold_from_controls
+from kernel_study.records import ROOT, read_json
 
 
 def test_noise_rule_requires_two_wins_and_uses_calibration_only():
-    from kernel_study.replay import threshold_from_controls, confirmed
     calibration = [[1.2, 1.04], [0.99, 1.13], [1.02, 1.03]]
     threshold = threshold_from_controls(calibration, 1.01)
     assert threshold == 1.04
@@ -22,7 +23,7 @@ def test_library_comparison_uses_its_own_candidate_samples(monkeypatch, public_c
     monkeypatch.setattr(worker, 'task_inputs', lambda *args: (lambda: None, [], []))
     monkeypatch.setattr(worker, 'bind', lambda *args: (lambda: None, []))
     timings = iter([(2., 2.), (4., 12.)])
-    monkeypatch.setattr(bench, 'time_pair', lambda *args: [
+    monkeypatch.setattr(timing, 'time_pair', lambda *args: [
         {'median_ms': value, 'samples_ms': [value]} for value in next(timings)])
     protocol = read_json(ROOT / 'configs/protocol.json')
     result = worker.evaluate(dict(case=public_case, protocol=protocol, config={}, source='candidate.py', library=True))

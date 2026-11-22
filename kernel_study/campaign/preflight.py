@@ -1,13 +1,12 @@
 """Run one public case and phase per GPU process before model search."""
 import subprocess
-from pathlib import Path
 
-from . import bench, public_cases as public
-from .correctness import check_forward
-from .interface import local_forward, render_native
-from .worker import validate
-from .core import digest, environment, read_json, write_json
-from .replay import calibrate, check_noise, first_call
+from ..judge.correctness import check_forward
+from ..judge.evaluate import validate
+from ..judge.interface import local_forward, render_native
+from ..judge.timing import calibrate, check_noise, first_call, time_pair
+from ..records import digest, environment, read_json, write_json
+from ..tasks import kernelbench, starts
 
 
 def hand_forward(problem, inputs):
@@ -39,33 +38,33 @@ def run(case, phase, directory, plan):
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.cuda.reset_peak_memory_stats()
     seed = plan['preflight_seeds'][int(phase=='hold')]
-    source, config = public.start(case)
+    source, config = starts.start(case)
     path = directory/'device.py'
     path.write_text(source)
     native_path = directory/'input.py'
-    native_path.write_text(public.matvec_path().read_text() if case['public_id']==4 else
+    native_path.write_text(kernelbench.matvec_path().read_text() if case['public_id']==4 else
                            render_native(case,source,config))
     protocol = plan['timing']
     result = dict(case=case,seed=seed,protocol=protocol,launch=config,device_source_hash=digest(source),
-                  native_source_hash=digest(native_path.read_text()),problem_hash=digest(public.task_path(case).read_text()))
+                  native_source_hash=digest(native_path.read_text()),problem_hash=digest(kernelbench.task_path(case).read_text()))
     if phase == 'stress':
         result['checks'] = {}
         for interface, source_path in [('native',native_path),('declarative',path)]:
             result['checks'][interface],_ = validate(case,source_path,config,interface,[seed],True)
         result['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
         return result
-    model, inputs, buffers = public.task_inputs(case,seed)
-    native = public.load_native(native_path)
+    model, inputs, buffers = kernelbench.task_inputs(case,seed)
+    native = starts.load_native(native_path)
     forward = lambda: native(*buffers)
     local = local_forward(case,path,config,buffers)
     eager = lambda: model(*inputs)
     if phase == 'hand':
-        public.upstream('tritonbench')
+        kernelbench.upstream('tritonbench')
         hand = hand_forward(case['public_id'],buffers)
         value,seconds = first_call(hand)
         del value
         result['check'] = check_forward(lambda *args: hand(),buffers,eager(),case)
-        candidate,start = bench.time_pair(hand,forward,protocol)
+        candidate,start = time_pair(hand,forward,protocol)
         result.update(first_call_seconds=seconds,forward=candidate,start=start,
                       paired_speedup=start['median_ms']/candidate['median_ms'])
     elif phase == 'preflight':
@@ -79,7 +78,7 @@ def run(case, phase, directory, plan):
             value, seconds = first_call(fn)
             del value
             result['checks'][label] = check_forward(lambda *args: fn(),buffers,expected,case)
-            timed, base = bench.time_pair(fn,forward,protocol)
+            timed, base = time_pair(fn,forward,protocol)
             result['timings'][label] = dict(first_call_seconds=seconds,forward=timed,start=base,
                                             paired_speedup=base['median_ms']/timed['median_ms'])
         if not torch.equal(local(),forward()):
@@ -100,7 +99,7 @@ def run(case, phase, directory, plan):
 
 def run_preflight(args, parser):
     import torch
-    plan = public.experiment()
+    plan = kernelbench.experiment()
     directory = args.output/args.case
     directory.mkdir(parents=True,exist_ok=True)
     report = dict(environment=check_device(plan),upstream=plan['upstream'])

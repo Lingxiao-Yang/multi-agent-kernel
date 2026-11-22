@@ -1,10 +1,11 @@
 import pytest
-from kernel_study.core import read_json, write_json
-from kernel_study.core import read_json
+
+from kernel_study.campaign.jobs import attempt_path, jobs, register
+from kernel_study.records import code_hashes, read_json, write_json
+from kernel_study.tasks.kernelbench import experiment
 
 
 def test_only_one_new_attempt_after_transport_failure(tmp_path):
-    from kernel_study.agent_campaign import attempt_path
     job = 'development-4-greedy-11'
     base = attempt_path(tmp_path, job, False)
     base.mkdir()
@@ -20,12 +21,13 @@ def test_only_one_new_attempt_after_transport_failure(tmp_path):
 
 
 def test_frozen_code_and_phase_settings():
-    from kernel_study.agent_campaign import code_hashes
-    from kernel_study.public_cases import experiment
     plan=experiment()
     frozen=code_hashes()
-    assert 'reference_report.py' not in frozen and 'public_referee.py' in frozen
-    assert 'public_cases.py' in frozen and 'agent_campaign.py' in frozen
+    assert {'kernel_study/judge/select.py', 'kernel_study/tasks/kernels.py',
+            'kernel_study/campaign/jobs.py', 'kernel_study/campaign/preflight.py',
+            'configs/protocol.json', 'configs/agent_baseline.json', 'knowledge/cards.json'} <= frozen.keys()
+    assert 'kernel_study/campaign/report.py' not in frozen
+    assert 'kernel_study/campaign/factorial.py' not in frozen
     assert plan['gpu_specs']['peak_memory_bw_gbps'] == 2039
     assert [(v['candidate_cap'],v['call_cap'],v['rounds']) for v in
             (plan['phases'][k] for k in ('smoke','calibration','development','holdout'))] == [
@@ -33,7 +35,6 @@ def test_frozen_code_and_phase_settings():
 
 
 def test_reporting_only_revision_preserves_the_registered_search(tmp_path):
-    from kernel_study.agent_campaign import register
     registered=dict(revision='before',code_hashes={'worker.py':'abc'},jobs=[[4,'greedy',11]])
     register(tmp_path,'development-protocol',registered)
     register(tmp_path,'development-protocol',dict(registered,revision='report-only'))
@@ -43,8 +44,6 @@ def test_reporting_only_revision_preserves_the_registered_search(tmp_path):
 
 
 def test_campaign_selects_only_registered_jobs_and_separate_calibration():
-    from kernel_study.agent_campaign import jobs
-    from kernel_study.public_cases import experiment
     plan = experiment()
     assert len(jobs(plan,'development')) == 12
     assert len(jobs(plan,'holdout')) == 18

@@ -1,12 +1,53 @@
-"""Per-request accounting shared by the public single and greedy campaigns."""
+"""Per-search limits and campaign-wide inference accounting."""
 import json
 import sqlite3
-from http.client import IncompleteRead
 from contextlib import closing, contextmanager
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from .core import Budget, event
-from .providers import ChatProvider
+
+@dataclass
+class Budget:
+    candidate_cap: int = 20
+    call_cap: int = 100
+    token_safety_cap: int = 500000
+    attempts: int = 0
+    calls: int = 0
+    input_tokens: int = 0
+    output_tokens: int = 0
+
+    @property
+    def tokens(self):
+        return self.input_tokens + self.output_tokens
+
+    def stop_reason(self):
+        if self.tokens >= self.token_safety_cap:
+            return "token_safety_cap"
+        if self.attempts >= self.candidate_cap:
+            return "candidate_cap"
+        if self.calls >= self.call_cap:
+            return "call_cap"
+        return None
+
+    def reserve_attempt(self):
+        if self.stop_reason():
+            raise RuntimeError(self.stop_reason())
+        self.attempts += 1
+
+    def reserve_call(self):
+        # Candidate count is already reserved before its model calls.
+        if self.calls >= self.call_cap or self.tokens >= self.token_safety_cap:
+            raise RuntimeError("model_budget_exhausted")
+        self.calls += 1
+
+    def charge_tokens(self, input_tokens, output_tokens):
+        if min(input_tokens, output_tokens) < 0:
+            raise ValueError("negative token count")
+        self.input_tokens += input_tokens
+        self.output_tokens += output_tokens
+
+    def snapshot(self):
+        return {**asdict(self), "tokens": self.tokens}
 
 
 class Ledger:
@@ -71,38 +112,3 @@ def interruption(directory):
             if entry['event']=='budget_stop' and entry['reason']=='dollar_cap_reservation':
                 return entry['reason']
     return None
-
-
-class MeteredChat(ChatProvider):
-    def __init__(self, ledger, directory, **kwargs):
-        super().__init__(**kwargs)
-        self.ledger, self.directory = ledger, Path(directory)
-
-    def send_messages(self, messages, stage, seed, json_output=False, max_tokens=None):
-        stopped = interruption(self.directory)
-        if stopped:
-            raise RuntimeError(stopped)
-        reserved = len(json.dumps(messages).encode())+256
-        output_cap = self.max_output_tokens if max_tokens is None else min(max_tokens,self.max_output_tokens)
-        log = self.directory/'model_events.jsonl'
-        try:
-            number = self.ledger.reserve(stage,reserved,output_cap)
-        except RuntimeError as exc:
-            event(log,'budget_stop',stage=stage,reason=str(exc),budget=self.ledger.summary())
-            raise
-        event(log,'request',id=number,stage=stage,seed=seed,messages=messages,budget=self.ledger.summary())
-        try:
-            reply = super().send_messages(messages,stage,seed,json_output,output_cap)
-        except Exception as exc:
-            if str(exc).startswith(('HTTP 400:', 'HTTP 401:', 'HTTP 403:', 'HTTP 404:', 'HTTP 429:')):
-                self.ledger.settle(number,0,0)
-            reason = 'transport' if isinstance(exc, (OSError, IncompleteRead)) else 'provider_error'
-            event(log,'request_error',id=number,reason=reason,error=str(exc))
-            raise
-        self.ledger.settle(number,reply.input_tokens,reply.output_tokens)
-        event(log,'response',id=number,stage=stage,model=reply.model,content=reply.text,
-              metadata=reply.metadata,budget=self.ledger.summary())
-        if reply.model != self.model:
-            event(log,'request_error',id=number,reason='model_changed',error='unexpected model snapshot')
-            raise RuntimeError(f'resolved model {reply.model} differs from snapshot {self.model}')
-        return reply
