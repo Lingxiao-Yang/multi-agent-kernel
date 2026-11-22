@@ -1,7 +1,7 @@
 import pytest
 
 from kernel_study.public_cases import start
-from kernel_study.source_space import _body_shapes, prepare, validate_plan
+from kernel_study.interface import launched_functions, prepare, validate_plan
 
 
 @pytest.mark.gpu
@@ -30,4 +30,4 @@ def test_wrong_arity_fails_before_gpu(public_case):
     source, config = start(public_case)
     config['launches'][0]['args'].pop()
     with pytest.raises(ValueError, match='argument count'):
-        _body_shapes(source, config)
+        launched_functions(source, config)

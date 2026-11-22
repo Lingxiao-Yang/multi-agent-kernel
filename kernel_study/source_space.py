@@ -1,53 +1,13 @@
-"""Source-generation search space with a declarative, trusted launch interface.
-
-No optimized implementation is included in the starting module. The model can
-replace kernels and their launch sequence, but cannot execute host Python.
-"""
+"""Check that a proposed edit changes the launched device code."""
 import ast
 import copy
-import math
 
-from .source_policy import check_source
+from .interface import launched_functions, validate_plan
 
-MODE = 'source-v1'
 GATE_VERSION = 3
-SYMBOLS = {'X', 'A', 'B', 'W', 'Y', 'S', 'T', 'M', 'N', 'K', 'ROWS', 'TOTAL', 'RB'}
 CONTRACT = '''For implement return {"config":{"mode":"source-v1","launches":[{"kernel":"name","grid":[positive integers],"args":[buffer/scalar symbol names or integer constants],"num_warps":4,"num_stages":1}]},"source":"complete Triton module", "rationale":"code transformation and hypothesis"}.
 Write new device code: config-only, null source, cosmetic renaming, and constant-only source edits are rejected and consume an attempt. Change computation, data movement, parallel decomposition, or kernel structure. No optimized alternative is supplied. You may replace function names/signatures and use 1-4 launches, choosing arbitrary bounded positive grids and integer constexpr arguments. Supply the complete source on every attempt, preserving any kernels still launched.
 Only imports triton and triton.language as tl, and @triton.jit device functions are allowed. Inline all device logic; no helper function calls, host code, autotune, reference/timer edits, input mutation, or external access. Supported primitives are listed in launch_contract. Every output must be overwritten on each invocation; scratch is uninitialized and must be written before being read. Shapes are contiguous row-major. Other stages return concise JSON; do not reproduce full source outside implement. Review the actual proposed source and measured failures.'''
-
-
-def validate_plan(config):
-    if set(config) != {'mode', 'launches'} or config['mode'] != MODE:
-        raise ValueError('source config requires mode=source-v1 and launches only')
-    launches = config['launches']
-    if not isinstance(launches, list) or not 1 <= len(launches) <= 4:
-        raise ValueError('require 1-4 launches')
-    for item in launches:
-        if set(item) != {'kernel', 'grid', 'args', 'num_warps', 'num_stages'}:
-            raise ValueError('launch requires kernel/grid/args/num_warps/num_stages')
-        if not isinstance(item['kernel'], str) or not item['kernel'].isidentifier() or item['kernel'].startswith('__'):
-            raise ValueError('invalid kernel identifier')
-        grid = item['grid']
-        if not isinstance(grid, list) or not 1 <= len(grid) <= 3 or any(type(x) is not int or not 1 <= x <= 2**20 for x in grid) or math.prod(grid) > 2**22:
-            raise ValueError('invalid or oversized launch grid')
-        if type(item['num_warps']) is not int or item['num_warps'] not in [1, 2, 4, 8] or type(item['num_stages']) is not int or not 1 <= item['num_stages'] <= 4:
-            raise ValueError('unsupported compiler options')
-        if not isinstance(item['args'], list) or not 1 <= len(item['args']) <= 32:
-            raise ValueError('require 1-32 positional arguments')
-        for arg in item['args']:
-            if not ((type(arg) is int and 0 <= arg <= 2**24) or (isinstance(arg, str) and arg in SYMBOLS)):
-                raise ValueError('invalid argument symbol or integer')
-    return config
-
-
-def contract(case):
-    from .source_policy import ALLOWED_TL
-    from .public_cases import layout
-    names, scalars, scratch = layout(case)
-    return {'format':MODE,'inputs':names, 'scalars':scalars, 'output_shape':case['output_shape'],
-            'workspace':{'Y':'output', 'S':[scratch], 'T':case['output_shape']},
-            'allowed_tl':sorted(ALLOWED_TL), 'limits':'1-4 declarative launches'}
 
 
 def _inline_straight_line_temporaries(body):
@@ -87,8 +47,6 @@ def _body_shapes(source, config):
 Ignore identifiers, literals and docstrings to reject trivial rewrites; inspect
 only launched functions. Human review of retained diffs remains necessary.
 """
-    tree = check_source(source)
-    funcs = {x.name:x for x in tree.body if isinstance(x, ast.FunctionDef)}
     result = []
     class Normalize(ast.NodeTransformer):
         def visit_BinOp(self,node):
@@ -119,12 +77,7 @@ only launched functions. Human review of retained diffs remains necessary.
             return ast.Name(id=node.id if node.id in ['tl','triton','range','float','int','min','max'] else 'var', ctx=node.ctx)
         def visit_Constant(self, node):
             return ast.Constant(value='<literal>')
-    for item in config['launches']:
-        if item['kernel'] not in funcs:
-            raise ValueError('launch references missing kernel: '+item['kernel'])
-        fn = funcs[item['kernel']]
-        if len(fn.args.args) != len(item['args']):
-            raise ValueError('launch argument count does not match kernel signature')
+    for fn in launched_functions(source, config):
         body = [x for x in fn.body if not (isinstance(x, ast.Expr) and isinstance(x.value, ast.Constant) and isinstance(x.value.value, str))]
         body = _inline_straight_line_temporaries(body)
         result.append(ast.dump(Normalize().visit(ast.Module(body=copy.deepcopy(body), type_ignores=[])), include_attributes=False))
@@ -140,42 +93,3 @@ def check_edit(source, config, parent_source, parent_config):
         raise ValueError('source_edit_required: launched device bodies have no structural change beyond identifiers/literals/straight-line temporaries')
     return {'structural_edit':True, 'launches_before':len(before), 'launches_after':len(after),
             'note':'Structural screen passed; transformation mechanism requires source review.'}
-
-
-def prepare(case, config, inputs, source, *, fresh_output=False, poison_output=False):
-    import torch
-    from .source_policy import load_source
-    validate_plan(config)
-    _body_shapes(open(source, encoding='utf-8').read(), config)
-    mod = load_source(source)
-    from .public_cases import layout
-    names, scalars, scratch = layout(case)
-    buffers = {**scalars, **dict(zip(names, inputs, strict=True))}
-    out_shape, scratch_shape = case['output_shape'], (scratch,)
-    launches = []
-    work_names = {'Y','S','T'}
-    used = {a for item in config['launches'] for a in item['args'] if a in work_names}
-    def workspace():
-        output = inputs[0].new_empty(out_shape)
-        work = {'Y':output}
-        if 'S' in used: work['S'] = output.new_empty(scratch_shape, dtype=torch.float32)
-        if 'T' in used: work['T'] = torch.empty_like(output)
-        return work
-    cached = None if fresh_output else workspace()
-    for item in config['launches']:
-        args = [buffers.get(a, a) for a in item['args']]
-        slots = [(i, a) for i,a in enumerate(item['args']) if a in work_names]
-        launches.append((getattr(mod,item['kernel'])[tuple(item['grid'])],args,slots,
-                         dict(num_warps=item['num_warps'],num_stages=item['num_stages'])))
-    compiled = []
-    def launch():
-        work = workspace() if fresh_output else cached
-        if poison_output:
-            work['Y'].fill_(float('nan'))
-        for kernel,template,slots,opts in launches:
-            args = template.copy()
-            for i, name in slots: args[i] = work[name]
-            built = kernel(*args,**opts)
-            if all(built is not old for old in compiled): compiled.append(built)
-        return work['Y']
-    return launch, compiled

@@ -55,7 +55,7 @@ def test_pair_worker_receives_both_recorded_finalists_and_reuses_raw_samples(tmp
 
 
 def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
-    from kernel_study.reference_report import changed_program
+    from kernel_study.public_referee import changed_program
     start = 'def run(x):\n    """baseline"""\n    return x + 1\n'
     copied = '# same launch\ndef run(x):\n    """new explanation"""\n    return x+1\n'
     assert not changed_program(copied,start)

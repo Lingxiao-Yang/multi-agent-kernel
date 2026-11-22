@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 from .core import read_json, write_json
-from .search import run_worker
+from .worker import run_worker
 
 
 def changed_program(source, start):

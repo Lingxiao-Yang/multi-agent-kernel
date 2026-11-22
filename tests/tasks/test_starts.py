@@ -1,12 +1,13 @@
 import pytest
 import ast
 from kernel_study.public_cases import experiment, start
-from kernel_study.source_space import validate_plan, _body_shapes
+from kernel_study.interface import validate_plan, launched_functions
 
 
 @pytest.mark.gpu
 def test_native_and_declarative_gelu_forward_share_device_code(tmp_path):
-    from kernel_study.public_cases import experiment, start, load_native, render_native, local_forward
+    from kernel_study.public_cases import experiment, start, load_native
+    from kernel_study.interface import render_native, local_forward
     import torch
     case = {**experiment()['cases']['26'], 'output_shape': [13, 781]}
     source, config = start(case)
@@ -25,7 +26,8 @@ def test_native_and_declarative_gelu_forward_share_device_code(tmp_path):
 
 def test_native_layernorm_exposes_affine_parameter_names():
     import ast
-    from kernel_study.public_cases import experiment, render_native, start
+    from kernel_study.public_cases import experiment, start
+    from kernel_study.interface import render_native
     case = experiment()['cases']['40']
     module = ast.parse(render_native(case,*start(case)))
     assert [arg.arg for arg in module.body[-1].args.args] == ['X','weight','bias']
@@ -46,6 +48,6 @@ def test_only_baseline_functions_are_exposed_and_all_launches_match():
     for number in ('2', '23', '40', '26', '36'):
         source, config = start(experiment()['cases'][number])
         validate_plan(config)
-        _body_shapes(source, config)
+        launched_functions(source, config)
         names = {node.name for node in ast.parse(source).body if isinstance(node, ast.FunctionDef)}
         assert names == {item['kernel'] for item in config['launches']}

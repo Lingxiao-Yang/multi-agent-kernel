@@ -2,7 +2,8 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from .public_cases import experiment, local_forward, start, task_inputs
+from .interface import local_forward
+from .public_cases import experiment, start, task_inputs
 
 
 def main():

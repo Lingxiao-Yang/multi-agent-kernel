@@ -9,7 +9,7 @@ from kernel_study.core import read_json
 def test_common_worker_with_official_matvec_and_hidden_seed(tmp_path,preflight_dir):
     from kernel_study.core import ROOT
     from kernel_study.public_cases import experiment
-    from kernel_study.search import run_worker
+    from kernel_study.worker import run_worker
     plan = experiment()
     case = plan['cases']['4']
     base = preflight_dir/'4'

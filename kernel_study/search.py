@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
-import sys
 import time
 from pathlib import Path
 
 from .core import ROOT, Budget, digest, environment, event, read_json, utcnow, write_json
 from . import source_space
+from .interface import contract, validate_plan
+from .public_referee import select_final
+from .worker import run_worker
 from .api_guidance import VERSION, guidance, history_context
 from .public_cases import start as public_start
 from .reference_search import interruption
@@ -22,25 +23,6 @@ ROLES = {
     'implement': 'You are the kernel implementer. Apply the shared plan to the incumbent. Return JSON only.',
     'review': 'You are the result reviewer. Explain measured outcomes and failures and suggest next directions. You cannot decide retention. Return JSON only.'
 }
-
-
-def run_worker(request, directory, label):
-    directory = Path(directory)
-    req = directory / (label + '.request.json')
-    out = directory / (label + '.result.json')
-    write_json(req, request)
-    env = {k:v for k,v in os.environ.items() if not any(s in k.upper() for s in ['API_KEY','SECRET','TOKEN','PASSWORD'])}
-    begin = time.perf_counter()
-    try:
-        proc = subprocess.run([sys.executable, '-m', 'kernel_study.worker', str(req), str(out)],
-                   cwd=ROOT, env=env, capture_output=True, text=True, timeout=request['protocol']['worker_timeout_s'])
-        (directory / (label + '.stderr.log')).write_text(proc.stderr, encoding='utf-8')
-        result = read_json(out) if out.exists() else {'status':'worker_crash','returncode':proc.returncode, 'error':proc.stderr[-4000:]}
-    except subprocess.TimeoutExpired:
-        result = {'status':'timeout', 'error':'worker exceeded wall-time limit'}
-    result['process_seconds'] = time.perf_counter() - begin
-    write_json(out, result)
-    return result
 
 
 def compact_result(result):
@@ -120,7 +102,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history_context(history) if shared_guidance else history,
                    'knowledge_cards':cards, 'hardware':manifest['environment'],
-                   'launch_contract':source_space.contract(case),
+                   'launch_contract':contract(case),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
         if shared_guidance:
@@ -138,7 +120,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             candidate = call('implement', context)
             last_proposal = dict(candidate)
             write_json(output / f'proposal_{attempt:03d}.json', candidate)
-            source_space.validate_plan(candidate['config'])
+            validate_plan(candidate['config'])
             text = candidate.get('source')
             if not isinstance(text, str) or not text.strip():
                 raise ValueError('source_edit_required: complete source string is mandatory')
@@ -184,7 +166,6 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'state.json', {'incumbent':incumbent,'history':history,'budget':budget.snapshot()})
         if stop:
             break
-    from .public_referee import select_final
     candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"), config=h['config'])
                   for h in history if h['result']['status']=='ok']
     final, selection = select_final(output, case, protocol, 'declarative', baseline, candidates)

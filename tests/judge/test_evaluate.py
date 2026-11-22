@@ -1,12 +1,12 @@
 import sys
 
-from kernel_study import public_cases, worker
+from kernel_study import worker
 from kernel_study.core import read_json, write_json
 
 
 def test_public_requests_reach_same_referee(tmp_path, monkeypatch):
     seen = []
-    monkeypatch.setattr(public_cases, 'evaluate', lambda r: seen.append(r) or {'status':'ok'})
+    monkeypatch.setattr(worker, 'evaluate', lambda r: seen.append(r) or {'status':'ok'})
     request, output = tmp_path/'request.json', tmp_path/'output.json'
     monkeypatch.setattr(sys, 'argv', ['worker', str(request), str(output)])
     for interface in ('native','declarative'):

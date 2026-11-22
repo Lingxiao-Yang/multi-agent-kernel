@@ -3,6 +3,9 @@ import subprocess
 from pathlib import Path
 
 from . import bench, public_cases as public
+from .correctness import check_forward
+from .interface import local_forward, render_native
+from .worker import validate
 from .core import digest, environment, read_json, write_json
 from .replay import calibrate, check_noise, first_call
 
@@ -41,27 +44,27 @@ def run(case, phase, directory, plan):
     path.write_text(source)
     native_path = directory/'input.py'
     native_path.write_text(public.matvec_path().read_text() if case['public_id']==4 else
-                           public.render_native(case,source,config))
+                           render_native(case,source,config))
     protocol = plan['timing']
     result = dict(case=case,seed=seed,protocol=protocol,launch=config,device_source_hash=digest(source),
                   native_source_hash=digest(native_path.read_text()),problem_hash=digest(public.task_path(case).read_text()))
     if phase == 'stress':
         result['checks'] = {}
         for interface, source_path in [('native',native_path),('declarative',path)]:
-            result['checks'][interface],_ = public.validate(case,source_path,config,interface,[seed],True)
+            result['checks'][interface],_ = validate(case,source_path,config,interface,[seed],True)
         result['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
         return result
     model, inputs, buffers = public.task_inputs(case,seed)
     native = public.load_native(native_path)
     forward = lambda: native(*buffers)
-    local = public.local_forward(case,path,config,buffers)
+    local = local_forward(case,path,config,buffers)
     eager = lambda: model(*inputs)
     if phase == 'hand':
         public.upstream('tritonbench')
         hand = hand_forward(case['public_id'],buffers)
         value,seconds = first_call(hand)
         del value
-        result['check'] = public.check_forward(lambda *args: hand(),buffers,eager(),case)
+        result['check'] = check_forward(lambda *args: hand(),buffers,eager(),case)
         candidate,start = bench.time_pair(hand,forward,protocol)
         result.update(first_call_seconds=seconds,forward=candidate,start=start,
                       paired_speedup=start['median_ms']/candidate['median_ms'])
@@ -75,7 +78,7 @@ def run(case, phase, directory, plan):
         for label,fn in [('native',forward),('local',local),('compile',compiled_forward),('eager',eager)]:
             value, seconds = first_call(fn)
             del value
-            result['checks'][label] = public.check_forward(lambda *args: fn(),buffers,expected,case)
+            result['checks'][label] = check_forward(lambda *args: fn(),buffers,expected,case)
             timed, base = bench.time_pair(fn,forward,protocol)
             result['timings'][label] = dict(first_call_seconds=seconds,forward=timed,start=base,
                                             paired_speedup=base['median_ms']/timed['median_ms'])

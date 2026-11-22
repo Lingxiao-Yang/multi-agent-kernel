@@ -4,7 +4,9 @@ from pathlib import Path
 
 from .core import read_json, write_json
 from .public_cases import experiment
-from .public_referee import changed_program
+from .agent_campaign import code_hashes, job_name, latest_attempt
+from .public_preflight import check_device
+from .public_referee import measure_pair
 
 
 def geometric(values):
@@ -51,7 +53,6 @@ def prefix(row, axis, limit):
 
 
 def phase_rows(root, phase, cases, seeds):
-    from .agent_campaign import job_name, latest_attempt
     rows, attempts, measurements = [], [], {}
     for case in cases:
         for seed in seeds:
@@ -89,9 +90,6 @@ def run_report(args, parser):
     args.output = args.output.resolve()
     plan = experiment()
     if args.measure_pairs:
-        from .agent_campaign import code_hashes, job_name, latest_attempt
-        from .public_preflight import check_device
-        from .public_referee import measure_pair
         check_device(plan)
         if read_json(args.output/(args.phase+'-protocol.json'))['code_hashes'] != code_hashes():
             parser.error('pair measurements require the registered evaluation code')
@@ -118,7 +116,6 @@ def run_report(args, parser):
     if args.freeze:
         if args.phase!='development' or not report['complete']:
             parser.error('complete development measurements are required to freeze single')
-        from .agent_campaign import code_hashes
         measured = read_json(args.output/'development-protocol.json')
         if code_hashes()!=measured['code_hashes']:
             parser.error('development measurements belong to different code')

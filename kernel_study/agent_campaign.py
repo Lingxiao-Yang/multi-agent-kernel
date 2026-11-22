@@ -17,10 +17,12 @@ from unittest.mock import patch
 
 from . import public_cases as public
 from .api_guidance import VERSION
-from .core import ROOT, digest, event, read_json, write_json
+from .core import ROOT, digest, environment, event, read_json, write_json
 from .reference_search import Ledger, MeteredChat, interruption
 from .public_referee import audit, measure_pair, select_final
-from .search import run_worker, search
+from .public_preflight import check_device
+from .search import search
+from .worker import run_worker
 
 
 def jobs(plan, phase):
@@ -133,7 +135,6 @@ def native_outcome(output, usage, native, final):
 
 
 def run_native(case, seed, protocol, provider, output, preflight, rounds):
-    from .core import environment
     root = public.upstream('KernelAgent')
     started = time.perf_counter()
     output.mkdir(parents=True,exist_ok=False)
@@ -145,10 +146,11 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
         test = (root/'examples/optimize_01_matvec/test.py').read_text()
     else:
         test = ('import torch\nfrom kernel import kernel_function\nfrom kernel_study import public_cases as p\n'
+                'from kernel_study.correctness import check_forward\n'
                 'def test_kernel():\n    with torch.no_grad():\n'
                 f"        case = p.experiment()['cases'][{str(case['public_id'])!r}]\n"
                 "        model, inputs, buffers = p.task_inputs(case,101)\n"
-                "        p.check_forward(kernel_function,buffers,model(*inputs),case)\n"
+                "        check_forward(kernel_function,buffers,model(*inputs),case)\n"
                 "    return True\nif __name__ == '__main__':\n    test_kernel()\n    print('PASS')\n")
     (output/'test.py').write_text(test)
     opts = dict(config=str(root/'examples/configs/greedy.yaml'),num_workers=1,gpu_ids=[0],
@@ -288,7 +290,6 @@ def run_campaign(args, parser):
     args.output = args.output.resolve()
     args.output.mkdir(parents=True,exist_ok=True)
     args.preflight = args.preflight.resolve()
-    from .public_preflight import check_device
     device = check_device(plan)
     upstream = public.upstream('KernelAgent').resolve()
     os.environ['PYTHONPATH'] = os.pathsep.join([str(ROOT),str(upstream),os.environ.get('PYTHONPATH','')])
@@ -325,7 +326,7 @@ def run_campaign(args, parser):
 def code_hashes():
     modules = ('agent_campaign','api_guidance','bench','core','knowledge','providers',
                'public_cases','public_kernels','public_preflight','public_referee','reference_search','replay',
-               'search','source_policy','source_space','worker')
+               'correctness','interface','search','source_policy','source_space','worker')
     hashes = {name+'.py':digest((ROOT/'kernel_study'/(name+'.py')).read_text()) for name in modules}
     for path in ('configs/agent_baseline.json','configs/protocol.json','knowledge/cards.json'):
         hashes[path] = digest((ROOT/path).read_text())
