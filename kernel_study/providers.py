@@ -40,15 +40,20 @@ class ChatProvider:
     def complete(self, system, context, stage, seed):
         messages = [{'role':'system', 'content':system},
                     {'role':'user', 'content':json.dumps({'stage':stage, **context}, sort_keys=True)}]
+        return self.send_messages(messages,stage,seed,json_output=True)
+
+    def send_messages(self, messages, stage, seed, json_output=False, max_tokens=None):
+        output_cap = self.max_output_tokens if max_tokens is None else min(max_tokens,self.max_output_tokens)
         # UTF-8 byte count is a conservative input reservation, not reported usage.
         input_reservation = len(json.dumps(messages).encode('utf-8')) + 256
         reserved_cost = None
         if self.dollar_cap is not None:
-            reserved_cost = (input_reservation*self.input_price + self.max_output_tokens*self.output_price)/1e6
+            reserved_cost = (input_reservation*self.input_price + output_cap*self.output_price)/1e6
             if self.spent + reserved_cost > self.dollar_cap:
                 raise RuntimeError('dollar_cap_reservation')
-        payload = {'model':self.model, 'messages':messages, 'max_completion_tokens':self.max_output_tokens,
-                   'response_format':{'type':'json_object'}}
+        payload = {'model':self.model, 'messages':messages, 'max_completion_tokens':output_cap}
+        if json_output:
+            payload['response_format'] = {'type':'json_object'}
         if self.temperature is not None:
             payload['temperature'] = self.temperature
         # Independent runs use API seed when the chosen endpoint supports it.

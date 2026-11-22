@@ -7,9 +7,11 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from kernel_study.core import read_json, write_json
+from kernel_study.metrics import library_timings
 
 source=Path(sys.argv[1]); output=Path(sys.argv[2]); output.mkdir(parents=True,exist_ok=True)
 rows=read_json(source/'pilot_results.json')
+manifest=read_json(source/'manifest.json')
 table=[]
 for row in rows:
     r=row['result']
@@ -20,7 +22,7 @@ for row in rows:
     table.append({'case':row['case'],'label':row['label'],'status':'ok','median_ms':latency,
                   'iqr_ms':r['candidate']['p75_ms']-r['candidate']['p25_ms'],
                   'paired_speedup':r['paired_speedup'],'confirmed':r['confirmed'],
-                  'library_ms':r['library']['median_ms'],
+                  **library_timings(r,manifest['protocol']['schema_version']),
                   'max_abs_error':max(x['max_abs_error'] for x in r['validation'])})
 keys=sorted(set().union(*(r.keys() for r in table)))
 with (output/'pilot.csv').open('w',newline='') as f:

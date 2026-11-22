@@ -54,10 +54,10 @@ def library_reference(case, inputs):
     return reference(case, inputs)
 
 
-def prepare(case, config, inputs, source=None):
+def prepare(case, config, inputs, source=None, *, fresh_output=False):
     if config.get('mode') == 'source-v1':
         from .source_space import prepare as prepare_source
-        return prepare_source(case, config, inputs, source)
+        return prepare_source(case, config, inputs, source, fresh_output=fresh_output)
     import torch
     import triton
     from . import kernels
@@ -67,15 +67,23 @@ def prepare(case, config, inputs, source=None):
     f = case["family"]
     shape = case["shape"]
     out_shape = shape[:2] if f == "matmul" else shape
-    output = torch.empty(out_shape, dtype=inputs[0].dtype, device="cuda")
-    scratch = torch.empty((shape[0], 2), device="cuda", dtype=torch.float32)
-    intermediate = torch.empty_like(output)
+    def workspace():
+        output = inputs[0].new_empty(out_shape)
+        scratch = intermediate = None
+        if f != "matmul" and not config["fused"]:
+            if f == "elementwise":
+                intermediate = torch.empty_like(output)
+            else:
+                scratch = torch.empty((shape[0], 2), device=output.device, dtype=torch.float32)
+        return output, scratch, intermediate
+    cached = None if fresh_output else workspace()
     opts = {"num_warps": config["num_warps"], "num_stages": config["num_stages"]}
     compiled = []
     def record(kernel):
         if all(kernel is not existing for existing in compiled):
             compiled.append(kernel)
     def launch():
+        output, scratch, intermediate = workspace() if fresh_output else cached
         if f == "matmul":
             m, n, k = shape
             bm, bn, bk = (config[x] for x in ("block_m", "block_n", "block_k"))
@@ -177,6 +185,9 @@ def resource_summary(compiled):
 
 
 def evaluate(request):
+    if 'public_id' in request['case']:
+        from .public_cases import evaluate as evaluate_public
+        return evaluate_public(request)
     import torch
     torch.cuda.set_device(0)
     torch.backends.cuda.matmul.allow_tf32 = False
@@ -187,8 +198,10 @@ def evaluate(request):
     result["validation"], result["first_launch_seconds"] = validate(case, config, seeds, request.get("source"))
     result["validation_seconds"] = time.perf_counter() - begin
     inputs = make_inputs(case, seeds[0] + 77)
-    fn, compiled = prepare(case, config, inputs, request.get("source"))
-    incumbent, _ = prepare(case, request.get("incumbent_config", config), inputs, request.get("incumbent_source", request.get("source")))
+    timing = {"fresh_output": protocol["schema_version"] >= 2}
+    fn, compiled = prepare(case, config, inputs, request.get("source"), **timing)
+    incumbent, _ = prepare(case, request.get("incumbent_config", config), inputs,
+                           request.get("incumbent_source", request.get("source")), **timing)
     fn(); incumbent(); torch.cuda.synchronize()
     result["candidate"], result["incumbent"] = time_pair(fn, incumbent, protocol)
     speedup = result["incumbent"]["median_ms"] / result["candidate"]["median_ms"]
@@ -199,7 +212,7 @@ def evaluate(request):
         result["confirmation"] = {"candidate": c2, "incumbent": i2}
         result["confirmed"] = i2["median_ms"] / c2["median_ms"] > protocol["improvement_threshold"]
     if request.get("library"):
-        _, result["library"] = time_pair(fn, lambda: library_reference(case, inputs), protocol)
+        result["library_candidate"], result["library"] = time_pair(fn, lambda: library_reference(case, inputs), protocol)
     if request.get("profile"):
         start = time.perf_counter()
         result["profile"] = {"mode": "compiler-resources", "kernels": resource_summary(compiled),

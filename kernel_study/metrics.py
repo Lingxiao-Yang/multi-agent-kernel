@@ -1,6 +1,17 @@
 """Logical throughput bounds; optional externally verified hardware peaks."""
 
 
+def library_timings(result, schema_version):
+    candidate = result['candidate']['median_ms']
+    library = result['library']['median_ms']
+    paired = schema_version >= 2
+    comparison = result['library_candidate']['median_ms'] if paired else candidate
+    return {'candidate_ms': candidate, 'library_ms': library,
+            'library_candidate_ms': comparison if paired else None,
+            'library_over_candidate': library / comparison,
+            'library_timing_basis': 'paired' if paired else 'historical-unpaired'}
+
+
 def work_and_traffic(case):
     item_bytes={'float16':2,'float32':4}[case['dtype']]
     if case['family']=='matmul':

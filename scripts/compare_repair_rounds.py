@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from kernel_study.core import read_json,write_json,VARIANTS
 from kernel_study.analysis import validate_cohort,geometric_mean
+from kernel_study.metrics import library_timings
 
 
 def load(root):
@@ -72,8 +73,7 @@ def compare(mini_root,strong_root,output):
                 first_retained_after_2=bool(kept and min(kept)>2),
                 selected_after_2=final['candidate_id']>2,
                 input_tokens=s['budget']['input_tokens'],output_tokens=s['budget']['output_tokens'],
-                cost_usd=s['estimated_inference_usd'],candidate_ms=r['candidate']['median_ms'],
-                library_ms=r['library']['median_ms'],library_over_candidate=r['library']['median_ms']/r['candidate']['median_ms'],
+                cost_usd=s['estimated_inference_usd'],**library_timings(r,s['manifest']['protocol']['schema_version']),
                 wall_seconds=s['wall_seconds'])
             prefix_budget=history[1]['budget_after_review'];protocol=s['manifest']['protocol']
             row['cost_through_attempt_2_usd']=(prefix_budget['input_tokens']*protocol['input_usd_per_million']+prefix_budget['output_tokens']*protocol['output_usd_per_million'])/1e6

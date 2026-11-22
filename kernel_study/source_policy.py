@@ -7,7 +7,7 @@ import ast
 import importlib.util
 from pathlib import Path
 
-ALLOWED_TL = set('constexpr float16 float32 int32 int64 program_id arange full zeros load store max min sum exp log sqrt rsqrt abs maximum minimum where dot trans reshape broadcast_to multiple_of max_contiguous cdiv div_rn range static_range num_programs'.split())
+ALLOWED_TL = set('constexpr bfloat16 float16 float32 int32 int64 program_id arange full zeros load store max min sum exp erf log sqrt rsqrt abs maximum minimum where dot trans reshape broadcast_to multiple_of max_contiguous cdiv div_rn range static_range num_programs'.split())
 
 
 def check_source(source):

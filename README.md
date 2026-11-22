@@ -5,6 +5,11 @@ This repository implements the study described in the
 specialization and curated hardware knowledge improve Triton kernel
 optimization when every variant gets the same attempt and call budget.
 
+The current baseline study compares the local four-stage single agent with
+single-worker KernelAgent greedy on six KernelBench tasks. The
+[baseline plan](docs/AGENT_BASELINE_PLAN.md) specifies the shared starts,
+timing controls and acceptance criteria.
+
 Engineering controls and local-GPU measurements are kept separate from the
 planned A100 LLM study, and they are not pooled with it.
 
@@ -25,7 +30,7 @@ be traced to the code on `main`.
 | `knowledge/cards.json` | Twelve sourced hardware knowledge cards |
 | `scripts/` | Pilot, campaign, probing and reporting entry points |
 | `cluster/` | Slurm launchers for TACC Lonestar6 |
-| `tests/` | CPU-only integrity tests |
+| `tests/` | CPU integrity tests and CUDA integration tests |
 | `docs/` | Proposal, protocol and development log |
 
 ## What is implemented
