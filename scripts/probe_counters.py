@@ -10,7 +10,7 @@ result={'ncu_path':ncu,'status':'not_installed','counter_access_verified':False}
 if ncu:
     cmd=[ncu,'--profile-from-start','off','--launch-count','1','--csv',
          '--metrics','dram__bytes_read.sum,dram__bytes_write.sum,sm__warps_active.avg.pct_of_peak_sustained_active',
-         sys.executable,'-m','kernel_study.profile_target']
+         sys.executable,str(Path(__file__).with_name('profile_target.py'))]
     try:
         run=subprocess.run(cmd,capture_output=True,text=True,timeout=120)
         result.update(returncode=run.returncode,stdout=run.stdout,stderr=run.stderr,

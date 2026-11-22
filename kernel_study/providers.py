@@ -8,6 +8,11 @@ import urllib.request
 import urllib.error
 import re
 from dataclasses import dataclass
+from http.client import IncompleteRead
+from pathlib import Path
+
+from .budget import interruption
+from .records import event
 
 
 @dataclass
@@ -96,26 +101,36 @@ class ChatProvider:
                      'elapsed_s':time.perf_counter()-start, 'estimated_usd':actual_cost})
 
 
-class ScriptedProvider:
-    """Infrastructure control. It is never evidence about LLM specialization."""
-    name = 'scripted-control'
-    model = 'none'
+class MeteredChat(ChatProvider):
+    def __init__(self, ledger, directory, **kwargs):
+        super().__init__(**kwargs)
+        self.ledger, self.directory = ledger, Path(directory)
 
-    def complete(self, system, context, stage, seed):
-        if stage == 'implement':
-            config = dict(context['incumbent']['config'])
-            attempt = context['attempt']
-            family = context['case']['family']
-            if family == 'matmul':
-                config['tensor_core'] = True
-                config['block_m'] = [16,32,64,32][(attempt-1)%4]
-                config['block_n'] = [16,32,64,64][(attempt-1)%4]
-                config['num_stages'] = [1,2,3,2][(attempt-1)%4]
-            else:
-                config['fused'] = True
-                config['num_warps'] = [4, 8, 2, 4][(attempt-1)%4]
-                config['block'] = [256,512,128,1024][(attempt-1)%4]
-            text = json.dumps({'config':config,'source':None,'rationale':'Predefined engineering control; no LLM inference.'})
-        else:
-            text = json.dumps({'note':'Scripted plumbing check; no scientific role/knowledge comparison.'})
-        return Reply(text, 0, 0, 'none', {'synthetic':True, 'estimated_usd':0})
+    def send_messages(self, messages, stage, seed, json_output=False, max_tokens=None):
+        stopped = interruption(self.directory)
+        if stopped:
+            raise RuntimeError(stopped)
+        reserved = len(json.dumps(messages).encode())+256
+        output_cap = self.max_output_tokens if max_tokens is None else min(max_tokens,self.max_output_tokens)
+        log = self.directory/'model_events.jsonl'
+        try:
+            number = self.ledger.reserve(stage,reserved,output_cap)
+        except RuntimeError as exc:
+            event(log,'budget_stop',stage=stage,reason=str(exc),budget=self.ledger.summary())
+            raise
+        event(log,'request',id=number,stage=stage,seed=seed,messages=messages,budget=self.ledger.summary())
+        try:
+            reply = super().send_messages(messages,stage,seed,json_output,output_cap)
+        except Exception as exc:
+            if str(exc).startswith(('HTTP 400:', 'HTTP 401:', 'HTTP 403:', 'HTTP 404:', 'HTTP 429:')):
+                self.ledger.settle(number,0,0)
+            reason = 'transport' if isinstance(exc, (OSError, IncompleteRead)) else 'provider_error'
+            event(log,'request_error',id=number,reason=reason,error=str(exc))
+            raise
+        self.ledger.settle(number,reply.input_tokens,reply.output_tokens)
+        event(log,'response',id=number,stage=stage,model=reply.model,content=reply.text,
+              metadata=reply.metadata,budget=self.ledger.summary())
+        if reply.model != self.model:
+            event(log,'request_error',id=number,reason='model_changed',error='unexpected model snapshot')
+            raise RuntimeError(f'resolved model {reply.model} differs from snapshot {self.model}')
+        return reply
