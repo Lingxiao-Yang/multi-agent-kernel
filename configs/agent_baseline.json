@@ -23,7 +23,7 @@
   "preflight_seeds": [7713, 8823],
   "validation_seeds": [101, 202, 303],
   "final_validation_seeds": [10001, 10002, 10003, 10004, 10005],
-  "timing": {"warmup": 3, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
+  "timing": {"warmup_ms": 2610, "slow_sample_ratio": 1.05, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
   "compile_mode": "max-autotune-no-cudagraphs",
   "phases": {
     "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},

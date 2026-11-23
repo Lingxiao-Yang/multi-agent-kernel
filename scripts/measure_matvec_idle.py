@@ -60,9 +60,21 @@ def trial(torch, left, right, idle):
     return before_idle, samples
 
 
+def archived_sources(archive):
+    from kernel_study.records import digest, read_json
+    preflight = archive/'preflight/4'
+    greedy = archive/'campaign/smoke-4-greedy-771'
+    paths = {'start':preflight/'input.py', 'greedy':greedy/'proposal_001.py'}
+    hashes = {k:digest(p.read_text()) for k,p in paths.items()}
+    if hashes != {'start':read_json(preflight/'preflight.json')['native_source_hash'],
+                  'greedy':read_json(greedy/'summary.json')['history'][0]['source_hash']}:
+        raise ValueError('matvec source differs from archived measurement')
+    return paths
+
+
 def main():
     import torch
-    from kernel_study.records import digest, read_json, write_json
+    from kernel_study.records import digest, write_json
     from kernel_study.tasks import kernelbench
     from kernel_study.campaign.preflight import check_device
 
@@ -73,13 +85,8 @@ def main():
     plan = kernelbench.experiment()
     device = check_device(plan)
     args.output.mkdir(mode=0o700)
-    preflight = args.archive/'preflight/4'
-    greedy = args.archive/'campaign/smoke-4-greedy-771'
-    paths = {'start':preflight/'input.py', 'greedy':greedy/'proposal_001.py'}
+    paths = archived_sources(args.archive)
     hashes = {k:digest(p.read_text()) for k,p in paths.items()}
-    if hashes != {'start':read_json(preflight/'preflight.json')['native_source_hash'],
-                  'greedy':read_json(greedy/'summary.json')['history'][0]['source_hash']}:
-        raise ValueError('matvec source differs from archived measurement')
     write_json(args.output/'manifest.json', dict(device=device, sources=hashes, schedule=list(schedule()),
                sample_columns=['round','side','host_start_ns','host_end_ns','cuda_ms'],
                conditioning_ms=750, samples_per_side=60, seed=7713))

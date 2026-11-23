@@ -94,7 +94,11 @@ def evaluate(request):
             result['library_candidate'],result['library'] = timing.time_pair(forward,lambda: model(*inputs),protocol)
         if request.get('final') and request.get('compare_compile',True):
             compiled_model = torch.compile(model,mode=experiment()['compile_mode'],fullgraph=True)
-            result['compile_candidate'],result['compile'] = timing.time_pair(forward,lambda: compiled_model(*inputs),protocol)
+            compiled_forward = lambda: compiled_model(*inputs)
+            if 'warmup_ms' in protocol:
+                value, result['compile_first_seconds'] = timing.first_call(compiled_forward)
+                del value
+            result['compile_candidate'],result['compile'] = timing.time_pair(forward,compiled_forward,protocol)
         if request.get('profile'):
             result['profile'] = {'mode':'compiler-resources','kernels':compile_resources(load_module(source),buffers)}
     result['worker_seconds'] = time.perf_counter()-started

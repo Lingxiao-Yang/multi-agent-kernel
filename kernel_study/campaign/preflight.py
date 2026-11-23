@@ -3,7 +3,7 @@ import subprocess
 
 from ..judge.correctness import check_forward
 from ..judge.evaluate import validate
-from ..judge.timing import calibrate, check_noise, first_call, time_pair
+from ..judge.timing import check_noise, first_call, time_pair
 from ..records import digest, environment, read_json, write_json
 from ..tasks import kernelbench, starts
 
@@ -83,7 +83,7 @@ def run(case, phase, directory, plan):
             result['timings'][label] = dict(first_call_seconds=seconds,forward=timed,start=base,
                                             paired_speedup=base['median_ms']/timed['median_ms'])
     elif phase == 'calibrate':
-        result.update(calibrate(forward,protocol,20))
+        result.update(check_noise(forward,forward,protocol,20,protocol['improvement_threshold']))
     else:
         threshold = read_json(directory/'calibrate.json')['threshold']
         result['self'] = check_noise(forward,forward,protocol,20,threshold)
