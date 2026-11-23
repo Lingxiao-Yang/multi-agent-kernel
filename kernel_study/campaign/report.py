@@ -166,14 +166,74 @@ def phase_rows(root, phase, cases, seeds):
     return rows,attempts,measurements
 
 
+def report_matvec_recheck(args, plan, parser):
+    seeds = plan['development_seeds']
+    if args.freeze or args.measure_pairs or (args.require_seed is not None and args.require_seed not in seeds):
+        parser.error('matvec rechecks report individual endpoints for the registered seeds')
+    rows,attempts,_ = phase_rows(args.output,args.phase,[4],seeds)
+    results = {}
+    target = plan['matvec_reference_ms']['random_best_of_four']
+    for row in rows:
+        path = args.output/row['run']/'matched-evidence.json'
+        proof = read_json(path) if path.is_file() else None
+        row['matched_evidence'] = proof
+        if row['status']!='complete' or 'latency_ms' not in row or not (proof and proof['identical']):
+            continue
+        result = dict(latency_ms=row['latency_ms'],passed=row['latency_ms']<=target,cost_usd=row['total_completed_usd'])
+        if row['seed']==11:
+            result['below_3_57_ms'] = row['latency_ms'] < 3.57
+        results[str(row['seed'])] = result
+    complete = len(results)==len(seeds)
+    decision = 'incomplete'
+    if complete:
+        decision = 'matvec-recheck-passed' if all(r['passed'] for r in results.values()) else 'matvec-recheck-failed'
+    write_json(args.output/(args.phase+'-report.json'),dict(complete=complete,decision=decision,seeds=results,
+               target_ms=target,attempts=attempts,searches=rows))
+    print(decision,results)
+    if args.require_seed is not None and not results.get(str(args.require_seed),{}).get('passed'):
+        raise SystemExit(3)
+
+
+def row_qualification(report, rows, spec, threshold):
+    for case in spec['cases']:
+        task = report['tasks'][str(case)]
+        task['reference_ms'] = spec['reference_ms'][str(case)]
+        pair = [r for r in rows if r['case']==case]
+        ratio = task['ratio']
+        if ratio is None or not any((r.get('matched_evidence') or {}).get('identical') for r in pair):
+            outcome = 'incomplete'
+        elif all(r['fallback'] for r in pair):
+            outcome = 'both-retained-start'
+        elif ratio > threshold:
+            outcome = 'single-slower'
+        elif ratio < 1/threshold:
+            outcome = 'single-faster'
+        else:
+            outcome = 'within-timing-tolerance'
+        task['outcome'] = outcome
+    report['complete'] = all(task['outcome']!='incomplete' for task in report['tasks'].values())
+    if report['complete']:
+        lost = any(task['outcome']=='single-slower' for task in report['tasks'].values())
+        report['decision'] = 'row-qualification-failed' if lost else 'row-qualification-passed'
+    else:
+        report['decision'] = 'incomplete'
+
+
 def run_report(args, parser):
     args.output = args.output.resolve()
     plan = experiment()
+    if args.phase=='matvec-recheck':
+        return report_matvec_recheck(args,plan,parser)
+    if getattr(args,'require_seed',None) is not None:
+        parser.error('--require-seed applies to matvec-recheck')
     if args.phase == 'matched-smoke':
         phase = plan['phases'][args.phase]
         cases, seeds = [phase['case']], [phase['seed']]
     elif args.phase == 'matvec-development':
         cases, seeds = [4], plan['development_seeds']
+    elif args.phase == 'row-qualification':
+        spec = plan['row_qualification']
+        cases, seeds = spec['cases'], [spec['seed']]
     else:
         cases, seeds = plan[args.phase], plan[args.phase+'_seeds']
     if args.measure_pairs:
@@ -190,6 +250,12 @@ def run_report(args, parser):
                 measure_pair(pair,*sides)
     rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
     report = compare(rows,cases,seeds,measurements)
+    if args.phase == 'row-qualification':
+        for row in rows:
+            if row['agent']=='single':
+                path = args.output/row['run']/'matched-evidence.json'
+                row['matched_evidence'] = read_json(path) if path.is_file() else None
+        row_qualification(report,rows,spec,plan['timing']['improvement_threshold'])
     if args.phase == 'matvec-development':
         report['comparison_to_greedy'] = report['decision']
         if report['complete']:

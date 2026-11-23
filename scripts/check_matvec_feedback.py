@@ -29,10 +29,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
     parser.add_argument('--start-deadline', action='store_true')
+    parser.add_argument('--case', choices=['4','23','40'], default='4')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    case = kernelbench.experiment()['cases']['4']
+    if args.case!='4' and not args.start_deadline:
+        parser.error('row cases support the startup verification only')
+    case = kernelbench.experiment()['cases'][args.case]
     baseline = starts.start_path(case)
     if args.start_deadline:
         import torch
