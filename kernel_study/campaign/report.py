@@ -190,13 +190,21 @@ def run_report(args, parser):
     rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
     report = compare(rows,cases,seeds,measurements)
     if args.phase == 'matvec-development':
+        report['comparison_to_greedy'] = report['decision']
+        if report['complete']:
+            report['decision'] = 'matvec-slice-complete'
         report['matvec_reference_ms'] = plan['matvec_reference_ms']
+        blind = {agent:{'count':0,'completed':0} for agent in ('single','greedy')}
         for row in rows:
             if 'latency_ms' in row:
                 row['at_or_below_reference'] = {k:row['latency_ms'] <= ms for k,ms in plan['matvec_reference_ms'].items()}
+                if row['status']=='complete':
+                    blind[row['agent']]['completed'] += 1
+                    blind[row['agent']]['count'] += row['at_or_below_reference']['random_best_of_four']
             if row['agent']=='single':
                 path = args.output/row['run']/'matched-evidence.json'
                 row['matched_evidence'] = read_json(path) if path.is_file() else None
+        report['at_or_below_random_four'] = blind
     if args.phase == 'matched-smoke':
         path = latest_attempt(args.output,job_name(args.phase,cases[0],'single',seeds[0]))/'matched-evidence.json'
         report['matched_evidence'] = read_json(path) if path.is_file() else None

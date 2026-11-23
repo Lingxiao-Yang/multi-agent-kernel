@@ -16,6 +16,23 @@ def test_matvec_slice_report_includes_the_two_model_free_reference_times(tmp_pat
     assert list(result['tasks'])==['4'] and result['decision']=='incomplete'
 
 
+def test_matching_greedy_can_still_miss_random_search_in_both_seeds(tmp_path):
+    from kernel_study.cli import main
+    from kernel_study.records import read_json
+    for seed in (11,22):
+        for agent in ('single','greedy'):
+            directory=tmp_path/f'matvec-development-4-{agent}-{seed}'
+            row=dict(agent=agent,case=4,seed=seed,status='complete',correct_new=True,fallback=False,
+                     budget={'attempts':4},candidates=[],cost_usd=.1,initial_ms=10.,latency_ms=8.)
+            write_json(directory/'audit.json',row)
+        pair=tmp_path/'pairs'/f'matvec-development-4-{seed}'
+        write_json(pair/'direct.result.json',dict(status='ok',candidate={'median_ms':8.},incumbent={'median_ms':8.}))
+    main(['report','matvec-development',str(tmp_path)])
+    result=read_json(tmp_path/'matvec-development-report.json')
+    assert result['decision']=='matvec-slice-complete' and result['comparison_to_greedy']=='passes'
+    assert result['at_or_below_random_four']=={a:{'count':0,'completed':2} for a in ('single','greedy')}
+
+
 def test_round_report_matches_parent_sources_and_keeps_upstream_timeout_separate(tmp_path):
     from kernel_study.records import digest
     (tmp_path/'baseline.py').write_text('start')
