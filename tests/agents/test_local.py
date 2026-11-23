@@ -65,6 +65,19 @@ def mock_worker(monkeypatch, worker):
     monkeypatch.setattr(select, 'run_worker', worker)
 
 
+def test_matched_smoke_shares_only_initial_counter_sample(tmp_path,monkeypatch,public_case,mock_environment,protocol):
+    metrics={'start':{'counter':12}}
+    profiled=[]
+    def worker(request,directory,label):
+        if request.get('profile'):
+            profiled.append((label,request.get('shared_ncu_metrics')))
+        return measurement(confirmed=label.startswith('candidate_'))
+    mock_worker(monkeypatch,worker)
+    local.search(public_case,'single',771,dict(protocol,candidate_cap=1,shared_ncu_metrics=metrics),
+                 SourceProvider(),tmp_path/'run')
+    assert profiled==[('baseline',metrics),('profile_001',None)]
+
+
 def measurement(confirmed=False):
     return dict(status='ok', confirmed=confirmed, paired_speedup=2. if confirmed else 1.,
                 candidate={'median_ms':1.}, incumbent={'median_ms':2. if confirmed else 1.})

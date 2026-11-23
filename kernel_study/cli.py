@@ -19,7 +19,7 @@ def main(argv=None):
     preflight.set_defaults(handler=run_preflight, parser=preflight)
 
     run = commands.add_parser('run', help='run one registered search')
-    run.add_argument('phase',choices=['smoke','calibration','development','holdout'])
+    run.add_argument('phase',choices=['smoke','calibration','matched-smoke','development','holdout'])
     run.add_argument('--preflight',type=Path,required=True)
     run.add_argument('--output',type=Path,required=True)
     run.add_argument('--counters',type=Path,required=True)

@@ -57,5 +57,5 @@ def code_hashes():
     files.extend(package/'campaign'/name for name in ('__init__.py', 'jobs.py', 'preflight.py'))
     for directory in ('tasks', 'judge', 'agents'):
         files.extend((package/directory).rglob('*.py'))
-    files.extend(ROOT/p for p in ('configs/agent_baseline.json', 'configs/protocol.json', 'knowledge/cards.json'))
+    files.extend(ROOT/p for p in ('configs/agent_baseline.json', 'configs/protocol.json', 'configs/greedy.json', 'knowledge/cards.json'))
     return {path.relative_to(ROOT).as_posix():digest(path.read_text(encoding='utf-8')) for path in sorted(files)}

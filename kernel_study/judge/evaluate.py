@@ -24,17 +24,20 @@ def bind(source, buffers):
     return lambda: native(*buffers)
 
 
-def ncu_evidence(source, problem, directory):
+def describe_ncu(metrics):
     from kernel_perf_agent.kernel_opt.roofline.ncu_roofline import RooflineAnalyzer
+    (last_kernel,) = metrics.values()
+    return dict(metrics=metrics, roofline=RooflineAnalyzer().analyze(last_kernel).to_dict(), kernel_selection='last')
+
+
+def ncu_evidence(source, problem, directory):
     from triton_kernel_agent.opt_worker_component.profiling.kernel_profiler import KernelProfiler
     directory.mkdir(parents=True, exist_ok=True)
     profiler = KernelProfiler(logging.getLogger(__name__), directory, directory)
     sampled = profiler.profile_kernel(source, problem, round_num=0, max_retries=1)
     if sampled is None or not sampled.metrics:
         raise RuntimeError(f'no NCU measurements in {directory}')
-    (last_kernel,) = sampled.metrics.values()
-    return dict(metrics=sampled.metrics, roofline=RooflineAnalyzer().analyze(last_kernel).to_dict(),
-                kernel_selection='last')
+    return describe_ncu(sampled.metrics)
 
 
 def compile_resources(module, buffers):
@@ -153,7 +156,10 @@ def main():
             import torch
             torch.cuda.empty_cache()
             directory = Path(args.output).with_suffix('.ncu')
-            result['profile']['ncu'] = ncu_evidence(Path(request['source']), task_path(request['case']), directory)
+            if 'shared_ncu_metrics' in request:
+                result['profile']['ncu'] = describe_ncu(request['shared_ncu_metrics'])
+            else:
+                result['profile']['ncu'] = ncu_evidence(Path(request['source']), task_path(request['case']), directory)
             result['profile']['mode'] = 'compiler-resources-and-ncu'
     except StaticRejection as exc:
         result = dict(status='static_rejected',error=str(exc),worker_seconds=time.perf_counter()-start)

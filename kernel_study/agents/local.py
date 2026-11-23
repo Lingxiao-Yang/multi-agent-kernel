@@ -69,6 +69,8 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'shared_api_guidance.json', shared_guidance)
     event(log, 'run_start', manifest=manifest)
     request = {'case':case,'interface':'native','source':str(base_source),'protocol':protocol,'library':True,'profile':True}
+    if 'shared_ncu_metrics' in protocol:
+        request['shared_ncu_metrics'] = protocol['shared_ncu_metrics']
     base_result = run_worker(request, output, 'baseline')
     event(log, 'baseline', result=base_result)
     if base_result['status'] != 'ok':

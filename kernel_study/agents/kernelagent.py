@@ -13,13 +13,17 @@ from unittest.mock import patch
 from ..budget import interruption
 from ..judge.evaluate import run_worker
 from ..judge.select import screen_candidate, select_final
-from ..records import digest, environment, event, write_json
+from ..records import ROOT, digest, environment, event, write_json
 from ..tasks import kernelbench
 
 
 def native_manager():
     from triton_kernel_agent.opt_manager import OptimizationManager
     return OptimizationManager
+
+
+def benchmark_problem(source, warmup_ms):
+    return source.rstrip() + f"\n\n\ndef get_benchmark_config():\n    return {{'warmup': {warmup_ms}}}\n"
 
 
 def worker_gpu():
@@ -117,7 +121,7 @@ def native_outcome(output, usage, native, final):
 
 
 def run_native(case, seed, protocol, provider, output, preflight, rounds):
-    root = kernelbench.upstream('KernelAgent')
+    kernelbench.upstream('KernelAgent')
     started = time.perf_counter()
     output.mkdir(parents=True,exist_ok=False)
     problem = output/'problem.py'
@@ -126,7 +130,7 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
     shutil.copyfile(preflight/'input.py',starter)
     test = case['test'] if 'test' in case else kernelbench.test_source(case)
     (output/'test.py').write_text(test)
-    opts = dict(config=str(root/'examples/configs/greedy.yaml'),num_workers=1,gpu_ids=[worker_gpu()],
+    opts = dict(config=str(ROOT/'configs/greedy.json'),num_workers=1,gpu_ids=[worker_gpu()],
                 gpu_name=kernelbench.experiment()['gpu'],openai_model=provider.model,
                 ncu_bin_path=shutil.which('ncu'),
                 log_dir=output/'greedy',

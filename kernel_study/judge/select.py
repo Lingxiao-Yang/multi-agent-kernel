@@ -95,8 +95,12 @@ def audit(output, agent):
         r = final['result']
         row.update(latency_ms=r['candidate']['median_ms'], fallback=final['candidate_id']==0,
                    initial_ms=r['incumbent']['median_ms'], speedup=r['paired_speedup'],
+                   compile_ms=r['compile']['median_ms'], compile_candidate_ms=r['compile_candidate']['median_ms'],
                    compile_speedup=r['compile']['median_ms']/r['compile_candidate']['median_ms'],
                    finalist={k:final[k] for k in ('source','interface')})
+        if 'library' in r and 'library_candidate' in r:
+            row.update(eager_ms=r['library']['median_ms'],eager_candidate_ms=r['library_candidate']['median_ms'],
+                       eager_speedup=r['library']['median_ms']/r['library_candidate']['median_ms'])
     write_json(output/'audit.json', row)
     return row
 

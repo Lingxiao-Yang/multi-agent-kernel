@@ -2,6 +2,19 @@ import json
 
 import pytest
 
+
+def test_greedy_worker_and_problem_hook_use_the_registered_prewarm():
+    from kernel_study.agents.kernelagent import benchmark_problem
+    from kernel_study.records import ROOT, code_hashes, read_json
+    from kernel_study.tasks.kernelbench import experiment
+    warmup=experiment()['timing']['warmup_ms']
+    config=read_json(ROOT/'configs/greedy.json')
+    assert config['benchmark_warmup']==warmup and config['strategy']=='greedy'
+    assert 'configs/greedy.json' in code_hashes()
+    namespace={}
+    exec(benchmark_problem('def get_inputs(): return [17]', warmup), namespace)
+    assert namespace['get_inputs']()==[17] and namespace['get_benchmark_config']()=={'warmup':warmup}
+
 from kernel_study.agents.kernelagent import native_adapters, native_manager, native_outcome
 from kernel_study.budget import Ledger
 from kernel_study.campaign.report import compare

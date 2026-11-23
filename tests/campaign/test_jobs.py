@@ -93,4 +93,40 @@ def test_native_smoke_and_reference_search_are_independent(tmp_path,monkeypatch)
     campaign.run_campaign(args,ArgumentParser())
     assert calls == [('single',1.01,1,4),('greedy',1.01,32,128)]
     assert not pairs
-    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(11.5019564)
+    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(11.1973984)
+
+
+def test_matched_smoke_is_one_candidate_for_each_agent_on_the_same_seed():
+    plan = experiment()
+    assert campaign.jobs(plan,'matched-smoke') == [(4,'greedy',771),(4,'single',771)]
+    phase = plan['phases']['matched-smoke']
+    assert (phase['rounds'],phase['candidate_cap'],phase['call_cap'])==(1,1,4)
+
+
+def test_paired_evidence_requires_the_frozen_source_and_the_actual_upstream_prompt(tmp_path):
+    from kernel_study.records import event
+    from kernel_study.campaign.jobs import shared_start_metrics
+    src=tmp_path/'initial.py'
+    src.write_text('frozen kernel')
+    metrics={'example':{'memory_metric':87.1}}
+    write_json(tmp_path/'greedy/round001_ncu_metrics.json', {'metadata':{'kernel_file':str(src)},'metrics':metrics})
+    event(tmp_path/'model_events.jsonl','request',stage='analysis',messages=[{'content':str(metrics['example'])}])
+    assert shared_start_metrics(tmp_path, 'frozen kernel')==metrics
+    with pytest.raises(ValueError,match='source'):
+        shared_start_metrics(tmp_path, 'different kernel')
+    (tmp_path/'model_events.jsonl').write_text('')
+    with pytest.raises(ValueError,match='prompt'):
+        shared_start_metrics(tmp_path, 'frozen kernel')
+
+
+def test_matched_prompt_audit_finds_one_changed_measurement(tmp_path):
+    from kernel_study.records import event
+    from kernel_study.campaign.jobs import check_single_evidence
+    evidence={'metrics':{'k':{'counter':87.1}},'roofline':{'bottleneck':'memory'}}
+    specs={'sm_count':108}
+    import json
+    for stage in ('analyze','advise','implement','review'):
+        context={'incumbent':{'result':{'profile':{'ncu':evidence}}},'hardware':{'specs':specs}}
+        event(tmp_path/'model_events.jsonl','request',stage=stage,messages=[{'role':'user','content':json.dumps(context)}])
+    assert check_single_evidence(tmp_path,evidence,specs)['identical']
+    assert not check_single_evidence(tmp_path,dict(evidence,metrics={'k':{'counter':40}}),specs)['identical']

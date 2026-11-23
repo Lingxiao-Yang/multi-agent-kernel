@@ -1,5 +1,6 @@
 """Register and run the public comparison one search at a time."""
 import fcntl
+import json
 import math
 import os
 import random
@@ -7,10 +8,11 @@ import subprocess
 import sys
 
 from ..agents.guidance import VERSION
-from ..agents.kernelagent import run_native
+from ..agents.kernelagent import benchmark_problem, run_native
 from ..agents.local import search
 from ..budget import Ledger
 from ..judge.select import audit, measure_pair
+from ..judge.evaluate import describe_ncu
 from ..providers import MeteredChat
 from ..records import ROOT, code_hashes, digest, read_json, write_json
 from ..tasks import kernelbench, starts
@@ -18,6 +20,9 @@ from .preflight import check_device
 
 
 def jobs(plan, phase):
+    if phase=='matched-smoke':
+        spec = plan['phases'][phase]
+        return [(spec['case'],agent,spec['seed']) for agent in ('greedy','single')]
     if phase in ('smoke','calibration'):
         phase_plan = plan['phases'][phase]
         agent = 'single' if phase=='smoke' else 'greedy'
@@ -55,6 +60,35 @@ def latest_attempt(root, job):
 
 def job_name(phase, case, agent, seed):
     return f'{phase}-{case}-{agent}-{seed}'
+
+
+def shared_start_metrics(directory, source):
+    from pathlib import Path
+    sample = read_json(directory/'greedy/round001_ncu_metrics.json')
+    if Path(sample['metadata']['kernel_file']).read_text() != source:
+        raise ValueError('upstream NCU sample belongs to a different source')
+    metrics = sample['metrics']
+    (row,) = metrics.values()
+    with (directory/'model_events.jsonl').open() as stream:
+        request = next((e for e in map(json.loads, stream)
+                        if e['event']=='request' and e['stage']=='analysis'), None)
+    if not row or not request or not any(str(row) in msg['content'] for msg in request['messages']):
+        raise ValueError('upstream analysis prompt does not contain this NCU sample')
+    return metrics
+
+
+def check_single_evidence(directory, evidence, specs):
+    stages = {}
+    with (directory/'model_events.jsonl').open() as stream:
+        for request in map(json.loads, stream):
+            if request['event'] != 'request':
+                continue
+            prompt = json.loads(next(m['content'] for m in request['messages'] if m['role']=='user'))
+            ncu = prompt['incumbent']['result'].get('profile',{}).get('ncu',{})
+            stages[request['stage']] = (ncu.get('metrics')==evidence['metrics'] and
+                                        ncu.get('roofline')==evidence['roofline'] and prompt['hardware']['specs']==specs)
+    return dict(stages=stages, identical={'analyze','advise','implement'} <= stages.keys() and all(stages.values()),
+                metric_count=sum(len(row) for row in evidence['metrics'].values()), metric_hash=digest(evidence['metrics']))
 
 
 def register(directory, name, record):
@@ -100,12 +134,21 @@ def run_job(args, plan, case_id, agent, seed):
         raise ValueError('starting code differs from preflight')
     if digest(case['problem']) != frozen['problem_hash']:
         raise ValueError('problem differs from preflight')
+    case['problem'] = benchmark_problem(case['problem'],protocol['warmup_ms'])
+    if args.phase=='matched-smoke' and agent=='single':
+        greedy = latest_attempt(args.output,job_name(args.phase,case_id,'greedy',seed))
+        protocol['shared_ncu_metrics'] = shared_start_metrics(greedy,(baseline/'input.py').read_text())
     if agent=='single':
         result = search(case,'single',seed,protocol,provider,output)
     else:
         result = run_native(case,seed,protocol,provider,output,baseline,rounds)
     audit(output,agent)
-    if args.phase in ('development','holdout'):
+    if args.phase=='matched-smoke' and agent=='single' and result['status']=='complete':
+        report = check_single_evidence(output,describe_ncu(protocol['shared_ncu_metrics']),plan['gpu_specs'])
+        write_json(output/'matched-evidence.json',report)
+        if not report['identical']:
+            raise ValueError('the actual model prompts did not match the registered hardware evidence')
+    if args.phase in ('matched-smoke','development','holdout'):
         sides = [latest_attempt(args.output,job_name(args.phase,case_id,a,seed)) for a in ('single','greedy')]
         measured = measure_pair(args.output/'pairs'/f'{args.phase}-{case_id}-{seed}', *sides)
         if measured is not None and measured['status']!='ok':
@@ -137,7 +180,7 @@ def run_campaign(args, parser):
         except ValueError as exc:
             parser.error(str(exc))
     case_id,agent,seed = schedule[args.job]
-    if args.phase in ('development','holdout'):
+    if args.phase in ('matched-smoke','development','holdout'):
         pair = args.output/'pairs'/f'{args.phase}-{case_id}-{seed}'
         pair.mkdir(parents=True,exist_ok=True)
         try:

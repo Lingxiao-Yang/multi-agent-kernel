@@ -16,6 +16,12 @@ def test_rejection_reasons_are_counted_per_agent():
     assert reasons['greedy']['static_check'] == reasons['greedy']['compilation'] == 1
 
 
+def test_report_separates_gpu_timeouts_and_confirmed_gains():
+    rows=[{'status':'timeout'},{'status':'ok','selected':True},{'status':'ok','selected':False}]
+    counts=report.rejection_counts(rows)
+    assert counts['timeout']==counts['confirmed']==counts['unconfirmed']==1
+
+
 def test_report_remeasures_only_pairs_assigned_to_its_card(tmp_path,monkeypatch):
     monkeypatch.setattr(report,'experiment',lambda: {'development':[4],'development_seeds':[11,22]})
     monkeypatch.setattr(report,'check_device',lambda plan: {'uuid':'GPU-a'})

@@ -70,3 +70,16 @@ def test_numerical_failure_at_the_endpoint_cannot_count_as_a_correct_new_candida
                budget=budget,history=[{'attempt':1,'result':{'status':'ok'}}],
                selection=[{'attempt':1,'status':'ok','selected':True,'latency_ms':1.,'endpoint_status':'incorrect'}]))
     assert not referee.audit(tmp_path,'greedy')['correct_new']
+
+
+def test_audit_keeps_paired_library_latencies_and_upstream_winner(tmp_path):
+    final=dict(status='ok',paired_speedup=2.,candidate={'median_ms':4},incumbent={'median_ms':8},
+               compile={'median_ms':3.5},compile_candidate={'median_ms':4.1},
+               library={'median_ms':3.},library_candidate={'median_ms':4.2})
+    write_json(tmp_path/'summary.json',dict(manifest={'case':{'public_id':4},'seed':771},status='complete',
+               budget={'attempts':0,'calls':0},final={'candidate_id':1,'source':'proposal.py','interface':'native','result':final},
+               upstream_selected={'source':'proposal.py','latency_ms':6.5}))
+    audit=referee.audit(tmp_path,'greedy')
+    assert audit['eager_ms']==3. and audit['eager_candidate_ms']==4.2
+    assert audit['compile_ms']==3.5 and audit['compile_candidate_ms']==4.1
+    assert audit['upstream_selected']['latency_ms']==6.5 and audit['latency_ms']==4
