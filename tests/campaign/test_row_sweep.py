@@ -81,7 +81,7 @@ def test_sweep_batch_preflights_and_calibrates_without_a_key(tmp_path):
     trace=tmp_path/'calls'
     (binpath/'python').write_text('#!/usr/bin/env python3\nimport json,os,sys\nwith open(os.environ["TRACE"],"a") as f: print(json.dumps([sys.argv[1:],"OPENAI_API_KEY" in os.environ]),file=f)\n')
     (binpath/'python').chmod(0o700)
-    env=dict(os.environ,SCRATCH=str(tmp_path),SLURM_SUBMIT_DIR=str(tmp_path),SLURM_JOB_ID='8',TRACE=str(trace),OPENAI_API_KEY='unused')
+    env=dict(os.environ,BASH_ENV=os.devnull,SCRATCH=str(tmp_path),SLURM_SUBMIT_DIR=str(tmp_path),SLURM_JOB_ID='8',TRACE=str(trace),OPENAI_API_KEY='unused')
     for case in ['23','40']:
         subprocess.run(['bash','-c','module(){ :; }; export -f module; bash "$1" "$2"','bash',str(script),case],env=env,check=True)
     calls=[json.loads(v) for v in trace.read_text().splitlines()]

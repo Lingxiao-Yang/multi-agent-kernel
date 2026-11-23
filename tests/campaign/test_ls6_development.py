@@ -29,7 +29,7 @@ if '--start-deadline' in args: sys.exit(int(os.environ['GUARD']))
     for name in ['python','scontrol']:
         (bindir/name).write_text(stub)
         (bindir/name).chmod(0o700)
-    env=dict(os.environ,SCRATCH=str(tmp_path),SLURM_SUBMIT_DIR=str(tmp_path),HOME=str(tmp_path),
+    env=dict(os.environ,BASH_ENV=os.devnull,SCRATCH=str(tmp_path),SLURM_SUBMIT_DIR=str(tmp_path),HOME=str(tmp_path),
              SLURM_JOB_ID='123',TRACE=str(trace),GUARD=str(guard),OPENAI_API_KEY='inherited-test')
     proc=subprocess.run(['bash','-c','module(){ :; }; export -f module; bash "$1" "$2"','bash',str(script),str(first)],env=env)
     assert proc.returncode==(1 if guard==1 else 0)
