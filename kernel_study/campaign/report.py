@@ -1,7 +1,8 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
+from pathlib import Path
 
 from ..judge.select import measure_pair
-from ..records import code_hashes, read_json, write_json
+from ..records import code_hashes, digest, read_json, write_json
 from ..tasks.kernelbench import experiment
 from .factorial import geometric_mean
 from .jobs import job_name, latest_attempt
@@ -65,6 +66,68 @@ def prefix(row, axis, limit):
     return best
 
 
+def verifier_timeouts(path):
+    if not path.is_file():
+        return None
+    return sum(line.endswith(' - ERROR - Test timed out') for line in path.read_text().splitlines())
+
+
+def parent_comparison(directory, attempt, previous):
+    request = directory/f'audit_{attempt:03d}.request.json'
+    result = directory/f'audit_{attempt:03d}.result.json'
+    if not request.is_file() or not result.is_file():
+        return None
+    judged = read_json(result)
+    if Path(read_json(request)['incumbent_source']).name != previous or judged['status'] != 'ok':
+        return None
+    return dict(previous=previous, confirmed=judged['confirmed'], candidate_ms=judged['candidate']['median_ms'],
+                parent_ms=judged['incumbent']['median_ms'])
+
+
+def round_benchmarks(artifacts, proposals):
+    measured = []
+    bench = artifacts/'benchmark_results.json'
+    if bench.is_file():
+        for name, timing in read_json(bench)['kernels'].items():
+            kernel = artifacts/(name+'.py')
+            if name == 'kernel_round_0' or not kernel.is_file(): continue
+            entry = proposals.get(digest(kernel.read_text()))
+            if entry:
+                public = entry['result'].get('candidate',{})
+                measured.append(dict(attempt=entry['attempt'],upstream_ms=timing['time_ms'],public_ms=public.get('median_ms')))
+    return measured
+
+
+def greedy_trajectory(directory, summary):
+    upstream = directory/'greedy'
+    proposals = {}
+    for entry in summary['history']:
+        key = entry['source_hash']
+        proposals[key] = None if key in proposals else entry
+    baseline = directory/'baseline.py'
+    baseline_hash = digest(baseline.read_text()) if baseline.is_file() else None
+    previous = 'baseline.py'
+    rounds = []
+    for step in summary['rounds']:
+        worker = upstream/'workers/w0'/f'r{step["round"]}'
+        artifacts = worker/'artifacts'
+        parent_file = artifacts/'kernel_round_0.py'
+        parent = change = None
+        if parent_file.is_file():
+            source_hash = digest(parent_file.read_text())
+            if source_hash == baseline_hash:
+                parent = 'baseline.py'
+            elif entry := proposals.get(source_hash):
+                attempt = entry['attempt']
+                parent = f'proposal_{attempt:03d}.py'
+                if parent != previous:
+                    change = parent_comparison(directory, attempt, previous)
+        rounds.append(dict(**step,parent=parent,parent_change=change,upstream_candidates=round_benchmarks(artifacts,proposals),
+                           upstream_candidate_timeouts=verifier_timeouts(worker/'logs/worker_0.log')))
+        previous = parent
+    return dict(upstream_initial_timeouts=verifier_timeouts(upstream/'initial_verify/worker_-1.log'),rounds=rounds)
+
+
 def phase_rows(root, phase, cases, seeds):
     rows, attempts, measurements = [], [], {}
     for case in cases:
@@ -88,6 +151,8 @@ def phase_rows(root, phase, cases, seeds):
                                          budget=row['budget']))
                     if directory==latest:
                         row = dict(row, run=directory.name)
+                        if agent=='greedy' and (directory/'summary.json').is_file():
+                            row['upstream_trajectory'] = greedy_trajectory(directory,read_json(directory/'summary.json'))
                         previous_cost = sum(item.get('committed_usd',0.) for item in records[:-1])
                         row['total_committed_usd'] = previous_cost + row.get('committed_usd',0.)
                         row['total_completed_usd'] = sum(item['cost_usd'] for item in records)
@@ -103,26 +168,37 @@ def phase_rows(root, phase, cases, seeds):
 def run_report(args, parser):
     args.output = args.output.resolve()
     plan = experiment()
+    if args.phase == 'matched-smoke':
+        phase = plan['phases'][args.phase]
+        cases, seeds = [phase['case']], [phase['seed']]
+    else:
+        cases, seeds = plan[args.phase], plan[args.phase+'_seeds']
     if args.measure_pairs:
         device = check_device(plan)
         if read_json(args.output/(args.phase+'-protocol.json'))['code_hashes'] != code_hashes():
             parser.error('pair measurements require the registered evaluation code')
-        for case in plan[args.phase]:
-            for seed in plan[args.phase+'_seeds']:
+        for case in cases:
+            for seed in seeds:
                 pair = args.output/'pairs'/f'{args.phase}-{case}-{seed}'
                 assigned = pair/'device.json'
                 if assigned.exists() and read_json(assigned)['uuid'] != device['uuid']:
                     continue
                 sides = [latest_attempt(args.output,job_name(args.phase,case,agent,seed)) for agent in ('single','greedy')]
                 measure_pair(pair,*sides)
-    rows,attempts,measurements = phase_rows(args.output,args.phase,plan[args.phase],plan[args.phase+'_seeds'])
-    report = compare(rows,plan[args.phase],plan[args.phase+'_seeds'],measurements)
+    rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
+    report = compare(rows,cases,seeds,measurements)
+    if args.phase == 'matched-smoke':
+        path = latest_attempt(args.output,job_name(args.phase,cases[0],'single',seeds[0]))/'matched-evidence.json'
+        report['matched_evidence'] = read_json(path) if path.is_file() else None
+        if report['complete']:
+            identical = report['matched_evidence'] and report['matched_evidence']['identical']
+            report['decision'] = 'paired-smoke-complete' if identical else 'missing-shared-evidence'
     report['attempts'] = attempts
     report['direct_pairs'] = {f'{case}-{seed}':data for (case,seed),data in measurements.items()}
     report['searches'] = rows
     budgets = []
-    for case in plan[args.phase]:
-        for seed in plan[args.phase+'_seeds']:
+    for case in cases:
+        for seed in seeds:
             pair = [r for r in rows if r['case']==case and r['seed']==seed and 'initial_ms' in r]
             if len(pair)!=2: continue
             for axis,limit in [('attempt',min(r['total_attempts'] for r in pair)),('usd',min(r['total_committed_usd'] for r in pair))]:

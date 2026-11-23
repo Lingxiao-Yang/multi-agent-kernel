@@ -7,6 +7,54 @@ from kernel_study.campaign.report import compare, phase_rows
 from kernel_study.records import write_json
 
 
+def test_round_report_matches_parent_sources_and_keeps_upstream_timeout_separate(tmp_path):
+    from kernel_study.records import digest
+    (tmp_path/'baseline.py').write_text('start')
+    (tmp_path/'proposal_001.py').write_text('new')
+    for i,source in [(1,'start'),(2,'new')]:
+        worker=tmp_path/'greedy/workers/w0'/f'r{i}'
+        (worker/'artifacts').mkdir(parents=True)
+        (worker/'logs').mkdir()
+        (worker/'artifacts/kernel_round_0.py').write_text(source)
+        (worker/'logs/worker_0.log').write_text('t - w - ERROR - Test timed out\n' if i==2 else '')
+    artifacts=tmp_path/'greedy/workers/w0/r1/artifacts'
+    (artifacts/'kernel_round_1.py').write_text('new')
+    write_json(artifacts/'benchmark_results.json',{'kernels':{'kernel_round_1':{'time_ms':8.}}})
+    result=dict(status='ok',candidate={'median_ms':4.},incumbent={'median_ms':10.},confirmed=True)
+    write_json(tmp_path/'audit_001.request.json',{'incumbent_source':'/cluster/baseline.py'})
+    write_json(tmp_path/'audit_001.result.json',result)
+    summary=dict(rounds=[{'round':1},{'round':2}],history=[dict(attempt=1,source_hash=digest('new'),result=result)])
+    data=report.greedy_trajectory(tmp_path,summary)
+    first,second=data['rounds']
+    assert first['upstream_candidates'][0] == dict(attempt=1,upstream_ms=8.,public_ms=4.)
+    assert second['parent']=='proposal_001.py' and second['parent_change']['confirmed']
+    assert second['parent_change']['parent_ms']==10. and second['parent_change']['candidate_ms']==4.
+    assert [r['upstream_candidate_timeouts'] for r in data['rounds']]==[0,1]
+    assert data['upstream_initial_timeouts'] is None
+
+
+def test_matched_smoke_can_be_reported_through_cli_without_a_gpu(tmp_path):
+    from kernel_study.cli import main
+    from kernel_study.records import read_json
+    main(['report','matched-smoke',str(tmp_path)])
+    result=read_json(tmp_path/'matched-smoke-report.json')
+    assert list(result['tasks'])==['4'] and result['decision']=='incomplete'
+
+
+def test_round_report_keeps_partial_archives_and_ambiguous_sources_unassigned(tmp_path):
+    from kernel_study.records import digest
+    artifacts=tmp_path/'greedy/workers/w0/r1/artifacts'
+    artifacts.mkdir(parents=True)
+    (artifacts/'kernel_round_0.py').write_text('repeated')
+    (artifacts/'kernel_round_1.py').write_text('repeated')
+    write_json(artifacts/'benchmark_results.json',{'kernels':{'kernel_round_1':{'time_ms':7.}}})
+    entries=[dict(attempt=i,source_hash=digest('repeated'),result={}) for i in (1,2)]
+    summary=dict(rounds=[{'round':1}],history=entries)
+    point=report.greedy_trajectory(tmp_path,summary)['rounds'][0]
+    assert point['parent'] is None and point['upstream_candidates']==[]
+    assert point['upstream_candidate_timeouts'] is None
+
+
 def test_rejection_reasons_are_counted_per_agent():
     rows = [dict(case=4,seed=11,agent=a,status='complete',latency_ms=1.,correct_new=False,
                  fallback=True,candidates=[{'status':s} for s in statuses])

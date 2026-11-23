@@ -32,7 +32,7 @@ def main(argv=None):
     run.set_defaults(handler=run_campaign, parser=run)
 
     report = commands.add_parser('report', help='summarize directly paired finalists')
-    report.add_argument('phase',choices=['development','holdout'])
+    report.add_argument('phase',choices=['matched-smoke','development','holdout'])
     report.add_argument('output',type=Path)
     report.add_argument('--freeze',action='store_true',help='Register the measured single implementation before holdout')
     report.add_argument('--measure-pairs',action='store_true',help='Measure missing finalist pairs on the registered GPU')
