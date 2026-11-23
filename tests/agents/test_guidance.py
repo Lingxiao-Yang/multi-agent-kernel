@@ -13,6 +13,12 @@ def test_guidance_resolves_irregular_shapes_without_optimized_code():
         assert '@triton.jit' not in str(result)
 
 
+def test_shared_guidance_keeps_task_specific_tuning_out_of_generic_rules():
+    text = ' '.join(guidance(experiment()['cases']['23'])['rules']).lower()
+    assert 'layernorm' not in text and 'padded vector extent' not in text
+    assert VERSION != 'native-triton-2026-11-22-v1'
+
+
 def test_context_keeps_diagnostics_but_does_not_repeat_generated_review_source():
     original=[dict(attempt=2,result=dict(status='incorrect',error='wrong mask'),
                    review=dict(source='large regenerated module',diagnosis='cover full row'),

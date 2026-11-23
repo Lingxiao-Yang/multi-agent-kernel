@@ -130,8 +130,12 @@ class Wrapper:
         if isinstance(node,ast.Constant):
             return 'scalar'
         if isinstance(node,ast.Attribute):
-            if dotted(node) in {'torch.'+dtype for dtype in (
-                    'bfloat16','float16','float32','float64','bool','uint8','int8','int16','int32','int64')}:
+            namespace = dotted(node.value)
+            if namespace in ('torch','tl','triton.language') and node.attr in (
+                    'bfloat16','float16','float32','float64','uint8','int8','int16','int32','int64'):
+                return 'scalar'
+            if (namespace == 'torch' and node.attr == 'bool') or (
+                    namespace in ('tl','triton.language') and node.attr in ('int1','uint16','uint32','uint64')):
                 return 'scalar'
             kind = self.expression(node.value,scope)
             if tensor(kind) and node.attr in ('shape','ndim','dtype','device','is_cuda'):

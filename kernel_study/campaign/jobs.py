@@ -89,7 +89,7 @@ def run_job(args, plan, case_id, agent, seed):
     protocol = read_json(ROOT/'configs/protocol.json')
     protocol.update(plan['timing'],candidate_cap=cap, call_cap=calls, model=args.model,
                     endpoint=args.endpoint,input_usd_per_million=args.input_price,output_usd_per_million=args.output_price,
-                    worker_timeout_s=600,search_space='native',
+                    worker_timeout_s=600,search_space='native',feedback_mode='timing-and-ncu',
                     full_calibration=args.phase=='calibration',shared_api_guidance=VERSION,validation_seeds=plan['validation_seeds'],
                     final_validation_seeds=plan['final_validation_seeds'])
     ledger = Ledger(args.output,output.name,cap,calls,args.input_price,args.output_price,

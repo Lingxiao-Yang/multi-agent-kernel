@@ -48,14 +48,25 @@ def task_inputs(case, seed):
 
 
 def test_source(case):
-    if case['public_id']==4:
-        test = (upstream('KernelAgent')/'examples/optimize_01_matvec/test.py').read_text()
-    else:
-        test = ('import torch\nfrom kernel import kernel_function\nfrom kernel_study.tasks import kernelbench as p\n'
-                'from kernel_study.judge.correctness import check_forward\n'
-                'def test_kernel():\n    with torch.no_grad():\n'
-                f"        case = p.experiment()['cases'][{str(case['public_id'])!r}]\n"
-                "        model, inputs, buffers = p.task_inputs(case,101)\n"
-                "        check_forward(kernel_function,buffers,model(*inputs),case)\n"
-                "    return True\nif __name__ == '__main__':\n    test_kernel()\n    print('PASS')\n")
-    return test
+    return f"""from pathlib import Path
+from kernel_study.judge.policy import check_source
+
+check_source(Path(__file__).with_name('kernel.py').read_text())
+
+import torch
+from kernel import kernel_function
+from kernel_study.tasks import kernelbench
+from kernel_study.judge.correctness import check_forward
+
+def test_kernel():
+    plan = kernelbench.experiment()
+    case = plan['cases'][{str(case['public_id'])!r}]
+    with torch.no_grad():
+        model, inputs, buffers = kernelbench.task_inputs(case, plan['validation_seeds'][0])
+        check_forward(kernel_function, buffers, model(*inputs), case)
+    return True
+
+if __name__ == '__main__':
+    test_kernel()
+    print('PASS')
+"""

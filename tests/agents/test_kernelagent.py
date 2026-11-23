@@ -9,22 +9,13 @@ from kernel_study.providers import MeteredChat
 from kernel_study.records import event
 
 
-def test_matvec_timeout_only_changes_the_initial_worker():
-    from kernel_study.agents.kernelagent import matvec_test_timeout
-
-    class Worker:
-        test_timeout_s = 30
-
-        def __init__(self, worker_id):
-            self.worker_id = worker_id
-
-        @matvec_test_timeout
-        def run_test(self):
-            return self.test_timeout_s
-
-    initial, candidate = Worker(-1), Worker(0)
-    assert initial.run_test() == 180
-    assert candidate.run_test() == initial.test_timeout_s == 30
+@pytest.mark.upstream
+def test_adapter_preserves_upstream_verification_method(tmp_path):
+    from triton_kernel_agent.worker import VerificationWorker
+    from types import SimpleNamespace
+    verify = VerificationWorker._run_test
+    with native_adapters(SimpleNamespace(model='test-model'), 11, tmp_path):
+        assert VerificationWorker._run_test is verify
 
 
 @pytest.mark.parametrize('visible,expected', [(None, 0), ('1,0', 1), ('GPU-abc', 'GPU-abc')])
@@ -81,11 +72,11 @@ def test_pinned_upstream_proposal_and_repair_use_distinct_attempt_files(tmp_path
         generate = OptimizationOrchestrator._generate_optimized_kernel
         assert generate(orchestrator,'make a proposal',1)==first
         assert worker._refine_kernel(first,{'stderr':'test failure'},'pointwise','check output')==second
-        assert generate(orchestrator,'try a different kernel',2) is None
+        assert generate(orchestrator,'try a different kernel',2)==rejected
         assert generate(orchestrator,'try another proposal',3) is None
         assert [(tmp_path/f'proposal_{i:03d}.py').read_text() for i in (1,2,3,4)] == [first,second,rejected,'']
-        failures = [e for e in map(json.loads,(tmp_path/'candidates.jsonl').read_text().splitlines()) if e['event']=='static_rejected']
-        assert len(failures)==1 and failures[0]['attempt']==3 and 'torch.sin' in failures[0]['reason']
+        extracted = [e for e in map(json.loads,(tmp_path/'candidates.jsonl').read_text().splitlines()) if e['event']=='extracted']
+        assert [e['attempt'] for e in extracted]==[1,2,3,4]
         assert native_outcome(tmp_path, ledger.summary(), {'total_rounds':2}, {'candidate_id':0})[0]=='complete'
         worker._extract_code_from_response(first)
         assert native_outcome(tmp_path, ledger.summary(), {'total_rounds':2}, {'candidate_id':0})[0]=='invalid'

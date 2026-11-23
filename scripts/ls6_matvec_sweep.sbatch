@@ -17,4 +17,7 @@ source "$archive/venv/bin/activate"
 cd "$work/project"
 export PYTHONNOUSERSITE=1 OMP_NUM_THREADS=1 KERNEL_BASELINE_UPSTREAM="$archive/upstream"
 export PYTHONPATH="$PWD:$KERNEL_BASELINE_UPSTREAM/KernelAgent"
+if ! timeout 8m python -m scripts.check_matvec_feedback "$work/feedback-$SLURM_JOB_ID"; then
+    echo 'Feedback check did not complete. See the verification records and stderr.' >&2
+fi
 exec python -m scripts.sweep_matvec "$work/results-$SLURM_JOB_ID"

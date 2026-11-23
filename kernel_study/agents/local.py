@@ -105,9 +105,10 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history_context(history) if shared_guidance else history,
-                   'knowledge_cards':cards, 'hardware':manifest['environment'],
-                   'starting_module':source_text,
+                   'knowledge_cards':cards, 'hardware':dict(manifest['environment'],specs=kernelbench.experiment()['gpu_specs']),
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
+        if incumbent['id'] != 0:
+            context['starting_module'] = source_text
         candidate = None
         if shared_guidance:
             context['shared_api_guidance'] = shared_guidance

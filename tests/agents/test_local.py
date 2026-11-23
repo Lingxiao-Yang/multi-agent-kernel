@@ -45,7 +45,9 @@ def test_single_receives_shared_files_and_accepts_a_launch_only_change(tmp_path,
     baseline = start(case)
     class NativeProvider(SourceProvider):
         def complete(self, system, context, stage, seed):
-            assert context['starting_module'] == baseline
+            assert context['incumbent']['source'] == baseline
+            assert 'starting_module' not in context
+            assert context['hardware']['specs'] == local.kernelbench.experiment()['gpu_specs']
             assert context['case']['problem'] == case['problem'] and context['case']['test'] == case['test']
             assert 'launch_contract' not in context and 'config' not in context['incumbent']
             self.source = baseline.replace('num_warps=4','num_warps=2')

@@ -13,7 +13,6 @@ from unittest.mock import patch
 from ..budget import interruption
 from ..judge.evaluate import run_worker
 from ..judge.select import screen_candidate, select_final
-from ..judge.policy import StaticRejection, check_source
 from ..records import digest, environment, event, write_json
 from ..tasks import kernelbench
 
@@ -28,18 +27,8 @@ def worker_gpu():
     return int(visible) if visible.isdecimal() else visible
 
 
-def matvec_test_timeout(run_test):
-    @functools.wraps(run_test)
-    def verify(worker):
-        if worker.worker_id == -1:
-            with patch.object(worker, 'test_timeout_s', max(180, worker.test_timeout_s)):
-                return run_test(worker)
-        return run_test(worker)
-    return verify
-
-
 @contextmanager
-def native_adapters(provider, seed, output, *, matvec=False):
+def native_adapters(provider, seed, output):
     from triton_kernel_agent.opt_worker_component.orchestrator.optimization_orchestrator import OptimizationOrchestrator
     from kernel_perf_agent.kernel_opt.diagnose_prompt import gpu_specs
     from triton_kernel_agent.worker import VerificationWorker
@@ -86,12 +75,6 @@ def native_adapters(provider, seed, output, *, matvec=False):
             return None
         event(output/'candidates.jsonl','extracted',attempt=index,round=round_number.get(),stage=stage.get(),
               source_hash=digest(code) if code else None,budget=usage)
-        if code:
-            try:
-                check_source(code)
-            except StaticRejection as exc:
-                event(output/'candidates.jsonl','static_rejected',attempt=index,reason=str(exc))
-                return None
         return code
 
     provider_config = ModelConfig(provider.model,[Transport])
@@ -104,9 +87,6 @@ def native_adapters(provider, seed, output, *, matvec=False):
                                              {**gpu_specs.GPU_SPECS_DATABASE,specs['name']:specs}))
         adapters.enter_context(patch.dict(os.environ))
         os.environ.pop('OPENAI_API_KEY',None)
-        if matvec:
-            adapters.enter_context(patch.object(VerificationWorker, '_run_test',
-                                                matvec_test_timeout(VerificationWorker._run_test)))
         for owner,method,label in [(OptimizationOrchestrator,'_generate_optimized_kernel','proposal'),
                                    (VerificationWorker,'_refine_kernel','repair')]:
             adapters.enter_context(patch.object(owner,method,tagged(getattr(owner,method),label)))
@@ -152,7 +132,7 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
                 log_dir=output/'greedy',
                 database_path=output/'greedy/program_db.json')
     if protocol.get('full_calibration'): opts['strategy_config'] = {'max_no_improvement':rounds}
-    with native_adapters(provider, seed, output, matvec=(case['public_id']==4)):
+    with native_adapters(provider, seed, output):
         manager = native_manager()(**opts)
         native = manager.run_optimization(initial_kernel=starter.read_text(),problem_file=problem,
                                           test_code=test,max_rounds=rounds)

@@ -1,5 +1,6 @@
 """Validate and measure a candidate in its own process."""
 import argparse
+import logging
 import os
 import subprocess
 import sys
@@ -11,7 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from ..records import ROOT, environment, read_json, write_json
-from ..tasks.kernelbench import experiment, load_module, task_inputs
+from ..tasks.kernelbench import experiment, load_module, task_inputs, task_path
 from ..tasks.starts import load_native
 from . import timing
 from .correctness import check_forward, fp64_chunks, stress_input
@@ -21,6 +22,19 @@ from .policy import StaticRejection, check_source
 def bind(source, buffers):
     native = load_native(source)
     return lambda: native(*buffers)
+
+
+def ncu_evidence(source, problem, directory):
+    from kernel_perf_agent.kernel_opt.roofline.ncu_roofline import RooflineAnalyzer
+    from triton_kernel_agent.opt_worker_component.profiling.kernel_profiler import KernelProfiler
+    directory.mkdir(parents=True, exist_ok=True)
+    profiler = KernelProfiler(logging.getLogger(__name__), directory, directory)
+    sampled = profiler.profile_kernel(source, problem, round_num=0, max_retries=1)
+    if sampled is None or not sampled.metrics:
+        raise RuntimeError(f'no NCU measurements in {directory}')
+    (last_kernel,) = sampled.metrics.values()
+    return dict(metrics=sampled.metrics, roofline=RooflineAnalyzer().analyze(last_kernel).to_dict(),
+                kernel_selection='last')
 
 
 def compile_resources(module, buffers):
@@ -135,6 +149,12 @@ def main():
         for path in {request['source'],request.get('incumbent_source', request['source'])}:
             check_source(Path(path).read_text())
         result = evaluate(request)
+        if request.get('profile') and request['protocol'].get('feedback_mode') == 'timing-and-ncu':
+            import torch
+            torch.cuda.empty_cache()
+            directory = Path(args.output).with_suffix('.ncu')
+            result['profile']['ncu'] = ncu_evidence(Path(request['source']), task_path(request['case']), directory)
+            result['profile']['mode'] = 'compiler-resources-and-ncu'
     except StaticRejection as exc:
         result = dict(status='static_rejected',error=str(exc),worker_seconds=time.perf_counter()-start)
     except Exception as exc:

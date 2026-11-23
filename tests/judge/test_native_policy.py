@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from kernel_study.judge.policy import check_source
@@ -8,6 +10,13 @@ from kernel_study.tasks.starts import start
 @pytest.mark.parametrize('case', list(experiment()['cases'].values()))
 def test_registered_native_programs_pass(case):
     check_source(start(case))
+
+
+def test_archived_matvec_wrapper_accepts_triton_dtype_constants():
+    source = (Path(__file__).parent/'fixtures/matvec_dtype_constants.py').read_text()
+    check_source(source)
+    with pytest.raises(ValueError):
+        check_source(source.replace('ACC_DTYPE = tl.float32','ACC_DTYPE = tl.exp(1.0)'))
 
 
 BASE = '''import torch
