@@ -3,7 +3,6 @@ import subprocess
 
 from ..judge.correctness import check_forward
 from ..judge.evaluate import validate
-from ..judge.interface import local_forward, render_native
 from ..judge.timing import calibrate, check_noise, first_call, time_pair
 from ..records import digest, environment, read_json, write_json
 from ..tasks import kernelbench, starts
@@ -45,25 +44,20 @@ def run(case, phase, directory, plan):
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.cuda.reset_peak_memory_stats()
     seed = plan['preflight_seeds'][int(phase=='hold')]
-    source, config = starts.start(case)
-    path = directory/'device.py'
-    path.write_text(source)
+    source = starts.start(case)
     native_path = directory/'input.py'
-    native_path.write_text(kernelbench.matvec_path().read_text() if case['public_id']==4 else
-                           render_native(case,source,config))
+    native_path.write_text(source)
     protocol = plan['timing']
-    result = dict(case=case,seed=seed,protocol=protocol,launch=config,device_source_hash=digest(source),
-                  native_source_hash=digest(native_path.read_text()),problem_hash=digest(kernelbench.task_path(case).read_text()))
+    result = dict(case=case,seed=seed,protocol=protocol,native_source_hash=digest(source),
+                  problem_hash=digest(kernelbench.task_path(case).read_text()))
     if phase == 'stress':
-        result['checks'] = {}
-        for interface, source_path in [('native',native_path),('declarative',path)]:
-            result['checks'][interface],_ = validate(case,source_path,config,interface,[seed],True)
+        checks,_ = validate(case,native_path,[seed],True)
+        result['checks'] = {'native':checks}
         result['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
         return result
     model, inputs, buffers = kernelbench.task_inputs(case,seed)
     native = starts.load_native(native_path)
     forward = lambda: native(*buffers)
-    local = local_forward(case,path,config,buffers)
     eager = lambda: model(*inputs)
     if phase == 'hand':
         kernelbench.upstream('tritonbench')
@@ -81,24 +75,18 @@ def run(case, phase, directory, plan):
         compiled = torch.compile(model, mode=plan['compile_mode'],fullgraph=True)
         compiled_forward = lambda: compiled(*inputs)
         result['checks'], result['timings'] = {}, {}
-        for label,fn in [('native',forward),('local',local),('compile',compiled_forward),('eager',eager)]:
+        for label,fn in [('native',forward),('compile',compiled_forward),('eager',eager)]:
             value, seconds = first_call(fn)
             del value
             result['checks'][label] = check_forward(lambda *args: fn(),buffers,expected,case)
             timed, base = time_pair(fn,forward,protocol)
             result['timings'][label] = dict(first_call_seconds=seconds,forward=timed,start=base,
                                             paired_speedup=base['median_ms']/timed['median_ms'])
-        if not torch.equal(local(),forward()):
-            raise AssertionError('starting interfaces returned different values')
-        result['identical_outputs'] = True
     elif phase == 'calibrate':
         result.update(calibrate(forward,protocol,20))
     else:
         threshold = read_json(directory/'calibrate.json')['threshold']
         result['self'] = check_noise(forward,forward,protocol,20,threshold)
-        result['interfaces'] = check_noise(local,forward,protocol,1,threshold)
-        ratios = result['interfaces']['trials'][0]['ratios']
-        result['interface_agreement'] = not (min(ratios)>threshold or min(1/r for r in ratios)>threshold)
     result['peak_allocated_bytes'] = torch.cuda.max_memory_allocated()
     result['peak_reserved_bytes'] = torch.cuda.max_memory_reserved()
     return result

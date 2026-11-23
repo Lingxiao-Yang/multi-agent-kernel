@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 
-def test_batch_runs_both_searches_after_key_free_preflight(tmp_path):
+def test_batch_runs_only_native_single_after_key_free_preflight(tmp_path):
     script = Path(__file__).resolve().parents[2] / 'scripts/ls6_matvec_smoke.sbatch'
     (tmp_path / 'venv/bin').mkdir(parents=True)
     (tmp_path / 'venv/bin/activate').write_text('export PATH="$SLURM_SUBMIT_DIR/venv/bin:$PATH"\n')
@@ -29,9 +29,9 @@ def test_batch_runs_both_searches_after_key_free_preflight(tmp_path):
     assert preflight == [('preflight', False), ('stress', False)]
     assert any(argv[0].endswith('/probe_counters.py') and not key for argv, key in calls)
     searches = [(argv, key) for argv, key in calls if 'run' in argv]
-    assert [argv[argv.index('--job')+1] for argv, _ in searches] == ['0', '1']
+    assert [argv[argv.index('--job')+1] for argv, _ in searches] == ['0']
     for argv, key in searches:
         assert key and argv[argv.index('run')+1] == 'smoke'
         assert argv[argv.index('--model')+1] == 'gpt-4.1-2025-04-14'
         assert argv[argv.index('--endpoint')+1] == 'https://api.openai.com/v1'
-        assert argv[argv.index('--output')+1] == str(tmp_path/'campaign')
+        assert argv[argv.index('--output')+1] == str(tmp_path/'campaign-native')

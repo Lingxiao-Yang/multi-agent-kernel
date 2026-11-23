@@ -33,8 +33,9 @@ def test_native_run_with_only_rejected_proposals_reaches_the_phase_report(tmp_pa
                 assert OptimizationOrchestrator._generate_optimized_kernel(obj,'make a proposal',number) is None
             return dict(success=False,total_rounds=2,kernel_code=None)
 
+    replies = iter(('No source this round.', 'import torch\ndef kernel_function(x): return torch.sin(x)'))
     def response(*args,**kwargs):
-        return io.BytesIO(json.dumps({'model':'test-model','choices':[{'message':{'content':'No source this round.'}}],
+        return io.BytesIO(json.dumps({'model':'test-model','choices':[{'message':{'content':next(replies)}}],
             'usage':{'prompt_tokens':10,'completion_tokens':5}}).encode())
     monkeypatch.setattr(urllib.request,'urlopen',response)
     monkeypatch.setattr(campaign,'native_manager',lambda:FailedProposals)
@@ -51,3 +52,4 @@ def test_native_run_with_only_rejected_proposals_reaches_the_phase_report(tmp_pa
     assert greedy['fallback'] and not greedy['correct_new'] and greedy['budget']['attempts']==2
     report=compare([dict(greedy,agent='single'),greedy],[4],[11],{(4,11):measurement})
     assert report['paired_searches']==1 and report['fallbacks']['greedy']==1
+    assert report['rejections']['greedy']['static_check']==1

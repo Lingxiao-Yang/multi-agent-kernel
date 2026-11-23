@@ -30,24 +30,18 @@ The multi-agent variants assign four specialist role prompts instead. Review
 is advisory only; the automated harness alone decides which candidates to
 keep.
 
-**Search space (revised after the configuration-only A100 pilot).** New model
-runs default to `source-v1`. Only the baseline kernels for the current family
-are exposed. The agent must return complete Triton source plus a declarative
-sequence of one to four launches. Function names, signatures, tiling, device
-algorithms and fusion boundaries may change. There are no `fused` or
-`tensor_core` switches and no supplied optimized implementations in the prompt.
-The trusted harness resolves buffers/scalars and launches the authored kernels;
-host Python, allocations, references and timing remain outside model control.
+**Search space.** In the public baseline comparison, both agents receive the
+same complete starting module, problem file and verification script. Each
+candidate defines `kernel_function` and one or more Triton kernels. The wrapper
+checks metadata, allocates output and workspace, launches kernels and returns
+the computed output. Mathematical operations belong inside Triton kernels.
 
-Null source and changes only to configuration, literals or identifiers consume
-an attempt and are rejected. An AST screen checks launched device bodies, but
-does not prove semantic novelty: retained source diffs must also be inspected.
-Failed proposals, source and diagnostics remain in the record. The previous
-proposal is available for repair, with repairs consuming the same attempt budget.
-
-The old `parameter-control` mode remains available explicitly. Job 3582416 is
-a configuration-selection control, not evidence of agent-authored kernel
-optimization. Its cohort must never be pooled with `source-v1` results.
+The common evaluator screens both agents before loading a module. It records the
+reason when a candidate calls a host compute operator, mutates an input or keeps
+state across calls. An unchanged starting program consumes an attempt. Changes
+to constants and launch parameters are eligible. The original proposal,
+diagnostics and any subsequent charged repair are preserved. The historical
+configuration-only and launch-plan runs keep their original protocols.
 
 ## Validation and timing
 
@@ -64,14 +58,16 @@ case in `configs/cases.json`. All tensors are contiguous.
 **Reference checks.**
 
 - The trusted reference runs on cloned inputs.
-- Each candidate must overwrite deliberately poisoned output buffers.
+- Each invocation returns a candidate-allocated output. The judge compares the
+  entire tensor against the reference on fresh seeds and pressure inputs.
 - Inputs must be bitwise unchanged after the candidate runs.
 
 **Timing.**
 
 - Warm-up and the first launch are excluded from timing.
-- Candidate and baseline alternate in AB/BA order using CUDA events: 31
-  samples of 10 inner repetitions each.
+- Candidate and baseline alternate in AB/BA order using CUDA events. The
+  four-variant protocol uses 31 samples of 10 repetitions. The public A100
+  baseline protocol currently records 9 samples of one full forward.
 - The median and IQR are reported, and the raw samples are kept.
 
 **Acceptance.** A candidate is kept only if it is correct and beats the
@@ -94,8 +90,7 @@ candidates, the same for every variant. The actual number of attempts depends
 on failures and is logged.
 
 **Profiling.** Compiler resource usage is collected for the baseline and for
-each new incumbent, up to 21 invocations. Nsight counter access was verified on
-A100 job 3582405. The revised pilot freezes the common feedback mode to timing
+each new incumbent, up to 21 invocations. Nsight counter access was verified on the A100. The revised pilot freezes the common feedback mode to timing
 and compiler resources; per-candidate Nsight counters are not yet integrated.
 Hardware-counter bottleneck claims cannot be inferred from resource reports
 or speedups.

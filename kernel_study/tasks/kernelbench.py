@@ -1,6 +1,5 @@
 """Registered KernelBench tasks, upstream revisions and tensor layouts."""
 import importlib.util
-import math
 import os
 import subprocess
 from pathlib import Path
@@ -48,16 +47,15 @@ def task_inputs(case, seed):
     return model, inputs, inputs+parameters
 
 
-def layout(case):
-    shape = case['output_shape']
-    m, n = shape[0], math.prod(shape[1:])
-    scalars = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
-    names = ['X']
-    scratch = 2*m
-    if case['family'] in ('matmul','matvec'):
-        names, scalars['K'] = ['A','B'], case['k']
-    if case['family'] in ('softmax','layernorm'):
-        scratch = 2*m*(1 + (n+1023)//1024)
-    if case['family'] == 'layernorm':
-        names += ['W','B']
-    return names,scalars,scratch
+def test_source(case):
+    if case['public_id']==4:
+        test = (upstream('KernelAgent')/'examples/optimize_01_matvec/test.py').read_text()
+    else:
+        test = ('import torch\nfrom kernel import kernel_function\nfrom kernel_study.tasks import kernelbench as p\n'
+                'from kernel_study.judge.correctness import check_forward\n'
+                'def test_kernel():\n    with torch.no_grad():\n'
+                f"        case = p.experiment()['cases'][{str(case['public_id'])!r}]\n"
+                "        model, inputs, buffers = p.task_inputs(case,101)\n"
+                "        check_forward(kernel_function,buffers,model(*inputs),case)\n"
+                "    return True\nif __name__ == '__main__':\n    test_kernel()\n    print('PASS')\n")
+    return test

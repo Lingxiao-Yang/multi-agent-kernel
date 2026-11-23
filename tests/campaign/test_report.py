@@ -7,6 +7,15 @@ from kernel_study.campaign.report import compare, phase_rows
 from kernel_study.records import write_json
 
 
+def test_rejection_reasons_are_counted_per_agent():
+    rows = [dict(case=4,seed=11,agent=a,status='complete',latency_ms=1.,correct_new=False,
+                 fallback=True,candidates=[{'status':s} for s in statuses])
+            for a,statuses in [('single',['static_rejected','incorrect']),('greedy',['static_rejected','compile_error','ok'])]]
+    reasons = compare(rows,[4],[11],{})['rejections']
+    assert reasons['single']['static_check'] == reasons['single']['numerical'] == 1
+    assert reasons['greedy']['static_check'] == reasons['greedy']['compilation'] == 1
+
+
 def test_report_remeasures_only_pairs_assigned_to_its_card(tmp_path,monkeypatch):
     monkeypatch.setattr(report,'experiment',lambda: {'development':[4],'development_seeds':[11,22]})
     monkeypatch.setattr(report,'check_device',lambda plan: {'uuid':'GPU-a'})
@@ -33,7 +42,8 @@ def test_retry_report_charges_both_runs_but_counts_one_search(tmp_path):
     for suffix, status, charge in [('', 'interrupted',.12),('-retry1','complete',.05)]:
         row=dict(agent='single',case=4,seed=11,status=status,stop_reason='transport' if not suffix else 'candidate_cap',
                  budget={'attempts':1},cost_usd=0. if not suffix else charge,committed_usd=charge,
-                 candidates=[{'attempt':1,'usd':charge}])
+                 candidates=[{'attempt':1,'usd':charge,'status':'static_rejected' if not suffix else 'ok',
+                              'selected':bool(suffix),'endpoint_status':'unconfirmed' if suffix else None}])
         write_json(tmp_path/(name+suffix)/'audit.json',row)
     rows,attempts,_=phase_rows(tmp_path,'development',[4],[11])
     assert len(rows)==1 and len(attempts)==2
@@ -41,6 +51,8 @@ def test_retry_report_charges_both_runs_but_counts_one_search(tmp_path):
     assert rows[0]['total_completed_usd']==pytest.approx(.05)
     assert rows[0]['total_attempts']==2
     assert rows[0]['matched_candidates'][0]['attempt']==2
+    rejected = compare(rows,[4],[11],{})['rejections']['single']
+    assert rejected['static_check'] == rejected['unconfirmed'] == 1
 
 
 def pairs(rows):

@@ -12,7 +12,8 @@ from unittest.mock import patch
 
 from ..budget import interruption
 from ..judge.evaluate import run_worker
-from ..judge.select import select_final
+from ..judge.select import screen_candidate, select_final
+from ..judge.policy import StaticRejection, check_source
 from ..records import digest, environment, event, write_json
 from ..tasks import kernelbench
 
@@ -74,7 +75,7 @@ def native_adapters(provider, seed, output, *, matvec=False):
         code = extract(worker,*args,**kwargs)
         if stage.get() not in ('proposal','repair'):
             event(output/'candidates.jsonl','unattributed_extraction')
-            return code
+            return None
         usage = provider.ledger.summary()
         index = usage['attempts']
         try:
@@ -82,9 +83,15 @@ def native_adapters(provider, seed, output, *, matvec=False):
                 source.write(code or '')
         except FileExistsError:
             event(output/'candidates.jsonl','duplicate_extraction',attempt=index)
-            return code
+            return None
         event(output/'candidates.jsonl','extracted',attempt=index,round=round_number.get(),stage=stage.get(),
               source_hash=digest(code) if code else None,budget=usage)
+        if code:
+            try:
+                check_source(code)
+            except StaticRejection as exc:
+                event(output/'candidates.jsonl','static_rejected',attempt=index,reason=str(exc))
+                return None
         return code
 
     provider_config = ModelConfig(provider.model,[Transport])
@@ -134,19 +141,10 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
     started = time.perf_counter()
     output.mkdir(parents=True,exist_ok=False)
     problem = output/'problem.py'
-    shutil.copyfile(kernelbench.task_path(case),problem)
+    problem.write_text(case['problem'] if 'problem' in case else kernelbench.task_path(case).read_text())
     starter = output/'baseline.py'
     shutil.copyfile(preflight/'input.py',starter)
-    if case['public_id']==4:
-        test = (root/'examples/optimize_01_matvec/test.py').read_text()
-    else:
-        test = ('import torch\nfrom kernel import kernel_function\nfrom kernel_study.tasks import kernelbench as p\n'
-                'from kernel_study.judge.correctness import check_forward\n'
-                'def test_kernel():\n    with torch.no_grad():\n'
-                f"        case = p.experiment()['cases'][{str(case['public_id'])!r}]\n"
-                "        model, inputs, buffers = p.task_inputs(case,101)\n"
-                "        check_forward(kernel_function,buffers,model(*inputs),case)\n"
-                "    return True\nif __name__ == '__main__':\n    test_kernel()\n    print('PASS')\n")
+    test = case['test'] if 'test' in case else kernelbench.test_source(case)
     (output/'test.py').write_text(test)
     opts = dict(config=str(root/'examples/configs/greedy.yaml'),num_workers=1,gpu_ids=[worker_gpu()],
                 gpu_name=kernelbench.experiment()['gpu'],openai_model=provider.model,
@@ -173,11 +171,13 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
     for source in candidates:
         i = int(source.stem.split('_')[1])
         req = dict(case=case,source=str(source),interface='native',incumbent_source=str(starter),protocol=protocol)
-        result = run_worker(req,output,f'candidate_{i:03}') if source.stat().st_size else {'status':'no_submission'}
+        result = screen_candidate(source.read_text(),starter.read_text())
+        if result is None:
+            result = run_worker(req,output,f'candidate_{i:03}')
         if result['status']=='ok':
-            eligible.append(dict(id=i, source=str(source), config=None))
+            eligible.append(dict(id=i, source=str(source)))
         history.append(dict(attempt=i,source_hash=digest(source.read_text()),result=result))
-    start = dict(id=0, source=str(starter), config=None)
+    start = dict(id=0, source=str(starter))
     final, selection = select_final(output, case, protocol, 'native', start, eligible)
     native_choices = [starter, *candidates]
     proposed = next((p for p in native_choices if selected and p.read_text()==selected),None)

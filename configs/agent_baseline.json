@@ -26,12 +26,12 @@
   "timing": {"warmup": 3, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
   "compile_mode": "max-autotune-no-cudagraphs",
   "phases": {
-    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 16, "single_call_cap": 4},
+    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
     "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128},
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}
   },
-  "historical_cost_usd": 13.4122396,
+  "historical_cost_usd": 13.4980436,
   "total_budget_usd": 25,
   "cases": {
     "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},

@@ -8,6 +8,19 @@ from .jobs import job_name, latest_attempt
 from .preflight import check_device
 
 
+def rejection_counts(candidates):
+    counts = dict.fromkeys(('static_check','compilation','numerical','unconfirmed'),0)
+    categories = {'static_rejected':'static_check', 'compile_error':'compilation',
+                  'incorrect':'numerical', 'unconfirmed':'unconfirmed'}
+    for candidate in candidates:
+        status = candidate.get('endpoint_status') or candidate['status']
+        if status=='ok' and candidate.get('selected') is False:
+            status = 'unconfirmed'
+        if status in categories:
+            counts[categories[status]] += 1
+    return counts
+
+
 def compare(rows, cases, seeds, measurements):
     keyed = {(r['case'],r['seed'],r['agent']):r for r in rows}
     if len(keyed)!=len(rows): raise ValueError('duplicate search')
@@ -35,7 +48,12 @@ def compare(rows, cases, seeds, measurements):
     elif ratio>1.10 and abs(fallbacks['single']-fallbacks['greedy'])==1: decision = 'pending-fallback-remeasurement'
     elif valid['single']>=valid['greedy'] and ratio<=1.10: decision = 'passes'
     else: decision = 'below-criterion'
-    return dict(complete=complete,paired_searches=paired,tasks=tasks,ratio=ratio,correct_new=valid,
+    rejections = {agent:rejection_counts([]) for agent in valid}
+    for row in rows:
+        counts = row['rejections'] if 'rejections' in row else rejection_counts(row.get('candidates',[]))
+        for category,count in counts.items():
+            rejections[row['agent']][category] += count
+    return dict(rejections=rejections,complete=complete,paired_searches=paired,tasks=tasks,ratio=ratio,correct_new=valid,
                 fallbacks=fallbacks,decision=decision)
 
 
@@ -75,6 +93,7 @@ def phase_rows(root, phase, cases, seeds):
                         row['total_completed_usd'] = sum(item['cost_usd'] for item in records)
                         previous_attempts = sum(item['budget']['attempts'] for item in records[:-1])
                         row['total_attempts'] = previous_attempts + row['budget']['attempts']
+                        row['rejections'] = rejection_counts(c for run in records for c in run['candidates'])
                         row['matched_candidates'] = [dict(c, usd=previous_cost+c['usd'],attempt=previous_attempts+c['attempt'])
                                                      for c in row['candidates']]
                         rows.append(row)

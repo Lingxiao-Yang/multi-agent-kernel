@@ -20,8 +20,8 @@ from .preflight import check_device
 def jobs(plan, phase):
     if phase in ('smoke','calibration'):
         phase_plan = plan['phases'][phase]
-        agents = ('greedy','single') if phase=='smoke' else ('greedy',)
-        return [(phase_plan['case'],agent,phase_plan['seed']) for agent in agents]
+        agent = 'single' if phase=='smoke' else 'greedy'
+        return [(phase_plan['case'],agent,phase_plan['seed'])]
     pairs = [(case,seed) for case in plan[phase] for seed in plan[phase+'_seeds']]
     rng = random.Random(20261121)
     rng.shuffle(pairs)
@@ -75,37 +75,37 @@ def run_job(args, plan, case_id, agent, seed):
     baseline = args.preflight/str(case_id)
     frozen = read_json(baseline/'preflight.json')
     stress = read_json(baseline/'stress.json')
-    identity = ('device_source_hash','native_source_hash','problem_hash','launch')
-    if any(stress[k]!=frozen[k] for k in identity) or set(stress['checks'])!={'native','declarative'}:
+    identity = ('native_source_hash','problem_hash')
+    if any(stress[k]!=frozen[k] for k in identity) or not stress['checks'].get('native'):
         raise ValueError('public pressure checks belong to different starts')
-    if not frozen['identical_outputs']:
-        raise ValueError('starting interfaces produced different outputs')
+    if 'native' not in frozen['checks']:
+        raise ValueError('missing native preflight checks')
     register(args.output,f'case-{case_id}-preflight',dict(preflight=digest(frozen),stress=digest(stress)))
-    case = dict(plan['cases'][str(case_id)],id=f'level1_{case_id}',problem=kernelbench.task_path(plan['cases'][str(case_id)]).read_text())
-    _, dims, _ = kernelbench.layout(case)
-    case['shape'] = [dims['M'],dims['N']] + ([dims['K']] if 'K' in dims else [])
+    case = dict(plan['cases'][str(case_id)], id=f'level1_{case_id}')
+    case['problem'] = kernelbench.task_path(case).read_text()
+    case['test'] = kernelbench.test_source(case)
     phase = plan['phases'][args.phase]
-    cap, calls, rounds = phase['candidate_cap'],phase.get(f'{agent}_call_cap',phase['call_cap']),phase['rounds']
+    cap, calls, rounds = phase['candidate_cap'],phase['call_cap'],phase['rounds']
     protocol = read_json(ROOT/'configs/protocol.json')
     protocol.update(plan['timing'],candidate_cap=cap, call_cap=calls, model=args.model,
                     endpoint=args.endpoint,input_usd_per_million=args.input_price,output_usd_per_million=args.output_price,
-                    worker_timeout_s=600,search_space='source-v1',
+                    worker_timeout_s=600,search_space='native',
                     full_calibration=args.phase=='calibration',shared_api_guidance=VERSION,validation_seeds=plan['validation_seeds'],
                     final_validation_seeds=plan['final_validation_seeds'])
     ledger = Ledger(args.output,output.name,cap,calls,args.input_price,args.output_price,
                     plan['total_budget_usd']-plan['historical_cost_usd'])
     provider = MeteredChat(ledger,output,model=args.model,endpoint=args.endpoint,max_output_tokens=protocol['max_output_tokens'],
                            temperature=protocol['temperature'],input_price=args.input_price,output_price=args.output_price)
-    if digest((baseline/'input.py').read_text()) != frozen['native_source_hash'] or digest(starts.start(case)[0]) != frozen['device_source_hash']:
+    if any(digest(source)!=frozen['native_source_hash'] for source in ((baseline/'input.py').read_text(),starts.start(case))):
         raise ValueError('starting code differs from preflight')
-    if digest(case['problem']) != frozen['problem_hash'] or starts.start(case)[1] != frozen['launch']:
-        raise ValueError('problem or launch differs from preflight')
+    if digest(case['problem']) != frozen['problem_hash']:
+        raise ValueError('problem differs from preflight')
     if agent=='single':
         result = search(case,'single',seed,protocol,provider,output)
     else:
         result = run_native(case,seed,protocol,provider,output,baseline,rounds)
     audit(output,agent)
-    if args.phase in ('smoke','development','holdout'):
+    if args.phase in ('development','holdout'):
         sides = [latest_attempt(args.output,job_name(args.phase,case_id,a,seed)) for a in ('single','greedy')]
         measured = measure_pair(args.output/'pairs'/f'{args.phase}-{case_id}-{seed}', *sides)
         if measured is not None and measured['status']!='ok':
@@ -137,18 +137,17 @@ def run_campaign(args, parser):
         except ValueError as exc:
             parser.error(str(exc))
     case_id,agent,seed = schedule[args.job]
-    if args.phase in ('smoke','development','holdout'):
+    if args.phase in ('development','holdout'):
         pair = args.output/'pairs'/f'{args.phase}-{case_id}-{seed}'
         pair.mkdir(parents=True,exist_ok=True)
         try:
             register(pair,'device',dict(uuid=device['uuid'],node=device['node']))
         except ValueError as exc:
             parser.error(str(exc))
-    if args.phase in ('calibration','development','holdout'):
-        smoke = read_json(latest_attempt(args.output,job_name('smoke',*jobs(plan,'smoke')[0]))/'summary.json')
-        if smoke['status']!='complete' or not any(h['result']['status']=='ok' for h in smoke['history']):
-            parser.error('a correct real smoke proposal is required')
     if args.phase in ('development','holdout'):
+        smoke = read_json(latest_attempt(args.output,job_name('smoke',*jobs(plan,'smoke')[0]))/'summary.json')
+        if smoke['status']!='complete' or not any(h['result']['status'] in ('ok','incorrect','compile_error') for h in smoke['history']):
+            parser.error('the native single smoke must reach GPU evaluation')
         calibration = read_json(latest_attempt(args.output,job_name('calibration',*jobs(plan,'calibration')[0]))/'summary.json')
         if calibration['status']!='complete' or calibration['upstream_rounds']!=plan['phases']['calibration']['rounds']:
             parser.error('matvec calibration incomplete')

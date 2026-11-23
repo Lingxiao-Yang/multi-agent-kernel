@@ -1,11 +1,11 @@
 #!/bin/bash -l
-#SBATCH -J matvec-pair
+#SBATCH -J matvec-single
 #SBATCH -p gpu-a100-small
 #SBATCH -N 1
 #SBATCH -n 1
 #SBATCH -t 02:00:00
-#SBATCH -o matvec-pair-%j.out
-#SBATCH -e matvec-pair-%j.err
+#SBATCH -o matvec-single-%j.out
+#SBATCH -e matvec-single-%j.err
 
 set -euo pipefail
 set +x
@@ -30,8 +30,6 @@ python "$PWD/project/scripts/probe_counters.py" "$PWD/counters.json"
 
 source "$HOME/.openai_env"
 export OPENAI_API_KEY
-for job in 0 1; do
-    study run smoke --job "$job" --preflight "$PWD/preflight" --output "$PWD/campaign" \
-        --counters "$PWD/counters.json" --model gpt-4.1-2025-04-14 \
-        --endpoint https://api.openai.com/v1 --input-price 2 --output-price 8
-done
+study run smoke --job 0 --preflight "$PWD/preflight" --output "$PWD/campaign-native" \
+    --counters "$PWD/counters.json" --model gpt-4.1-2025-04-14 \
+    --endpoint https://api.openai.com/v1 --input-price 2 --output-price 8

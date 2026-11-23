@@ -1,17 +1,14 @@
 import copy
 
 from kernel_study.agents.guidance import VERSION, guidance, history_context
-from kernel_study.tasks.kernelbench import experiment, layout
+from kernel_study.tasks.kernelbench import experiment
 
 
 def test_guidance_resolves_irregular_shapes_without_optimized_code():
     for case in experiment()['cases'].values():
-        _, dims, _ = layout(case)
-        case = dict(case, shape=[dims[k] for k in ('M', 'N', 'K') if k in dims])
-        result=guidance(case);s=result['resolved_scalars']
-        assert s['N']==case['shape'][1]
-        assert s['TOTAL']==case['shape'][0]*case['shape'][1]
-        assert s['RB']>=s['N'] and s['RB']&(s['RB']-1)==0
+        result=guidance(case)
+        assert result['output_shape']==case['output_shape']
+        assert 'resolved_scalars' not in result
         assert result['version']==VERSION
         assert '@triton.jit' not in str(result)
 

@@ -13,7 +13,8 @@ from kernel_study.records import ROOT, code_hashes, read_json
 class SourceProvider:
     name = 'test'
     model = 'test-model'
-    source = """import triton
+    source = """import torch
+import triton
 import triton.language as tl
 
 @triton.jit
@@ -21,16 +22,40 @@ def gelu(X, Y, TOTAL: tl.constexpr, BLOCK: tl.constexpr):
     i = tl.program_id(0)*BLOCK + tl.arange(0, BLOCK)
     x = tl.load(X+i, i<TOTAL, other=0.)
     tl.store(Y+i, x, i<TOTAL)
+
+def kernel_function(X):
+    Y = torch.empty_like(X)
+    gelu[(1,)](X, Y, X.numel(), 256)
+    return Y
 """
 
     def complete(self, system, context, stage, seed):
-        answer = dict(config=context['incumbent']['config'], source=self.source) if stage=='implement' else {}
+        answer = dict(source=self.source, rationale='tune the program') if stage=='implement' else {}
         return Reply(json.dumps(answer), 1, 1, self.model, {})
 
 
 @pytest.fixture
 def protocol():
-    return dict(read_json(ROOT/'configs/protocol.json'), search_space='source-v1', candidate_cap=2, call_cap=8)
+    return dict(read_json(ROOT/'configs/protocol.json'), search_space='native', candidate_cap=2, call_cap=8)
+
+
+def test_single_receives_shared_files_and_accepts_a_launch_only_change(tmp_path, monkeypatch, public_case, mock_environment, protocol):
+    from kernel_study.tasks.starts import start
+    case = dict(public_case,problem='pytorch task',test='correctness script')
+    baseline = start(case)
+    class NativeProvider(SourceProvider):
+        def complete(self, system, context, stage, seed):
+            assert context['starting_module'] == baseline
+            assert context['case']['problem'] == case['problem'] and context['case']['test'] == case['test']
+            assert 'launch_contract' not in context and 'config' not in context['incumbent']
+            self.source = baseline.replace('num_warps=4','num_warps=2')
+            return super().complete(system, context, stage, seed)
+    def worker(request, directory, label):
+        assert request['interface']=='native' and 'config' not in request
+        return measurement(confirmed='candidate_001' in request['source'])
+    mock_worker(monkeypatch, worker)
+    result = local.search(case,'single',11,dict(protocol,candidate_cap=1),NativeProvider(),tmp_path/'run')
+    assert result['final']['candidate_id']==1 and result['final']['interface']=='native'
 
 
 def mock_worker(monkeypatch, worker):
@@ -91,6 +116,7 @@ def test_fresh_final_validation_falls_back(tmp_path, monkeypatch, public_case, m
     result = local.search(public_case,'single',11,protocol,SourceProvider(),tmp_path/'run')
     assert result['history'][0]['accepted']
     assert checks==['audit_001','final_001','final_000']
+    assert result['selection'][0]['endpoint_status']=='incorrect'
     assert result['final']['candidate_id']==0 and result['speedup']==1
 
 
@@ -119,3 +145,18 @@ def test_source_search_rejects_null_source_and_counts_failed_attempts(tmp_path, 
     assert result['speedup']==1 and result['final']['candidate_id']==0
     assert contexts[-1][1]['proposed_candidate']['source'] is None
     assert 'previous_proposal' in contexts[4][1]
+
+
+def test_native_submission_requires_a_rationale(tmp_path, monkeypatch, public_case, mock_environment, protocol):
+    class NoRationale(SourceProvider):
+        def complete(self, system, context, stage, seed):
+            response = {'source':self.source} if stage=='implement' else {}
+            return Reply(json.dumps(response), 1, 1, self.model, {})
+    workers = []
+    def worker(request, directory, label):
+        workers.append(label)
+        return measurement()
+    mock_worker(monkeypatch, worker)
+    result = local.search(public_case,'single',11,dict(protocol,candidate_cap=1),NoRationale(),tmp_path/'run')
+    assert workers == ['baseline','final_000']
+    assert 'rationale' in result['history'][0]['result']['error']

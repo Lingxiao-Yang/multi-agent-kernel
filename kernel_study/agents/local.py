@@ -7,12 +7,11 @@ from pathlib import Path
 
 from ..budget import Budget, interruption
 from ..judge.evaluate import run_worker
-from ..judge.interface import contract, validate_plan
-from ..judge.select import select_final
+from ..judge.select import screen_candidate, select_final
 from ..records import ROOT, code_hashes, digest, environment, event, read_json, utcnow, write_json
+from ..tasks import kernelbench
 from ..tasks.starts import start
-from .edit_gate import CONTRACT, GATE_VERSION, check_edit
-from .guidance import VERSION, guidance, history_context
+from .guidance import CONTRACT, VERSION, guidance, history_context
 from .knowledge import select_cards
 
 GENERAL = ('You are a general GPU kernel optimizer. Use the supplied evidence to optimize the current incumbent. '
@@ -47,9 +46,14 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         if protocol['shared_api_guidance'] != VERSION:
             raise ValueError('unknown shared API guidance version')
         shared_guidance = guidance(case)
-    protocol = {**protocol, 'source_gate_version':GATE_VERSION}
-    source_text, base_config = start(case)
-    # Candidate source stores only the device module; trusted wrapper is never editable.
+    source_text = start(case)
+    case = dict(case)
+    if 'problem' not in case:
+        case['problem'] = kernelbench.task_path(case).read_text()
+    if 'test' not in case:
+        case['test'] = kernelbench.test_source(case)
+    (output/'problem.py').write_text(case['problem'])
+    (output/'test.py').write_text(case['test'])
     base_source = output / 'baseline.py'
     base_source.write_text(source_text, encoding='utf-8')
     budget = Budget(**{k:protocol[k] for k in ['candidate_cap','call_cap','token_safety_cap']})
@@ -64,13 +68,13 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
     if shared_guidance:
         write_json(output/'shared_api_guidance.json', shared_guidance)
     event(log, 'run_start', manifest=manifest)
-    request = {'case':case,'config':base_config,'source':str(base_source),'protocol':protocol,'library':True,'profile':True}
+    request = {'case':case,'interface':'native','source':str(base_source),'protocol':protocol,'library':True,'profile':True}
     base_result = run_worker(request, output, 'baseline')
     event(log, 'baseline', result=base_result)
     if base_result['status'] != 'ok':
         write_json(output/'summary.json', {'status':'baseline_failed','manifest':manifest,'budget':budget.snapshot()})
         return read_json(output/'summary.json')
-    incumbent = {'id':0, 'config':base_config, 'source':str(base_source), 'result':base_result}
+    incumbent = {'id':0, 'source':str(base_source), 'result':base_result}
     baseline = incumbent
     history = []
     last_proposal = None
@@ -98,11 +102,11 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         budget.reserve_attempt()
         attempt = budget.attempts
         cards = select_cards(case['family'], incumbent['result'].get('profile'), drop_category) if 'knowledge' in variant else []
-        context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],'config':incumbent['config'],
+        context = {'case':case,'attempt':attempt,'incumbent':{'id':incumbent['id'],
                    'source':Path(incumbent['source']).read_text(encoding='utf-8'), 'result':compact_result(incumbent['result'])},
                    'history':history_context(history) if shared_guidance else history,
                    'knowledge_cards':cards, 'hardware':manifest['environment'],
-                   'launch_contract':contract(case),
+                   'starting_module':source_text,
                    'api_documentation':['https://triton-lang.org/main/python-api/triton.language.html'], 'budget':budget.snapshot()}
         candidate = None
         if shared_guidance:
@@ -110,8 +114,8 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             context['stage_instructions'] = {
                 'analyze':'Inspect the current code and previous failure. Distinguish compiler/API mistakes, output coverage, and numerical errors from performance hypotheses.',
                 'advise':'Give a concise implementable plan. If the previous proposal failed, identify the exact repair and verify shape/constexpr/masking invariants before proposing more optimization.',
-                'implement':'Return complete source and launch config. Re-check all resolved dimensions and reduction invariants. Repairs consume this attempt; no unmeasured speedup claims.',
-                'review':'Return concise diagnosis, outcome, and next_step fields. Explain the measured result. Do not return source/config; only implement supplies executable proposals.'}
+                'implement':'Return the complete native module and a rationale. Check output coverage, strides and reduction precision. Repairs consume this attempt; no unmeasured speedup claims.',
+                'review':'Return concise diagnosis, outcome, and next_step fields. Explain the measured result. Only the implementation stage supplies an executable module.'}
         if last_proposal is not None:
             context['previous_proposal'] = last_proposal
         try:
@@ -120,30 +124,30 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             candidate = call('implement', context)
             last_proposal = dict(candidate)
             write_json(output / f'proposal_{attempt:03d}.json', candidate)
-            validate_plan(candidate['config'])
             text = candidate.get('source')
             if not isinstance(text, str) or not text.strip():
-                raise ValueError('source_edit_required: complete source string is mandatory')
-            (output / f'proposed_{attempt:03d}.py').write_text(text, encoding='utf-8')
-            edit = check_edit(text, candidate['config'], context['incumbent']['source'], incumbent['config'])
+                raise ValueError('source_edit_required: submit the complete native module')
             candidate_source = output / f'candidate_{attempt:03d}.py'
             candidate_source.write_text(text, encoding='utf-8')
+            if not isinstance(candidate.get('rationale'), str) or not candidate['rationale'].strip():
+                raise ValueError('provide a rationale for the change')
             candidate['source'] = str(candidate_source)
             candidate['id'], candidate['parent_id'] = attempt, incumbent['id']
-            result = run_worker({'case':case,'config':candidate['config'],'source':candidate['source'],
-                        'incumbent_config':incumbent['config'],'incumbent_source':incumbent['source'],
-                        'protocol':protocol}, output, f'candidate_{attempt:03d}')
+            result = screen_candidate(text,source_text)
+            if result is None:
+                result = run_worker({'case':case,'interface':'native','source':candidate['source'],
+                                     'incumbent_source':incumbent['source'],'protocol':protocol}, output, f'candidate_{attempt:03d}')
             accepted = result['status'] == 'ok' and result['confirmed']
             if accepted:
                 candidate['result'] = result
                 incumbent = candidate
                 if profile_count < protocol['profile_cap']:
-                    prof = run_worker({'case':case,'config':candidate['config'],'source':candidate['source'],
+                    prof = run_worker({'case':case,'interface':'native','source':candidate['source'],
                                       'protocol':protocol,'profile':True}, output, f'profile_{attempt:03d}')
                     profile_count += 1
                     result['profile'] = prof.get('profile', {'unavailable':prof['status']})
-            record = {'attempt':attempt,'parent_id':candidate['parent_id'],'config':candidate['config'],
-                      'source_hash':digest(text),'source_edit':edit,'rationale':candidate.get('rationale'), 'accepted':accepted,
+            record = {'attempt':attempt,'parent_id':candidate['parent_id'],'interface':'native',
+                      'source_hash':digest(text),'rationale':candidate.get('rationale'), 'accepted':accepted,
                       'previous_failure_attempt':history[-1]['attempt'] if history and history[-1]['result']['status']!='ok' else None,
                       'result':compact_result(result),'cards':[c['id'] for c in cards], 'budget':budget.snapshot()}
         except Exception as exc:
@@ -166,9 +170,9 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         write_json(output/'state.json', {'incumbent':incumbent,'history':history,'budget':budget.snapshot()})
         if stop:
             break
-    candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"), config=h['config'])
+    candidates = [dict(id=h['attempt'], source=str(output/f"candidate_{h['attempt']:03d}.py"))
                   for h in history if h['result']['status']=='ok']
-    final, selection = select_final(output, case, protocol, 'declarative', baseline, candidates)
+    final, selection = select_final(output, case, protocol, 'native', baseline, candidates)
     final_stop = stop or budget.stop_reason()
     completed_search = final_stop in ['candidate_cap','call_cap','token_safety_cap']
     summary = {'status':('complete' if completed_search else 'interrupted') if final else 'final_failed', 'manifest':manifest,

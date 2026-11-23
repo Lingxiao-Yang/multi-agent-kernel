@@ -63,15 +63,17 @@ def test_pinned_upstream_proposal_and_repair_use_distinct_attempt_files(tmp_path
     from triton_kernel_agent.worker import VerificationWorker
     from triton_kernel_agent.opt_worker_component.orchestrator.optimization_orchestrator import OptimizationOrchestrator
 
-    first = 'def kernel_function(x):\n    # Keep the input, then compute the elementwise result from the original value.\n    return x + 1'
-    second = first.replace('x + 1','x + 2')
-    replies = iter((first,second,'No candidate in this reply.'))
+    from kernel_study.tasks.starts import start
+    first = start({'family':'gelu'}).strip()
+    second = first.replace('num_warps=4','num_warps=2')
+    rejected = second.replace('return Y','return torch.sin(X)')
+    replies = iter((first,second,rejected,'No candidate in this reply.'))
     def response(*args,**kwargs):
         reply = {'model':'test-model','choices':[{'message':{'content':next(replies)}}],
                  'usage':{'prompt_tokens':40,'completion_tokens':20}}
         return io.BytesIO(json.dumps(reply).encode())
     monkeypatch.setattr(urllib.request,'urlopen',response)
-    ledger = Ledger(tmp_path,'callbacks',3,3,1.,1.,1.)
+    ledger = Ledger(tmp_path,'callbacks',4,4,1.,1.,1.)
     provider = MeteredChat(ledger,tmp_path,model='test-model',endpoint='http://localhost:1')
     with native_adapters(provider,11,tmp_path):
         worker = VerificationWorker(0,tmp_path,tmp_path,openai_model='test-model')
@@ -80,12 +82,15 @@ def test_pinned_upstream_proposal_and_repair_use_distinct_attempt_files(tmp_path
         assert generate(orchestrator,'make a proposal',1)==first
         assert worker._refine_kernel(first,{'stderr':'test failure'},'pointwise','check output')==second
         assert generate(orchestrator,'try a different kernel',2) is None
-        assert [(tmp_path/f'proposal_{i:03d}.py').read_text() for i in (1,2,3)] == [first,second,'']
+        assert generate(orchestrator,'try another proposal',3) is None
+        assert [(tmp_path/f'proposal_{i:03d}.py').read_text() for i in (1,2,3,4)] == [first,second,rejected,'']
+        failures = [e for e in map(json.loads,(tmp_path/'candidates.jsonl').read_text().splitlines()) if e['event']=='static_rejected']
+        assert len(failures)==1 and failures[0]['attempt']==3 and 'torch.sin' in failures[0]['reason']
         assert native_outcome(tmp_path, ledger.summary(), {'total_rounds':2}, {'candidate_id':0})[0]=='complete'
         worker._extract_code_from_response(first)
         assert native_outcome(tmp_path, ledger.summary(), {'total_rounds':2}, {'candidate_id':0})[0]=='invalid'
     calls=[e for e in map(json.loads,(tmp_path/'model_events.jsonl').read_text().splitlines()) if e['event']=='request']
-    assert [e['stage'] for e in calls]==['proposal','repair','proposal']
+    assert [e['stage'] for e in calls]==['proposal','repair','proposal','proposal']
 
 
 def test_exhausted_diagnostic_call_budget_keeps_a_zero_proposal_search(tmp_path):
