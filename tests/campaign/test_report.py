@@ -7,6 +7,15 @@ from kernel_study.campaign.report import compare, phase_rows
 from kernel_study.records import write_json
 
 
+def test_matvec_slice_report_includes_the_two_model_free_reference_times(tmp_path):
+    from kernel_study.cli import main
+    from kernel_study.records import read_json
+    main(['report','matvec-development',str(tmp_path)])
+    result = read_json(tmp_path/'matvec-development-report.json')
+    assert result['matvec_reference_ms']=={'random_best_of_four':4.10,'best_launch':3.17}
+    assert list(result['tasks'])==['4'] and result['decision']=='incomplete'
+
+
 def test_round_report_matches_parent_sources_and_keeps_upstream_timeout_separate(tmp_path):
     from kernel_study.records import digest
     (tmp_path/'baseline.py').write_text('start')

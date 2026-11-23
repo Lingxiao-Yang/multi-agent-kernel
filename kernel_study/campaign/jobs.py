@@ -20,6 +20,8 @@ from .preflight import check_device
 
 
 def jobs(plan, phase):
+    if phase=='matvec-development':
+        return [(4,agent,seed) for seed in plan['development_seeds'] for agent in ('greedy','single')]
     if phase=='matched-smoke':
         spec = plan['phases'][phase]
         return [(spec['case'],agent,spec['seed']) for agent in ('greedy','single')]
@@ -36,6 +38,10 @@ def jobs(plan, phase):
         rng.shuffle(agents)
         result.extend((case,agent,seed) for agent in agents)
     return result
+
+
+def phase_budget(plan, phase):
+    return plan['phases']['development' if phase=='matvec-development' else phase]
 
 
 def attempt_path(root, job, retry):
@@ -84,9 +90,13 @@ def check_single_evidence(directory, evidence, specs):
             if request['event'] != 'request':
                 continue
             prompt = json.loads(next(m['content'] for m in request['messages'] if m['role']=='user'))
+            if prompt['incumbent'].get('id',0) != 0:
+                continue
             ncu = prompt['incumbent']['result'].get('profile',{}).get('ncu',{})
-            stages[request['stage']] = (ncu.get('metrics')==evidence['metrics'] and
-                                        ncu.get('roofline')==evidence['roofline'] and prompt['hardware']['specs']==specs)
+            identical = (ncu.get('metrics')==evidence['metrics'] and
+                         ncu.get('roofline')==evidence['roofline'] and prompt['hardware']['specs']==specs)
+            stage = request['stage']
+            stages[stage] = stages.get(stage,True) and identical
     return dict(stages=stages, identical={'analyze','advise','implement'} <= stages.keys() and all(stages.values()),
                 metric_count=sum(len(row) for row in evidence['metrics'].values()), metric_hash=digest(evidence['metrics']))
 
@@ -118,7 +128,7 @@ def run_job(args, plan, case_id, agent, seed):
     case = dict(plan['cases'][str(case_id)], id=f'level1_{case_id}')
     case['problem'] = kernelbench.task_path(case).read_text()
     case['test'] = kernelbench.test_source(case)
-    phase = plan['phases'][args.phase]
+    phase = phase_budget(plan,args.phase)
     cap, calls, rounds = phase['candidate_cap'],phase['call_cap'],phase['rounds']
     protocol = read_json(ROOT/'configs/protocol.json')
     protocol.update(plan['timing'],candidate_cap=cap, call_cap=calls, model=args.model,
@@ -135,7 +145,8 @@ def run_job(args, plan, case_id, agent, seed):
     if digest(case['problem']) != frozen['problem_hash']:
         raise ValueError('problem differs from preflight')
     case['problem'] = benchmark_problem(case['problem'],protocol['warmup_ms'])
-    if args.phase=='matched-smoke' and agent=='single':
+    shared_start = args.phase in ('matched-smoke','matvec-development') and agent=='single'
+    if shared_start:
         greedy = latest_attempt(args.output,job_name(args.phase,case_id,'greedy',seed))
         protocol['shared_ncu_metrics'] = shared_start_metrics(greedy,(baseline/'input.py').read_text())
     if agent=='single':
@@ -143,12 +154,12 @@ def run_job(args, plan, case_id, agent, seed):
     else:
         result = run_native(case,seed,protocol,provider,output,baseline,rounds)
     audit(output,agent)
-    if args.phase=='matched-smoke' and agent=='single' and result['status']=='complete':
+    if shared_start and result['status']=='complete':
         report = check_single_evidence(output,describe_ncu(protocol['shared_ncu_metrics']),plan['gpu_specs'])
         write_json(output/'matched-evidence.json',report)
         if not report['identical']:
             raise ValueError('the actual model prompts did not match the registered hardware evidence')
-    if args.phase in ('matched-smoke','development','holdout'):
+    if args.phase in ('matched-smoke','matvec-development','development','holdout'):
         sides = [latest_attempt(args.output,job_name(args.phase,case_id,a,seed)) for a in ('single','greedy')]
         measured = measure_pair(args.output/'pairs'/f'{args.phase}-{case_id}-{seed}', *sides)
         if measured is not None and measured['status']!='ok':
@@ -180,14 +191,14 @@ def run_campaign(args, parser):
         except ValueError as exc:
             parser.error(str(exc))
     case_id,agent,seed = schedule[args.job]
-    if args.phase in ('matched-smoke','development','holdout'):
+    if args.phase in ('matched-smoke','matvec-development','development','holdout'):
         pair = args.output/'pairs'/f'{args.phase}-{case_id}-{seed}'
         pair.mkdir(parents=True,exist_ok=True)
         try:
             register(pair,'device',dict(uuid=device['uuid'],node=device['node']))
         except ValueError as exc:
             parser.error(str(exc))
-    if args.phase in ('development','holdout'):
+    if args.phase in ('matvec-development','development','holdout'):
         smoke = read_json(latest_attempt(args.output,job_name('smoke',*jobs(plan,'smoke')[0]))/'summary.json')
         if smoke['status']!='complete' or not any(h['result']['status'] in ('ok','incorrect','compile_error') for h in smoke['history']):
             parser.error('the native single smoke must reach GPU evaluation')

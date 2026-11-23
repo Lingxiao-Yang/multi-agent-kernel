@@ -93,7 +93,28 @@ def test_native_smoke_and_reference_search_are_independent(tmp_path,monkeypatch)
     campaign.run_campaign(args,ArgumentParser())
     assert calls == [('single',1.01,1,4),('greedy',1.01,32,128)]
     assert not pairs
-    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(11.1973984)
+    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(11.0855004)
+
+
+def test_matvec_development_pairs_use_development_seeds_and_caps():
+    plan = experiment()
+    assert jobs(plan,'matvec-development')==[(4,a,s) for s in [11,22] for a in ('greedy','single')]
+    assert campaign.phase_budget(plan,'matvec-development')==dict(rounds=4,candidate_cap=4,call_cap=16)
+
+
+def test_four_candidate_audit_keeps_earlier_failures_and_skips_new_incumbents(tmp_path):
+    import json
+    from kernel_study.records import event
+    good = dict(metrics={'k':{'m':1}},roofline={'r':1})
+    specs={'sm_count':108}
+    for attempt,parent in [(1,0),(2,0),(3,2)]:
+        for stage in ['analyze','advise','implement','review']:
+            ncu = {} if parent or (attempt==1 and stage=='advise') else good
+            prompt=dict(attempt=attempt,incumbent=dict(id=parent,result={'profile':{'ncu':ncu}}),hardware={'specs':specs})
+            event(tmp_path/'model_events.jsonl','request',stage=stage,messages=[dict(role='user',content=json.dumps(prompt))])
+    checked=campaign.check_single_evidence(tmp_path,good,specs)
+    assert checked['stages']==dict(analyze=True,advise=False,implement=True,review=True)
+    assert not checked['identical']
 
 
 def test_matched_smoke_is_one_candidate_for_each_agent_on_the_same_seed():

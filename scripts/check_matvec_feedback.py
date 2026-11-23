@@ -17,15 +17,31 @@ def verify(worker, source, case):
                 source_hash=digest(text), stdout=stdout, stderr=stderr)
 
 
+def deadline_status(row):
+    if row['seconds'] > 20 or 'Test execution timed out after 20 seconds' in row['stderr']:
+        return 75
+    return 0 if row['passed'] else 1
+
+
 def main():
     from triton_kernel_agent.worker import VerificationWorker
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
-    output = parser.parse_args().output.resolve()
+    parser.add_argument('--start-deadline', action='store_true')
+    args = parser.parse_args()
+    output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     case = kernelbench.experiment()['cases']['4']
     baseline = starts.start_path(case)
+    if args.start_deadline:
+        import torch
+        import triton
+        kernelbench.load_module(kernelbench.task_path(case))
+        row = verify(VerificationWorker(0,output,output,test_timeout_s=20), baseline, case)
+        write_json(output/'verification.json', dict(row, torch=torch.__version__, triton=triton.__version__))
+        print(f"Startup verification: {row['seconds']:.3f} seconds, passed={row['passed']}",flush=True)
+        raise SystemExit(deadline_status(row))
     result = {}
     for name, path in [('baseline',baseline),('proposal_005',ROOT/'tests/judge/fixtures/matvec_dtype_constants.py')]:
         work = output/name

@@ -65,6 +65,18 @@ def mock_worker(monkeypatch, worker):
     monkeypatch.setattr(select, 'run_worker', worker)
 
 
+def test_single_requests_prose_advice_and_only_the_implementer_writes_code(tmp_path,monkeypatch,public_case,mock_environment,protocol):
+    prompts = {}
+    class Provider(SourceProvider):
+        def complete(self, system, context, stage, seed):
+            prompts[stage] = system
+            return super().complete(system,context,stage,seed)
+    mock_worker(monkeypatch,lambda *args: measurement())
+    local.search(public_case,'single',11,dict(protocol,candidate_cap=1),Provider(),tmp_path/'run')
+    assert 'plain language' in prompts['advise'] and 'no source code' in prompts['advise']
+    assert 'complete Python module' not in prompts['advise'] and 'complete Python module' in prompts['implement']
+
+
 def test_matched_smoke_shares_only_initial_counter_sample(tmp_path,monkeypatch,public_case,mock_environment,protocol):
     metrics={'start':{'counter':12}}
     profiled=[]

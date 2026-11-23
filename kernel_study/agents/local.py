@@ -91,7 +91,11 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             # Same call slot reassigned to implementer/general reasoning.
             replacement = 'advise' if stage == 'implement' else 'implement'
             system = ROLES[replacement] if variant.startswith('multi') else GENERAL
-        prompt = system + '\n' + CONTRACT
+        contract = CONTRACT
+        if variant=='single' and stage=='advise':
+            contract = ('Return a JSON object with an advice field containing at most three short sentences in plain language. '
+                        'Describe the proposed edits and their trade-offs. Include no source code or pseudocode.')
+        prompt = system + '\n' + contract
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)
         budget.charge_tokens(reply.input_tokens, reply.output_tokens)

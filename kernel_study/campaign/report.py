@@ -171,6 +171,8 @@ def run_report(args, parser):
     if args.phase == 'matched-smoke':
         phase = plan['phases'][args.phase]
         cases, seeds = [phase['case']], [phase['seed']]
+    elif args.phase == 'matvec-development':
+        cases, seeds = [4], plan['development_seeds']
     else:
         cases, seeds = plan[args.phase], plan[args.phase+'_seeds']
     if args.measure_pairs:
@@ -187,6 +189,14 @@ def run_report(args, parser):
                 measure_pair(pair,*sides)
     rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
     report = compare(rows,cases,seeds,measurements)
+    if args.phase == 'matvec-development':
+        report['matvec_reference_ms'] = plan['matvec_reference_ms']
+        for row in rows:
+            if 'latency_ms' in row:
+                row['at_or_below_reference'] = {k:row['latency_ms'] <= ms for k,ms in plan['matvec_reference_ms'].items()}
+            if row['agent']=='single':
+                path = args.output/row['run']/'matched-evidence.json'
+                row['matched_evidence'] = read_json(path) if path.is_file() else None
     if args.phase == 'matched-smoke':
         path = latest_attempt(args.output,job_name(args.phase,cases[0],'single',seeds[0]))/'matched-evidence.json'
         report['matched_evidence'] = read_json(path) if path.is_file() else None

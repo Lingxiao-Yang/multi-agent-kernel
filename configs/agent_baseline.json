@@ -32,7 +32,8 @@
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}
   },
-  "historical_cost_usd": 13.8026016,
+  "matvec_reference_ms": {"random_best_of_four": 4.10, "best_launch": 3.17},
+  "historical_cost_usd": 13.9144996,
   "total_budget_usd": 25,
   "cases": {
     "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},
