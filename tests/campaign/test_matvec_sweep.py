@@ -27,7 +27,7 @@ def test_grid_keeps_failures_and_rechecks_finalists_on_new_inputs(tmp_path, monk
         fast = 'm16-' in label
         return dict(status='ok', confirmed=fast, candidate={'median_ms':4 if fast else 10},
                     incumbent={'median_ms':10}, paired_speedup=2.5 if fast else 1.)
-    monkeypatch.setattr(sweep, 'run_worker', worker)
+    monkeypatch.setattr(sweep.launch_sweep, 'run_worker', worker)
     case = {'family':'matvec'}
     protocol = dict(validation_seeds=[101], final_validation_seeds=[10001,10002,10003,10004,10005])
     grid = [sweep.BASELINE, (16,256,8,4), (32,128,2,1)]
