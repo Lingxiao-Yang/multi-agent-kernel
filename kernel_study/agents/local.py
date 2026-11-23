@@ -23,6 +23,17 @@ ROLES = {
     'review': 'You are the result reviewer. Explain measured outcomes and failures and suggest next directions. You cannot decide retention. Return JSON only.'
 }
 
+STAGE_CONTRACTS = {
+    'analyze': ('Return a JSON object with an analysis field. Describe the bottleneck hypotheses and supporting '
+                'measurements in plain language. Include no source code or pseudocode.'),
+    'advise': ('Return a JSON object with an advice field containing at most three short sentences in plain language. '
+               'Describe the proposed edits and their trade-offs. Include no source code or pseudocode.'),
+    'implement': (CONTRACT + '\nSubmit a module different from the current incumbent. If it already looks optimal, '
+                  'try the most promising untested direction supported by the evidence.'),
+    'review': ('Return a JSON object with diagnosis, outcome and next_step fields. Refer to the measurements '
+               'available for this attempt. Include no source code or pseudocode.'),
+}
+
 
 def compact_result(result):
     def clean(value):
@@ -91,11 +102,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
             # Same call slot reassigned to implementer/general reasoning.
             replacement = 'advise' if stage == 'implement' else 'implement'
             system = ROLES[replacement] if variant.startswith('multi') else GENERAL
-        contract = CONTRACT
-        if variant=='single' and stage=='advise':
-            contract = ('Return a JSON object with an advice field containing at most three short sentences in plain language. '
-                        'Describe the proposed edits and their trade-offs. Include no source code or pseudocode.')
-        prompt = system + '\n' + contract
+        prompt = system + '\n' + STAGE_CONTRACTS[stage]
         event(log, 'model_request', stage=stage, system=prompt, context=context, budget=budget.snapshot())
         reply = provider.complete(prompt, context, stage, seed + budget.calls)
         budget.charge_tokens(reply.input_tokens, reply.output_tokens)
@@ -103,7 +110,10 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
         if resolved_model is not None and reply.model != resolved_model:
             raise RuntimeError('model_version_changed')
         resolved_model = reply.model
-        return json.loads(reply.text)
+        answer = json.loads(reply.text)
+        if stage != 'implement' and isinstance(answer, dict):
+            answer.pop('source', None)
+        return answer
     while not budget.stop_reason():
         budget.reserve_attempt()
         attempt = budget.attempts
@@ -140,7 +150,7 @@ def search(case, variant, seed, protocol, provider, output, drop_role=None, drop
                 raise ValueError('provide a rationale for the change')
             candidate['source'] = str(candidate_source)
             candidate['id'], candidate['parent_id'] = attempt, incumbent['id']
-            result = screen_candidate(text,source_text)
+            result = screen_candidate(text,source_text,incumbent_source=context['incumbent']['source'])
             if result is None:
                 result = run_worker({'case':case,'interface':'native','source':candidate['source'],
                                      'incumbent_source':incumbent['source'],'protocol':protocol}, output, f'candidate_{attempt:03d}')

@@ -65,16 +65,50 @@ def mock_worker(monkeypatch, worker):
     monkeypatch.setattr(select, 'run_worker', worker)
 
 
-def test_single_requests_prose_advice_and_only_the_implementer_writes_code(tmp_path,monkeypatch,public_case,mock_environment,protocol):
+@pytest.mark.parametrize('variant',['single','multi','single_knowledge','multi_knowledge'])
+def test_only_the_implementation_stage_supplies_code(tmp_path,monkeypatch,public_case,mock_environment,protocol,variant):
     prompts = {}
     class Provider(SourceProvider):
         def complete(self, system, context, stage, seed):
             prompts[stage] = system
+            if stage!='implement':
+                assert all('source' not in context.get(k,{}) for k in ('analyze','advise'))
+                return Reply(json.dumps({stage:'text','source':'unexpected module'}),1,1,self.model,{})
             return super().complete(system,context,stage,seed)
     mock_worker(monkeypatch,lambda *args: measurement())
-    local.search(public_case,'single',11,dict(protocol,candidate_cap=1),Provider(),tmp_path/'run')
-    assert 'plain language' in prompts['advise'] and 'no source code' in prompts['advise']
-    assert 'complete Python module' not in prompts['advise'] and 'complete Python module' in prompts['implement']
+    result=local.search(public_case,variant,11,dict(protocol,candidate_cap=1),Provider(),tmp_path/'run')
+    for stage in ('analyze','advise','review'):
+        assert 'no source code' in prompts[stage].lower() and 'complete Python module' not in prompts[stage]
+    assert 'three short sentences' in prompts['advise'] and 'plain language' in prompts['advise']
+    assert 'complete Python module' in prompts['implement'] and 'untested' in prompts['implement']
+    assert 'source' not in result['history'][0]['review']
+
+
+@pytest.mark.parametrize('variant',['single','multi'])
+def test_repeated_incumbent_is_charged_but_never_timed_and_search_continues(tmp_path,monkeypatch,public_case,mock_environment,protocol,variant):
+    workers, contexts = [], []
+    class Provider(SourceProvider):
+        def complete(self,system,context,stage,seed):
+            if stage=='analyze':
+                contexts.append(copy.deepcopy(context))
+            if stage=='implement':
+                attempt=context['attempt']
+                source = [self.source,self.source+'\n# same program\n',self.source.replace('256','128')][attempt-1]
+                return Reply(json.dumps(dict(source=source,rationale='test a change')),1,1,self.model,{})
+            return super().complete(system,context,stage,seed)
+    def worker(request,directory,label):
+        workers.append(label)
+        return measurement(confirmed=True)
+    mock_worker(monkeypatch,worker)
+    out=tmp_path/'run'
+    result=local.search(public_case,variant,11,dict(protocol,candidate_cap=3,call_cap=12),Provider(),out)
+    repeated=contexts[2]['history'][-1]['result']
+    assert repeated['status']=='unchanged_incumbent' and 'no new measurement' in repeated['reason'].lower()
+    assert 'candidate' not in repeated
+    assert not {'candidate_002','profile_002','audit_002','final_002'} & set(workers)
+    assert contexts[2]['incumbent']['id']==1 and result['final']['candidate_id']==3
+    assert result['budget']['attempts']==3 and result['budget']['calls']==12
+    assert (out/'candidate_002.py').is_file() and not result['history'][1]['accepted']
 
 
 def test_matched_smoke_shares_only_initial_counter_sample(tmp_path,monkeypatch,public_case,mock_environment,protocol):

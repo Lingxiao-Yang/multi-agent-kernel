@@ -10,9 +10,10 @@ from .preflight import check_device
 
 
 def rejection_counts(candidates):
-    counts = dict.fromkeys(('static_check','compilation','numerical','timeout','unconfirmed','confirmed'),0)
+    counts = dict.fromkeys(('static_check','compilation','numerical','timeout','unchanged_incumbent','unconfirmed','confirmed'),0)
     categories = {'static_rejected':'static_check', 'compile_error':'compilation',
-                  'incorrect':'numerical', 'timeout':'timeout', 'unconfirmed':'unconfirmed','confirmed':'confirmed'}
+                  'incorrect':'numerical', 'timeout':'timeout', 'unchanged_incumbent':'unchanged_incumbent',
+                  'unconfirmed':'unconfirmed','confirmed':'confirmed'}
     for candidate in candidates:
         status = candidate.get('endpoint_status') or candidate['status']
         if status=='ok' and 'selected' in candidate:

@@ -19,13 +19,15 @@ def changed_program(source, start):
     return statements(source) != statements(start)
 
 
-def screen_candidate(source, start):
+def screen_candidate(source, start, *, incumbent_source=None):
     if not source.strip():
         return {'status':'no_submission'}
     try:
         check_source(source)
     except StaticRejection as exc:
         return {'status':'static_rejected','error':str(exc)}
+    if incumbent_source is not None and not changed_program(source,incumbent_source):
+        return {'status':'unchanged_incumbent','reason':'The proposal matches the current incumbent. No new measurement was made. Try an untested direction.'}
     if not changed_program(source, start):
         return {'status':'unchanged'}
     return None
