@@ -52,7 +52,9 @@ python -m scripts.sweep_matvec results/matvec-sweep
 python -m scripts.sweep_rows --case 23 results/softmax-sweep
 ```
 
-The role study reads `role-study.json` from a fresh private campaign directory. After the code is merged, register the full mainline commit in `revision`, the ordered integer case IDs in `cases`, the five new integer search seeds in `seeds` and the knowledge-card choice as a boolean in `knowledge`. One job index identifies one case, seed and variant. Successive pairs alternate which variant goes first. The same case and seed share one starting Nsight Compute measurement. Each search has four candidate slots and at most 16 calls.
+The formal role study uses matvec (4), softmax (23), LayerNorm (40) and FP32 matrix multiplication (2), each with its original frozen start. Five seeds per variant give 20 matched `single`–`multi` pairs, or 40 searches without knowledge cards.
+
+The role study reads `role-study.json` from a fresh private campaign directory. Register the full merged mainline commit in `revision`, `[4, 23, 40, 2]` in `cases`, the five new integer search seeds in `seeds` and the knowledge-card choice as a boolean in `knowledge`. One job index identifies one case, seed and variant. Successive pairs alternate which variant goes first. The same case and seed share one starting Nsight Compute measurement. Each search has four candidate slots and at most 16 calls.
 
 On Lonestar6, the submit directory contains the registered checkout as `project/`, prepared cases under `preflight/`, the registration under `campaign/`, the CUDA module name in `cuda-module`, and a zstd runtime archive `runtime.tar.zst` containing `venv/` and `upstream/`. Put its expanded size in bytes in `runtime.bytes`. The job stages the checkout and runtime on node-local storage, verifies the frozen start and probes counters before loading the model credential from the account's private `~/.openai_env` (mode 600). Submit the indices for a pair in the same allocation.
 

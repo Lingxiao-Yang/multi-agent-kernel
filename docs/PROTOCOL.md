@@ -20,7 +20,9 @@ Each speed ratio uses both samples from its own paired measurement. The finalist
 
 ## Registration and reporting
 
-After merge, register a mainline commit, case list, five fresh search seeds per variant and knowledge-card choice before running a scored search. Qualification, real-model smoke and zero-model launch sweeps have separate outputs. The matched arms use the same snapshot, prices, sampling settings, information and candidate budget. Paired searches run on the same A100 UUID and their finalists are timed in one worker. Each case and seed has a recorded run order. [Campaign entry point](../kernel_study/campaign/jobs.py)
+The formal comparison uses the original starts for matvec (4), softmax (23), LayerNorm (40) and FP32 matrix multiplication (2). Five fresh seeds per case give 20 pairs and 40 searches for `single` and `multi` without knowledge cards.
+
+Before scoring, register the merged mainline commit, these four case IDs, the five seed values and the knowledge-card choice. Qualification, real-model smoke and zero-model launch sweeps have separate outputs. The matched arms use the same snapshot, prices, sampling settings, information and candidate budget. Paired searches run on the same A100 UUID and their finalists are timed in one worker. Each case and seed has a recorded run order. [Campaign entry point](../kernel_study/campaign/jobs.py)
 
 For each task, count searches whose final kernel confirms a gain over the start, and searches that return the start. Report direct finalist latencies in ms, costs and where each endpoint falls relative to the task’s launch-parameter references. Show best correct latency at matched candidate counts and actual dollar spend. For each requested contrast, take the geometric mean of the direct latency ratios within a case, then weight the cases equally. An incomplete comparison reports its observed pairs and leaves the overall ratio empty. If knowledge-card variants are registered, compare roles within each knowledge condition and cards within each role. [Campaign report](../kernel_study/campaign/report.py)
 
