@@ -23,11 +23,32 @@ case "${1:?job name}" in
 esac
 module load python/3.12.11
 module load "$(cat "$archive/cuda-module")"
-source "$archive/venv/bin/activate"
-cd "$work/project"
-export PYTHONNOUSERSITE=1 OMP_NUM_THREADS=1 KERNEL_BASELINE_UPSTREAM="$archive/upstream"
-export PYTHONPATH="$PWD:$KERNEL_BASELINE_UPSTREAM/KernelAgent"
 guard="$work/guard-$SLURM_JOB_ID-${SLURM_RESTART_COUNT:-0}"
+mkdir -p "$guard"
+read -r required < "$work/runtime.bytes"
+node_dir=
+for parent in "${SLURM_TMPDIR:-/tmp}" "${TMPDIR:-/tmp}" /tmp; do
+    [[ -d $parent && -w $parent ]] || continue
+    fs=$(findmnt -n -T "$parent" -o FSTYPE)
+    available=$(df -B1 --output=avail "$parent" | tail -1)
+    printf '%s %s %d %d\n' "$parent" "$fs" "$available" "$required" >> "$guard/storage.txt"
+    case "$fs" in xfs|ext[234]|btrfs|tmpfs) ;; *) continue ;; esac
+    (( available > required )) || continue
+    node_dir=$(mktemp -d "$parent/qualification-$SLURM_JOB_ID.XXXXXXXX")
+    break
+done
+if [[ -z $node_dir ]]; then echo "No node-local space for the runtime" >&2; exit 1; fi
+trap 'rm -rf -- "$node_dir"' EXIT
+/usr/bin/time -f %e -o "$guard/unpack.seconds" tar --use-compress-program=zstd -xf "$work/runtime.tar.zst" -C "$node_dir"
+revision=$(git -C "$work/project" rev-parse HEAD)
+cd "$node_dir/project"
+git fetch -q "$work/project" "$revision"
+git checkout -q --detach "$revision"
+test "$(git rev-parse HEAD)" = "$revision"
+export PYTHONNOUSERSITE=1 OMP_NUM_THREADS=1 KERNEL_BASELINE_UPSTREAM="$node_dir/upstream"
+export PATH="$node_dir/venv/bin:$PATH" PYTHONPATH="$PWD:$KERNEL_BASELINE_UPSTREAM/KernelAgent"
+printf '%s\n' "$revision" "$(command -v python)" "$PWD" "$KERNEL_BASELINE_UPSTREAM" > "$guard/runtime.txt"
+hostname >> "$guard/runtime.txt"
 status=0
 python -m scripts.check_matvec_feedback "$guard" --start-deadline --case "$case_id" || status=$?
 if [[ $status == 75 ]]; then

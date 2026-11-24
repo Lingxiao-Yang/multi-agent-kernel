@@ -66,7 +66,7 @@ def test_row_qualification_reads_each_same_card_pair(tmp_path):
     assert read_json(tmp_path/(phase+'-report.json'))['decision']=='incomplete'
 
 
-def test_slurm_submits_the_row_pairs_after_both_matvec_targets(tmp_path):
+def test_slurm_submits_only_the_two_row_pairs_once_after_a_partial_retry(tmp_path):
     import os
     import subprocess
     from pathlib import Path
@@ -74,7 +74,7 @@ def test_slurm_submits_the_row_pairs_after_both_matvec_targets(tmp_path):
     bindir.mkdir()
     sbatch=bindir/'sbatch'
     sbatch.write_text('#!/bin/bash\necho "Site accounting active"\n'
-                      'if [[ ${!#} == softmax && ! -f "$CALLS.retry" ]]; then touch "$CALLS.retry"; exit 2; fi\n'
+                      'if [[ ${!#} == layernorm && ! -f "$CALLS.retry" ]]; then touch "$CALLS.retry"; exit 2; fi\n'
                       'echo "$*" >> "$CALLS"\nwc -l < "$CALLS"\n')
     sbatch.chmod(0o700)
     calls=tmp_path/'calls'
@@ -84,6 +84,5 @@ def test_slurm_submits_the_row_pairs_after_both_matvec_targets(tmp_path):
     for _ in range(2):
         subprocess.run(['bash',str(script)],cwd=tmp_path,env=env,check=True)
     submitted=calls.read_text().splitlines()
-    assert [line.split()[-1] for line in submitted]==['matvec-11','matvec-22','softmax','layernorm']
-    assert all('--dependency' not in line for line in submitted[:2])
-    assert all('--dependency=afterok:1:2' in line and '--kill-on-invalid-dep=yes' in line for line in submitted[2:])
+    assert [line.split()[-1] for line in submitted]==['softmax','layernorm']
+    assert all('--dependency' not in line for line in submitted)

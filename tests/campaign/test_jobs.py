@@ -93,7 +93,8 @@ def test_native_smoke_and_reference_search_are_independent(tmp_path,monkeypatch)
     campaign.run_campaign(args,ArgumentParser())
     assert calls == [('single',1.01,1,4),('greedy',1.01,32,128)]
     assert not pairs
-    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(9.8828744)
+    assert plan['total_budget_usd'] == 100
+    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(84.1360744)
 
 
 def test_matvec_development_pairs_use_development_seeds_and_caps():
