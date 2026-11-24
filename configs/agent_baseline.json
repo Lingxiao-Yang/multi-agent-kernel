@@ -28,6 +28,7 @@
   "phases": {
     "matched-smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
     "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
+    "multi-smoke": {"case": 4, "seed": 11, "rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128},
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}
@@ -40,7 +41,7 @@
       "40": {"random_best_of_four": 1.0147839784622192, "best_launch": 1.0045440196990967}
     }
   },
-  "historical_cost_usd": 15.8639256,
+  "historical_cost_usd": 16.6126696,
   "total_budget_usd": 100,
   "cases": {
     "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},

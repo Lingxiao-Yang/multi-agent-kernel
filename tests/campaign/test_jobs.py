@@ -91,10 +91,20 @@ def test_native_smoke_and_reference_search_are_independent(tmp_path,monkeypatch)
     args.phase = 'calibration'
     gpu['uuid'] = 'GPU-second'
     campaign.run_campaign(args,ArgumentParser())
-    assert calls == [('single',1.01,1,4),('greedy',1.01,32,128)]
+    metrics = {'kernel':{'metric':21.}}
+    def shared(directory, source):
+        assert directory.name=='matvec-development-4-greedy-11' and source=='native source'
+        return metrics
+    monkeypatch.setattr(campaign,'shared_start_metrics',shared)
+    monkeypatch.setattr(campaign,'describe_ncu',lambda raw: {'metrics':raw})
+    monkeypatch.setattr(campaign,'check_single_evidence',lambda *args: {'identical':True})
+    args.phase = 'multi-smoke'
+    assert jobs(plan,args.phase)==[(4,'multi',11)]
+    campaign.run_campaign(args,ArgumentParser())
+    assert calls == [('single',1.01,1,4),('greedy',1.01,32,128),('multi',1.01,4,16)]
     assert not pairs
     assert plan['total_budget_usd'] == 100
-    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(84.1360744)
+    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(83.3873304)
 
 
 def test_matvec_development_pairs_use_development_seeds_and_caps():

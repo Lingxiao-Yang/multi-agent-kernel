@@ -5,7 +5,7 @@ import pytest
 
 from kernel_study.records import read_json
 from kernel_study.tasks import starts
-from scripts import check_matvec_feedback as check
+from scripts import verify_starts as check
 
 
 def test_startup_only_requeues_slow_verification():

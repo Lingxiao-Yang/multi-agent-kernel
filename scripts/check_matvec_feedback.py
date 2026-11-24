@@ -1,39 +1,12 @@
 """Check frozen starts with the upstream verifier and replay matvec hardware feedback."""
 import argparse
 from pathlib import Path
-import time
+import sys
 
 from kernel_study.judge.evaluate import ncu_evidence
-from kernel_study.records import ROOT, digest, write_json
+from kernel_study.records import ROOT, write_json
 from kernel_study.tasks import kernelbench, starts
-
-
-def verify(worker, source, case):
-    text = source.read_text()
-    worker._write_files(text, [kernelbench.test_source(case)])
-    begin = time.monotonic()
-    ok, stdout, stderr = worker._run_test()
-    return dict(passed=ok, seconds=time.monotonic()-begin, timeout_s=worker.test_timeout_s,
-                source_hash=digest(text), stdout=stdout, stderr=stderr)
-
-
-def deadline_status(row):
-    if row['passed']:
-        return 0 if row['seconds'] <= 25 else 75
-    return 75 if row['stderr'].strip() == 'Test execution timed out after 30 seconds' else 1
-
-
-def check_start(worker, source, case, versions):
-    attempts = []
-    for i in range(1, 4):
-        row = verify(worker, source, case)
-        attempts.append(row)
-        write_json(worker.workdir/'verification.json', dict(row, attempts=attempts, **versions))
-        print(f"Startup verification {i}: {row['seconds']:.3f} seconds, passed={row['passed']}", flush=True)
-        status = deadline_status(row)
-        if status != 75:
-            return status
-    return 75
+from scripts.verify_starts import verify, main as verify_starts
 
 
 def main():
@@ -41,36 +14,14 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument('--start-deadline', action='store_true')
-    mode.add_argument('--all-starts', action='store_true')
-    cases = kernelbench.experiment()['cases']
-    parser.add_argument('--case', choices=cases, default='4')
+    if '--start-deadline' in sys.argv or '--all-starts' in sys.argv:
+        return verify_starts()
+    parser.add_argument('--case', choices=['4'], default='4')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    if args.all_starts:
-        passed = []
-        for case_id, case in cases.items():
-            work = output/case_id
-            work.mkdir()
-            worker = VerificationWorker(0, work, work, test_timeout_s=30)
-            row = verify(worker, starts.start_path(case), case)
-            write_json(work/'verification.json', row)
-            print(f"{case['family']}: {row['seconds']:.3f} seconds, passed={row['passed']}", flush=True)
-            passed.append(row['passed'])
-        raise SystemExit(0 if all(passed) else 1)
-    if args.case!='4' and not args.start_deadline:
-        parser.error('only matvec supports the hardware feedback replay')
-    case = cases[args.case]
+    case = kernelbench.experiment()['cases']['4']
     baseline = starts.start_path(case)
-    if args.start_deadline:
-        import torch
-        import triton
-        kernelbench.load_module(kernelbench.task_path(case))
-        worker = VerificationWorker(0, output, output, test_timeout_s=30)
-        versions = dict(torch=torch.__version__, triton=triton.__version__)
-        raise SystemExit(check_start(worker, baseline, case, versions))
     result = {}
     for name, path in [('baseline',baseline),('proposal_005',ROOT/'tests/judge/fixtures/matvec_dtype_constants.py')]:
         work = output/name

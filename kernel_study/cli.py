@@ -20,7 +20,7 @@ def main(argv=None):
 
     run = commands.add_parser('run', help='run one registered search')
     report_phases = ['matched-smoke','matvec-development','matvec-recheck','row-qualification','development','holdout']
-    run.add_argument('phase',choices=['smoke','calibration',*report_phases])
+    run.add_argument('phase',choices=['smoke','multi-smoke','calibration',*report_phases])
     run.add_argument('--preflight',type=Path,required=True)
     run.add_argument('--output',type=Path,required=True)
     run.add_argument('--counters',type=Path,required=True)

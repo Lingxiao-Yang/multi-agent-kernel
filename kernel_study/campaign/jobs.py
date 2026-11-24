@@ -34,10 +34,10 @@ def jobs(plan, phase):
     if phase=='matched-smoke':
         spec = plan['phases'][phase]
         return [(spec['case'],agent,spec['seed']) for agent in ('greedy','single')]
-    if phase in ('smoke','calibration'):
+    standalone = {'smoke':'single', 'multi-smoke':'multi', 'calibration':'greedy'}
+    if phase in standalone:
         phase_plan = plan['phases'][phase]
-        agent = 'single' if phase=='smoke' else 'greedy'
-        return [(phase_plan['case'],agent,phase_plan['seed'])]
+        return [(phase_plan['case'],standalone[phase],phase_plan['seed'])]
     pairs = [(case,seed) for case in plan[phase] for seed in plan[phase+'_seeds']]
     rng = random.Random(20261121)
     rng.shuffle(pairs)
@@ -51,6 +51,16 @@ def jobs(plan, phase):
 
 def phase_budget(plan, phase):
     return plan['phases']['development' if phase in DEVELOPMENT_SLICES else phase]
+
+
+def batch_case(plan, phase, indices):
+    schedule = jobs(plan,phase)
+    if len(set(indices))!=len(indices) or any(i<0 or i>=len(schedule) for i in indices):
+        raise ValueError('job indices must be distinct and within the phase')
+    cases = {schedule[i][0] for i in indices}
+    if len(cases)!=1:
+        raise ValueError('one allocation must run jobs for the same case')
+    return cases.pop()
 
 
 def attempt_path(root, job, retry):
@@ -154,15 +164,15 @@ def run_job(args, plan, case_id, agent, seed):
     if digest(case['problem']) != frozen['problem_hash']:
         raise ValueError('problem differs from preflight')
     case['problem'] = benchmark_problem(case['problem'],protocol['warmup_ms'])
-    evidence_phase = 'matvec-development' if args.phase=='matvec-recheck' else args.phase
-    shared_start = evidence_phase in ('matched-smoke','matvec-development','row-qualification') and agent=='single'
+    evidence_phase = 'matvec-development' if args.phase in ('matvec-recheck','multi-smoke') else args.phase
+    shared_start = evidence_phase in ('matched-smoke','matvec-development','row-qualification') and agent!='greedy'
     if shared_start:
         greedy = latest_attempt(args.output,job_name(evidence_phase,case_id,'greedy',seed))
         protocol['shared_ncu_metrics'] = shared_start_metrics(greedy,(baseline/'input.py').read_text())
-    if agent=='single':
-        result = search(case,'single',seed,protocol,provider,output)
-    else:
+    if agent=='greedy':
         result = run_native(case,seed,protocol,provider,output,baseline,rounds)
+    else:
+        result = search(case,agent,seed,protocol,provider,output)
     audit(output,agent)
     if shared_start and result['status']=='complete':
         report = check_single_evidence(output,describe_ncu(protocol['shared_ncu_metrics']),plan['gpu_specs'])
