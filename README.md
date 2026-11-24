@@ -16,7 +16,7 @@ The local search and the upstream adapter both submit a full Python module with 
 | `configs/`, `knowledge/` | Case shapes and tolerances, device and runtime settings, search limits, greedy settings and knowledge cards |
 | `scripts/` | Counter probe, frozen-start verifier, launch sweeps and Lonestar6 batch entry points |
 | `tests/` | Component tests and integration tests that exercise the public search and upstream adapter |
-| `docs/` | Study protocols, completed refactor plan and historical notes in `archive/` |
+| `docs/` | Study protocol, baseline qualification and [archived plans and experiment notes](docs/archive/) |
 
 ## Install and test
 
