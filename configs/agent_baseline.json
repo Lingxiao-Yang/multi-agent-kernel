@@ -35,6 +35,7 @@
   },
   "row_qualification": {"cases": [23, 40], "seed": 11},
   "launch_reference_ms": {
+    "2": {"random_best_of_four": 9.064448356628418, "best_launch": 8.704000473022461},
     "4": {"random_best_of_four": 4.10, "best_launch": 3.17},
     "23": {"random_best_of_four": 13.657088279724121, "best_launch": 13.507583618164062},
     "40": {"random_best_of_four": 1.0147839784622192, "best_launch": 1.0045440196990967}
