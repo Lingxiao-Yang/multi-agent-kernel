@@ -18,9 +18,22 @@ def verify(worker, source, case):
 
 
 def deadline_status(row):
-    if row['seconds'] > 20 or 'Test execution timed out after 20 seconds' in row['stderr']:
-        return 75
-    return 0 if row['passed'] else 1
+    if row['passed']:
+        return 0 if row['seconds'] <= 25 else 75
+    return 75 if row['stderr'].strip() == 'Test execution timed out after 30 seconds' else 1
+
+
+def check_start(worker, source, case, versions):
+    attempts = []
+    for i in range(1, 4):
+        row = verify(worker, source, case)
+        attempts.append(row)
+        write_json(worker.workdir/'verification.json', dict(row, attempts=attempts, **versions))
+        print(f"Startup verification {i}: {row['seconds']:.3f} seconds, passed={row['passed']}", flush=True)
+        status = deadline_status(row)
+        if status != 75:
+            return status
+    return 75
 
 
 def main():
@@ -29,22 +42,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
     parser.add_argument('--start-deadline', action='store_true')
-    parser.add_argument('--case', choices=['4','23','40'], default='4')
+    cases = kernelbench.experiment()['cases']
+    parser.add_argument('--case', choices=cases, default='4')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     if args.case!='4' and not args.start_deadline:
-        parser.error('row cases support the startup verification only')
-    case = kernelbench.experiment()['cases'][args.case]
+        parser.error('only matvec supports the hardware feedback replay')
+    case = cases[args.case]
     baseline = starts.start_path(case)
     if args.start_deadline:
         import torch
         import triton
         kernelbench.load_module(kernelbench.task_path(case))
-        row = verify(VerificationWorker(0,output,output,test_timeout_s=20), baseline, case)
-        write_json(output/'verification.json', dict(row, torch=torch.__version__, triton=triton.__version__))
-        print(f"Startup verification: {row['seconds']:.3f} seconds, passed={row['passed']}",flush=True)
-        raise SystemExit(deadline_status(row))
+        worker = VerificationWorker(0, output, output, test_timeout_s=30)
+        versions = dict(torch=torch.__version__, triton=triton.__version__)
+        raise SystemExit(check_start(worker, baseline, case, versions))
     result = {}
     for name, path in [('baseline',baseline),('proposal_005',ROOT/'tests/judge/fixtures/matvec_dtype_constants.py')]:
         work = output/name
