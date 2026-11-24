@@ -1,5 +1,8 @@
+import os
+import shutil
 import subprocess
 import sys
+import tarfile
 from pathlib import Path
 
 from scripts.profile_start_verifier import stage_times
@@ -35,3 +38,31 @@ def test_kernel():
     assert result.stdout.strip() == 'PASS'
     stages = [line.split()[1] for line in (tmp_path/'stages.tsv').read_text().splitlines()]
     assert set(stages) == {'imports', 'version', 'inputs', 'reference', 'kernel', 'comparison', 'process'}
+
+
+def test_slurm_profile_extracts_with_the_cluster_tar(tmp_path):
+    root = Path(__file__).resolve().parents[2]
+    archive = tmp_path/'kernel-study-campaign/a100-matvec-20261122'
+    work, node, tools = tmp_path/'work', tmp_path/'node', tmp_path/'bin'
+    for directory in (archive/'venv/bin', work, node, tools):
+        directory.mkdir(parents=True)
+    (archive/'cuda-module').write_text('cuda/test')
+    interpreter = archive/'venv/bin/python'
+    interpreter.write_text('#!/bin/sh\ncase "$0" in "$SLURM_TMPDIR"/*) echo local;; *) echo shared;; esac\n')
+    interpreter.chmod(0o700)
+    with tarfile.open(work/'runtime.tar.zst','w') as bundle:
+        bundle.add(archive/'venv', arcname='venv')
+    (work/'runtime.bytes').write_text('10000\n')
+    tar = shutil.which('tar')
+    for name, body in [('tar', f'for arg do [ "$arg" != "--zstd" ] || exit 64; done\nexec "{tar}" "$@"'),
+                       ('zstd', 'cat'), ('findmnt', 'echo xfs')]:
+        path = tools/name
+        path.write_text('#!/bin/sh\n'+body+'\n')
+        path.chmod(0o700)
+    env = dict(os.environ, PATH=str(tools)+':'+os.environ['PATH'], SCRATCH=str(tmp_path),
+               SLURM_TMPDIR=str(node), SLURM_JOB_ID='123', SLURM_SUBMIT_DIR=str(work))
+    result = subprocess.run(['bash','-c','module(){ :; }; export -f module; bash "$1"','bash',
+                             str(root/'scripts/ls6_verifier_profile.sbatch')], env=env, capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.splitlines() == ['shared','local']
+    assert not any(node.iterdir())

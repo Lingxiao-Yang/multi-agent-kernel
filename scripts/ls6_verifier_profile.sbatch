@@ -33,7 +33,7 @@ for parent in "${SLURM_TMPDIR:-/tmp}" "${TMPDIR:-/tmp}" /tmp; do
     (( free > required )) || continue
     node_dir=$(mktemp -d "$parent/verifier-$SLURM_JOB_ID.XXXXXXXX")
     trap 'rm -rf -- "$node_dir"' EXIT
-    /usr/bin/time -f %e -o "$out/unpack.seconds" tar --zstd -xf "$work/runtime.tar.zst" -C "$node_dir"
+    /usr/bin/time -f %e -o "$out/unpack.seconds" tar --use-compress-program=zstd -xf "$work/runtime.tar.zst" -C "$node_dir"
     run_verifier local "$node_dir/venv" "$node_dir/project" "$node_dir/upstream"
     exit 0
 done
