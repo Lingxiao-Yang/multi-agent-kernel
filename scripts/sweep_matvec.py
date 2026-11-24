@@ -6,6 +6,7 @@ import random
 
 from kernel_study.campaign import launch_sweep
 from kernel_study.campaign.jobs import register
+from kernel_study.campaign.launch_sweep import matvec_label as label
 from kernel_study.campaign.preflight import check_device
 from kernel_study.records import digest, write_json
 from kernel_study.tasks import kernelbench, starts
@@ -30,10 +31,6 @@ def variant(source, config):
             raise ValueError(f'launch parameter differs from frozen source: {old_line.strip()}')
         source = source.replace(old_line, fmt.format(new))
     return source
-
-
-def label(config):
-    return 'm{}-k{}-w{}-s{}'.format(*config)
 
 
 def run(output, case, protocol, grid):

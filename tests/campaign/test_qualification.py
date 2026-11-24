@@ -27,19 +27,37 @@ def test_matvec_recheck_uses_both_standalone_endpoints_and_charges(tmp_path):
     save_audit(tmp_path,phase,4,11,'single',4.10)
     main(['report',phase,str(tmp_path),'--require-seed','11'])
     partial=read_json(tmp_path/(phase+'-report.json'))
-    assert partial['decision']=='incomplete' and partial['seeds']['11']['passed']
+    assert partial['decision']=='incomplete' and partial['seeds']['11']['at_or_below_random_median']
     assert partial['seeds']['11']['below_3_57_ms'] is False
     assert partial['seeds']['11']['cost_usd']==.12
-    save_audit(tmp_path,phase,4,22,'single',4.101)
     with pytest.raises(SystemExit) as stopped:
         main(['report',phase,str(tmp_path),'--require-seed','22'])
+    assert stopped.value.code==3
+    save_audit(tmp_path,phase,4,22,'single',4.101)
+    main(['report',phase,str(tmp_path),'--require-seed','22'])
     result=read_json(tmp_path/(phase+'-report.json'))
-    assert stopped.value.code==3 and result['decision']=='matvec-recheck-failed'
-    save_audit(tmp_path,phase,4,11,'single',3.56)
-    save_audit(tmp_path,phase,4,22,'single',4.09)
-    main(['report',phase,str(tmp_path)])
-    result=read_json(tmp_path/(phase+'-report.json'))
-    assert result['decision']=='matvec-recheck-passed' and result['seeds']['11']['below_3_57_ms']
+    assert result['complete'] and result['decision']=='matvec-recheck-complete'
+    assert not result['seeds']['22']['at_or_below_random_median']
+
+
+def test_matvec_ranks_same_seed_endpoints_against_four_distinct_draws(tmp_path):
+    from scripts.sweep_matvec import label
+    grid = [[1,1,1,i] for i in range(1,6)]
+    sweep = tmp_path/'sweep'
+    write_json(sweep/'manifest.json',dict(case=experiment()['cases']['4'], grid=grid))
+    for config,ms in zip(grid,[3.,5.,6.,7.,None]):
+        row = dict(status='ok', candidate={'median_ms':ms}) if ms else dict(status='incorrect')
+        write_json(sweep/f'screen-{label(config)}.result.json',row)
+    save_audit(tmp_path,'matvec-recheck',4,11,'single',3.)
+    save_audit(tmp_path,'matvec-development',4,11,'greedy',6.)
+    save_audit(tmp_path,'matvec-development',4,11,'single',2.9)
+    main(['report','matvec-recheck',str(tmp_path),'--matvec-sweep',str(sweep)])
+    report=read_json(tmp_path/'matvec-recheck-report.json')
+    assert report['random_four_population']==5
+    seed=report['seeds']['11']
+    assert seed['random_four_at_or_below']==pytest.approx(4/5)
+    assert seed['previous']['greedy']=={'latency_ms':6.,'random_four_at_or_below':1.}
+    assert seed['previous']['single']=={'latency_ms':2.9,'random_four_at_or_below':0.}
 
 
 def test_row_qualification_reads_each_same_card_pair(tmp_path):

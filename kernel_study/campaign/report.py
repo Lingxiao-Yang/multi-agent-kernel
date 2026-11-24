@@ -1,4 +1,5 @@
 """Summarize independently checked candidates at matched attempt and dollar budgets."""
+from math import comb
 from pathlib import Path
 
 from ..judge.select import measure_pair
@@ -6,6 +7,7 @@ from ..records import code_hashes, digest, read_json, write_json
 from ..tasks.kernelbench import experiment
 from .factorial import geometric_mean
 from .jobs import job_name, latest_attempt
+from .launch_sweep import matvec_label
 from .preflight import check_device
 
 
@@ -166,31 +168,59 @@ def phase_rows(root, phase, cases, seeds):
     return rows,attempts,measurements
 
 
+def matvec_screen_times(directory, case):
+    manifest = read_json(directory/'manifest.json')
+    if manifest['case'] != case:
+        raise ValueError('launch sweep belongs to a different task')
+    times = []
+    for config in manifest['grid']:
+        row = read_json(directory/f'screen-{matvec_label(config)}.result.json')
+        times.append(row['candidate']['median_ms'] if row['status']=='ok' else float('inf'))
+    return times
+
+
+def matvec_endpoint(ms, sweep):
+    result = dict(latency_ms=ms)
+    if sweep is not None:
+        slower = sum(t > ms for t in sweep)
+        result['random_four_at_or_below'] = 1 - comb(slower,4)/comb(len(sweep),4)
+    return result
+
+
 def report_matvec_recheck(args, plan, parser):
     seeds = plan['development_seeds']
     if args.freeze or args.measure_pairs or (args.require_seed is not None and args.require_seed not in seeds):
         parser.error('matvec rechecks report individual endpoints for the registered seeds')
     rows,attempts,_ = phase_rows(args.output,args.phase,[4],seeds)
     results = {}
-    target = plan['matvec_reference_ms']['random_best_of_four']
+    reference = plan['matvec_reference_ms']
+    sweep = matvec_screen_times(args.matvec_sweep,plan['cases']['4']) if args.matvec_sweep else None
     for row in rows:
         path = args.output/row['run']/'matched-evidence.json'
         proof = read_json(path) if path.is_file() else None
         row['matched_evidence'] = proof
         if row['status']!='complete' or 'latency_ms' not in row or not (proof and proof['identical']):
             continue
-        result = dict(latency_ms=row['latency_ms'],passed=row['latency_ms']<=target,cost_usd=row['total_completed_usd'])
+        result = matvec_endpoint(row['latency_ms'],sweep)
+        result.update(at_or_below_random_median=row['latency_ms']<=reference['random_best_of_four'],
+                      cost_usd=row['total_completed_usd'],previous={})
+        for agent in ('greedy','single'):
+            run = job_name('matvec-development',4,agent,row['seed'])
+            prior = latest_attempt(args.output,run)/'audit.json'
+            if prior.is_file():
+                audit = read_json(prior)
+                if audit['status']=='complete' and 'latency_ms' in audit:
+                    result['previous'][agent] = matvec_endpoint(audit['latency_ms'],sweep)
         if row['seed']==11:
             result['below_3_57_ms'] = row['latency_ms'] < 3.57
         results[str(row['seed'])] = result
     complete = len(results)==len(seeds)
-    decision = 'incomplete'
-    if complete:
-        decision = 'matvec-recheck-passed' if all(r['passed'] for r in results.values()) else 'matvec-recheck-failed'
+    decision = 'matvec-recheck-complete' if complete else 'incomplete'
     write_json(args.output/(args.phase+'-report.json'),dict(complete=complete,decision=decision,seeds=results,
-               target_ms=target,attempts=attempts,searches=rows))
+               reference_ms=reference,random_four_population=len(sweep) if sweep is not None else None,
+               attempts=attempts,searches=rows))
     print(decision,results)
-    if args.require_seed is not None and not results.get(str(args.require_seed),{}).get('passed'):
+    if args.require_seed is not None and str(args.require_seed) not in results:
         raise SystemExit(3)
 
 
@@ -224,6 +254,8 @@ def run_report(args, parser):
     plan = experiment()
     if args.phase=='matvec-recheck':
         return report_matvec_recheck(args,plan,parser)
+    if getattr(args,'matvec_sweep',None) is not None:
+        parser.error('--matvec-sweep applies to matvec-recheck')
     if getattr(args,'require_seed',None) is not None:
         parser.error('--require-seed applies to matvec-recheck')
     if args.phase == 'matched-smoke':

@@ -7,6 +7,10 @@ from ..records import ROOT, read_json
 from ..tasks import starts
 
 
+def matvec_label(config):
+    return 'm{}-k{}-w{}-s{}'.format(*config)
+
+
 def protocol(plan):
     settings = dict(read_json(ROOT/'configs/protocol.json'), **plan['timing'])
     return dict(settings, validation_seeds=plan['validation_seeds'], final_validation_seeds=plan['final_validation_seeds'],

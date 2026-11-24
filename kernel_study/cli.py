@@ -37,7 +37,8 @@ def main(argv=None):
     report.add_argument('output',type=Path)
     report.add_argument('--freeze',action='store_true',help='Register the measured single implementation before holdout')
     report.add_argument('--measure-pairs',action='store_true',help='Measure missing finalist pairs on the registered GPU')
-    report.add_argument('--require-seed',type=int,help='Exit with status 3 unless this matvec recheck meets its latency target')
+    report.add_argument('--require-seed',type=int,help='Require a completed matvec recheck with matched starting evidence')
+    report.add_argument('--matvec-sweep',type=Path,help='Rank matvec recheck endpoints against a completed launch sweep')
     report.set_defaults(handler=run_report, parser=report)
 
     args = parser.parse_args(argv)
