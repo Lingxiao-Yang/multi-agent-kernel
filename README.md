@@ -52,7 +52,7 @@ python -m scripts.sweep_matvec results/matvec-sweep
 python -m scripts.sweep_rows --case 23 results/softmax-sweep
 ```
 
-The role study reads `role-study.json` from a fresh private campaign directory. After the code is merged, register the full mainline commit in `revision`, the ordered integer case IDs in `cases`, the new integer search seeds in `seeds` and the knowledge-card choice as a boolean in `knowledge`. One job index identifies one case, seed and variant. Successive pairs alternate which variant goes first. The same case and seed share one starting Nsight Compute measurement. Each search has four candidate slots and at most 16 calls.
+The role study reads `role-study.json` from a fresh private campaign directory. After the code is merged, register the full mainline commit in `revision`, the ordered integer case IDs in `cases`, the five new integer search seeds in `seeds` and the knowledge-card choice as a boolean in `knowledge`. One job index identifies one case, seed and variant. Successive pairs alternate which variant goes first. The same case and seed share one starting Nsight Compute measurement. Each search has four candidate slots and at most 16 calls.
 
 On Lonestar6, the submit directory contains the registered checkout as `project/`, prepared cases under `preflight/`, the registration under `campaign/`, the CUDA module name in `cuda-module`, and a zstd runtime archive `runtime.tar.zst` containing `venv/` and `upstream/`. Put its expanded size in bytes in `runtime.bytes`. The job stages the checkout and runtime on node-local storage, verifies the frozen start and probes counters before loading the model credential from the account's private `~/.openai_env` (mode 600). Submit the indices for a pair in the same allocation.
 
@@ -70,4 +70,4 @@ kernel-study run roles --job 0 --preflight "$KERNEL_BASELINE_PREFLIGHT" \
 kernel-study report roles results/campaign
 ```
 
-The report records confirmed gains and fallbacks per task, direct finalist latencies, matched candidate and spend curves, and the costs of interrupted attempts. A recorded transport interruption permits one `--retry-transport` on the same job. Use `report roles --measure-pairs` on the pair's registered GPU to complete missing finalist timings without a model call. [Historical results](../../tree/results)
+The report records confirmed final gains and fallbacks per task, direct finalist latencies, performance against launch-sweep references, matched candidate and spend curves, and the costs of interrupted attempts. A recorded transport interruption permits one `--retry-transport` on the same job. Use `report roles --measure-pairs` on the pair's registered GPU to complete missing finalist timings without a model call. [Historical results](../../tree/results)

@@ -98,9 +98,11 @@ def test_role_report_counts_searches_with_confirmed_gains_and_uses_direct_measur
             for agent in ('single','multi'):
                 gained=case==4 and agent=='multi'
                 path=tmp_path/f'roles-{case}-{agent}-{seed}'
+                lost_at_endpoint=case==23 and agent=='single' and seed==44
                 write_json(path/'audit.json',dict(agent=agent,case=case,seed=seed,status='complete',fallback=not gained,
                            initial_ms=10.,latency_ms=8. if gained else 10.,cost_usd=.12,committed_usd=.12,
-                           budget={'attempts':1},candidates=[dict(attempt=1,usd=.12,status='ok',latency_ms=8.,selected=gained)]))
+                           budget={'attempts':1},candidates=[dict(attempt=1,usd=.12,status='ok',latency_ms=8.,selected=gained or lost_at_endpoint,
+                                                               endpoint_status='unconfirmed' if lost_at_endpoint else None)]))
                 write_json(path/'matched-evidence.json',dict(identical=True))
             pair=tmp_path/'pairs'/f'roles-{case}-{seed}'/'single-vs-multi'
             write_json(pair/'direct.result.json',dict(status='ok',candidate={'median_ms':4. if case==4 else 1.},incumbent={'median_ms':1.}))
@@ -109,6 +111,10 @@ def test_role_report_counts_searches_with_confirmed_gains_and_uses_direct_measur
     assert r['complete'] and r['comparisons']['single-vs-multi']['ratio']==pytest.approx(2.)
     assert r['tasks']['4']['multi']['confirmed_gain_searches']==2
     assert r['tasks']['23']['single']['fallbacks']==2
+    assert r['tasks']['23']['single']['confirmed_gain_searches']==0
+    assert r['tasks']['4']['reference_ms']=={'random_best_of_four':4.10,'best_launch':3.17}
+    row=next(s for s in r['searches'] if s['case']==4 and s['agent']=='multi')
+    assert row['at_or_below_reference']=={'random_best_of_four':False,'best_launch':False}
     assert r['comparisons']['single-vs-multi']['matched_budget_ms']
     (tmp_path/'pairs/roles-4-44/single-vs-multi/direct.result.json').unlink()
     main(['report','roles',str(tmp_path)])

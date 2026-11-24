@@ -194,7 +194,7 @@ def report_matvec_recheck(args, plan, parser):
         parser.error('matvec rechecks report individual endpoints for the registered seeds')
     rows,attempts,_ = phase_rows(args.output,args.phase,[4],seeds)
     results = {}
-    reference = plan['matvec_reference_ms']
+    reference = plan['launch_reference_ms']['4']
     sweep = matvec_screen_times(args.matvec_sweep,plan['cases']['4']) if args.matvec_sweep else None
     for row in rows:
         path = args.output/row['run']/'matched-evidence.json'
@@ -225,10 +225,10 @@ def report_matvec_recheck(args, plan, parser):
         raise SystemExit(3)
 
 
-def row_qualification(report, rows, spec, threshold):
-    for case in spec['cases']:
+def row_qualification(report, rows, cases, references, threshold):
+    for case in cases:
         task = report['tasks'][str(case)]
-        task['reference_ms'] = spec['reference_ms'][str(case)]
+        task['reference_ms'] = references[str(case)]
         pair = [r for r in rows if r['case']==case]
         ratio = task['ratio']
         if ratio is None or not any((r.get('matched_evidence') or {}).get('identical') for r in pair):
@@ -263,7 +263,7 @@ def matched_budgets(rows, cases, seeds):
     return budgets
 
 
-def report_roles(root, spec):
+def report_roles(root, spec, references):
     cases,seeds = spec['cases'],spec['seeds']
     contrasts = roles.comparisons(spec)
     agents = list(dict.fromkeys(agent for contrast in contrasts for agent in contrast))
@@ -275,11 +275,13 @@ def report_roles(root, spec):
             completed[row['case'],row['seed'],row['agent']] = row
     tasks = {}
     for case in cases:
-        tasks[str(case)] = {}
+        tasks[str(case)] = {'reference_ms':references.get(str(case),{})}
         for agent in agents:
             runs = [row for (c,s,a),row in completed.items() if c==case and a==agent]
-            tasks[str(case)][agent] = dict(completed=len(runs),fallbacks=sum(r['fallback'] for r in runs),
-                confirmed_gain_searches=sum(any(c.get('selected') for c in r['candidates']) for r in runs))
+            for row in runs:
+                row['at_or_below_reference'] = {name:row['latency_ms']<=ms for name,ms in tasks[str(case)]['reference_ms'].items()}
+            fallbacks = sum(r['fallback'] for r in runs)
+            tasks[str(case)][agent] = dict(completed=len(runs),fallbacks=fallbacks,confirmed_gain_searches=len(runs)-fallbacks)
     effects = {}
     for left,right in contrasts:
         name = left+'-vs-'+right
@@ -345,7 +347,7 @@ def run_report(args, parser):
                     sides = [latest_attempt(args.output,job_name(args.phase,case,agent,seed)) for agent in ('single','greedy')]
                     measure_pair(pair,*sides)
     if args.phase=='roles':
-        return report_roles(args.output,plan['role_study'])
+        return report_roles(args.output,plan['role_study'],plan['launch_reference_ms'])
     rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
     report = compare(rows,cases,seeds,measurements)
     if args.phase == 'row-qualification':
@@ -353,16 +355,16 @@ def run_report(args, parser):
             if row['agent']=='single':
                 path = args.output/row['run']/'matched-evidence.json'
                 row['matched_evidence'] = read_json(path) if path.is_file() else None
-        row_qualification(report,rows,spec,plan['timing']['improvement_threshold'])
+        row_qualification(report,rows,cases,plan['launch_reference_ms'],plan['timing']['improvement_threshold'])
     if args.phase == 'matvec-development':
         report['comparison_to_greedy'] = report['decision']
         if report['complete']:
             report['decision'] = 'matvec-slice-complete'
-        report['matvec_reference_ms'] = plan['matvec_reference_ms']
+        report['matvec_reference_ms'] = plan['launch_reference_ms']['4']
         blind = {agent:{'count':0,'completed':0} for agent in ('single','greedy')}
         for row in rows:
             if 'latency_ms' in row:
-                row['at_or_below_reference'] = {k:row['latency_ms'] <= ms for k,ms in plan['matvec_reference_ms'].items()}
+                row['at_or_below_reference'] = {k:row['latency_ms'] <= ms for k,ms in plan['launch_reference_ms']['4'].items()}
                 if row['status']=='complete':
                     blind[row['agent']]['completed'] += 1
                     blind[row['agent']]['count'] += row['at_or_below_reference']['random_best_of_four']
