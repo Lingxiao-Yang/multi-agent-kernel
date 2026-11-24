@@ -1,26 +1,19 @@
-"""Profile one public GELU launch after warming up the kernel."""
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from kernel_study.judge.interface import local_forward
-from kernel_study.tasks.kernelbench import experiment
-from kernel_study.tasks.starts import start
-
-
+"""Profile one small launch of the registered GELU device kernel."""
 def main():
     import torch
-    case = dict(experiment()['cases']['26'], output_shape=[1, 2048])
-    x = torch.zeros(case['output_shape'], device='cuda', dtype=torch.float32)
-    source, config = start(case)
-    with TemporaryDirectory() as directory:
-        path = Path(directory)/'device.py'
-        path.write_text(source)
-        forward = local_forward(case, path, config, [x])
+    from kernel_study.tasks.baselines.gelu import gelu
+
+    x = torch.zeros(2048, device='cuda', dtype=torch.float32)
+    y = torch.empty_like(x)
+    def forward():
+        gelu[(1,)](x, y, 2048, 2048, num_warps=4, num_stages=1)
+    forward()
+    torch.cuda.synchronize()
+    torch.cuda.cudart().cudaProfilerStart()
+    try:
         forward()
         torch.cuda.synchronize()
-        torch.cuda.cudart().cudaProfilerStart()
-        forward()
-        torch.cuda.synchronize()
+    finally:
         torch.cuda.cudart().cudaProfilerStop()
 
 

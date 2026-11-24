@@ -5,8 +5,8 @@ from kernel_study.judge.select import changed_program
 from kernel_study.records import write_json
 
 
-@pytest.mark.parametrize('interface', ['native','declarative'])
-def test_final_selection_checks_every_candidate_against_the_current_winner(tmp_path, monkeypatch, interface):
+def test_final_selection_checks_every_candidate_against_the_current_winner(tmp_path, monkeypatch):
+    interface = 'native'
     start = {'id':0, 'source':str(tmp_path/'baseline.py'), 'config':None}
     candidates = []
     for i in range(5):
@@ -31,7 +31,7 @@ def test_final_selection_checks_every_candidate_against_the_current_winner(tmp_p
 
 def test_pair_worker_receives_both_recorded_finalists_and_reuses_raw_samples(tmp_path, monkeypatch):
     directories = {}
-    for agent, interface in [('single','declarative'),('greedy','native')]:
+    for agent, interface in [('single','native'),('greedy','native')]:
         directory = tmp_path/agent
         directory.mkdir()
         (directory/'winner.py').write_text('pass')
@@ -52,7 +52,7 @@ def test_pair_worker_receives_both_recorded_finalists_and_reuses_raw_samples(tmp
     req = calls[0]
     assert req['source'] == str(directories['single']/'winner.py')
     assert req['incumbent_source'] == str(directories['greedy']/'winner.py')
-    assert (req['interface'],req['incumbent_interface']) == ('declarative','native')
+    assert req['interface']=='native' and 'config' not in req
 
 
 def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
@@ -60,3 +60,26 @@ def test_formatting_and_docstrings_do_not_turn_a_start_into_a_new_candidate():
     copied = '# same launch\ndef run(x):\n    """new explanation"""\n    return x+1\n'
     assert not changed_program(copied,start)
     assert changed_program(copied.replace('x+1','x+2'),start)
+
+
+def test_numerical_failure_at_the_endpoint_cannot_count_as_a_correct_new_candidate(tmp_path):
+    from kernel_study.records import event
+    budget = {'attempts':1,'committed_usd':0.05}
+    event(tmp_path/'model_events.jsonl', 'request', stage='proposal', id=1, budget=budget)
+    write_json(tmp_path/'summary.json', dict(manifest={'case':{'public_id':4},'seed':11},status='complete',
+               budget=budget,history=[{'attempt':1,'result':{'status':'ok'}}],
+               selection=[{'attempt':1,'status':'ok','selected':True,'latency_ms':1.,'endpoint_status':'incorrect'}]))
+    assert not referee.audit(tmp_path,'greedy')['correct_new']
+
+
+def test_audit_keeps_paired_library_latencies_and_upstream_winner(tmp_path):
+    final=dict(status='ok',paired_speedup=2.,candidate={'median_ms':4},incumbent={'median_ms':8},
+               compile={'median_ms':3.5},compile_candidate={'median_ms':4.1},
+               library={'median_ms':3.},library_candidate={'median_ms':4.2})
+    write_json(tmp_path/'summary.json',dict(manifest={'case':{'public_id':4},'seed':771},status='complete',
+               budget={'attempts':0,'calls':0},final={'candidate_id':1,'source':'proposal.py','interface':'native','result':final},
+               upstream_selected={'source':'proposal.py','latency_ms':6.5}))
+    audit=referee.audit(tmp_path,'greedy')
+    assert audit['eager_ms']==3. and audit['eager_candidate_ms']==4.2
+    assert audit['compile_ms']==3.5 and audit['compile_candidate_ms']==4.1
+    assert audit['upstream_selected']['latency_ms']==6.5 and audit['latency_ms']==4

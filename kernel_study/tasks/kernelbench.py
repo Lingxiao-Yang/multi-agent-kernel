@@ -1,6 +1,5 @@
 """Registered KernelBench tasks, upstream revisions and tensor layouts."""
 import importlib.util
-import math
 import os
 import subprocess
 from pathlib import Path
@@ -48,16 +47,26 @@ def task_inputs(case, seed):
     return model, inputs, inputs+parameters
 
 
-def layout(case):
-    shape = case['output_shape']
-    m, n = shape[0], math.prod(shape[1:])
-    scalars = {'M':m, 'ROWS':m, 'N':n, 'TOTAL':m*n, 'RB':1 << (n-1).bit_length()}
-    names = ['X']
-    scratch = 2*m
-    if case['family'] in ('matmul','matvec'):
-        names, scalars['K'] = ['A','B'], case['k']
-    if case['family'] in ('softmax','layernorm'):
-        scratch = 2*m*(1 + (n+1023)//1024)
-    if case['family'] == 'layernorm':
-        names += ['W','B']
-    return names,scalars,scratch
+def test_source(case):
+    return f"""from pathlib import Path
+from kernel_study.judge.policy import check_source
+
+check_source(Path(__file__).with_name('kernel.py').read_text())
+
+import torch
+from kernel import kernel_function
+from kernel_study.tasks import kernelbench
+from kernel_study.judge.correctness import check_forward
+
+def test_kernel():
+    plan = kernelbench.experiment()
+    case = plan['cases'][{str(case['public_id'])!r}]
+    with torch.no_grad():
+        model, inputs, buffers = kernelbench.task_inputs(case, plan['validation_seeds'][0])
+        check_forward(kernel_function, buffers, model(*inputs), case)
+    return True
+
+if __name__ == '__main__':
+    test_kernel()
+    print('PASS')
+"""

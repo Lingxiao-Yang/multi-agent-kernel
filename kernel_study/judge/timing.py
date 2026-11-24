@@ -1,4 +1,6 @@
 """Paired timing, compiler resources and noise calibration."""
+from collections import deque
+from statistics import median
 import time
 
 
@@ -8,25 +10,54 @@ def summarize(values):
             "p75_ms": float(np.percentile(values, 75)), "min_ms": min(values), "samples_ms": values}
 
 
+def cuda_milliseconds(forward, repeats, events):
+    start, end = events
+    start.record()
+    for _ in range(repeats):
+        forward()
+    end.record()
+    end.synchronize()
+    return start.elapsed_time(end)
+
+
 def time_pair(a, b, protocol):
     import torch
-    for _ in range(protocol["warmup"]):
-        a(); b()
-    torch.cuda.synchronize()
+    forwards = (a, b)
+    events = (torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True))
+    warm = [deque(maxlen=5), deque(maxlen=5)]
+    work_ms = 0.
+    pairs = 0
+    if 'warmup_ms' in protocol:
+        for forward in forwards:
+            forward()
+            torch.cuda.synchronize()
+        while work_ms < protocol['warmup_ms']:
+            for side, forward in enumerate(forwards):
+                elapsed = cuda_milliseconds(forward, 1, events)
+                warm[side].append(elapsed)
+                work_ms += elapsed
+            pairs += 1
+    else:
+        for _ in range(protocol['warmup']):
+            a()
+            b()
+        torch.cuda.synchronize()
+
     samples = [[], []]
-    inner = protocol["inner_repeats"]
-    # Fixed alternating AB/BA order limits temporal bias; no overlapping work.
-    for rep in range(protocol["timing_repeats"]):
-        for index in ([0, 1] if rep % 2 == 0 else [1, 0]):
-            fn = (a, b)[index]
-            start, end = torch.cuda.Event(enable_timing=True), torch.cuda.Event(enable_timing=True)
-            start.record()
-            for _ in range(inner):
-                fn()
-            end.record()
-            end.synchronize()
-            samples[index].append(start.elapsed_time(end) / inner)
-    return [summarize(x) for x in samples]
+    inner = protocol['inner_repeats']
+    for rep in range(protocol['timing_repeats']):
+        for side in ((0, 1) if rep % 2 == 0 else (1, 0)):
+            elapsed = cuda_milliseconds(forwards[side], inner, events)
+            samples[side].append(elapsed / inner)
+    result = [summarize(side) for side in samples]
+    for side, observed in enumerate(warm):
+        if observed:
+            reference = median(observed)
+            limit = protocol['slow_sample_ratio'] * reference
+            result[side].update(warmup_gpu_ms=work_ms, warmup_pairs=pairs,
+                                warmup_median_ms=reference, slow_sample_threshold_ms=limit,
+                                slow_sample_indices=[i for i,ms in enumerate(samples[side]) if ms > limit])
+    return result
 
 
 def resource_summary(compiled):

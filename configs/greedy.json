@@ -1,0 +1,10 @@
+{
+  "strategy": "greedy",
+  "num_workers": 1,
+  "strategy_config": {"max_no_improvement": 5},
+  "high_reasoning_effort": true,
+  "benchmark_warmup": 2610,
+  "benchmark_repeat": 100,
+  "divergence_threshold": 50.0,
+  "target_platform": "cuda"
+}

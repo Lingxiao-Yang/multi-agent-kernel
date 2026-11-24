@@ -1,149 +1,35 @@
-# Experimental Protocol and Completion Criteria
+# Public kernel study protocol
 
-The [project proposal](proposal_final.pdf) defines the research question.
-This document records the implementation choices, deviations from the
-proposal, and the gates for calling the study complete. It does not swap the
-full experiment for a smaller engineering exercise.
+The role comparison asks what changes when four specialist system prompts replace one general system prompt within the same four-stage search. The external qualification compared the local `single` loop with one worker of KernelAgent's `greedy`. The original proposal described 144 searches over twelve tasks. The public campaign uses the budgets and measurements below. [Original proposal](proposal_final.pdf) · [Baseline qualification](AGENT_BASELINE_PLAN.md)
 
-## Primary study
+## One search
 
-**Scale.** Twelve cases × four variants × three seeds give 144 searches.
-Every search in a family starts from the same baseline source hash.
+A case fixes a KernelBench Level 1 problem, public input shapes and dtype, tolerances, verifier and native Triton start. The start has one Python entry point, `kernel_function`. Its wrapper may inspect metadata, allocate output and temporary tensors, launch kernels and return the output. The device code performs the numerical work. Changes to launch parameters, constants and algorithms are all eligible. [Cases and frozen environment](../configs/agent_baseline.json)
 
-**Budgets.**
+1. The two local variants receive the same starting source, task, verifier, hardware specifications and measured starting counters. One capture of the last kernel supplies both sides of each case–seed pair. The search can profile a new incumbent. A run records the source and counter hashes, prompts, responses and measurements.
+2. Analysis gives bottleneck hypotheses and supporting measurements. Advice describes at most three proposed edits or trade-offs in short sentences. Implementation returns a complete module in `source` and its `rationale`. Review returns `diagnosis`, `outcome` and `next_step` after the judge runs. Analysis, advice and review use prose. The judge decides retention.
+3. Each local search permits four candidate attempts, 16 model calls and up to 500,000 tokens. It records actual usage for the fixed model snapshot and prices. An unchanged proposal, compilation failure or wrong output consumes an attempt. A transport interruption permits one fresh attempt at the job, with both runs' usage preserved.
+4. The common judge screens each proposal before import, evaluates the full output on search seed 101 and checks that inputs remain unchanged. It times a correct module against the incumbent. A candidate must exceed a 1.01× latency ratio in each of two paired measurements to replace the incumbent.
+5. The final judge replays proposals in submission order on seeds 10001–10005 and on zeros, constants, large and negative inputs. LayerNorm also uses a large-offset input. Pressure tests compare against an FP64 reference with the configured tolerance and eager's measured numerical error. The judge rechecks the selected candidate against the original start. It records the actual source and latency when the search falls back to the start.
 
-- Each search has matched caps of 20 candidate attempts and 100 model calls.
-- Actual token use is reported, and token-limited runs are flagged separately.
-- The default 500,000-token safety cap is provisional until after the pilot
-  review.
+## Timing and controls
 
-**Shared conditions.** All four variants use:
+The A100 protocol measures full forwards, including output allocation. Each side runs once before measurement. The pair then accumulates at least 2,610 ms of GPU warm-up. CUDA events time nine samples of one forward per side, alternating AB/BA order. Each record retains the raw samples, median, quartiles and indices above 1.05 times that side's final warm-up median. All nine samples contribute to the reported median.
 
-- the same underlying model;
-- four sequential calls per candidate;
-- the same context construction and sampling settings;
-- greedy retention and the same evidence.
+Each speed ratio uses both samples from its own paired measurement. The finalist has separate pairs against its incumbent, eager and `torch.compile` in `max-autotune-no-cudagraphs` mode. Compilation time is recorded separately. Calibration and an independent hold each compare the frozen start against itself 20 times at 1.01, with two rounds per trial. Exact FP32 matrix multiplication disables TF32. Launch sweeps keep the frozen algorithm and dtype and repeat finalist measurements three times. [Timing](../kernel_study/judge/timing.py) · [GPU evaluator](../kernel_study/judge/evaluate.py)
 
-**Prompts.** The single agent keeps a general prompt for all four calls. Stage
-labels give it the same analysis, planning, implementation and review steps.
-The multi-agent variants assign four specialist role prompts instead. Review
-is advisory only; the automated harness alone decides which candidates to
-keep.
+## Registration and reporting
 
-**Search space (revised after the configuration-only A100 pilot).** New model
-runs default to `source-v1`. Only the baseline kernels for the current family
-are exposed. The agent must return complete Triton source plus a declarative
-sequence of one to four launches. Function names, signatures, tiling, device
-algorithms and fusion boundaries may change. There are no `fused` or
-`tensor_core` switches and no supplied optimized implementations in the prompt.
-The trusted harness resolves buffers/scalars and launches the authored kernels;
-host Python, allocations, references and timing remain outside model control.
+The formal comparison uses the original starts for matvec (4), softmax (23), LayerNorm (40) and FP32 matrix multiplication (2). Five fresh seeds per case give 20 pairs and 40 searches for `single` and `multi` without knowledge cards.
 
-Null source and changes only to configuration, literals or identifiers consume
-an attempt and are rejected. An AST screen checks launched device bodies, but
-does not prove semantic novelty: retained source diffs must also be inspected.
-Failed proposals, source and diagnostics remain in the record. The previous
-proposal is available for repair, with repairs consuming the same attempt budget.
+Before scoring, register the merged mainline commit, these four case IDs, the five seed values and the knowledge-card choice. Qualification, real-model smoke and zero-model launch sweeps have separate outputs. The matched arms use the same snapshot, prices, sampling settings, information and candidate budget. Paired searches run on the same A100 UUID and their finalists are timed in one worker. Each case and seed has a recorded run order. [Campaign entry point](../kernel_study/campaign/jobs.py)
 
-The old `parameter-control` mode remains available explicitly. Job 3582416 is
-a configuration-selection control, not evidence of agent-authored kernel
-optimization. Its cohort must never be pooled with `source-v1` results.
+For each task, count searches whose final kernel confirms a gain over the start, and searches that return the start. Report direct finalist latencies in ms, costs and where each endpoint falls relative to the task’s launch-parameter references. Show best correct latency at matched candidate counts and actual dollar spend. For each requested contrast, take the geometric mean of the direct latency ratios within a case, then weight the cases equally. An incomplete comparison reports its observed pairs and leaves the overall ratio empty. If knowledge-card variants are registered, compare roles within each knowledge condition and cards within each role. [Campaign report](../kernel_study/campaign/report.py)
 
-## Validation and timing
+## Analysis in the original proposal
 
-**Correctness criteria.** Tolerances (dtype, `atol`, `rtol`) are fixed per
-case in `configs/cases.json`. All tensors are contiguous.
+The original twelve-case design specified 20 candidates and 100 calls per search, with three seeds for each of four role and knowledge conditions. Its source-only and configuration-control runs retain their original measurement protocols. The public role comparison reports results separately by model snapshot, provider, source and GPU.
 
-**Inputs.**
+The four-arm analysis uses paired log speedups. It averages seed effects within each case and resamples whole cases 5,000 times with seed 42. It reports the role effect without cards, the card effect for the single agent, the role effect with cards and the interaction `(multi_knowledge × single) / (multi × single_knowledge)`. Computing these quantities requires complete matched observations. [Factorial analysis](../kernel_study/campaign/factorial.py)
 
-- Search uses seeds 101, 202 and 303.
-- Final validation uses seeds 10001–10005, which are never seen during search.
-- Every validation also tests zero, constant, large-magnitude and negative
-  inputs.
-
-**Reference checks.**
-
-- The trusted reference runs on cloned inputs.
-- Each candidate must overwrite deliberately poisoned output buffers.
-- Inputs must be bitwise unchanged after the candidate runs.
-
-**Timing.**
-
-- Warm-up and the first launch are excluded from timing.
-- Candidate and baseline alternate in AB/BA order using CUDA events: 31
-  samples of 10 inner repetitions each.
-- The median and IQR are reported, and the raw samples are kept.
-
-**Acceptance.** A candidate is kept only if it is correct and beats the
-incumbent by more than 1.01× in two separate paired comparisons. This
-threshold is a pilot choice, not a statistical test.
-
-**Reported speedups.**
-
-- Search curves use timings relative to the baseline.
-- Final speedups come from remeasuring the selected candidate and the
-  baseline together.
-
-**Fallback.** If a candidate fails final validation on fresh inputs, the
-harness falls back to the previously retained candidate, then the one before
-it. The initial kernel is always eligible, so a run with no improvement scores
-1.0.
-
-**Final-evaluation budget.** Final evaluation covers at most 21 retained
-candidates, the same for every variant. The actual number of attempts depends
-on failures and is logged.
-
-**Profiling.** Compiler resource usage is collected for the baseline and for
-each new incumbent, up to 21 invocations. Nsight counter access was verified on
-A100 job 3582405. The revised pilot freezes the common feedback mode to timing
-and compiler resources; per-candidate Nsight counters are not yet integrated.
-Hardware-counter bottleneck claims cannot be inferred from resource reports
-or speedups.
-
-## Analysis
-
-**Effects.** Runs are paired by case and seed across all four variants, and
-effects are computed on log speedups. Within each case, the paired effects
-are averaged.
-
-**Uncertainty.** Whole cases are then resampled in a case-cluster bootstrap:
-5,000 resamples with seed 42.
-
-**Reported quantities.**
-
-- The role effect without knowledge.
-- The knowledge effect for the single agent.
-- The role effect with knowledge.
-- The multiplicative interaction,
-  `(multi_knowledge × single) / (multi × single_knowledge)`.
-
-**Exclusions and pooling.**
-
-- Missing and incomplete runs are reported, and no runs are selected after
-  the fact.
-- Token-limited runs and runs that failed at the endpoint are reported
-  separately.
-- Results are never pooled across:
-  - different GPUs, such as a local RTX GPU and an A100;
-  - different providers;
-  - different source hashes or model versions.
-
-## Gates before declaring the experiment complete
-
-1. A100 correctness and software compatibility are verified on every case.
-2. Profiling capability is checked; if needed, a common reduced mode is frozen
-   explicitly.
-3. The model, prices, token safety cap, cases, knowledge bank and protocol
-   hashes are frozen.
-4. The four-variant pilot passes and its cost is reviewed.
-5. The primary repeated searches are complete, including unsuccessful runs.
-6. Role and knowledge-category ablations on two cases are complete, and
-   example mechanisms are inspected.
-7. The following are produced:
-   - confidence intervals and cost curves;
-   - library comparisons and measured throughput;
-   - justified roofline bounds;
-   - the final report and presentation.
-
-Completion is measured against these milestones. Unit tests and source code
-alone cannot show that steps 4–7 are complete.
+The original proposal also calls for role and knowledge-category ablations on two cases, inspection of example mechanisms, uncertainty intervals, cost curves, library comparisons, measured throughput and justified roofline bounds. Those experiments and their report follow the model and protocol freeze. The qualification outcomes and smoke latencies describe their observed tasks and seeds.

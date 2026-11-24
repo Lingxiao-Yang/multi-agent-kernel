@@ -1,6 +1,23 @@
 import pytest
 
+from kernel_study.campaign import preflight
 from kernel_study.campaign.preflight import hand_forward
+from kernel_study.tasks.kernelbench import experiment
+
+
+def test_check_device_selects_torchs_gpu_and_records_its_uuid(monkeypatch):
+    plan = experiment()
+    info = {k:plan[k] for k in ('torch','triton','cuda')}
+    info.update(gpu='NVIDIA A100-PCIE-40GB',uuid='bbbb',node='v330-test')
+    monkeypatch.setattr(preflight,'environment',lambda: dict(info))
+    monkeypatch.setattr(preflight.subprocess,'check_output',
+                        lambda *args,**kwargs: 'GPU-aaaa, 100.0\nGPU-bbbb, 570.195.03\n')
+    result = preflight.check_device(plan)
+    assert result['uuid']=='GPU-bbbb' and result['driver']=='570.195.03'
+    with pytest.raises(ValueError):
+        preflight.check_device(dict(plan,driver='other'))
+    with pytest.raises(ValueError):
+        preflight.check_device(dict(plan,gpu='NVIDIA A800-SXM4-80GB'))
 
 
 @pytest.mark.gpu

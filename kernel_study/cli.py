@@ -19,7 +19,8 @@ def main(argv=None):
     preflight.set_defaults(handler=run_preflight, parser=preflight)
 
     run = commands.add_parser('run', help='run one registered search')
-    run.add_argument('phase',choices=['smoke','calibration','development','holdout'])
+    report_phases = ['matched-smoke','matvec-development','matvec-recheck','row-qualification','development','holdout','roles']
+    run.add_argument('phase',choices=['smoke','multi-smoke','calibration',*report_phases])
     run.add_argument('--preflight',type=Path,required=True)
     run.add_argument('--output',type=Path,required=True)
     run.add_argument('--counters',type=Path,required=True)
@@ -32,10 +33,12 @@ def main(argv=None):
     run.set_defaults(handler=run_campaign, parser=run)
 
     report = commands.add_parser('report', help='summarize directly paired finalists')
-    report.add_argument('phase',choices=['development','holdout'])
+    report.add_argument('phase',choices=report_phases)
     report.add_argument('output',type=Path)
     report.add_argument('--freeze',action='store_true',help='Register the measured single implementation before holdout')
     report.add_argument('--measure-pairs',action='store_true',help='Measure missing finalist pairs on the registered GPU')
+    report.add_argument('--require-seed',type=int,help='Require a completed matvec recheck with matched starting evidence')
+    report.add_argument('--matvec-sweep',type=Path,help='Rank matvec recheck endpoints against a completed launch sweep')
     report.set_defaults(handler=run_report, parser=report)
 
     args = parser.parse_args(argv)
