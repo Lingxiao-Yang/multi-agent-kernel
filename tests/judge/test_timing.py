@@ -21,7 +21,7 @@ def test_library_comparison_uses_its_own_candidate_samples(monkeypatch, public_c
     monkeypatch.setattr(worker, 'environment', lambda: {})
     monkeypatch.setattr(worker, 'validate', lambda *args: ([], 0.))
     monkeypatch.setattr(worker, 'task_inputs', lambda *args: (lambda: None, [], []))
-    monkeypatch.setattr(worker, 'bind', lambda *args: (lambda: None, []))
+    monkeypatch.setattr(worker, 'bind', lambda *args: lambda: None)
     timings = iter([(2., 2.), (4., 12.)])
     monkeypatch.setattr(timing, 'time_pair', lambda *args: [
         {'median_ms': value, 'samples_ms': [value]} for value in next(timings)])

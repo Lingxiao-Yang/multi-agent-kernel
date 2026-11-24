@@ -7,6 +7,7 @@ __pycache__/
 *.egg-info/
 .env
 /AGENT_BASELINE_LOG.md
+/REFACTOR_LOG.md
 tmp/
 *.ncu-rep
 

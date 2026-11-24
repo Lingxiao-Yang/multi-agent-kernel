@@ -44,7 +44,7 @@ def environment():
         result.update(torch=torch.__version__, triton=triton.__version__, cuda=torch.version.cuda)
         if torch.cuda.is_available():
             p = torch.cuda.get_device_properties(0)
-            result.update(gpu=p.name, memory_bytes=p.total_memory,
+            result.update(gpu=p.name, uuid=str(p.uuid), node=platform.node(), memory_bytes=p.total_memory,
                           capability=list(torch.cuda.get_device_capability(0)), sm_count=p.multi_processor_count)
     except ImportError:
         pass
@@ -54,8 +54,8 @@ def environment():
 def code_hashes():
     package = ROOT/'kernel_study'
     files = [path for path in package.glob('*.py') if path.name != 'cli.py']
-    files.extend(package/'campaign'/name for name in ('__init__.py', 'jobs.py', 'preflight.py'))
+    files.extend(package/'campaign'/name for name in ('__init__.py', 'jobs.py', 'preflight.py', 'roles.py'))
     for directory in ('tasks', 'judge', 'agents'):
         files.extend((package/directory).rglob('*.py'))
-    files.extend(ROOT/p for p in ('configs/agent_baseline.json', 'configs/protocol.json', 'knowledge/cards.json'))
+    files.extend(ROOT/p for p in ('configs/agent_baseline.json', 'configs/protocol.json', 'configs/greedy.json', 'knowledge/cards.json'))
     return {path.relative_to(ROOT).as_posix():digest(path.read_text(encoding='utf-8')) for path in sorted(files)}

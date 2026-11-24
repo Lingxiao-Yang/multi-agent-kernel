@@ -16,15 +16,14 @@ def test_common_worker_with_official_matvec_and_hidden_seed(tmp_path,preflight_d
     plan = experiment()
     case = plan['cases']['4']
     base = preflight_dir/'4'
-    config = read_json(base/'preflight.json')['launch']
-    protocol = dict(read_json(ROOT/'configs/protocol.json'),**{'final_validation_seeds':[10001]})
+    protocol = dict(read_json(ROOT/'configs/protocol.json'), **{'final_validation_seeds':[10001]})
     protocol.update(plan['timing'],worker_timeout_s=600)
-    for interface,source in [('native','input.py'),('declarative','device.py')]:
-        result = run_worker(dict(case=case,protocol=protocol,config=config,source=str(base/source),
-                                 interface=interface,final=True,library=True),tmp_path,interface)
-        assert result['status']=='ok', result.get('error')
-        assert result['validation'][0]['inputs_unchanged']
-        assert all(len(result[k]['samples_ms'])==9 for k in ('library_candidate','library','compile_candidate','compile'))
+    result = run_worker(dict(case=case,protocol=protocol,source=str(base/'input.py'),
+                             interface='native',final=True,library=True,profile=True),tmp_path,'native')
+    assert result['status']=='ok', result.get('error')
+    assert result['validation'][0]['inputs_unchanged']
+    assert result['profile']['kernels'] and result['profile']['kernels'][0]['registers_per_thread']
+    assert all(len(result[k]['samples_ms'])==9 for k in ('library_candidate','library','compile_candidate','compile'))
 
 
 @pytest.mark.gpu

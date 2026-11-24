@@ -29,7 +29,7 @@ def pytest_collection_modifyitems(items):
 @pytest.fixture
 def public_case():
     return dict(public_id=26, id='test', family='gelu', dtype='float32',
-                shape=[8, 32], output_shape=[8, 32], atol=1e-5, rtol=1e-5)
+                problem='public torch task',test='public correctness script', shape=[8, 32], output_shape=[8, 32], atol=1e-5, rtol=1e-5)
 
 
 @pytest.fixture

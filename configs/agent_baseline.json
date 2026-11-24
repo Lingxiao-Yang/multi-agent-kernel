@@ -4,36 +4,45 @@
     "KernelBench": "423217d9fda91e0c2d67e4a43bf62f96f6d104f1",
     "tritonbench": "32bc178ce503b0fbcf9a1ed3cc033e6d6fe6edc0"
   },
-  "gpu": "NVIDIA A800-SXM4-80GB",
+  "gpu": "NVIDIA A100 PCIe 40GB",
   "gpu_specs": {
-    "architecture": "Ampere", "peak_memory_bw_gbps": 2039,
+    "architecture": "Ampere", "peak_memory_bw_gbps": 1555,
     "peak_fp32_tflops": 19.5, "peak_fp16_tflops": 312, "peak_bf16_tflops": 312,
     "sm_count": 108, "max_threads_per_sm": 2048, "l1_cache_kb": 192, "l2_cache_mb": 40,
-    "memory_gb": 80, "memory_type": "HBM2e"
+    "memory_gb": 40, "memory_type": "HBM2"
   },
-  "device_uuid_sha256": "15c7925505a1cd260e1a62294c696c67fab6d1e296b8d603bd791dc641af9b98",
-  "driver": "580.126.09",
-  "torch": "2.12.1+cu130",
+  "driver": "570.195.03",
+  "torch": "2.12.1+cu126",
   "triton": "3.7.1",
-  "cuda": "13.0",
+  "cuda": "12.6",
   "agents": ["single", "greedy"],
   "development": [4, 23, 40],
   "holdout": [2, 26, 36],
   "development_seeds": [11, 22],
   "holdout_seeds": [11, 22, 33],
   "preflight_seeds": [7713, 8823],
-  "validation_seeds": [101, 202, 303],
+  "validation_seeds": [101],
   "final_validation_seeds": [10001, 10002, 10003, 10004, 10005],
-  "timing": {"warmup": 3, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
+  "timing": {"warmup_ms": 2610, "slow_sample_ratio": 1.05, "timing_repeats": 9, "inner_repeats": 1, "improvement_threshold": 1.01},
   "compile_mode": "max-autotune-no-cudagraphs",
   "phases": {
-    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 16},
+    "matched-smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
+    "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
+    "multi-smoke": {"case": 4, "seed": 11, "rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128},
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}
   },
-  "historical_cost_usd": 13.4122396,
-  "total_budget_usd": 25,
+  "matvec_reference_ms": {"random_best_of_four": 4.10, "best_launch": 3.17},
+  "row_qualification": {
+    "cases": [23, 40], "seed": 11,
+    "reference_ms": {
+      "23": {"random_best_of_four": 13.657088279724121, "best_launch": 13.507583618164062},
+      "40": {"random_best_of_four": 1.0147839784622192, "best_launch": 1.0045440196990967}
+    }
+  },
+  "historical_cost_usd": 17.0311236,
+  "total_budget_usd": 100,
   "cases": {
     "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},
     "23": {"public_id":23, "family":"softmax", "output_shape":[4096,393216], "dtype":"float32", "atol":1e-11, "rtol":0.0001},

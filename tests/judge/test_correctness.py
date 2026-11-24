@@ -1,9 +1,8 @@
 import pytest
 
 from kernel_study.judge.correctness import check_forward, fp64_chunks
-from kernel_study.judge.interface import local_forward, prepare
 from kernel_study.tasks.kernelbench import experiment
-from kernel_study.tasks.starts import start
+from kernel_study.tasks.starts import start_path, load_native
 
 
 def test_common_referee_rejects_mutation_wrong_shape_and_wrong_dtype():
@@ -18,17 +17,14 @@ def test_common_referee_rejects_mutation_wrong_shape_and_wrong_dtype():
 @pytest.mark.gpu
 def test_layernorm_start_preserves_small_differences_on_large_offsets(tmp_path):
     import torch
-    case={**experiment()['cases']['40'],'output_shape':[3,4,16,79]}
+    case = experiment()['cases']['40']
     torch.manual_seed(10001)
     x=torch.rand(case['output_shape'],device='cuda')/32+1024
     model=torch.nn.LayerNorm(x.shape[1:],device='cuda').eval()
     with torch.no_grad():
         w,b=model.weight,model.bias
-        source,config=start(case)
-        path=tmp_path/'device.py'
-        path.write_text(source)
-        fn=local_forward(case,path,config,[x,w,b])
-        actual=check_forward(lambda *_:fn(),[x,w,b],model(x),case,
+        fn = load_native(start_path(case))
+        actual=check_forward(fn,[x,w,b],model(x),case,
                                     reference_chunks=fp64_chunks(model,[x]))
         assert actual['elements']==x.numel()
 
@@ -46,18 +42,3 @@ def test_stress_uses_the_fp64_error_of_eager_and_rejects_nonfinite():
     assert check(torch.tensor([[1.1, .9]]))['elements']==2
     for invalid in (torch.tensor([[1.2,1.]]), torch.tensor([[float('nan'),1.]])):
         with pytest.raises(AssertionError): check(invalid)
-
-
-@pytest.mark.gpu
-def test_declarative_validation_poisons_each_fresh_output(tmp_path):
-    import torch
-
-    case={**experiment()['cases']['26'],'output_shape':[2,17]}
-    source,config=start(case)
-    source=source.replace('i<TOTAL)', 'i<TOTAL-1)')
-    path=tmp_path/'partial.py'
-    path.write_text(source)
-    x=torch.ones((2,17),device='cuda')
-    forward,_=prepare(case,config,[x],path,fresh_output=True,poison_output=True)
-    for _ in range(2):
-        assert torch.isnan(forward().flatten()[-1])

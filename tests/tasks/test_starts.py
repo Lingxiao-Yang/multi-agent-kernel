@@ -1,52 +1,29 @@
 import ast
-from pathlib import Path
 
 import pytest
 
-from kernel_study.judge.interface import launched_functions, local_forward, render_native, validate_plan
-from kernel_study.tasks import starts
-from kernel_study.tasks.kernelbench import experiment
-from kernel_study.tasks.starts import load_native, start
+from kernel_study.records import digest
+from kernel_study.tasks import kernelbench, starts
 
 
-@pytest.mark.gpu
-def test_native_and_declarative_gelu_forward_share_device_code(tmp_path):
-    import torch
-    case = {**experiment()['cases']['26'], 'output_shape': [13, 781]}
-    source, config = start(case)
-    device = tmp_path/'device.py'
-    device.write_text(source)
-    host = tmp_path/'native.py'
-    host.write_text(render_native(case,source,config))
-    x = torch.randn(13,781,device='cuda')
-    saved = x.clone()
-    native = load_native(host)
-    local = local_forward(case,device,config,[x])
-    assert torch.equal(local(),native(x))
-    torch.testing.assert_close(local(),torch.nn.functional.gelu(x))
-    assert torch.equal(saved,x)
+HASHES = {
+    '2':'f9e41154bea9556175f0c45dc10d6ae1e7ad1e4ed9e479d95b266ce283e0b857',
+    '4':'6f4d7a7578e55dd40c5f966cbe8ae9c2317e389fb7a3f15fbfacf7c70ef4a165',
+    '23':'1b1ff1e691cacad6b077e955c89154ab8a014412b5c866cbca590da3626fe55e',
+    '26':'ea89595c75bf44ad1668eae6eb765b3bd5d587c141bf03dd7e6baf95bf69a499',
+    '36':'a5caed22cf12b17aa2232b834ab72d9149511675299a752d6a4c0664d757f103',
+    '40':'37f7937591f684ab13199d22ff4609861afdb5f7e7c41df23bac39e80ccf079d',
+}
 
 
-def test_native_layernorm_exposes_affine_parameter_names():
-    case = experiment()['cases']['40']
-    module = ast.parse(render_native(case,*start(case)))
-    assert [arg.arg for arg in module.body[-1].args.args] == ['X','weight','bias']
+@pytest.mark.parametrize('number', HASHES)
+def test_frozen_native_start_matches_measured_module(number):
+    source = starts.start(kernelbench.experiment()['cases'][number])
+    assert digest(source) == HASHES[number]
+    names = [n.name for n in ast.parse(source).body if isinstance(n, ast.FunctionDef)]
+    assert names.count('kernel_function') == 1
 
 
-def test_public_starts_read_their_own_device_modules(monkeypatch):
-    original=starts.device_function
-    def read(path,name):
-        assert path == Path(starts.__file__).with_name('kernels.py')
-        return original(path,name)
-    monkeypatch.setattr(starts,'device_function',read)
-    for case in ('2','23','40'):
-        assert start(experiment()['cases'][case])[1]['launches']
-
-
-def test_only_baseline_functions_are_exposed_and_all_launches_match():
-    for number in ('2', '23', '40', '26', '36'):
-        source, config = start(experiment()['cases'][number])
-        validate_plan(config)
-        launched_functions(source, config)
-        names = {node.name for node in ast.parse(source).body if isinstance(node, ast.FunctionDef)}
-        assert names == {item['kernel'] for item in config['launches']}
+@pytest.mark.upstream
+def test_matvec_matches_upstream_example():
+    assert starts.start(kernelbench.experiment()['cases']['4']) == kernelbench.matvec_path().read_text()
