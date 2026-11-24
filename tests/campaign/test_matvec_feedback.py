@@ -70,3 +70,23 @@ def test_verification_uses_the_upstream_deadline_and_keeps_failures(tmp_path):
     row = check.verify(Worker(), starts.start_path({'family':'matvec'}), {'family':'matvec','public_id':4})
     assert row['passed'] is False and row['timeout_s']==30 and row['stderr']=='test output'
     assert row['seconds'] >= 0
+
+
+def test_all_starts_keep_one_result_per_case_including_failures(tmp_path, monkeypatch):
+    seen = []
+    class Worker:
+        def __init__(self, worker_id, workdir, log_dir, test_timeout_s=30):
+            assert workdir.is_dir() and workdir == log_dir
+            assert test_timeout_s == 30
+    def verify(worker, source, case):
+        assert source == starts.start_path(case)
+        seen.append(case['public_id'])
+        return {'passed':case['public_id'] != 23, 'seconds':20., 'timeout_s':30}
+    monkeypatch.setattr(check, 'verify', verify)
+    monkeypatch.setitem(sys.modules, 'triton_kernel_agent.worker', SimpleNamespace(VerificationWorker=Worker))
+    monkeypatch.setattr(sys, 'argv', ['check', str(tmp_path), '--all-starts'])
+    with pytest.raises(SystemExit) as result:
+        check.main()
+    assert result.value.code == 1
+    assert sorted(seen) == [2,4,23,26,36,40]
+    assert all(read_json(tmp_path/str(i)/'verification.json')['passed'] == (i != 23) for i in seen)

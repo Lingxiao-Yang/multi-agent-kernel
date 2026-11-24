@@ -1,4 +1,4 @@
-"""Check the real verifier deadline and hardware feedback on archived matvec inputs."""
+"""Check frozen starts with the upstream verifier and replay matvec hardware feedback."""
 import argparse
 from pathlib import Path
 import time
@@ -41,12 +41,25 @@ def main():
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('output', type=Path)
-    parser.add_argument('--start-deadline', action='store_true')
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument('--start-deadline', action='store_true')
+    mode.add_argument('--all-starts', action='store_true')
     cases = kernelbench.experiment()['cases']
     parser.add_argument('--case', choices=cases, default='4')
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    if args.all_starts:
+        passed = []
+        for case_id, case in cases.items():
+            work = output/case_id
+            work.mkdir()
+            worker = VerificationWorker(0, work, work, test_timeout_s=30)
+            row = verify(worker, starts.start_path(case), case)
+            write_json(work/'verification.json', row)
+            print(f"{case['family']}: {row['seconds']:.3f} seconds, passed={row['passed']}", flush=True)
+            passed.append(row['passed'])
+        raise SystemExit(0 if all(passed) else 1)
     if args.case!='4' and not args.start_deadline:
         parser.error('only matvec supports the hardware feedback replay')
     case = cases[args.case]
