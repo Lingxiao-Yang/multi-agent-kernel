@@ -7,7 +7,7 @@ import subprocess
 import sys
 from decimal import Decimal
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import mkstemp
 
 from ..agents.guidance import VERSION
 from ..agents.kernelagent import benchmark_problem, run_native
@@ -169,9 +169,9 @@ def check_single_evidence(directory, evidence, specs):
 def register(directory, name, record):
     path = directory/(name+'.json')
     if not path.exists():
-        with TemporaryDirectory(dir=directory, prefix=f'.{name}.') as temporary:
-            staged = Path(temporary)/path.name
-            with staged.open('w', encoding='utf-8') as stream:
+        fd, staged = mkstemp(dir=directory, prefix=f'.{name}.')
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as stream:
                 json.dump(record, stream, indent=2, allow_nan=False)
                 stream.flush()
                 os.fsync(stream.fileno())
@@ -179,6 +179,8 @@ def register(directory, name, record):
                 os.link(staged, path)
             except FileExistsError:
                 pass
+        finally:
+            os.unlink(staged)
     previous = read_json(path)
     if any(digest(previous.get(k))!=digest(v) for k,v in record.items() if k!='revision'):
         raise ValueError(f'{name} differs from the registered configuration')

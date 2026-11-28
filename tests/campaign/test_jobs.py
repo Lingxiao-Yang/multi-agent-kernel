@@ -54,6 +54,7 @@ def test_registration_closes_the_record_before_publishing(tmp_path, monkeypatch)
     link = os.link
 
     def publish(source, destination):
+        assert Path(source).parent == Path(destination).parent
         open_files = {path.resolve() for path in Path('/proc/self/fd').iterdir()}
         assert Path(source).resolve() not in open_files
         link(source, destination)
