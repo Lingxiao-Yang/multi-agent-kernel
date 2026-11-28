@@ -10,7 +10,7 @@ from contextlib import ExitStack, contextmanager
 from contextvars import ContextVar
 from unittest.mock import patch
 
-from ..budget import interruption
+from ..budget import LedgerError, interruption
 from ..judge.evaluate import run_worker
 from ..judge.select import screen_candidate, select_final
 from ..records import ROOT, digest, environment, event, write_json
@@ -48,8 +48,12 @@ def native_adapters(provider, seed, output):
         def get_response(self, model_name, messages, **kwargs):
             if model_name != provider.model:
                 raise ValueError('unexpected model selection')
-            reply = provider.send_messages(messages,stage.get(),seed+provider.ledger.summary()['calls']+1,
-                                           max_tokens=kwargs.get('max_tokens'))
+            try:
+                calls = provider.ledger.summary()['calls']
+            except LedgerError as exc:
+                provider.failure = exc
+                raise
+            reply = provider.send_messages(messages,stage.get(),seed+calls+1,max_tokens=kwargs.get('max_tokens'))
             return LLMResponse(content=reply.text,model=reply.model,provider=self.name,usage=reply.metadata['usage'])
 
     def tagged(fn, label):
@@ -98,8 +102,8 @@ def native_adapters(provider, seed, output):
         yield
 
 
-def native_outcome(output, usage, native, final):
-    reason = interruption(output)
+def native_outcome(output, usage, native, final, failure=None):
+    reason = interruption(output) or (str(failure) if failure is not None else None)
     if reason:
         return 'interrupted', reason
     expected = set(range(1, usage['attempts']+1))
@@ -173,6 +177,6 @@ def run_native(case, seed, protocol, provider, output, preflight, rounds):
                    final=final,selection=selection,upstream_selected=upstream_selected,history=history,budget=usage,upstream_rounds=native.get('total_rounds'),rounds=curve,
                    upstream_success=native.get('success',False),wall_seconds=time.perf_counter()-started,
                    estimated_inference_usd=usage['completed_usd'],budget_committed_usd=usage['committed_usd'])
-    summary['status'], summary['stop_reason'] = native_outcome(output, usage, native, final)
+    summary['status'], summary['stop_reason'] = native_outcome(output, usage, native, final, provider.failure)
     write_json(output/'summary.json',summary)
     return summary

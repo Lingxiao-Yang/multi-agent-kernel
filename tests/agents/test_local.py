@@ -1,12 +1,15 @@
 import copy
+import errno
 import json
+import sqlite3
 from pathlib import Path
 
 import pytest
 
 from kernel_study.agents import local
+from kernel_study.budget import Ledger
 from kernel_study.judge import select
-from kernel_study.providers import Reply
+from kernel_study.providers import ChatProvider, MeteredChat, Reply
 from kernel_study.records import ROOT, code_hashes, read_json
 
 
@@ -142,6 +145,49 @@ def test_api_failure_is_not_completed_scientific_search(tmp_path, monkeypatch, p
     assert not result['scientific_evidence']
     assert result['budget']['calls']==1 and result['budget']['tokens']==0
     assert result['estimated_inference_usd']==0
+
+
+@pytest.mark.parametrize('failure', ['sqlite', 'settlement', 'proposal_file'])
+def test_storage_or_accounting_failure_interrupts_search(tmp_path, monkeypatch, public_case, mock_environment, protocol, failure):
+    out = tmp_path/'run'
+    ledger = Ledger(tmp_path, out.name, 2, 8, 2., 8., 1.)
+    provider = MeteredChat(ledger,out,model='test-model',endpoint='http://localhost:1')
+    stages = []
+
+    def send(self, messages, stage, *args):
+        stages.append(stage)
+        return SourceProvider().complete(None, None, stage, None)
+
+    if failure == 'sqlite':
+        execute = sqlite3.connect
+
+        def fail_connect(*args, **kwargs):
+            if not stages:
+                raise sqlite3.OperationalError('disk I/O error')
+            return execute(*args, **kwargs)
+
+        monkeypatch.setattr(sqlite3, 'connect', fail_connect)
+        calls, reason = [], 'disk I/O error'
+    elif failure == 'settlement':
+        settle = ledger.settle
+        monkeypatch.setattr(ledger, 'settle', lambda number,i,o: settle(number+1,i,o))
+        calls, reason = ['analyze'], 'unreserved or already settled request'
+    else:
+        write_json = local.write_json
+
+        def fail_proposal(path, value):
+            if path.name == 'proposal_001.json':
+                raise OSError(errno.EIO, 'proposal file I/O error')
+            write_json(path, value)
+
+        monkeypatch.setattr(local, 'write_json', fail_proposal)
+        calls, reason = ['analyze','advise','implement'], 'proposal file I/O error'
+    monkeypatch.setattr(ChatProvider,'send_messages',send)
+    mock_worker(monkeypatch,lambda *args: measurement())
+    result = local.search(public_case,'single',11,protocol,provider,out)
+    assert result['status']=='interrupted' and reason in result['stop_reason']
+    assert stages==calls and result['history']==[] and result['final'] is None
+    assert read_json(out/'summary.json')['stop_reason']==result['stop_reason']
 
 
 def test_incorrect_candidates_keep_baseline_and_count_calls(tmp_path, monkeypatch, public_case, mock_environment, protocol):

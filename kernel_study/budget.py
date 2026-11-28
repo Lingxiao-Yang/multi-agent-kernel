@@ -1,9 +1,17 @@
-"""Per-search limits and campaign-wide inference accounting."""
+"""Per-search limits and inference accounting."""
 import json
 import sqlite3
 from contextlib import closing, contextmanager
 from dataclasses import asdict, dataclass
 from pathlib import Path
+
+
+class BudgetExceeded(RuntimeError):
+    pass
+
+
+class LedgerError(RuntimeError):
+    pass
 
 
 @dataclass
@@ -31,13 +39,13 @@ class Budget:
 
     def reserve_attempt(self):
         if self.stop_reason():
-            raise RuntimeError(self.stop_reason())
+            raise BudgetExceeded(self.stop_reason())
         self.attempts += 1
 
     def reserve_call(self):
         # Candidate count is already reserved before its model calls.
         if self.calls >= self.call_cap or self.tokens >= self.token_safety_cap:
-            raise RuntimeError("model_budget_exhausted")
+            raise BudgetExceeded("model_budget_exhausted")
         self.calls += 1
 
     def charge_tokens(self, input_tokens, output_tokens):
@@ -56,16 +64,21 @@ class Ledger:
         self.job = job
         self.candidate_cap, self.call_cap = candidate_cap, call_cap
         self.input_price, self.output_price, self.allowance = input_price, output_price, allowance
-        with self.transaction() as db:
-            db.execute('''CREATE TABLE IF NOT EXISTS calls (
-                id INTEGER PRIMARY KEY, job TEXT, stage TEXT, attempt INTEGER,
-                committed REAL, completed REAL, input_tokens INTEGER, output_tokens INTEGER)''')
+        self.initialized = False
 
     @contextmanager
     def transaction(self):
-        with closing(sqlite3.connect(self.path,timeout=30)) as db, db:
-            db.execute('BEGIN IMMEDIATE')
-            yield db
+        try:
+            with closing(sqlite3.connect(self.path,timeout=30)) as db, db:
+                db.execute('BEGIN IMMEDIATE')
+                if not self.initialized:
+                    db.execute('''CREATE TABLE IF NOT EXISTS calls (
+                        id INTEGER PRIMARY KEY, job TEXT, stage TEXT, attempt INTEGER,
+                        committed REAL, completed REAL, input_tokens INTEGER, output_tokens INTEGER)''')
+                yield db
+            self.initialized = True
+        except sqlite3.Error as exc:
+            raise LedgerError(str(exc)) from exc
 
     def cost(self, inputs, outputs):
         return (inputs*self.input_price + outputs*self.output_price)/1e6
@@ -81,7 +94,7 @@ class Ledger:
             committed, = db.execute('SELECT COALESCE(SUM(committed),0) FROM calls').fetchone()
             reserve = self.cost(inputs,outputs)
             if committed+reserve > self.allowance:
-                raise RuntimeError('dollar_cap_reservation')
+                raise BudgetExceeded('dollar_cap_reservation')
             return db.execute('INSERT INTO calls(job,stage,attempt,committed) VALUES(?,?,?,?)',
                               (self.job,stage,int(proposal),reserve)).lastrowid
 
@@ -92,7 +105,7 @@ class Ledger:
                                     WHERE id=? AND job=? AND completed IS NULL''',
                                  (inputs,outputs,cost,cost,number,self.job))
             if changed.rowcount != 1:
-                raise ValueError('unreserved or already settled request')
+                raise LedgerError('unreserved or already settled request')
 
     def summary(self):
         with self.transaction() as db:

@@ -133,7 +133,11 @@ def run_worker(request, directory, label):
         proc = subprocess.run([sys.executable, '-m', 'kernel_study.judge.evaluate', str(req), str(out)],
                    cwd=ROOT, env=env, capture_output=True, text=True, timeout=request['protocol']['worker_timeout_s'])
         (directory / (label + '.stderr.log')).write_text(proc.stderr, encoding='utf-8')
-        result = read_json(out) if out.exists() else {'status':'worker_crash','returncode':proc.returncode, 'error':proc.stderr[-4000:]}
+        if proc.returncode or not out.is_file():
+            raise RuntimeError(f'{label} worker exited without a result ({proc.returncode}): {proc.stderr[-4000:]}')
+        result = read_json(out)
+        if result['status']=='storage_error':
+            raise OSError(result['error'])
     except subprocess.TimeoutExpired:
         result = {'status':'timeout', 'error':'worker exceeded wall-time limit'}
     result['process_seconds'] = time.perf_counter() - begin
@@ -163,6 +167,8 @@ def main():
             result['profile']['mode'] = 'compiler-resources-and-ncu'
     except StaticRejection as exc:
         result = dict(status='static_rejected',error=str(exc),worker_seconds=time.perf_counter()-start)
+    except OSError as exc:
+        result = dict(status='storage_error',error=str(exc),worker_seconds=time.perf_counter()-start)
     except Exception as exc:
         status = 'incorrect' if isinstance(exc, AssertionError) else 'error'
         if type(exc).__module__.startswith(('triton.compiler','triton.runtime.errors')):

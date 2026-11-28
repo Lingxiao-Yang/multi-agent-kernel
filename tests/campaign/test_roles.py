@@ -1,10 +1,12 @@
 from argparse import ArgumentParser, Namespace
+import sqlite3
 
 import pytest
 
+from kernel_study.budget import Ledger
 from kernel_study.campaign import jobs as campaign
 from kernel_study.cli import main
-from kernel_study.records import digest,read_json,write_json
+from kernel_study.records import digest,event,read_json,write_json
 
 
 def registration(root, knowledge=False):
@@ -53,7 +55,7 @@ def test_role_runs_share_measured_counters_and_compare_the_actual_two_finalists(
     counters=tmp_path/'counters.json'
     write_json(counters,{'counter_access_verified':True})
     args=Namespace(phase='roles',job=0,preflight=base.parent,output=output,counters=counters,model='test-model',
-                   endpoint='http://localhost:1',input_price=2.,output_price=8.,retry_transport=False)
+                   endpoint='http://localhost:1',input_price=2.,output_price=8.,retry_transport=False,auto_retry_transport=True)
     monkeypatch.setenv('OPENAI_API_KEY','test-only')
     monkeypatch.setattr(campaign,'check_device',lambda plan:dict(uuid='GPU-1',node='node1',driver=plan['driver']))
     monkeypatch.setattr(campaign.kernelbench,'upstream',lambda name:tmp_path)
@@ -67,7 +69,15 @@ def test_role_runs_share_measured_counters_and_compare_the_actual_two_finalists(
         measurements.append(folder)
         return {'metrics':raw}
     def search(case,agent,seed,protocol,provider,folder):
+        assert provider.ledger.path.parent == folder
+        assert provider.ledger.allowance == (0.75 if folder.name.endswith('-retry1') else 1.)
         searches.append((agent,seed,protocol['shared_ncu_metrics']))
+        folder.mkdir()
+        provider.ledger.reserve('analyze',1000,1000)
+        if agent=='single' and not folder.name.endswith('-retry1'):
+            result = dict(status='interrupted',stop_reason='transport',budget_committed_usd=.25)
+            write_json(folder/'summary.json',result)
+            return result
         write_json(folder/'audit.json',{})
         return {'status':'complete'}
     def pair(folder,a,b):
@@ -83,12 +93,41 @@ def test_role_runs_share_measured_counters_and_compare_the_actual_two_finalists(
     for i in (0,1):
         args.job=i
         campaign.run_campaign(args,ArgumentParser())
-    assert len(measurements)==1 and searches==[('single',44,raw),('multi',44,raw)]
-    assert pairs==[('roles-4-single-44','roles-4-multi-44')]
+    assert len(measurements)==1 and searches==[('single',44,raw),('single',44,raw),('multi',44,raw)]
+    assert pairs==[('roles-4-single-44-retry1','roles-4-multi-44')]
+    assert not (output/'usage.sqlite3').exists()
+    prior = output/'roles-4-single-44'
+    assert read_json(prior/'summary.json')['stop_reason']=='transport' and not args.retry_transport
+    assert (prior/'usage.sqlite3').is_file() and (output/(prior.name+'-retry1')/'usage.sqlite3').is_file()
     spec=read_json(output/'role-study.json')
     write_json(output/'role-study.json',dict(spec,revision='another'))
     with pytest.raises(SystemExit): campaign.run_campaign(args,ArgumentParser())
-    assert len(searches)==2
+    assert len(searches)==3
+
+
+def test_registered_role_budget_is_checked_before_submission(tmp_path, monkeypatch, capsys):
+    registration(tmp_path)
+    main(['check-budget','roles',str(tmp_path)])
+    assert '8.00' in capsys.readouterr().out
+    plan = campaign.kernelbench.experiment()
+    monkeypatch.setattr(campaign.kernelbench,'experiment',lambda:dict(plan,historical_cost_usd=93))
+    with pytest.raises(SystemExit):
+        main(['check-budget','roles',str(tmp_path)])
+    assert 'exceeds' in capsys.readouterr().err
+
+
+def record_role_trace(path):
+    ledger = Ledger(path,path.name,4,16,2.,8.,1.)
+    history = []
+    for attempt in range(1,5):
+        for stage in ('analyze','advise','implement','review'):
+            number = ledger.reserve(stage,3000,1000)
+            event(path/'model_events.jsonl','request',id=number,stage=stage)
+            ledger.settle(number,3000,187)
+            event(path/'model_events.jsonl','response',id=number,stage=stage,
+                  metadata=dict(usage=dict(prompt_tokens=3000,completion_tokens=187)))
+        history.append(dict(attempt=attempt,result={'status':'ok'}))
+    write_json(path/'summary.json',dict(status='complete',history=history))
 
 
 def test_role_report_counts_searches_with_confirmed_gains_and_uses_direct_measurements(tmp_path):
@@ -104,6 +143,7 @@ def test_role_report_counts_searches_with_confirmed_gains_and_uses_direct_measur
                            budget={'attempts':1},candidates=[dict(attempt=1,usd=.12,status='ok',latency_ms=8.,selected=gained or lost_at_endpoint,
                                                                endpoint_status='unconfirmed' if lost_at_endpoint else None)]))
                 write_json(path/'matched-evidence.json',dict(identical=True))
+                record_role_trace(path)
             pair=tmp_path/'pairs'/f'roles-{case}-{seed}'/'single-vs-multi'
             write_json(pair/'direct.result.json',dict(status='ok',candidate={'median_ms':4. if case==4 else 1.},incumbent={'median_ms':1.}))
     main(['report','roles',str(tmp_path)])
@@ -120,3 +160,33 @@ def test_role_report_counts_searches_with_confirmed_gains_and_uses_direct_measur
     main(['report','roles',str(tmp_path)])
     r=read_json(tmp_path/'roles-report.json')
     assert not r['complete'] and r['comparisons']['single-vs-multi']['ratio'] is None
+
+
+@pytest.mark.parametrize('failure', ['reply', 'settlement', 'proposal_error'])
+def test_role_report_excludes_search_with_incomplete_accounting(tmp_path, failure):
+    registration(tmp_path)
+    for agent in ('single','multi'):
+        path = tmp_path/f'roles-4-{agent}-44'
+        write_json(path/'audit.json',dict(agent=agent,case=4,seed=44,status='complete',fallback=True,
+                   initial_ms=10.,latency_ms=10.,cost_usd=.12,committed_usd=.12,budget={'attempts':4},candidates=[]))
+        write_json(path/'matched-evidence.json',dict(identical=True))
+        record_role_trace(path)
+    if failure == 'reply':
+        log = path/'model_events.jsonl'
+        log.write_text('\n'.join(log.read_text().splitlines()[:-1])+'\n')
+    elif failure == 'settlement':
+        with sqlite3.connect(path/'usage.sqlite3') as db:
+            db.execute('UPDATE calls SET completed=NULL WHERE id=16')
+    else:
+        summary = read_json(path/'summary.json')
+        summary['history'][0]['result'] = dict(status='proposal_error',error='disk I/O error')
+        write_json(path/'summary.json',summary)
+    pair = tmp_path/'pairs/roles-4-44/single-vs-multi'
+    write_json(pair/'direct.result.json',dict(status='ok',candidate={'median_ms':10.},incumbent={'median_ms':10.}))
+    main(['report','roles',str(tmp_path)])
+    report = read_json(tmp_path/'roles-report.json')
+    assert report['tasks']['4']['single']['completed']==1 and report['tasks']['4']['multi']['completed']==0
+    assert not report['comparisons']['single-vs-multi']['direct_pairs']
+    assert not report['comparisons']['single-vs-multi']['matched_budget_ms']
+    attempt = next(a for a in report['attempts'] if a['directory']==path.name)
+    assert attempt['status']=='invalid' and attempt['reason'] and attempt['completed_usd']==.12

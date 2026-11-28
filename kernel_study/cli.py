@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 from .campaign.preflight import run_preflight
-from .campaign.jobs import run_campaign
+from .campaign.jobs import check_budget, run_campaign
 from .campaign.report import run_report
 
 
@@ -20,17 +20,25 @@ def main(argv=None):
 
     run = commands.add_parser('run', help='run one registered search')
     report_phases = ['matched-smoke','matvec-development','matvec-recheck','row-qualification','development','holdout','roles']
-    run.add_argument('phase',choices=['smoke','multi-smoke','calibration',*report_phases])
+    run_phases = ['smoke','multi-smoke','calibration',*report_phases]
+    run.add_argument('phase',choices=run_phases)
     run.add_argument('--preflight',type=Path,required=True)
     run.add_argument('--output',type=Path,required=True)
     run.add_argument('--counters',type=Path,required=True)
-    run.add_argument('--retry-transport',action='store_true',help='Run one new search after a recorded transport interruption')
+    retry = run.add_mutually_exclusive_group()
+    retry.add_argument('--retry-transport',action='store_true',help='Run one new search after a recorded transport interruption')
+    retry.add_argument('--auto-retry-transport',action='store_true',help='Retry a transport interruption once in this allocation')
     run.add_argument('--job',type=int,required=True,help='Zero-based index in the phase')
     run.add_argument('--model',default=os.environ.get('KERNEL_BASELINE_MODEL'))
     run.add_argument('--endpoint',default=os.environ.get('OPENAI_BASE_URL','https://api.openai.com/v1'))
     run.add_argument('--input-price',type=float,default=os.environ.get('KERNEL_BASELINE_INPUT_PRICE'))
     run.add_argument('--output-price',type=float,default=os.environ.get('KERNEL_BASELINE_OUTPUT_PRICE'))
     run.set_defaults(handler=run_campaign, parser=run)
+
+    budget = commands.add_parser('check-budget', help='check the phase dollar limit before submission')
+    budget.add_argument('phase',choices=run_phases)
+    budget.add_argument('output',type=Path)
+    budget.set_defaults(handler=check_budget, parser=budget)
 
     report = commands.add_parser('report', help='summarize directly paired finalists')
     report.add_argument('phase',choices=report_phases)
