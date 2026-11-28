@@ -6,7 +6,8 @@ import random
 import subprocess
 import sys
 from decimal import Decimal
-from tempfile import NamedTemporaryFile
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from ..agents.guidance import VERSION
 from ..agents.kernelagent import benchmark_problem, run_native
@@ -134,7 +135,6 @@ def measure_finalists(root, phase, case, seed, plan):
 
 
 def shared_start_metrics(directory, source):
-    from pathlib import Path
     sample = read_json(directory/'greedy/round001_ncu_metrics.json')
     if Path(sample['metadata']['kernel_file']).read_text() != source:
         raise ValueError('upstream NCU sample belongs to a different source')
@@ -169,11 +169,14 @@ def check_single_evidence(directory, evidence, specs):
 def register(directory, name, record):
     path = directory/(name+'.json')
     if not path.exists():
-        with NamedTemporaryFile(mode='w', encoding='utf-8', dir=directory, prefix=f'.{name}.') as temporary:
-            json.dump(record, temporary, indent=2, allow_nan=False)
-            temporary.flush()
+        with TemporaryDirectory(dir=directory, prefix=f'.{name}.') as temporary:
+            staged = Path(temporary)/path.name
+            with staged.open('w', encoding='utf-8') as stream:
+                json.dump(record, stream, indent=2, allow_nan=False)
+                stream.flush()
+                os.fsync(stream.fileno())
             try:
-                os.link(temporary.name, path)
+                os.link(staged, path)
             except FileExistsError:
                 pass
     previous = read_json(path)
