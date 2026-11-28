@@ -6,7 +6,7 @@ from ..judge.select import measure_pair
 from ..records import code_hashes, digest, read_json, write_json
 from ..tasks.kernelbench import experiment
 from .factorial import geometric_mean
-from .jobs import campaign_plan, job_name, latest_attempt, measure_finalists
+from .jobs import campaign_plan, job_name, latest_attempt, measure_finalists, phase_budget
 from .launch_sweep import matvec_label
 from .preflight import check_device
 from . import roles
@@ -132,7 +132,7 @@ def greedy_trajectory(directory, summary):
     return dict(upstream_initial_timeouts=verifier_timeouts(upstream/'initial_verify/worker_-1.log'),rounds=rounds)
 
 
-def phase_rows(root, phase, cases, seeds, agents=('single','greedy')):
+def phase_rows(root, phase, cases, seeds, agents=('single','greedy'), check_complete=None):
     rows, attempts, measurements = [], [], {}
     for case in cases:
         for seed in seeds:
@@ -149,6 +149,10 @@ def phase_rows(root, phase, cases, seeds, agents=('single','greedy')):
                     if not path.exists():
                         continue
                     row = read_json(path)
+                    if check_complete and row['status']=='complete':
+                        reason = check_complete(directory)
+                        if reason:
+                            row.update(status='invalid',stop_reason=reason)
                     records.append(row)
                     attempts.append(dict(directory=directory.name, status=row['status'], reason=row.get('stop_reason'),
                                          completed_usd=row['cost_usd'], committed_usd=row.get('committed_usd',0.),
@@ -263,11 +267,12 @@ def matched_budgets(rows, cases, seeds):
     return budgets
 
 
-def report_roles(root, spec, references):
+def report_roles(root, spec, references, rounds):
     cases,seeds = spec['cases'],spec['seeds']
     contrasts = roles.comparisons(spec)
     agents = list(dict.fromkeys(agent for contrast in contrasts for agent in contrast))
-    rows,attempts,_ = phase_rows(root,'roles',cases,seeds,agents)
+    rows,attempts,_ = phase_rows(root,'roles',cases,seeds,agents,
+                                check_complete=lambda directory: roles.integrity_problem(directory,rounds))
     completed = {}
     for row in rows:
         evidence = root/row['run']/'matched-evidence.json'
@@ -300,7 +305,7 @@ def report_roles(root, spec, references):
                 means[str(case)] = geometric_mean(ratios)
         ratio = geometric_mean(list(means.values())) if len(means)==len(cases) else None
         effects[name] = dict(ratio=ratio,case_ratios=means,direct_pairs=direct,
-                             matched_budget_ms=matched_budgets([r for r in rows if r['agent'] in (left,right)],cases,seeds))
+                             matched_budget_ms=matched_budgets([r for r in completed.values() if r['agent'] in (left,right)],cases,seeds))
     complete = all(e['ratio'] is not None for e in effects.values())
     write_json(root/'roles-report.json',dict(complete=complete,registration=spec,tasks=tasks,
                                             comparisons=effects,searches=rows,attempts=attempts))
@@ -341,13 +346,13 @@ def run_report(args, parser):
                 if assigned.exists() and read_json(assigned)['uuid'] != device['uuid']:
                     continue
                 if args.phase=='roles':
-                    if assigned.is_file():
+                    if assigned.is_file() and read_json(assigned)['node']==device['node']:
                         measure_finalists(args.output,args.phase,case,seed,plan)
                 else:
                     sides = [latest_attempt(args.output,job_name(args.phase,case,agent,seed)) for agent in ('single','greedy')]
                     measure_pair(pair,*sides)
     if args.phase=='roles':
-        return report_roles(args.output,plan['role_study'],plan['launch_reference_ms'])
+        return report_roles(args.output,plan['role_study'],plan['launch_reference_ms'],phase_budget(plan,'roles')['rounds'])
     rows,attempts,measurements = phase_rows(args.output,args.phase,cases,seeds)
     report = compare(rows,cases,seeds,measurements)
     if args.phase == 'row-qualification':

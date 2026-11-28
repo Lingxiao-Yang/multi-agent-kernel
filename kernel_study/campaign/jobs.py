@@ -1,11 +1,13 @@
 """Register and run the public comparison one search at a time."""
-import fcntl
 import json
 import math
 import os
 import random
 import subprocess
 import sys
+from decimal import Decimal
+from pathlib import Path
+from tempfile import mkstemp
 
 from ..agents.guidance import VERSION
 from ..agents.kernelagent import benchmark_problem, run_native
@@ -63,6 +65,30 @@ def phase_budget(plan, phase):
     return plan['phases']['development' if phase in (*DEVELOPMENT_SLICES,'roles') else phase]
 
 
+def search_budget_usd(plan, phase):
+    return phase_budget(plan,phase).get('search_budget_usd',plan['search_budget_usd'])
+
+
+def check_phase_budget(plan, phase):
+    count = len(jobs(plan,phase))
+    per_search = Decimal(str(search_budget_usd(plan,phase)))
+    remaining = Decimal(str(plan['total_budget_usd'])) - Decimal(str(plan['historical_cost_usd']))
+    total = per_search * count
+    if not per_search.is_finite() or per_search <= 0:
+        raise ValueError('search budget must be a positive finite dollar amount')
+    if total > remaining:
+        raise ValueError(f'{phase} budget ${total:.2f} exceeds the remaining ${remaining:.2f}')
+    return count, per_search, total, remaining
+
+
+def check_budget(args, parser):
+    try:
+        count, per_search, total, remaining = check_phase_budget(campaign_plan(args.phase,args.output),args.phase)
+    except ValueError as exc:
+        parser.error(str(exc))
+    print(f'{count} searches at ${per_search:.2f}: ${total:.2f} of ${remaining:.7f} available')
+
+
 def batch_case(plan, phase, indices):
     schedule = jobs(plan,phase)
     if len(set(indices))!=len(indices) or any(i<0 or i>=len(schedule) for i in indices):
@@ -109,7 +135,6 @@ def measure_finalists(root, phase, case, seed, plan):
 
 
 def shared_start_metrics(directory, source):
-    from pathlib import Path
     sample = read_json(directory/'greedy/round001_ncu_metrics.json')
     if Path(sample['metadata']['kernel_file']).read_text() != source:
         raise ValueError('upstream NCU sample belongs to a different source')
@@ -143,19 +168,27 @@ def check_single_evidence(directory, evidence, specs):
 
 def register(directory, name, record):
     path = directory/(name+'.json')
-    with (directory/(name+'.lock')).open('a') as lock:
-        fcntl.flock(lock, fcntl.LOCK_EX)
-        if path.exists():
-            previous = read_json(path)
-            if any(digest(previous.get(k))!=digest(v) for k,v in record.items() if k!='revision'):
-                raise ValueError(f'{name} differs from the registered configuration')
-        else:
-            write_json(path, record)
+    if not path.exists():
+        fd, staged = mkstemp(dir=directory, prefix=f'.{name}.')
+        try:
+            with os.fdopen(fd, 'w', encoding='utf-8') as stream:
+                json.dump(record, stream, indent=2, allow_nan=False)
+                stream.flush()
+                os.fsync(stream.fileno())
+            try:
+                os.link(staged, path)
+            except FileExistsError:
+                pass
+        finally:
+            os.unlink(staged)
+    previous = read_json(path)
+    if any(digest(previous.get(k))!=digest(v) for k,v in record.items() if k!='revision'):
+        raise ValueError(f'{name} differs from the registered configuration')
 
 
-def run_job(args, plan, case_id, agent, seed):
+def run_job(args, plan, case_id, agent, seed, retry=False):
     job = job_name(args.phase,case_id,agent,seed)
-    output = attempt_path(args.output,job,args.retry_transport)
+    output = attempt_path(args.output,job,retry)
     baseline = args.preflight/str(case_id)
     frozen = read_json(baseline/'preflight.json')
     stress = read_json(baseline/'stress.json')
@@ -171,14 +204,18 @@ def run_job(args, plan, case_id, agent, seed):
     case['test'] = kernelbench.test_source(case)
     phase = phase_budget(plan,args.phase)
     cap, calls, rounds = phase['candidate_cap'],phase['call_cap'],phase['rounds']
+    allowance = Decimal(str(search_budget_usd(plan,args.phase)))
+    if retry:
+        prior = read_json(args.output/job/'summary.json')
+        allowance -= Decimal(str(prior['budget_committed_usd']))
     protocol = read_json(ROOT/'configs/protocol.json')
     protocol.update(plan['timing'],candidate_cap=cap, call_cap=calls, model=args.model,
                     endpoint=args.endpoint,input_usd_per_million=args.input_price,output_usd_per_million=args.output_price,
+                    attempt_budget_usd=float(allowance),
                     worker_timeout_s=600,search_space='native',feedback_mode='timing-and-ncu',
                     full_calibration=args.phase=='calibration',shared_api_guidance=VERSION,validation_seeds=plan['validation_seeds'],
                     final_validation_seeds=plan['final_validation_seeds'])
-    ledger = Ledger(args.output,output.name,cap,calls,args.input_price,args.output_price,
-                    plan['total_budget_usd']-plan['historical_cost_usd'])
+    ledger = Ledger(output,output.name,cap,calls,args.input_price,args.output_price,float(allowance))
     provider = MeteredChat(ledger,output,model=args.model,endpoint=args.endpoint,max_output_tokens=protocol['max_output_tokens'],
                            temperature=protocol['temperature'],input_price=args.input_price,output_price=args.output_price)
     if any(digest(source)!=frozen['native_source_hash'] for source in ((baseline/'input.py').read_text(),starts.start(case))):
@@ -211,6 +248,10 @@ def run_job(args, plan, case_id, agent, seed):
 
 def run_campaign(args, parser):
     plan = campaign_plan(args.phase,args.output)
+    try:
+        check_phase_budget(plan,args.phase)
+    except ValueError as exc:
+        parser.error(str(exc))
     schedule = jobs(plan,args.phase)
     if not 0<=args.job<len(schedule): parser.error('job index outside phase')
     if not read_json(args.counters)['counter_access_verified']: parser.error('NCU counters unavailable')
@@ -253,6 +294,12 @@ def run_campaign(args, parser):
         freeze = read_json(args.output/'strategy_freeze.json')
         if freeze['code_hashes']!=code_hashes(): parser.error('code differs from development freeze')
     sys.path.insert(0,str(upstream))
-    result = run_job(args,plan,case_id,agent,seed)
+    result = run_job(args,plan,case_id,agent,seed,retry=args.retry_transport)
+    if getattr(args,'auto_retry_transport',False) and (result['status'],result.get('stop_reason'))==('interrupted','transport'):
+        print('transport interruption, retrying on the registered device', flush=True)
+        result = run_job(args,plan,case_id,agent,seed,retry=True)
     print(result['status'])
-    if result['status']!='complete': raise SystemExit(2)
+    if result['status']!='complete':
+        if reason := result.get('stop_reason'):
+            print(reason,file=sys.stderr)
+        raise SystemExit(2)

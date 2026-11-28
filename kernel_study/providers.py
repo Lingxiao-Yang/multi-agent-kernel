@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from http.client import IncompleteRead
 from pathlib import Path
 
-from .budget import interruption
+from .budget import BudgetExceeded, LedgerError, interruption
 from .records import event
 
 
@@ -105,8 +105,18 @@ class MeteredChat(ChatProvider):
     def __init__(self, ledger, directory, **kwargs):
         super().__init__(**kwargs)
         self.ledger, self.directory = ledger, Path(directory)
+        self.failure = None
 
     def send_messages(self, messages, stage, seed, json_output=False, max_tokens=None):
+        if self.failure is not None:
+            raise self.failure
+        try:
+            return self._send_messages(messages,stage,seed,json_output,max_tokens)
+        except (LedgerError, OSError) as exc:
+            self.failure = exc
+            raise
+
+    def _send_messages(self, messages, stage, seed, json_output, max_tokens):
         stopped = interruption(self.directory)
         if stopped:
             raise RuntimeError(stopped)
@@ -115,7 +125,7 @@ class MeteredChat(ChatProvider):
         log = self.directory/'model_events.jsonl'
         try:
             number = self.ledger.reserve(stage,reserved,output_cap)
-        except RuntimeError as exc:
+        except BudgetExceeded as exc:
             event(log,'budget_stop',stage=stage,reason=str(exc),budget=self.ledger.summary())
             raise
         event(log,'request',id=number,stage=stage,seed=seed,messages=messages,budget=self.ledger.summary())

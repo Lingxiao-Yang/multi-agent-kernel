@@ -34,7 +34,7 @@ python scripts/probe_counters.py "$work/counters-$SLURM_JOB_ID.json"
 source "$HOME/.openai_env"
 export OPENAI_API_KEY
 for job in "$@"; do
-    python -c 'from kernel_study.cli import main; main()' run "$phase" --job "$job" \
+    python -c 'from kernel_study.cli import main; main()' run "$phase" --job "$job" --auto-retry-transport \
         --preflight "$work/preflight" --output "$work/campaign" --counters "$work/counters-$SLURM_JOB_ID.json" \
         --model gpt-4.1-2025-04-14 --endpoint https://api.openai.com/v1 --input-price 2 --output-price 8
 done

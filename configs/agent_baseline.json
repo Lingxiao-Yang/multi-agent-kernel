@@ -29,7 +29,7 @@
     "matched-smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
     "smoke": {"case": 4, "seed": 771, "rounds": 1, "candidate_cap": 1, "call_cap": 4},
     "multi-smoke": {"case": 4, "seed": 11, "rounds": 4, "candidate_cap": 4, "call_cap": 16},
-    "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128},
+    "calibration": {"case": 4, "seed": 772, "rounds": 8, "candidate_cap": 32, "call_cap": 128, "search_budget_usd": 8},
     "development": {"rounds": 4, "candidate_cap": 4, "call_cap": 16},
     "holdout": {"rounds": 4, "candidate_cap": 4, "call_cap": 16}
   },
@@ -40,8 +40,9 @@
     "23": {"random_best_of_four": 13.657088279724121, "best_launch": 13.507583618164062},
     "40": {"random_best_of_four": 1.0147839784622192, "best_launch": 1.0045440196990967}
   },
-  "historical_cost_usd": 17.0311236,
+  "historical_cost_usd": 27.3911236,
   "total_budget_usd": 100,
+  "search_budget_usd": 1,
   "cases": {
     "4": {"public_id":4, "family":"matvec", "output_shape":[2048,1], "k":1048576, "dtype":"bfloat16", "atol":0.01, "rtol":0.01},
     "23": {"public_id":23, "family":"softmax", "output_shape":[4096,393216], "dtype":"float32", "atol":1e-11, "rtol":0.0001},

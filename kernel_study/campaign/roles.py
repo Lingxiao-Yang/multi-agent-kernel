@@ -1,5 +1,8 @@
 """Schedules and shared starting evidence for paired local-role searches."""
 import fcntl
+import json
+import sqlite3
+from contextlib import closing
 
 from ..judge.evaluate import ncu_evidence
 from ..records import digest, read_json, write_json
@@ -38,6 +41,45 @@ def schedule(spec):
                 arms = cards+arms if (i+j//2)%2 else arms+cards
             jobs.extend((case,a,seed) for a in arms)
     return jobs
+
+
+def integrity_problem(directory, rounds):
+    ledger = directory/'usage.sqlite3'
+    if not ledger.is_file():
+        return 'missing per-search ledger'
+    try:
+        summary = read_json(directory/'summary.json')
+        history = summary['history']
+        if summary['status']!='complete' or len(history)!=rounds:
+            return 'incomplete candidate history'
+        for entry in history:
+            result = entry['result']
+            if result['status'] in ('storage_error','ledger_error','worker_crash') or (
+                    result['status']=='proposal_error' and result.get('kind')!='model_output'):
+                return 'candidate history contains a search error'
+        with (directory/'model_events.jsonl').open(encoding='utf-8') as stream:
+            events = list(map(json.loads,stream))
+        if any(e['event']=='request_error' for e in events):
+            return 'model trace contains a request error'
+        requests = [(e['id'],e['stage']) for e in events if e['event']=='request']
+        replies = [e for e in events if e['event']=='response']
+        stages = ['analyze','advise','implement','review'] * rounds
+        if ([stage for _,stage in requests]!=stages or len({i for i,_ in requests})!=len(stages) or
+                [(e['id'],e['stage']) for e in replies]!=requests):
+            return 'model requests and replies do not match the registered stages'
+        expected = []
+        for reply in replies:
+            usage = reply['metadata']['usage']
+            expected.append((directory.name,reply['id'],reply['stage'],usage['prompt_tokens'],usage['completion_tokens']))
+        with closing(sqlite3.connect(ledger.resolve().as_uri()+'?mode=ro', uri=True)) as db:
+            settled = db.execute('''SELECT job,id,stage,input_tokens,output_tokens,completed,committed
+                                    FROM calls ORDER BY id''').fetchall()
+        if ([row[:5] for row in settled]!=expected or
+                any(completed is None or completed!=committed for *_,completed,committed in settled)):
+            return 'model replies and ledger settlements do not match'
+    except (OSError, sqlite3.Error, ValueError, KeyError, TypeError) as exc:
+        return f'cannot read search accounting: {exc}'
+    return None
 
 
 def starting_metrics(pair, source, problem):

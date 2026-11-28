@@ -43,6 +43,7 @@ def test_batch_keeps_credentials_within_the_search_process(tmp_path):
         assert any('--start-deadline' in line and '--case 4' in line for line in calls)
         assert sum(line.startswith('key|') for line in calls)==runs
         assert sum(' run multi-smoke --job 0 ' in line for line in calls)==runs
+        assert sum('--auto-retry-transport' in line for line in calls)==runs
         assert calls.count('|requeue 123')==requeues
 
 
@@ -72,7 +73,14 @@ def test_node_runtime_loads_the_submitted_shallow_checkout(tmp_path):
         (tools/name).chmod(0o700)
     env=dict(os.environ,BASH_ENV=os.devnull,PATH=str(tools)+':'+os.environ['PATH'],SLURM_TMPDIR=str(node),
              SLURM_JOB_ID='123',work=str(work),guard=str(work/'guard'))
-    command='set -eu; module(){ :; }; source "$1"; test "$(cat version)" = new; git rev-parse HEAD'
+    command='''set -eu
+module(){ :; }
+source "$1"
+test "$(cat version)" = new
+for path in "$TMPDIR" "$TRITON_CACHE_DIR" "$TORCHINDUCTOR_CACHE_DIR" "$CUDA_CACHE_PATH"; do
+    [[ $path == "$node_dir/"* ]]
+done
+git rev-parse HEAD'''
     proc=subprocess.run(['bash','-c',command,'bash',root/'scripts/ls6_stage_runtime.sh'],env=env,text=True,capture_output=True)
     assert proc.returncode==0,proc.stderr
     assert proc.stdout.strip()==expected

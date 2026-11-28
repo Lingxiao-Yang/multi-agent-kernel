@@ -1,5 +1,8 @@
-import pytest
+import os
 from argparse import ArgumentParser, Namespace
+from pathlib import Path
+
+import pytest
 
 from kernel_study.campaign import jobs as campaign
 from kernel_study.campaign.jobs import attempt_path, jobs, register
@@ -44,6 +47,21 @@ def test_reporting_only_revision_preserves_the_registered_search(tmp_path):
     assert read_json(tmp_path/'development-protocol.json')==registered
     with pytest.raises(ValueError):
         register(tmp_path,'development-protocol',dict(registered,revision='worker-changed',code_hashes={'worker.py':'def'}))
+    assert list(tmp_path.iterdir()) == [tmp_path/'development-protocol.json']
+
+
+def test_registration_closes_the_record_before_publishing(tmp_path, monkeypatch):
+    link = os.link
+
+    def publish(source, destination):
+        assert Path(source).parent == Path(destination).parent
+        open_files = {path.resolve() for path in Path('/proc/self/fd').iterdir()}
+        assert Path(source).resolve() not in open_files
+        link(source, destination)
+
+    monkeypatch.setattr(campaign.os, 'link', publish)
+    register(tmp_path, 'experiment', {'model': 'pinned'})
+    assert read_json(tmp_path/'experiment.json') == {'model': 'pinned'}
 
 
 def test_campaign_selects_only_registered_jobs_and_separate_calibration():
@@ -104,7 +122,7 @@ def test_native_smoke_and_reference_search_are_independent(tmp_path,monkeypatch)
     assert calls == [('single',1.01,1,4),('greedy',1.01,32,128),('multi',1.01,4,16)]
     assert not pairs
     assert plan['total_budget_usd'] == 100
-    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(82.9688764)
+    assert plan['total_budget_usd'] - plan['historical_cost_usd'] == pytest.approx(72.6088764)
 
 
 def test_matvec_development_pairs_use_development_seeds_and_caps():
